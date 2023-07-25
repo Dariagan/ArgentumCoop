@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://bnnpdke2jnp3m"]
+
+[ext_resource type="Texture2D" uid="uid://dfw0k5nv07jm" path="res://assets/textures/terrain/grass.png" id="1_bikp8"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hglak"]
+resource_name = "grass_set"
+texture = ExtResource("1_bikp8")
+0:0/size_in_atlas = Vector2i(8, 8)
+0:0/0 = 0
+8:0/size_in_atlas = Vector2i(8, 8)
+8:0/0 = 0
+16:0/size_in_atlas = Vector2i(8, 8)
+16:0/0 = 0
+24:0/size_in_atlas = Vector2i(8, 8)
+24:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_fetod"]
+sources/0 = SubResource("TileSetAtlasSource_hglak")
+
+[node name="main" type="Node2D"]
+
+[node name="world" type="Node2D" parent="."]
+
+[node name="TileMap" type="TileMap" parent="world"]
+texture_filter = 1
+tile_set = SubResource("TileSet_fetod")
+cell_quadrant_size = 12
+format = 2
