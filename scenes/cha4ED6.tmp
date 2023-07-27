@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://dc8bdyscrt7p8"]
+[gd_scene load_steps=6 format=3 uid="uid://dc8bdyscrt7p8"]
 
 [ext_resource type="Script" path="res://scripts/character_controller.gd" id="1_6kpxu"]
 [ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/body/tipo2.tres" id="2_ykerk"]
 [ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/body/human_male_frames.tres" id="3_mppgl"]
-[ext_resource type="Script" path="res://scripts/health_component.gd" id="4_l0abp"]
-[ext_resource type="Script" path="res://scenes/HitboxComponent.gd" id="5_sxmhn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rs5qs"]
+size = Vector2(18, 38)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0lsyp"]
 properties/0/path = NodePath(".:position")
@@ -16,9 +17,6 @@ properties/1/spawn = false
 properties/1/sync = true
 properties/1/watch = false
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_rs5qs"]
-size = Vector2(18, 38)
-
 [node name="Character" type="CharacterBody2D" node_paths=PackedStringArray("_body_sprite", "_head_sprite", "_helmet_sprite", "_weapon_sprite", "_shield_sprite")]
 script = ExtResource("1_6kpxu")
 _body_sprite = NodePath("Body/Body")
@@ -29,6 +27,10 @@ _shield_sprite = NodePath("Body/Shield")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.4, 1.4)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_rs5qs")
 
 [node name="Body" type="Node2D" parent="."]
 
@@ -55,13 +57,3 @@ speed_scale = 2.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_0lsyp")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 2)
-shape = SubResource("RectangleShape2D_rs5qs")
-
-[node name="HealthComponent" type="Node2D" parent="."]
-script = ExtResource("4_l0abp")
-
-[node name="HitboxComponent" type="Node2D" parent="."]
-script = ExtResource("5_sxmhn")

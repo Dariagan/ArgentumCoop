@@ -1,29 +1,30 @@
 [gd_scene load_steps=3 format=3 uid="uid://dfo7r6mykn0qa"]
 
-[ext_resource type="Script" path="res://Multiplayer_Test.gd" id="1_yeo47"]
+[ext_resource type="Script" path="res://main.gd" id="1_cd774"]
 [ext_resource type="PackedScene" uid="uid://dc8bdyscrt7p8" path="res://scenes/character_controller.tscn" id="2_oaccn"]
 
 [node name="Multiplayer_Test" type="Node2D"]
-script = ExtResource("1_yeo47")
+script = ExtResource("1_cd774")
 player_scene = ExtResource("2_oaccn")
 
-[node name="host" type="Button" parent="."]
-offset_right = 8.0
-offset_bottom = 8.0
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://scenes/character_controller.tscn")
+spawn_path = NodePath("..")
+spawn_limit = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="host" type="Button" parent="CanvasLayer"]
+offset_right = 44.0
+offset_bottom = 31.0
 text = "Host"
 
-[node name="join" type="Button" parent="."]
+[node name="join" type="Button" parent="CanvasLayer"]
 offset_left = 4.0
 offset_top = 65.0
 offset_right = 42.0
 offset_bottom = 96.0
 text = "Join"
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://scenes/character_controller.tscn")
-spawn_path = NodePath("..")
-
-[node name="Node2D" type="Node2D" parent="."]
-
-[connection signal="pressed" from="host" to="." method="_on_host_pressed"]
-[connection signal="pressed" from="join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="CanvasLayer/host" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="CanvasLayer/join" to="." method="_on_join_pressed"]

@@ -7,12 +7,12 @@
 [sub_resource type="Resource" id="Resource_miwqk"]
 script = ExtResource("3_5qymb")
 item = ExtResource("2_opxxo")
-quantity = 3
+quantity = 1
 
 [sub_resource type="Resource" id="Resource_vifup"]
 script = ExtResource("3_5qymb")
 item = ExtResource("2_opxxo")
-quantity = 4
+quantity = 1
 
 [sub_resource type="Resource" id="Resource_1qjuo"]
 script = ExtResource("3_5qymb")
@@ -22,7 +22,7 @@ quantity = 1
 [sub_resource type="Resource" id="Resource_i8pm6"]
 script = ExtResource("3_5qymb")
 item = ExtResource("2_opxxo")
-quantity = 3
+quantity = 1
 
 [sub_resource type="Resource" id="Resource_byi0u"]
 script = ExtResource("3_5qymb")

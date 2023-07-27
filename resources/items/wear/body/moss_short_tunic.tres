@@ -11,4 +11,4 @@ id = ""
 name = ""
 description = ""
 texture = ExtResource("3_j0mdv")
-max_stack_size = 1
+max_stack_size = 0

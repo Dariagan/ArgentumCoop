@@ -1,5 +1,5 @@
 extends RefCounted
-class_name Character
+class_name CharacterData
 
 var health: int
 var max_speed: int

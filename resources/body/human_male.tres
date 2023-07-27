@@ -5,8 +5,7 @@
 
 [resource]
 script = ExtResource("1_g083j")
-head_offset_x = 0
+head_offset_x = 0.0
 head_offset_y = -38
 animation = ExtResource("1_6t3r3")
-tall = true
 sex = 1
