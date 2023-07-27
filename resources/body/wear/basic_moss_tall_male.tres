@@ -1,6 +1,0 @@
-[gd_resource type="Resource" script_class="BodyWearData" load_steps=2 format=3 uid="uid://bl6n0sf6p5dsu"]
-
-[sub_resource type="GDScript" id="GDScript_lsf1r"]
-
-[resource]
-script = SubResource("GDScript_lsf1r")

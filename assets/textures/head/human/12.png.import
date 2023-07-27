@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://drtktj8wavbse"
-path="res://.godot/imported/basic_moss_tall_male.png-9cdb0c22fbc57e3d97cde249faa483ae.ctex"
+uid="uid://s6pdm4ldf66o"
+path="res://.godot/imported/12.png-775684d811f308595d0345473480ae84.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/body/wear/basic_moss_tall_male.png"
-dest_files=["res://.godot/imported/basic_moss_tall_male.png-9cdb0c22fbc57e3d97cde249faa483ae.ctex"]
+source_file="res://assets/textures/head/human/12.png"
+dest_files=["res://.godot/imported/12.png-775684d811f308595d0345473480ae84.ctex"]
 
 [params]
 

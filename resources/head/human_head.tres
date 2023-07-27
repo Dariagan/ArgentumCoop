@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="HeadSpriteData" load_steps=3 format=3 uid="uid://bmxqmgv3yhofq"]
+
+[ext_resource type="SpriteFrames" uid="uid://bttp6r3k8vp16" path="res://resources/body/new_sprite_frames.tres" id="1_pn2rj"]
+[ext_resource type="Script" path="res://scripts/resources/head/head_sprite_data.gd" id="2_w6muk"]
+
+[resource]
+script = ExtResource("2_w6muk")
+animation = ExtResource("1_pn2rj")
+sex = 1
+races = Array[Resource("res://scripts/resources/body/race.gd")]([])

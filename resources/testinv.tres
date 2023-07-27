@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="InventoryData" load_steps=9 format=3 uid="uid://d2hwy8yajbica"]
+
+[ext_resource type="Script" path="res://scripts/inventory/inventory_data.gd" id="1_kxf1l"]
+[ext_resource type="Resource" uid="uid://desohv4u7fmj4" path="res://resources/items/wear/body/moss_short_tunic.tres" id="2_opxxo"]
+[ext_resource type="Script" path="res://scripts/inventory/slot_data.gd" id="3_5qymb"]
+
+[sub_resource type="Resource" id="Resource_miwqk"]
+script = ExtResource("3_5qymb")
+item = ExtResource("2_opxxo")
+quantity = 3
+
+[sub_resource type="Resource" id="Resource_vifup"]
+script = ExtResource("3_5qymb")
+item = ExtResource("2_opxxo")
+quantity = 4
+
+[sub_resource type="Resource" id="Resource_1qjuo"]
+script = ExtResource("3_5qymb")
+item = ExtResource("2_opxxo")
+quantity = 1
+
+[sub_resource type="Resource" id="Resource_i8pm6"]
+script = ExtResource("3_5qymb")
+item = ExtResource("2_opxxo")
+quantity = 3
+
+[sub_resource type="Resource" id="Resource_byi0u"]
+script = ExtResource("3_5qymb")
+item = ExtResource("2_opxxo")
+quantity = 1
+
+[resource]
+script = ExtResource("1_kxf1l")
+slot_datas = Array[ExtResource("3_5qymb")]([SubResource("Resource_miwqk"), SubResource("Resource_vifup"), SubResource("Resource_1qjuo"), SubResource("Resource_i8pm6"), SubResource("Resource_byi0u"), null])
