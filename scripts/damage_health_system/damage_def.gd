@@ -4,6 +4,14 @@ class_name DamageDef
 enum Mobility { NONE, MOBILIZES, CONFUSES, IMMOBILIZES, PARALYZES }
 enum Invisibility { NONE, REMOVES, GIVES }
 
+@export_category("Damage Proportions")
+# mejor hacer parte de la weapon?
+@export_range(0, 1) var blunt_damage: float
+@export_range(0, 1) var sharp_damage: float
+@export_range(0, 1) var magic_damage: float
+@export_range(0, 1) var fire_damage: float
+
+#hacer q soo se exporte un array con todas las reductions opcionales?
 @export_category("Armor Reduction")
 
 @export_range(0, 2) var blunt_armor_reduction_ratio: float
@@ -37,7 +45,7 @@ enum Invisibility { NONE, REMOVES, GIVES }
 @export_category("Lasting damage")
 
 #debería ser small
-@export var venom: float # se podria hacer una clase poison, y q cada uno requiera un trtamiento especial
+@export var venom: float # se podria hacer cada ailment un recurso
 
 @export_range(0, 1) var venom_chance: float
 
@@ -46,8 +54,5 @@ enum Invisibility { NONE, REMOVES, GIVES }
 
 @export_range(0, 1) var wound_infection_chance_increase: float
 
-@export_range(0, 0.3) var incineration_ratio_on_penetration: float
-#hacer q la armor reduction dure??
 
-@export_range(0, 0.3) var bleeding_ratio_on_penetration: float
 
