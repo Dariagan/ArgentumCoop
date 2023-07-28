@@ -11,6 +11,8 @@ enum Invisibility { NONE, REMOVES, GIVES }
 @export_range(0, 1) var magic_damage: float
 @export_range(0, 1) var fire_damage: float
 
+
+
 #hacer q soo se exporte un array con todas las reductions opcionales?
 @export_category("Armor Reduction")
 

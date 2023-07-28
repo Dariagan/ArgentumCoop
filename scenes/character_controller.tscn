@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/character_controller.gd" id="1_6kpxu"]
 [ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/body/tipo2.tres" id="2_ykerk"]
 [ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/body/human_male_frames.tres" id="3_mppgl"]
-[ext_resource type="Script" path="res://scripts/health_component.gd" id="4_l0abp"]
+[ext_resource type="Script" path="res://scripts/damage_health_system/health_component.gd" id="4_r8x07"]
 [ext_resource type="Script" path="res://scenes/HitboxComponent.gd" id="5_sxmhn"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0lsyp"]
@@ -61,7 +61,7 @@ position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_rs5qs")
 
 [node name="HealthComponent" type="Node2D" parent="."]
-script = ExtResource("4_l0abp")
+script = ExtResource("4_r8x07")
 
 [node name="HitboxComponent" type="Node2D" parent="."]
 script = ExtResource("5_sxmhn")

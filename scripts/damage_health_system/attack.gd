@@ -6,6 +6,6 @@ var damage: float
 
 var damage_def: DamageDef
 
-func _init(attacker: Node2D = null, damage_def: DamageDef = null):
-	
+func _init(attacker: Node2D, damage: float, damage_def: DamageDef):
+	pass
 
