@@ -1,6 +1,6 @@
 [gd_scene load_steps=25 format=3 uid="uid://b74gy5ftp0hpu"]
 
-[ext_resource type="Script" path="res://overworld.gd" id="1_eyxno"]
+[ext_resource type="Script" path="res://world.gd" id="1_1b43x"]
 [ext_resource type="Texture2D" uid="uid://dfw0k5nv07jm" path="res://assets/textures/terrain/temperate_grass/grass.png" id="2_mxlh0"]
 [ext_resource type="Texture2D" uid="uid://bgw7cq5uihkel" path="res://assets/textures/terrain/floors.png" id="3_dtpmk"]
 [ext_resource type="Texture2D" uid="uid://dm0byqkrd0naw" path="res://assets/textures/terrain/temperate_grass/roads.png" id="4_jcgip"]
@@ -459,13 +459,18 @@ pattern_12 = SubResource("TileMapPattern_s1iva")
 pattern_13 = SubResource("TileMapPattern_u45ix")
 pattern_14 = SubResource("TileMapPattern_334ua")
 
-[node name="world" type="Node2D"]
-script = ExtResource("1_eyxno")
+[node name="GameWorld" type="Node2D"]
+script = ExtResource("1_1b43x")
 
-[node name="TileMap" type="TileMap" parent="."]
+[node name="OverWorldTileMap" type="TileMap" parent="."]
 texture_filter = 1
 position = Vector2(0, -1)
 tile_set = SubResource("TileSet_v7wd6")
 cell_quadrant_size = 32
 format = 2
 script = ExtResource("5_pv8iy")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://scenes/character_controller.tscn")
+spawn_path = NodePath("../OverWorldTileMap")
+spawn_limit = 1

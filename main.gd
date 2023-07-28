@@ -3,6 +3,11 @@ extends Node2D
 var peer = ENetMultiplayerPeer.new()
 @export var player_scene: PackedScene
 
+@onready var world: GameWorld = $GameWorld
+
+
+func _on_quick_start_pressed() -> void:
+	pass 
 
 func _on_host_pressed() -> void:
 	peer.create_server(135)
@@ -17,10 +22,9 @@ func _on_join_pressed() -> void:
 # 1 = host
 func _add_player(id: int = 1) -> void:
 	
-	var player = player_scene.instantiate()
+	var player: Character = player_scene.instantiate()
 	player.name = str(id)
 	
-	#el error está en esto
-	call_deferred("add_child", player)
-	
-	
+	world.spawn_player(player)
+	world.visible = true
+
