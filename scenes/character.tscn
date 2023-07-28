@@ -1,10 +1,10 @@
 [gd_scene load_steps=8 format=3 uid="uid://dc8bdyscrt7p8"]
 
-[ext_resource type="Script" path="res://scripts/character_controller.gd" id="1_6kpxu"]
-[ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/body/tipo2.tres" id="2_ykerk"]
-[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/body/human_male_frames.tres" id="3_mppgl"]
-[ext_resource type="Script" path="res://scripts/damage_health_system/health_component.gd" id="4_r8x07"]
-[ext_resource type="Script" path="res://scenes/HitboxComponent.gd" id="5_sxmhn"]
+[ext_resource type="Script" path="res://scripts/character.gd" id="1_g4k5a"]
+[ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/body/tipo2.tres" id="2_eerwt"]
+[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/body/human_male_frames.tres" id="3_0ksen"]
+[ext_resource type="Script" path="res://scripts/damage_health_system/health_component.gd" id="4_gxni7"]
+[ext_resource type="Script" path="res://scenes/HitboxComponent.gd" id="5_73bf4"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0lsyp"]
 properties/0/path = NodePath(".:position")
@@ -20,7 +20,7 @@ properties/1/watch = false
 size = Vector2(18, 38)
 
 [node name="Character" type="CharacterBody2D" node_paths=PackedStringArray("_body_sprite", "_head_sprite", "_helmet_sprite", "_weapon_sprite", "_shield_sprite")]
-script = ExtResource("1_6kpxu")
+script = ExtResource("1_g4k5a")
 _body_sprite = NodePath("Body/Body")
 _head_sprite = NodePath("Body/Head")
 _helmet_sprite = NodePath("Body/Helmet")
@@ -37,13 +37,13 @@ texture_filter = 1
 
 [node name="Head" type="AnimatedSprite2D" parent="Body"]
 texture_filter = 1
-sprite_frames = ExtResource("2_ykerk")
+sprite_frames = ExtResource("2_eerwt")
 animation = &"idle_down"
 offset = Vector2(-0.2, -23)
 
 [node name="Body" type="AnimatedSprite2D" parent="Body"]
 texture_filter = 1
-sprite_frames = ExtResource("3_mppgl")
+sprite_frames = ExtResource("3_0ksen")
 animation = &"walk_down"
 speed_scale = 2.0
 
@@ -61,7 +61,7 @@ position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_rs5qs")
 
 [node name="HealthComponent" type="Node2D" parent="."]
-script = ExtResource("4_r8x07")
+script = ExtResource("4_gxni7")
 
 [node name="HitboxComponent" type="Node2D" parent="."]
-script = ExtResource("5_sxmhn")
+script = ExtResource("5_73bf4")
