@@ -1,20 +1,35 @@
-[gd_scene load_steps=7 format=3 uid="uid://bnnpdke2jnp3m"]
+[gd_scene load_steps=9 format=3 uid="uid://bnnpdke2jnp3m"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
-[ext_resource type="PackedScene" uid="uid://dc8bdyscrt7p8" path="res://scenes/character_controller.tscn" id="2_134bm"]
-[ext_resource type="PackedScene" uid="uid://b74gy5ftp0hpu" path="res://scenes/overworld.tscn" id="3_k1nw4"]
+[ext_resource type="PackedScene" uid="uid://c640ckrygghxk" path="res://scenes/character.tscn" id="2_j7w4e"]
+[ext_resource type="PackedScene" uid="uid://b74gy5ftp0hpu" path="res://scenes/game_world.tscn" id="3_k1nw4"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
+[ext_resource type="Script" path="res://scripts/lobby.gd" id="6_f7i7g"]
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_nrebj"]
-properties/0/path = NodePath("GameWorld:visible")
+[sub_resource type="GDScript" id="GDScript_o6nda"]
+script/source = "extends Control
+
+func _on_host_pressed() -> void:
+	hide()
+
+func _on_join_pressed() -> void:
+	_on_host_pressed()
+"
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_3sa62"]
+properties/0/path = NodePath("UI/MainMenu:visible")
 properties/0/spawn = false
 properties/0/sync = true
 properties/0/watch = false
+properties/1/path = NodePath("GameWorld:visible")
+properties/1/spawn = false
+properties/1/sync = true
+properties/1/watch = false
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_iuim6")
-player_scene = ExtResource("2_134bm")
+player_scene = ExtResource("2_j7w4e")
 
 [node name="GameWorld" parent="." instance=ExtResource("3_k1nw4")]
 visible = false
@@ -43,10 +58,12 @@ script = ExtResource("4_10wcn")
 layout_mode = 1
 
 [node name="MainMenu" type="Control" parent="UI"]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = SubResource("GDScript_o6nda")
 
 [node name="Quick Start" type="Button" parent="UI/MainMenu"]
 layout_mode = 0
@@ -72,12 +89,31 @@ offset_right = 45.0
 offset_bottom = 148.0
 text = "Join"
 
-[node name="Node2D" type="Node2D" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_f7i7g")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/PanelContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "'s lobby"
+vertical_alignment = 1
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_nrebj")
+replication_config = SubResource("SceneReplicationConfig_3sa62")
 
 [connection signal="pressed" from="UI/MainMenu/Quick Start" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="UI/MainMenu/Quick Start" to="." method="_on_quick_start_pressed"]
 [connection signal="pressed" from="UI/MainMenu/Host" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="UI/MainMenu/Host" to="UI/MainMenu" method="_on_host_pressed"]
 [connection signal="pressed" from="UI/MainMenu/join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="UI/MainMenu/join" to="UI/MainMenu" method="_on_join_pressed"]

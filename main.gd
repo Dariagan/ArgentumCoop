@@ -1,10 +1,15 @@
 extends Node2D
 
+# MUY IMPORTANTE: SI SE COLOCA CUALQUIER COSA EN EL SCENE TREE, HAY QUE PONER UN MULTIPLAYER SPAWNER PARA ESTE
+
+# CADA VEZ Q SE USA ADD_CHILD, ASEGURARSE Q TIENE UN SYNCHRONIZER PUESTO
+
 var peer = ENetMultiplayerPeer.new()
 @export var player_scene: PackedScene
 
-@onready var world: GameWorld = $GameWorld
+@onready var world: Node2D = $GameWorld
 
+var players: Array[Character]
 
 func _on_quick_start_pressed() -> void:
 	pass 
@@ -28,3 +33,4 @@ func _add_player(id: int = 1) -> void:
 	world.spawn_player(player)
 	world.visible = true
 
+# MUY IMPORTANTE: SI SE COLOCA CUALQUIER COSA EN EL SCENE TREE, HAY QUE PONER UN MULTIPLAYER SPAWNER PARA ESTE

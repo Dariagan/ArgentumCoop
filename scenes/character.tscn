@@ -1,0 +1,52 @@
+[gd_scene load_steps=6 format=3 uid="uid://c640ckrygghxk"]
+
+[ext_resource type="Script" path="res://scripts/character.gd" id="1_iidgx"]
+[ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/body/tipo2.tres" id="2_xaysv"]
+[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/body/human_male_frames.tres" id="3_dihk3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mq83o"]
+size = Vector2(18, 38)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_8qs0i"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/sync = true
+properties/0/watch = false
+properties/1/path = NodePath("Body/Body:speed_scale")
+properties/1/spawn = true
+properties/1/sync = true
+properties/1/watch = false
+
+[node name="character" type="CharacterBody2D"]
+script = ExtResource("1_iidgx")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(1.4, 1.4)
+
+[node name="Body" type="Node2D" parent="."]
+
+[node name="Helmet" type="AnimatedSprite2D" parent="Body"]
+texture_filter = 1
+
+[node name="Head" type="AnimatedSprite2D" parent="Body"]
+texture_filter = 1
+sprite_frames = ExtResource("2_xaysv")
+animation = &"idle_down"
+offset = Vector2(-0.2, -23)
+
+[node name="Body" type="AnimatedSprite2D" parent="Body"]
+texture_filter = 1
+sprite_frames = ExtResource("3_dihk3")
+animation = &"walk_down"
+speed_scale = 2.0
+
+[node name="Shield" type="AnimatedSprite2D" parent="Body"]
+
+[node name="Weapon" type="AnimatedSprite2D" parent="Body"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_mq83o")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_8qs0i")

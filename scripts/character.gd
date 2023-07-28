@@ -7,11 +7,11 @@ class_name Character
 
 @export var friction = 16 #hacer q salga del piso
 
-@export var _body_sprite: AnimatedSprite2D 
-@export var _head_sprite: AnimatedSprite2D 
-@export var _helmet_sprite: AnimatedSprite2D 
-@export var _weapon_sprite: AnimatedSprite2D
-@export var _shield_sprite: AnimatedSprite2D
+@onready var helmet: AnimatedSprite2D = $Body/Helmet
+@onready var head: AnimatedSprite2D = $Body/Head
+@onready var body: AnimatedSprite2D = $Body/Body
+@onready var shield: AnimatedSprite2D = $Body/Shield
+@onready var weapon: AnimatedSprite2D = $Body/Weapon
 
 @onready var camera_2d: Camera2D = $Camera2D
 
@@ -63,10 +63,10 @@ func move_by_input(delta: float) -> void:
 	var distance_moved: float = position.distance_to(previous_position)
 
 	if distance_moved > 1:
-		_body_sprite.speed_scale = distance_moved/1
+		body.speed_scale = distance_moved/1
 		body_state = BodyState.JOG
 	elif distance_moved > 0.01:
-		_body_sprite.speed_scale = distance_moved/0.8
+		body.speed_scale = distance_moved/0.8
 		body_state = BodyState.WALK
 	else:
 		body_state = BodyState.IDLE
@@ -77,6 +77,8 @@ func move_by_input(delta: float) -> void:
 
 func apply_friction(amount: float, delta: float):
 	var real_amount: float = amount * delta
+	
+	# _velocity = _velocity.move_toward(Vector2.ZERO, real_amount)
 	if _velocity.length() > real_amount:
 		_velocity -= _velocity.normalized() * real_amount
 	else:
@@ -94,13 +96,13 @@ func _process_animation() -> void:
 	
 @rpc("call_local")
 func _play_animation(animation_name: String) -> void:	
-	if _body_sprite.sprite_frames:
-		_body_sprite.play(animation_name)
-	if _weapon_sprite.sprite_frames:
-		_weapon_sprite.play(animation_name)
-	if _shield_sprite.sprite_frames:
-		_shield_sprite.play(animation_name)
-	if _head_sprite.sprite_frames:
-		_head_sprite.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
-	if _helmet_sprite.sprite_frames:
-		_helmet_sprite.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
+	if body.sprite_frames:
+		body.play(animation_name)
+	if weapon.sprite_frames:
+		weapon.play(animation_name)
+	if shield.sprite_frames:
+		shield.play(animation_name)
+	if head.sprite_frames:
+		head.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
+	if helmet.sprite_frames:
+		helmet.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
