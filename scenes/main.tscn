@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://bnnpdke2jnp3m"]
+[gd_scene load_steps=7 format=3 uid="uid://bnnpdke2jnp3m"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="PackedScene" uid="uid://dc8bdyscrt7p8" path="res://scenes/character_controller.tscn" id="2_134bm"]
 [ext_resource type="PackedScene" uid="uid://b74gy5ftp0hpu" path="res://scenes/overworld.tscn" id="3_k1nw4"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
+[ext_resource type="Script" path="res://overworld.gd" id="4_pa0uj"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 
 [node name="main" type="Node2D"]
@@ -11,6 +12,7 @@ script = ExtResource("1_iuim6")
 player_scene = ExtResource("2_134bm")
 
 [node name="overworld" parent="." instance=ExtResource("3_k1nw4")]
+script = ExtResource("4_pa0uj")
 
 [node name="UI" type="CanvasLayer" parent="."]
 

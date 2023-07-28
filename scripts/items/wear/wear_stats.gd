@@ -1,9 +1,13 @@
 extends Resource
 class_name WearStats
 
-@export var armor: int = 0
-@export var temperature_offset: int = 0
+@export_range(0,20) var sharp_armor: int = 0
+@export_range(0,20) var blunt_armor: int = 0
+@export_range(0,20) var fire_armor: int = 0
+@export_range(0,20) var magical_armor: int = 0
 
-@export var magical_armor: int = 0
-@export var weight: int
+@export_range(-20,20) var temperature_offset: int = 0
+
+
+
 
