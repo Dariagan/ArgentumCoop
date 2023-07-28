@@ -5,6 +5,7 @@ var peer = ENetMultiplayerPeer.new()
 
 @onready var world: GameWorld = $GameWorld
 
+
 func _on_quick_start_pressed() -> void:
 	pass 
 
@@ -23,8 +24,7 @@ func _add_player(id: int = 1) -> void:
 	
 	var player: Character = player_scene.instantiate()
 	player.name = str(id)
+	
 	world.spawn_player(player)
-	
-	
 	world.visible = true
 

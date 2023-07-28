@@ -1,13 +1,14 @@
 [gd_scene load_steps=3 format=3 uid="uid://dfo7r6mykn0qa"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_cd774"]
-[ext_resource type="PackedScene" uid="uid://dc8bdyscrt7p8" path="res://scenes/character.tscn" id="2_2hri4"]
+[ext_resource type="PackedScene" uid="uid://dc8bdyscrt7p8" path="res://scenes/character_controller.tscn" id="2_oaccn"]
 
 [node name="Multiplayer_Test" type="Node2D"]
 script = ExtResource("1_cd774")
-player_scene = ExtResource("2_2hri4")
+player_scene = ExtResource("2_oaccn")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://scenes/character_controller.tscn")
 spawn_path = NodePath("..")
 spawn_limit = 1
 
