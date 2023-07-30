@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="InventoryData" load_steps=9 format=3 uid="uid://d2hwy8yajbica"]
 
-[ext_resource type="Script" path="res://scripts/inventory/inventory_data.gd" id="1_kxf1l"]
+[ext_resource type="Script" path="res://scripts/resources/things/inventory/inventory_data.gd" id="1_kxf1l"]
 [ext_resource type="Resource" uid="uid://desohv4u7fmj4" path="res://resources/items/wear/body/moss_short_tunic.tres" id="2_opxxo"]
-[ext_resource type="Script" path="res://scripts/inventory/slot_data.gd" id="3_5qymb"]
+[ext_resource type="Script" path="res://scripts/resources/things/inventory/slot_data.gd" id="3_5qymb"]
 
 [sub_resource type="Resource" id="Resource_miwqk"]
 script = ExtResource("3_5qymb")

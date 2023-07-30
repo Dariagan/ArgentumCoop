@@ -1,7 +1,7 @@
 extends Faction
 class_name PlayerFaction
 
-var members = Array[
+var members = Array[Character]
 	
 func _init() -> void:
 	

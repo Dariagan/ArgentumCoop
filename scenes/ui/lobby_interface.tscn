@@ -1,0 +1,50 @@
+[gd_scene load_steps=4 format=3 uid="uid://bmlps0vcr6nlb"]
+
+[ext_resource type="Script" path="res://scripts/ui/lobby_interface.gd" id="1_452rt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1077h"]
+bg_color = Color(0.235294, 0.235294, 0.235294, 1)
+
+[sub_resource type="Theme" id="Theme_h4kyi"]
+Label/styles/normal = SubResource("StyleBoxFlat_1077h")
+
+[node name="LobbyInterface" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_h4kyi")
+script = ExtResource("1_452rt")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_vertical = 1
+text = "'s lobby"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(300, 500)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
