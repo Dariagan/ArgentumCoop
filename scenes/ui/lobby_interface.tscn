@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bmlps0vcr6nlb"]
+[gd_scene load_steps=5 format=3 uid="uid://bmlps0vcr6nlb"]
 
 [ext_resource type="Script" path="res://scripts/ui/lobby_interface.gd" id="1_452rt"]
 
@@ -7,6 +7,16 @@ bg_color = Color(0.235294, 0.235294, 0.235294, 1)
 
 [sub_resource type="Theme" id="Theme_h4kyi"]
 Label/styles/normal = SubResource("StyleBoxFlat_1077h")
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_lvrru"]
+properties/0/path = NodePath("VBoxContainer/HBoxContainer/ChatLabel:text")
+properties/0/spawn = true
+properties/0/sync = true
+properties/0/watch = false
+properties/1/path = NodePath("VBoxContainer/HBoxContainer/PlayersLabel:text")
+properties/1/spawn = true
+properties/1/sync = true
+properties/1/watch = false
 
 [node name="LobbyInterface" type="PanelContainer"]
 anchors_preset = 15
@@ -20,31 +30,35 @@ script = ExtResource("1_452rt")
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-size_flags_vertical = 1
-text = "'s lobby"
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 500)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ChatLabel" type="Label" parent="VBoxContainer/HBoxContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
 
-[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(300, 500)
+[node name="PlayersLabel" type="Label" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+size_flags_vertical = 1
 horizontal_alignment = 1
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="TextEdit" type="TextEdit" parent="VBoxContainer/HBoxContainer2"]
-custom_minimum_size = Vector2(0, 100)
+[node name="WriteMsgBox" type="TextEdit" parent="VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
+caret_blink = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_lvrru")
+
+[connection signal="text_changed" from="VBoxContainer/HBoxContainer2/WriteMsgBox" to="." method="_on_write_msg_box_text_changed"]

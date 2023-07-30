@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bnnpdke2jnp3m"]
+[gd_scene load_steps=11 format=3 uid="uid://bnnpdke2jnp3m"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="PackedScene" uid="uid://b74gy5ftp0hpu" path="res://scenes/game_world.tscn" id="3_k1nw4"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/lobby.gd" id="4_vtap0"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 [ext_resource type="PackedScene" uid="uid://bmlps0vcr6nlb" path="res://scenes/ui/lobby_interface.tscn" id="6_7n63y"]
+[ext_resource type="Script" path="res://scripts/ui/menu_container.gd" id="7_37ijf"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_3sa62"]
@@ -34,9 +35,9 @@ spawn_path = NodePath("..")
 [node name="Lobby" type="Node" parent="."]
 script = ExtResource("4_vtap0")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="Canvas" type="CanvasLayer" parent="."]
 
-[node name="HUD" type="Control" parent="UI"]
+[node name="HUD" type="Control" parent="Canvas"]
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -45,7 +46,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="InventoryInterface" type="Control" parent="UI/HUD"]
+[node name="InventoryInterface" type="Control" parent="Canvas/HUD"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -54,22 +55,29 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_10wcn")
 
-[node name="Inventory" parent="UI/HUD/InventoryInterface" instance=ExtResource("5_7q6ev")]
+[node name="Inventory" parent="Canvas/HUD/InventoryInterface" instance=ExtResource("5_7q6ev")]
 layout_mode = 1
 
-[node name="MainMenu" parent="UI" instance=ExtResource("7_wv7ku")]
-offset_left = 1.0
-offset_top = 38.0
-offset_right = 41.0
-offset_bottom = 78.0
+[node name="MenuContainer" type="Container" parent="Canvas"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(182, -118)
+script = ExtResource("7_37ijf")
 
-[node name="LobbyInterface" parent="UI" instance=ExtResource("6_7n63y")]
+[node name="MainMenu" parent="Canvas/MenuContainer" instance=ExtResource("7_wv7ku")]
+layout_mode = 2
+
+[node name="LobbyInterface" parent="Canvas/MenuContainer" instance=ExtResource("6_7n63y")]
 visible = false
+layout_mode = 2
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_interval = 1.01
 delta_interval = 1.07
 replication_config = SubResource("SceneReplicationConfig_3sa62")
 
-[connection signal="host_pressed" from="UI/MainMenu" to="UI/LobbyInterface" method="_on_main_menu_host_pressed"]
-[connection signal="join_pressed" from="UI/MainMenu" to="UI/LobbyInterface" method="_on_main_menu_join_pressed"]
+[connection signal="host_pressed" from="Canvas/MenuContainer/MainMenu" to="Canvas/MenuContainer" method="_on_main_menu_host_pressed"]
+[connection signal="name_changed" from="Canvas/MenuContainer/MainMenu" to="." method="_on_main_menu_name_changed"]

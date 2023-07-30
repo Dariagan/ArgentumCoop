@@ -6,7 +6,6 @@ var peer = ENetMultiplayerPeer.new()
 
 @onready var world: Node2D = $"../GameWorld"
 
-
 var players: Array[Character]
 
 func _on_quick_start_pressed() -> void:
