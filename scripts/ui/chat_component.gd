@@ -5,7 +5,7 @@ extends Node
 @export var scroll_container: ScrollContainer 
 @export var MESSAGE_CHAR_LIMIT: int = 144
 
-var player_id: String
+var username: String
 
 var current_text = ''
 var cursor_line = 0
@@ -24,7 +24,7 @@ func _on_input_event(event):
 func add_chat_message() -> void:
 	var new_text : String = chat_text_edit.text.strip_edges() 
 	if new_text.length() > 0:
-		chat_label.text += "%s: %s\n" % [player_id, new_text]
+		chat_label.text += "%s: %s\n" % [username, new_text]
 		chat_text_edit.text = ""
 		chat_text_edit.set_caret_line(0)
 		chat_text_edit.set_caret_column(0)

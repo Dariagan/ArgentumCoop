@@ -1,29 +1,51 @@
 extends Node
 
-
 var peer = ENetMultiplayerPeer.new()
 #@export var player_scene: PackedScene
 
+var _username: String 
+
 @onready var world: Node2D = $"../GameWorld"
 
-var players: Array[Character]
+var _players: Array = []
 
-func _on_quick_start_pressed() -> void:
-	pass 
+signal player_list_updated(players: Array)
+
+signal player_username_received(username: String)
 
 func _host() -> void:
-
 	peer.create_server(135)
 	multiplayer.multiplayer_peer = peer
-	multiplayer.peer_connected.connect(_add_player)
-	_add_player()
+	multiplayer.peer_connected.connect(_on_player_join)
+	_players.push_back(_username)
 
 func _join() -> void:
 	peer.create_client("localhost", 135)
 	multiplayer.multiplayer_peer = peer
+	
+# executed ONLY server-side when a player joins
+func _on_player_join(peer_id: int) -> void:
+	await get_tree().create_timer(0.5).timeout
+	_get_player_username.rpc_id(peer_id)
+	_players.push_back(await player_username_received)
+	player_list_updated.emit(_players)
+	_give_player_list_to_joiner.rpc_id(peer_id, _players) #executed on the newly joined player's machine
+	
+	
+	
+@rpc
+func _give_player_list_to_joiner(players: Array) -> void:
+	_players = players
+	player_list_updated.emit(_players)
+	
+# todos lo pueden llamar? arreglar!
+# gets executed both in the function caller's PC, and in all the remote connected PCs
+@rpc("any_peer", "call_local")
+func _add_connected_player_to_player_list(new_player_username: String) -> void:
 
+	_players.push_back(new_player_username)
+	player_list_updated.emit(_players)
 
-# 1 = host
 func _add_player(id: int = 1) -> void:
 	pass
 	"""
@@ -33,15 +55,20 @@ func _add_player(id: int = 1) -> void:
 	world.spawn_player(player)
 	world.visible = true"""
 
+@rpc
+func _get_player_username() -> void:
+	_receive_player_username.rpc_id(multiplayer.get_remote_sender_id(), _username)
+@rpc("any_peer")
+func _receive_player_username(username: String) -> void:
+	player_username_received.emit(username)
 
-func _on_lobby_interface_is_ready(hosting: bool) -> void:
-	if hosting:
-		_host()
-	else:
-		_join()
+func _on_menu_container_hosting() -> void:
+	_host()
+
+func _on_menu_container_joining() -> void:
+	_join()
+
+func update_username(username: String):
+	_username = username
 	
 	
-
-
-func _on_main_menu_host_pressed() -> void:
-	pass # Replace with function body.

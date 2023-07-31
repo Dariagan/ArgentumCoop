@@ -1,18 +1,21 @@
 extends Node
 
-var player_id: String = "nameless_%s" % generateRandomString(4)
+var username: String = "nameless_%s" % generateRandomString(4)
 
-@onready var menu_container: Container = $Canvas/MenuContainer
+@onready var menu_control: Container = $Canvas/MenuControl
+@onready var lobby: Node = $Lobby
 
 func _ready() -> void:
-	_update_player_id_for_children()
+	_update_username_for_children()
 
 func _on_main_menu_name_changed(new_name: String) -> void:
-	player_id = new_name
-	_update_player_id_for_children()
+	username = new_name
+	_update_username_for_children()
 	
-func _update_player_id_for_children():
-	menu_container.update_player_id(player_id)
+func _update_username_for_children():
+	#volver un grupo
+	menu_control.update_username(username)
+	lobby.update_username(username)
 
 func generateRandomString(length: int) -> String:
 	var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

@@ -2,8 +2,5 @@
 
 [ext_resource type="Script" path="res://scripts/ui/chat_component.gd" id="1_jqqsc"]
 
-[node name="ChatComponent" type="Node" node_paths=PackedStringArray("chat_text_edit", "chat_label", "scroll_container")]
+[node name="ChatComponent" type="Node"]
 script = ExtResource("1_jqqsc")
-chat_text_edit = NodePath("")
-chat_label = NodePath("")
-scroll_container = NodePath("")

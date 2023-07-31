@@ -1,18 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://dvqq1banvf1yw"]
+[gd_scene load_steps=3 format=3 uid="uid://c6iyqt68mx0gp"]
 
 [ext_resource type="Script" path="res://scripts/ui/lobby_interface.gd" id="1_452rt"]
 [ext_resource type="PackedScene" uid="uid://cpat3jp6fu4q2" path="res://scenes/ui/chat_component.tscn" id="2_hg86q"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t48f8"]
-bg_color = Color(0.239216, 0.239216, 0.239216, 1)
-
 [node name="PanelContainer" type="PanelContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_t48f8")
+offset_right = 1152.0
+offset_bottom = 648.0
 script = ExtResource("1_452rt")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
