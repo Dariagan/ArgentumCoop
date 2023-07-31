@@ -26,7 +26,7 @@ func _join() -> void:
 # executed ONLY server-side when a player joins
 func _on_player_join(peer_id: int) -> void:
 	await get_tree().create_timer(0.5).timeout
-	_get_player_username.rpc_id(peer_id)
+	_request_player_username(peer_id)
 	_players.push_back(await player_username_received)
 	player_list_updated.emit(_players)
 	_give_player_list_to_joiner.rpc_id(peer_id, _players) #executed on the newly joined player's machine
@@ -55,12 +55,18 @@ func _add_player(id: int = 1) -> void:
 	world.spawn_player(player)
 	world.visible = true"""
 
+var requested_peer: int = -1
+func _request_player_username(peer_id: int) -> void:
+	requested_peer = peer_id
+	_return_player_username.rpc_id(peer_id)
 @rpc
-func _get_player_username() -> void:
+func _return_player_username() -> void:
 	_receive_player_username.rpc_id(multiplayer.get_remote_sender_id(), _username)
 @rpc("any_peer")
 func _receive_player_username(username: String) -> void:
-	player_username_received.emit(username)
+	if requested_peer == multiplayer.get_remote_sender_id():
+		player_username_received.emit(username)
+	requested_peer = -1
 
 func _on_menu_container_hosting() -> void:
 	_host()

@@ -43,10 +43,12 @@ func _add_lobby_title_line_edit(host_name: String) -> void:
 	h_box_container.move_child(lobby_title_line_edit, 0)
 	lobby_title_line_edit.connect("text_submitted", _on_lobby_title_text_submitted)
 	
+	
 func _add_lobby_title_label(new_title: String) -> void:
 	lobby_title_label = Label.new()
 	lobby_title_label.text = new_title
 	lobby_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lobby_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h_box_container.add_child(lobby_title_label)
 	h_box_container.move_child(lobby_title_label, 0)
 	
@@ -79,7 +81,7 @@ func _ready_button_pressed(toggled: bool) -> void:
 func _on_lobby_title_text_submitted(new_text: String) -> void:
 	_update_lobby_title.rpc(new_text)
 	
-@rpc("call_local")
+@rpc
 func _update_lobby_title(new_text: String):
 	if lobby_title_label:
 		lobby_title_label.text = new_text

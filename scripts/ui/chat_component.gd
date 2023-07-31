@@ -19,12 +19,13 @@ func _on_input_event(event):
 		var key_event = event as InputEventKey 
 		if key_event.keycode == KEY_ENTER and key_event.pressed and !key_event.echo:
 			get_viewport().set_input_as_handled()
-			add_chat_message()
+			add_chat_message.rpc(chat_text_edit.text.strip_edges(), username)
 			
-func add_chat_message() -> void:
-	var new_text : String = chat_text_edit.text.strip_edges() 
+@rpc("any_peer", "call_local")
+func add_chat_message(new_text : String, sender: String) -> void:
+
 	if new_text.length() > 0:
-		chat_label.text += "%s: %s\n" % [username, new_text]
+		chat_label.text += "%s: %s\n" % [sender, new_text]
 		chat_text_edit.text = ""
 		chat_text_edit.set_caret_line(0)
 		chat_text_edit.set_caret_column(0)
