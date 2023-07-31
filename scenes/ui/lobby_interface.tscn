@@ -62,3 +62,5 @@ caret_multiple = false
 chat_text_edit = NodePath("../VBoxContainer/HBoxContainer3/WriteMsgBox")
 chat_label = NodePath("../VBoxContainer/HBoxContainer2/ScrollContainer/ChatLabel")
 scroll_container = NodePath("../VBoxContainer/HBoxContainer2/ScrollContainer")
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer1/LeaveButton" to="." method="_on_leave_button_pressed"]

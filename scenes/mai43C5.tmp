@@ -59,7 +59,6 @@ layout_mode = 2
 
 [connection signal="player_joined" from="Lobby" to="Canvas/MenuControl" method="_on_lobby_player_joined"]
 [connection signal="player_list_updated" from="Lobby" to="Canvas/MenuControl" method="_on_lobby_player_list_updated"]
-[connection signal="removed_from_lobby" from="Lobby" to="Canvas/MenuControl" method="_on_lobby_removed_from_lobby"]
 [connection signal="hosting" from="Canvas/MenuControl" to="Lobby" method="_on_menu_container_hosting"]
 [connection signal="joining" from="Canvas/MenuControl" to="Lobby" method="_on_menu_container_joining"]
 [connection signal="host_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_host_pressed"]

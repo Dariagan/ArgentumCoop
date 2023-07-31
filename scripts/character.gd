@@ -75,8 +75,6 @@ func move_by_input(delta: float) -> void:
 	
 	previous_position = position
 	
-	
-
 func apply_friction(amount: float, delta: float):
 	var real_amount: float = amount * delta
 	

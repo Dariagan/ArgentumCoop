@@ -32,6 +32,7 @@ func set_up_host_lobby(host_name: String) -> void:
 	_add_lobby_title_line_edit(host_name)
 	players_label.text += "%s (host)\n" % host_name
 	
+	
 func _add_lobby_title_line_edit(host_name: String) -> void:
 	lobby_title_line_edit = LineEdit.new()
 	lobby_title_line_edit.text = "%s's lobby" % host_name	
@@ -56,7 +57,8 @@ func _add_lobby_title_label(new_title: String) -> void:
 func set_up_joiner_lobby() -> void:
 	_add_start_button(false)
 	_add_lobby_title_label("")
-	print()
+	
+	
 	
 func _add_start_button(hosting: bool) -> void:
 	if hosting:
@@ -77,12 +79,15 @@ func _start_button_pressed() -> void:
 
 func _ready_button_pressed(toggled: bool) -> void:
 	ready_toggled.emit(toggled)
+	
+func _update_lobby_title_for_client(peer_id: int):
+	_update_lobby_title_client_side.rpc_id(peer_id, lobby_title_line_edit.text)
 
 func _on_lobby_title_text_submitted(new_text: String) -> void:
-	_update_lobby_title.rpc(new_text)
+	_update_lobby_title_client_side.rpc(new_text)
 	
 @rpc
-func _update_lobby_title(new_text: String):
+func _update_lobby_title_client_side(new_text: String):
 	if lobby_title_label:
 		lobby_title_label.text = new_text
 
