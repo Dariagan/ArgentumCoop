@@ -15,8 +15,8 @@ var lobby_title_label: Label
 
 var start_button: Button
 
-signal host_pressed_start
 signal ready_toggled(value: bool)
+
 signal left
 
 func update_player_list(new_player_list: Array) -> void:
@@ -64,7 +64,7 @@ func _add_start_button(hosting: bool) -> void:
 	if hosting:
 		start_button = Button.new()
 		start_button.text = "Start"
-		start_button.connect("pressed", _start_button_pressed)
+		start_button.connect("pressed", _ready_button_pressed)
 	else:
 		start_button = CheckBox.new()
 		start_button.text = "Ready"
@@ -73,11 +73,9 @@ func _add_start_button(hosting: bool) -> void:
 	start_button.custom_minimum_size.x = 300
 	h_box_container_3.add_child(start_button)
 	
-	
-func _start_button_pressed() -> void:
-	host_pressed_start.emit()
 
-func _ready_button_pressed(toggled: bool) -> void:
+
+func _ready_button_pressed(toggled: bool = true) -> void:
 	ready_toggled.emit(toggled)
 	
 func _update_lobby_title_for_client(peer_id: int):
