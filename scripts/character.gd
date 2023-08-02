@@ -1,5 +1,7 @@
 extends CharacterBody2D
-class_name Character
+class_name Character#Being, después crear otros scripts con su class_name q lo extiendan (animal y humanoid?).
+#después, extender a animal y humanoid y meter los componentes que quieras que definiste en otros scripts.
+#así añadimos nueva funcionalidad en base a composición en vez de a herencia (sostenible a largo plazo) 
 
 @export var speed: float = 6
 @export var acceleration = 30
@@ -7,11 +9,9 @@ class_name Character
 
 @export var friction = 16 #hacer q salga del piso
 
-@onready var helmet: AnimatedSprite2D = $Body/Helmet
-@onready var head: AnimatedSprite2D = $Body/Head
-@onready var body: AnimatedSprite2D = $Body/Body
-@onready var shield: AnimatedSprite2D = $Body/Shield
-@onready var weapon: AnimatedSprite2D = $Body/Weapon
+
+@onready var body_parts: Node2D = $BodyParts
+
 
 @onready var camera_2d: Camera2D = $Camera2D
 
@@ -20,7 +20,7 @@ var _velocity: Vector2 = Vector2.ZERO
 
 var axis: Vector2 = Vector2.ZERO
 
-var character: CharacterData
+
 
 enum BodyState { IDLE, WALK, JOG }
 
@@ -63,11 +63,15 @@ func move_by_input(delta: float) -> void:
 	var distance_moved: float = position.distance_to(previous_position)
 
 	if distance_moved > 1:
-		body.speed_scale = distance_moved/1
+		for body_part in body_parts.get_children():
+			body_part.speed_scale = distance_moved/1
 		body_state = BodyState.JOG
+		
 	elif distance_moved > 0.01:
-		body.speed_scale = distance_moved/0.8
+		for body_part in body_parts.get_children():
+			body_part.speed_scale = distance_moved/0.8
 		body_state = BodyState.WALK
+		
 	else:
 		body_state = BodyState.IDLE
 	
@@ -90,12 +94,21 @@ func _update_facing_direction() -> void:
 	else:
 		_facing_direction = "up" if axis.y < 0 else "down"
 
+# esto debería ser un componente
 func _process_animation() -> void:	
 	_play_animation.rpc(str(BodyState.keys()[body_state]).to_lower()
 	 + "_" + _facing_direction)
-	
 @rpc("call_local")
 func _play_animation(animation_name: String) -> void:	
+	
+	#creo q es mejor
+	for body_part in body_parts.get_children():
+		if body_part.sprite_frames:
+			body_part.play(animation_name)
+			#agregar un Node nombrado idle_only o un script a la body part con un bool q indique si es idle_only=true, en ese caso usar el replace
+			#puede q haya q hacer algo parecido si es solo run sin jog, asi q tal vez el script con un array es mejor. si el 
+			#TAL VEZ es mejor llamar a algun método con parámetro un enum-estado en cada body part scripteada y esta handlee la animación q debería playear
+	"""
 	if body.sprite_frames:
 		body.play(animation_name)
 	if weapon.sprite_frames:
@@ -106,3 +119,5 @@ func _play_animation(animation_name: String) -> void:
 		head.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
 	if helmet.sprite_frames:
 		helmet.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
+	"""
+# esto debería ser un componente

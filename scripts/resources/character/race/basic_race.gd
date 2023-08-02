@@ -1,12 +1,14 @@
 extends Resource
-class_name Race
+class_name BasicRace
 
 
-@export var id: String
+@export var id: String = "vanilla_"
 @export var name: String
 @export_multiline var description: String 
 
 @export_range(0, 3) var hunger_rate: float = 1
+
+@export_category("Combat Multipliers")
 
 @export var health_multiplier: float = 1
 @export var max_speed_multiplier: float = 1
@@ -19,15 +21,11 @@ class_name Race
 
 @export var damage_reductions: Array[AttackTypeMultiplier]
 
-@export_category("Work Multipliers")
+@export_range(0, 3) var sneak_proficiency: float = 1
 
-@export_range(0, 2) var global_learning_multiplier: float = 0
-@export_range(0, 2) var smithing_learning_multiplier: float = 0
-@export_range(0, 2) var manual_labor_multiplier: float = 0
-@export_range(0, 2) var research_multiplier: float = 0
+#export array de tupla biome_id: string preferrance: float
 
-@export_range(0, 2) var trade_proficiency: float = 0
-@export_range(0, 2) var sneak_proficiency: float = 0
 
+@export_category("Population")
 #1 -> 100% of pawns are male 0 _> all pawns are female
 @export_range(0, 1) var males_females_ratio: float = 0.5
