@@ -1,4 +1,4 @@
-extends Container
+extends Node
 
 @onready var main_menu: Container = $MainMenu
 
@@ -40,7 +40,7 @@ func cancel_host():
 	hosting.emit(false)
 	_return_from_lobby_to_menu()
 	
-func _on_lobby_player_joined(peer_id) -> void:
+func _on_lobby_peer_joined(peer_id) -> void:
 	lobby_interface._update_lobby_title_for_client(peer_id)
 # for host
 
@@ -59,15 +59,12 @@ func leave_lobby():
 	_return_from_lobby_to_menu()
 
 func _return_from_lobby_to_menu() -> void:
+	print(1)
 	lobby_interface.queue_free()
 	main_menu.show()
 	
 func _on_lobby_removed_from_lobby(kicked: bool) -> void:
 	_return_from_lobby_to_menu()
 # for joiner
-
-
-
-
 
 

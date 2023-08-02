@@ -1,12 +1,16 @@
-extends PanelContainer
+extends Node
 class_name LobbyInterface
 
+#TODO VOLVER CADA PLAYER UN MENUDROPDOWN
+@onready var players_label: Label = $ChatContainer/VBoxContainer/HBoxContainer2/PlayersLabel
 
-@onready var players_label: Label = $VBoxContainer/HBoxContainer2/PlayersLabel
-@onready var chat_component: Node = $ChatComponent
-@onready var h_box_container: HBoxContainer = $VBoxContainer/HBoxContainer1
+@onready var chat_component: Node = $ChatContainer/VBoxContainer/ChatComponent
 
-@onready var h_box_container_3: HBoxContainer = $VBoxContainer/HBoxContainer3
+@onready var h_box_container: HBoxContainer = $ChatContainer/VBoxContainer/HBoxContainer1
+@onready var h_box_container_3: HBoxContainer = $ChatContainer/VBoxContainer/HBoxContainer3
+
+@onready var chat_container: PanelContainer = $ChatContainer
+
 
 var _username: String
 
@@ -18,6 +22,10 @@ var start_button: Button
 signal ready_toggled(value: bool)
 
 signal left
+
+signal character_create(value: bool)
+
+
 
 func update_player_list(new_player_list: Array) -> void:
 	players_label.text = ""
@@ -70,7 +78,7 @@ func _add_start_button(hosting: bool) -> void:
 		start_button.text = "Ready"
 		start_button.connect("toggled", _ready_button_pressed)
 	
-	start_button.custom_minimum_size.x = 300
+	start_button.custom_minimum_size.x = 150
 	h_box_container_3.add_child(start_button)
 	
 
@@ -85,13 +93,20 @@ func _on_lobby_title_text_submitted(new_text: String) -> void:
 	_update_lobby_title_client_side.rpc(new_text)
 	
 @rpc
-func _update_lobby_title_client_side(new_text: String):
+func _update_lobby_title_client_side(new_text: String) -> void:
+	
 	if lobby_title_label:
 		lobby_title_label.text = new_text
 
-func update_username(new_username: String):
+func update_username(new_username: String) -> void:
 	_username = new_username
 	chat_component.username = _username	
 
 func _on_leave_button_pressed() -> void:
 	left.emit()
+
+
+func _on_create_character_button_pressed() -> void:
+	chat_container.hide()
+	chat_component.input_enabled = false
+	get_children()[1].show()

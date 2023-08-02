@@ -3,16 +3,16 @@ extends Node
 var peer = ENetMultiplayerPeer.new()
 # local username
 var _username: String 
+
 @onready var world: Node2D = $"../GameWorld"
+@export var character_creation_scene: PackedScene
 
 var _players: Array = []
 var _peers: Array = []
 var _ready_peers: Array = []
 
 signal player_list_updated(players: Array)
-
 signal peer_joined(peer_id: int)
-
 signal removed_from_lobby(kicked: bool)
 
 func _host() -> void:
@@ -36,11 +36,11 @@ func _on_player_join(peer_id: int) -> void:
 	
 	_sync_state_for_clients()
 	
-	# for host
+	# for host:
 	player_list_updated.emit(_players)
 	peer_joined.emit(peer_id)
 	
-func _sync_state_for_clients(): 
+func _sync_state_for_clients() -> void: 
 	#each is executed on every client's machine
 	_give_player_list.rpc(_players) 
 	_give_peer_list.rpc(_peers)
@@ -67,12 +67,12 @@ func _on_menu_container_joining(joining: bool) -> void:
 		peer.close()
 		clear_arrays()
 		
-func clear_arrays():
+func clear_arrays() -> void:
 	_players.clear()
 	_peers.clear()
 	_ready_peers.clear()
 		
-func _on_player_disconnect(peer_id: int):
+func _on_player_disconnect(peer_id: int) -> void:
 	_players.remove_at(_peers.find(peer_id))
 	_peers.erase(peer_id)
 	_ready_peers.erase(peer_id)
@@ -80,7 +80,7 @@ func _on_player_disconnect(peer_id: int):
 	player_list_updated.emit(_players)
 				
 @rpc
-func _remove_from_lobby(kicked: bool):
+func _remove_from_lobby(kicked: bool) -> void:
 	_players.clear()
 	_peers.clear()
 	_ready_peers.clear()
@@ -95,7 +95,7 @@ func _on_menu_control_player_ready(ready: bool) -> void:
 	if multiplayer.get_unique_id() != 1:
 		_peer_is_ready.rpc(ready)
 		
-	elif _is_everybody_is_ready():
+	elif _is_everybody_ready():
 		print("starting")
 
 @rpc("call_local", "any_peer")
@@ -106,7 +106,7 @@ func _peer_is_ready(ready: bool) -> void:
 	elif not ready:
 		_ready_peers.erase(peer)
 	
-func _is_everybody_is_ready() -> bool:
+func _is_everybody_ready() -> bool:
 	return _ready_peers.size() + 1 == _peers.size()
 		
 		
@@ -116,7 +116,7 @@ var requested_peer: int = -1
 func _request_player_username(peer_id: int) -> void:
 	requested_peer = peer_id
 	_return_player_username.rpc_id(peer_id)
-@rpc
+@rpc 
 func _return_player_username() -> void:
 	_receive_player_username.rpc_id(multiplayer.get_remote_sender_id(), _username)
 @rpc("any_peer")

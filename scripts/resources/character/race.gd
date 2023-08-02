@@ -1,6 +1,11 @@
 extends Resource
 class_name Race
 
+
+@export var id: String
+@export var name: String
+@export_multiline var description: String 
+
 @export_range(0, 3) var hunger_rate: float = 1
 
 @export var health_multiplier: float = 1
@@ -14,7 +19,7 @@ class_name Race
 
 @export var damage_reductions: Array[AttackTypeMultiplier]
 
-@export_category("multipliers")
+@export_category("Work Multipliers")
 
 @export_range(0, 2) var global_learning_multiplier: float = 0
 @export_range(0, 2) var smithing_learning_multiplier: float = 0

@@ -5,6 +5,8 @@ extends Node
 @export var scroll_container: ScrollContainer 
 @export var MESSAGE_CHAR_LIMIT: int = 144
 
+var input_enabled: bool = true
+
 var username: String
 
 var current_text = ''
@@ -15,7 +17,7 @@ func _ready() -> void:
 	chat_text_edit.connect("gui_input", _on_input_event)
 	
 func _on_input_event(event):
-	if event is InputEventKey:
+	if event is InputEventKey and input_enabled:
 		var key_event = event as InputEventKey 
 		if key_event.keycode == KEY_ENTER and key_event.pressed and !key_event.echo:
 			get_viewport().set_input_as_handled()
@@ -31,9 +33,7 @@ func add_chat_message(new_text : String, sender: String) -> void:
 		chat_text_edit.set_caret_column(0)
 		
 		await get_tree().create_timer(0.001).timeout
-
 		scroll_container.scroll_vertical = scroll_container.get_v_scroll_bar().max_value
-
 
 func _on_write_msg_box_text_changed() -> void:
 	var new_text : String = chat_text_edit.text

@@ -2,6 +2,6 @@ extends Resource
 class_name RecipeData
 
 @export var name: String
-@export var inputs: Array[SlotData]
-@export var outputs: Array[SlotData]
+@export var inputs: Dictionary
+@export var outputs: Dictionary
 @export var workRequired: int
