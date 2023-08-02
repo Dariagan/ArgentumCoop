@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="HumanoidRace" load_steps=2 format=3 uid="uid://bxa4glyry1oy3"]
+
+[ext_resource type="Script" path="res://scripts/resources/character/race/humanoid_race.gd" id="1_o1aqn"]
+
+[resource]
+script = ExtResource("1_o1aqn")
+global_learning_multiplier = 1.0
+smithing_learning_multiplier = 1.0
+manual_labor_multiplier = 1.0
+research_multiplier = 1.0
+trade_proficiency = 1.0
+id = "vani_human"
+name = "Human"
+description = "humans are tall and smort"
+hunger_rate = 1.0
+health_multiplier = 1.0
+max_speed_multiplier = 1.0
+strength_multiplier = 1.0
+male_can_vent = false
+female_can_vent = false
+damage_reductions = Array[Resource("res://scripts/resources/damage_health_system/attack_type_multiplier.gd")]([])
+sneak_proficiency = 1.0
+males_females_ratio = 0.5

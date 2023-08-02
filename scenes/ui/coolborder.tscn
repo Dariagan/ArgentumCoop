@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://vxv66o5h4qwi"]
+
+[ext_resource type="StyleBox" uid="uid://c8tf2niublngn" path="res://resources/ui/borderwhitetopleft.tres" id="1_vv2oi"]
+[ext_resource type="StyleBox" uid="uid://b82rxr6u6wk6v" path="res://resources/ui/borderblackbottomright.tres" id="2_en2xy"]
+
+[node name="WhiteBorderTopLeft" type="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("1_vv2oi")
+
+[node name="BlackBorderBottomRight" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_en2xy")

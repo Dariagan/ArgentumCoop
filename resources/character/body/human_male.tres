@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BodySpriteData" load_steps=3 format=3 uid="uid://dql6ti408hg7"]
+
+[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/character/body/human_male_frames.tres" id="1_6t3r3"]
+[ext_resource type="Script" path="res://scripts/resources/body/body_sprite_data.gd" id="1_g083j"]
+
+[resource]
+script = ExtResource("1_g083j")
+head_offset_x = 0.0
+head_offset_y = -38
+animation = ExtResource("1_6t3r3")
+sex = 1

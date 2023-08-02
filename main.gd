@@ -1,30 +1,30 @@
-extends Node2D
+extends Node
 
-var peer = ENetMultiplayerPeer.new()
-@export var player_scene: PackedScene
+var username: String = "nameless_%s" % generateRandomString(4)
 
-@onready var world: GameWorld = $GameWorld
+@onready var menu_control: Container = $Canvas/MenuControl
+@onready var lobby: Node = $Lobby
 
+func _ready() -> void:
+	_update_username_for_children()
 
-func _on_quick_start_pressed() -> void:
-	pass 
-
-func _on_host_pressed() -> void:
-	peer.create_server(135)
-	multiplayer.multiplayer_peer = peer
-	multiplayer.peer_connected.connect(_add_player)
-	_add_player()
-
-func _on_join_pressed() -> void:
-	peer.create_client("localhost", 135)
-	multiplayer.multiplayer_peer = peer
-
-# 1 = host
-func _add_player(id: int = 1) -> void:
+func _on_main_menu_name_changed(new_name: String) -> void:
+	username = new_name
+	_update_username_for_children()
 	
-	var player: Character = player_scene.instantiate()
-	player.name = str(id)
-	
-	world.spawn_player(player)
-	world.visible = true
+func _update_username_for_children():
+	#volver un grupo
+	menu_control.update_username(username)
+	lobby.update_username(username)
 
+func generateRandomString(length: int) -> String:
+	var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var random_string = ""
+	for i in range(length):
+		var random_index = randi() % chars.length()
+		random_string += chars.substr(random_index, 1)
+	return random_string
+	
+
+
+	

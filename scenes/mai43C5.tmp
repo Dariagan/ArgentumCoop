@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="PackedScene" uid="uid://b74gy5ftp0hpu" path="res://scenes/game_world.tscn" id="3_k1nw4"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
-[ext_resource type="PackedScene" uid="uid://dhuq261jv5fvi" path="res://scenes/character_creation_lobby.tscn" id="4_lphit"]
+[ext_resource type="PackedScene" uid="uid://cd6jw226lw1a3" path="res://scenes/player.tscn" id="4_of6q2"]
 [ext_resource type="Script" path="res://scripts/lobby.gd" id="4_vtap0"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 [ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
@@ -16,13 +16,10 @@ script = ExtResource("1_iuim6")
 [node name="GameWorld" parent="." instance=ExtResource("3_k1nw4")]
 visible = false
 
+[node name="Player_" parent="GameWorld" instance=ExtResource("4_of6q2")]
+
 [node name="Lobby" type="Node" parent="."]
 script = ExtResource("4_vtap0")
-character_creation_scene = ExtResource("4_lphit")
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby"]
-_spawnable_scenes = PackedStringArray("res://scenes/character_creation_lobby.tscn")
-spawn_path = NodePath("..")
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 
@@ -54,20 +51,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(182, -118)
-size_flags_horizontal = 3
-size_flags_vertical = 3
 script = ExtResource("7_6o24h")
 lobby_interface_scene = ExtResource("8_losb1")
 
 [node name="MainMenu" parent="Canvas/MenuControl" instance=ExtResource("7_wv7ku")]
 layout_mode = 2
 
-[connection signal="peer_joined" from="Lobby" to="Canvas/MenuControl" method="_on_lobby_peer_joined"]
+[connection signal="player_joined" from="Lobby" to="Canvas/MenuControl" method="_on_lobby_player_joined"]
 [connection signal="player_list_updated" from="Lobby" to="Canvas/MenuControl" method="_on_lobby_player_list_updated"]
-[connection signal="removed_from_lobby" from="Lobby" to="Canvas/MenuControl" method="_on_lobby_removed_from_lobby"]
 [connection signal="hosting" from="Canvas/MenuControl" to="Lobby" method="_on_menu_container_hosting"]
 [connection signal="joining" from="Canvas/MenuControl" to="Lobby" method="_on_menu_container_joining"]
-[connection signal="player_ready" from="Canvas/MenuControl" to="Lobby" method="_on_menu_control_player_ready"]
 [connection signal="host_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_host_pressed"]
 [connection signal="join_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_join_pressed"]
 [connection signal="name_changed" from="Canvas/MenuControl/MainMenu" to="." method="_on_main_menu_name_changed"]
