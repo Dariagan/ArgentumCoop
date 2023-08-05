@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Class" load_steps=2 format=3 uid="uid://bfr7wcpjoh70n"]
+
+[ext_resource type="Script" path="res://scripts/resources/beings/controllable/classes/class.gd" id="1_dagek"]
+
+[resource]
+script = ExtResource("1_dagek")
+id = "warrior"
+name = "Warrior"
+available_pets_ids = {}
+available_spells = Array[String]([])

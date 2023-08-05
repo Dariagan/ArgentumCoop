@@ -1,5 +1,7 @@
 extends BasicRace
-class_name HumanoidRace
+class_name ControllableRace
+
+@export var available_classes: Array[Class]
 
 @export_category("Work Multipliers")
 

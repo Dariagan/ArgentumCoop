@@ -46,7 +46,7 @@ func _add_lobby_title_line_edit(host_name: String) -> void:
 	lobby_title_line_edit.text = "%s's lobby" % host_name	
 	lobby_title_line_edit.max_length = 70
 	lobby_title_line_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lobby_title_line_edit.size_flags_horizontal =Control.SIZE_EXPAND_FILL
+	lobby_title_line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lobby_title_line_edit.caret_blink = true
 	h_box_container.add_child(lobby_title_line_edit)
 	h_box_container.move_child(lobby_title_line_edit, 0)
@@ -110,3 +110,6 @@ func _on_create_character_button_pressed() -> void:
 	chat_container.hide()
 	chat_component.input_enabled = false
 	get_children()[1].show()
+
+# ----------------- character creation -----------------
+

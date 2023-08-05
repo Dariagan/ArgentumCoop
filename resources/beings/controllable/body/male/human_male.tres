@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="BodySpriteData" load_steps=3 format=3 uid="uid://cy7fmpib41alf"]
+
+[ext_resource type="Script" path="res://scripts/resources/beings/sprites/body/body_sprite_data.gd" id="1_405b8"]
+[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/beings/controllable/body/frames/human_male_frames.tres" id="1_jpo26"]
+
+[resource]
+script = ExtResource("1_405b8")
+head_offset_down = Vector2(0, 10)
+head_offset_up = Vector2(0, 10)
+head_offset_sideways = Vector2(0, 0)
+animation = ExtResource("1_jpo26")
+sex = 0

@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://c640ckrygghxk"]
 
 [ext_resource type="Script" path="res://scripts/character.gd" id="1_iidgx"]
-[ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/character/body/tipo2.tres" id="2_ecji7"]
-[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/character/body/human_male_frames.tres" id="3_kie8j"]
+[ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/beings/controllable/head/frames/human_male_brunette_mullet.tres" id="2_ku45w"]
+[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/beings/controllable/body/frames/human_male_frames.tres" id="3_813nv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mq83o"]
 size = Vector2(18, 38)
@@ -30,13 +30,13 @@ texture_filter = 1
 
 [node name="Head" type="AnimatedSprite2D" parent="BodyParts"]
 texture_filter = 1
-sprite_frames = ExtResource("2_ecji7")
+sprite_frames = ExtResource("2_ku45w")
 animation = &"idle_down"
 offset = Vector2(-0.2, -23)
 
 [node name="Body" type="AnimatedSprite2D" parent="BodyParts"]
 texture_filter = 1
-sprite_frames = ExtResource("3_kie8j")
+sprite_frames = ExtResource("3_813nv")
 animation = &"walk_down"
 speed_scale = 2.0
 
