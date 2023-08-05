@@ -5,3 +5,5 @@ class_name UncontrollableRace
 
 #@export var behavior: NcbBehavior
 
+#hacer tupla triple de id-item, probabilidad, cantidad. 
+@export var possible_loot: Dictionary

@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="UncontrollableRace" load_steps=5 format=3 uid="uid://djbj7w1wc1v1i"]
+
+[ext_resource type="Script" path="res://scripts/resources/beings/race/uncontrollable_race.gd" id="1_537ad"]
+[ext_resource type="SpriteFrames" uid="uid://d4jut4hh1pme0" path="res://resources/beings/uncontrollable/body/frames/pig_frames.tres" id="1_mx3sf"]
+[ext_resource type="Script" path="res://scripts/resources/beings/sprites/body/body_sprite_data.gd" id="2_sogpu"]
+
+[sub_resource type="Resource" id="Resource_c7rrs"]
+script = ExtResource("2_sogpu")
+head_offset_down = Vector2(0, 0)
+head_offset_up = Vector2(0, 0)
+head_offset_sideways = Vector2(0, 0)
+animation = ExtResource("1_mx3sf")
+sex = 3
+
+[resource]
+script = ExtResource("1_537ad")
+taming_difficulty = 0.5
+id = ""
+name = " Pig"
+demonym = ""
+singular_denomination = ""
+plural_denomination = ""
+head_sprites = Array[Resource("res://scripts/resources/beings/sprites/head/head_sprite_data.gd")]([])
+body_sprites = Array[ExtResource("2_sogpu")]([SubResource("Resource_c7rrs")])
+description = ""
+filth_generation = 0.0
+max_encumberance_multiplier = 1.0
+hunger_rate = 1.0
+diets = Array[Resource("res://scripts/resources/beings/race/diet.gd")]([])
+can_vent = false
+can_climb = false
+males_females_ratio = 0.5

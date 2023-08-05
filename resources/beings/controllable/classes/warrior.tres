@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="Class" load_steps=2 format=3 uid="uid://bfr7wcpjoh70n"]
+[gd_resource type="Resource" script_class="Class" load_steps=3 format=3 uid="uid://bfr7wcpjoh70n"]
 
-[ext_resource type="Script" path="res://scripts/resources/beings/controllable/classes/class.gd" id="1_dagek"]
+[ext_resource type="Resource" uid="uid://djbj7w1wc1v1i" path="res://resources/beings/uncontrollable/races/pig.tres" id="1_2y4qg"]
+[ext_resource type="Script" path="res://scripts/resources/beings/controllable/class.gd" id="1_dagek"]
 
 [resource]
 script = ExtResource("1_dagek")
 id = "warrior"
 name = "Warrior"
-available_pets_ids = {}
+available_followers = Array[Resource("res://scripts/resources/beings/race/uncontrollable_race.gd")]([ExtResource("1_2y4qg")])
 available_spells = Array[String]([])

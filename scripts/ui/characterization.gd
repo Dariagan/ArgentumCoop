@@ -1,12 +1,15 @@
 extends VBoxContainer
 
+@onready var global_game_data = get_node("/root/GlobalGameData")
 @onready var race_menu_button: MenuButton = $RaceMenuButton
 @onready var sex_menu_button: MenuButton = $SexMenuButton
 @onready var head_menu_button: MenuButton = $HeadMenuButton
 @onready var class_menu_button: MenuButton = $ClassMenuButton
 @onready var follower_menu_button: MenuButton = $FollowerMenuButton
 
-@onready var global_game_data = get_node("/root/GlobalGameData")
+signal race_selected(race: ControllableRace)
+signal class_selected(klass: Class)
+signal follower_selected(follower: UncontrollableRace)
 
 var _found_races: Array
 var _current_race: ControllableRace
@@ -14,8 +17,6 @@ var _current_sex: GlobalEnums.Sex
 var _current_head: HeadSpriteData
 var _current_class: Class
 var _current_follower: UncontrollableRace
-
-
 
 # MULTIPLICAR LA FONT SIZE POR LA WIDTH DIVIDIDA ENTRE ALGUNA CONSTANTE? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
 func _ready() -> void:
@@ -55,7 +56,7 @@ func _on_sex_selected(id: int):
 func _on_head_selected(id: int):
 	_current_head = _current_race.head_sprites[id]
 	head_menu_button.text = " "
-	head_menu_button.icon = _current_head.animation.get_frame_texture("idle_down", 0)
+	head_menu_button.icon = _current_head.frames.get_frame_texture("idle_down", 0)
 
 func _on_class_selected(id: int):
 	_current_class = _current_race.available_classes[id]
@@ -76,10 +77,12 @@ func _update_popup_menu(popup_menu: PopupMenu, items: Array):
 	popup_menu.clear()
 	var i: int = 0
 	for item in items:
-		if item.icon:
+		if "icon" in item and item.icon:
 			popup_menu.add_icon_item(item.icon, item.name, i)
-		elif item.head_sprites and item.head_sprites.size() >= 1 and item.head_sprites[0].animation:
-			popup_menu.add_icon_item(item.head_sprites[0].animation.get_frame_texture("idle_down", 0), item.name, i)
+		elif item is BasicRace and item.head_sprites and item.head_sprites.size() >= 1 and item.head_sprites[0].frames:
+			popup_menu.add_icon_item(item.head_sprites[0].frames.get_frame_texture("idle_down", 0), item.name, i)
+		elif item is UncontrollableRace and item.body_sprites and item.body_sprites.size() >= 1 and item.body_sprites[0].frames:
+			popup_menu.add_icon_item(item.body_sprites[0].frames.get_frame_texture("idle_down", 0), item.name, i)
 		else:
 			popup_menu.add_item(item.name, i)
 		i += 1
@@ -104,7 +107,7 @@ func _setup_head_menu_popup():
 	popup.clear()
 	var i: int = 0
 	for head_sprite in _current_race.head_sprites:
-		popup.add_icon_item(head_sprite.animation.get_frame_texture("idle_down", 0), "", i)
+		popup.add_icon_item(head_sprite.frames.get_frame_texture("idle_down", 0), "", i)
 		i += 1
 	
 	if _current_head and not _current_head in _current_race.head_sprites:

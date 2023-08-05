@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 [ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
-[ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby_interface.tscn" id="8_losb1"]
+[ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/chat_room/lobby_interface.tscn" id="8_rvt7q"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_iuim6")
@@ -57,7 +57,7 @@ pivot_offset = Vector2(182, -118)
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("7_6o24h")
-lobby_interface_scene = ExtResource("8_losb1")
+lobby_interface_scene = ExtResource("8_rvt7q")
 
 [node name="MainMenu" parent="Canvas/MenuControl" instance=ExtResource("7_wv7ku")]
 layout_mode = 2
