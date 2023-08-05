@@ -5,7 +5,9 @@ class_name BasicRace
 @export var name: String = " "
 @export var icon: Texture2D
 
-@export var sprites_data: Array[SpriteData]
+@export var head_sprites_datas: Array[SpriteData]
+@export var body_sprites_datas: Array[SpriteData]
+@export var other_sprites_datas: Array[SpriteData]
 
 @export var demonym: String #gentilicio
 @export var singular_denomination: String
@@ -25,13 +27,13 @@ class_name BasicRace
 @export_range(0, 3) var hunger_rate: float = 1
 @export var diets: Array[Diet]
 
-@export var combat_multipliers: CombatMultipliers
+
 
 @export_category("Abilities")
 @export var can_vent: bool = false
 @export var can_climb: bool = false#hacer int de nivel 0-10?
 
-
+@export var combat_multipliers: CombatMultipliers
 
 
 #export array de tupla biome_id: string preferrance: float
@@ -41,3 +43,5 @@ class_name BasicRace
 # value = 1 -> 100% of pawns are male 0 _> all pawns are female
 
 @export_range(0, 1) var males_females_ratio: float = 0.5
+
+

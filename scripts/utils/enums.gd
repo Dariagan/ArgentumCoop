@@ -1,5 +1,5 @@
-extends Object
-class_name GlobalEnums
+
+class_name Enums
 
 enum Sex { MALE = 1, FEMALE, ANY }
 

@@ -1,13 +1,13 @@
 [gd_scene load_steps=17 format=3 uid="uid://dvqq1banvf1yw"]
 
-[ext_resource type="Script" path="res://scripts/ui/lobby_interface.gd" id="1_gewq0"]
-[ext_resource type="PackedScene" uid="uid://cpat3jp6fu4q2" path="res://scenes/ui/chat_room/chat_component.tscn" id="2_5fe4g"]
-[ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse-7021371.jpg" id="3_rncrb"]
-[ext_resource type="FontFile" uid="uid://ctrsrtkxeu85y" path="res://assets/fonts/Exocet2.ttf" id="4_n6a85"]
-[ext_resource type="PackedScene" uid="uid://vxv66o5h4qwi" path="res://scenes/ui/coolborder.tscn" id="5_msqxt"]
-[ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resources/ui/lineeditname.tres" id="6_nuk4o"]
-[ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="7_d0fj4"]
-[ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/character_characterization.tscn" id="8_3i0au"]
+[ext_resource type="Script" path="res://scripts/ui/lobby_interface.gd" id="1_ccl6q"]
+[ext_resource type="PackedScene" uid="uid://cpat3jp6fu4q2" path="res://scenes/ui/lobby/chat_component.tscn" id="2_5ng8f"]
+[ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse-7021371.jpg" id="3_y8ymn"]
+[ext_resource type="FontFile" uid="uid://ctrsrtkxeu85y" path="res://assets/fonts/Exocet2.ttf" id="4_7et2h"]
+[ext_resource type="PackedScene" uid="uid://vxv66o5h4qwi" path="res://scenes/ui/coolborder.tscn" id="5_afl3m"]
+[ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resources/ui/lineeditname.tres" id="6_1a38e"]
+[ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="7_7ufi4"]
+[ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/character_characterization.tscn" id="8_nbaej"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_efsbq"]
 
@@ -32,7 +32,7 @@ bg_color = Color(0.498039, 0.537255, 0.309804, 0.372549)
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [sub_resource type="Theme" id="Theme_ouea4"]
-default_font = ExtResource("4_n6a85")
+default_font = ExtResource("4_7et2h")
 MenuButton/font_sizes/font_size = 23
 MenuButton/styles/focus = SubResource("StyleBoxFlat_efsbq")
 MenuButton/styles/hover = SubResource("StyleBoxFlat_yggfa")
@@ -46,7 +46,7 @@ bg_color = Color(0.286275, 0.258824, 0.176471, 0.290196)
 
 [sub_resource type="LabelSettings" id="LabelSettings_43e4q"]
 line_spacing = 0.0
-font = ExtResource("4_n6a85")
+font = ExtResource("4_7et2h")
 font_size = 49
 font_color = Color(0.137255, 0.137255, 0.137255, 1)
 outline_size = 2
@@ -54,7 +54,7 @@ outline_color = Color(0.603922, 0, 0, 1)
 shadow_size = 0
 
 [node name="Node" type="Node"]
-script = ExtResource("1_gewq0")
+script = ExtResource("1_ccl6q")
 
 [node name="ChatContainer" type="PanelContainer" parent="."]
 anchors_preset = 15
@@ -68,7 +68,7 @@ size_flags_vertical = 3
 [node name="VBoxContainer" type="VBoxContainer" parent="ChatContainer"]
 layout_mode = 2
 
-[node name="ChatComponent" parent="ChatContainer/VBoxContainer" node_paths=PackedStringArray("chat_text_edit", "chat_label", "scroll_container") instance=ExtResource("2_5fe4g")]
+[node name="ChatComponent" parent="ChatContainer/VBoxContainer" node_paths=PackedStringArray("chat_text_edit", "chat_label", "scroll_container") instance=ExtResource("2_5ng8f")]
 chat_text_edit = NodePath("../HBoxContainer3/WriteMsgBox")
 chat_label = NodePath("../HBoxContainer2/ScrollContainer/ChatLabel")
 scroll_container = NodePath("../HBoxContainer2/ScrollContainer")
@@ -125,7 +125,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_rncrb")
+texture = ExtResource("3_y8ymn")
 expand_mode = 5
 
 [node name="Control" type="Control" parent="TextureRect"]
@@ -143,7 +143,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_ouea4")
 
-[node name="CoolBorder" parent="TextureRect/Control" instance=ExtResource("5_msqxt")]
+[node name="CoolBorder" parent="TextureRect/Control" instance=ExtResource("5_afl3m")]
 layout_mode = 1
 
 [node name="TransparentBackground" type="Panel" parent="TextureRect/Control"]
@@ -194,11 +194,11 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.721569, 0.713726, 0.435294, 1)
 theme_override_colors/font_placeholder_color = Color(0.721569, 0.713726, 0.435294, 1)
 theme_override_colors/caret_color = Color(0.733333, 0.501961, 0.298039, 1)
-theme_override_fonts/font = ExtResource("4_n6a85")
+theme_override_fonts/font = ExtResource("4_7et2h")
 theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = ExtResource("6_nuk4o")
-theme_override_styles/focus = ExtResource("6_nuk4o")
-theme_override_styles/read_only = ExtResource("6_nuk4o")
+theme_override_styles/normal = ExtResource("6_1a38e")
+theme_override_styles/focus = ExtResource("6_1a38e")
+theme_override_styles/read_only = ExtResource("6_1a38e")
 placeholder_text = "Name"
 alignment = 1
 max_length = 28
@@ -223,7 +223,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_7ufi4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -240,10 +240,10 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="CharacterCharacterization" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer" instance=ExtResource("8_3i0au")]
+[node name="CharacterCharacterization" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer" instance=ExtResource("8_nbaej")]
 layout_mode = 2
 
-[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_7ufi4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -278,7 +278,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_7ufi4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -309,7 +309,7 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_7ufi4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -343,7 +343,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_7ufi4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -369,7 +369,7 @@ theme_override_font_sizes/font_size = 27
 text = "Class stats"
 horizontal_alignment = 1
 
-[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_7ufi4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -395,7 +395,7 @@ theme_override_font_sizes/font_size = 27
 text = "Net stats"
 horizontal_alignment = 1
 
-[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer" instance=ExtResource("7_7ufi4")]
 visible = false
 layout_mode = 2
 

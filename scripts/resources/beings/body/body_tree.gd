@@ -9,5 +9,5 @@ class_name BodyTree
 
 # not inherited by children, only local to the body part
 # body groups the part belongs to (arm, leg, shoulder, etc)
-@export var body_groups: Array[String]
+@export var in_body_groups: Array[String] = []
 

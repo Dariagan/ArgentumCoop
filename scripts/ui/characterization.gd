@@ -13,8 +13,8 @@ signal follower_selected(follower: UncontrollableRace)
 
 var _found_races: Array
 var _current_race: ControllableRace
-var _current_sex: GlobalEnums.Sex
-var _current_head: HeadSpriteData
+var _current_sex: Enums.Sex
+var _current_head: SpriteData
 var _current_class: Class
 var _current_follower: UncontrollableRace
 
@@ -47,14 +47,14 @@ func _on_race_selected(id: int):
 	#selected_race.emit(_current_race)
 
 func _on_sex_selected(id: int):
-	_current_sex = id as GlobalEnums.Sex
-	sex_menu_button.text = "Sex: %s" % str(GlobalEnums.Sex.keys()[id - 1])
+	_current_sex = id as Enums.Sex
+	sex_menu_button.text = "Sex: %s" % str(Enums.Sex.keys()[id - 1])
 	
 	if _current_race and _current_sex > 0:
 		_setup_head_menu_popup()
 	
 func _on_head_selected(id: int):
-	_current_head = _current_race.head_sprites[id]
+	_current_head = _current_race.head_sprites_datas[id]
 	head_menu_button.text = " "
 	head_menu_button.icon = _current_head.frames.get_frame_texture("idle_down", 0)
 
@@ -79,8 +79,8 @@ func _update_popup_menu(popup_menu: PopupMenu, items: Array):
 	for item in items:
 		if "icon" in item and item.icon:
 			popup_menu.add_icon_item(item.icon, item.name, i)
-		elif item is BasicRace and item.head_sprites and item.head_sprites.size() >= 1 and item.head_sprites[0].frames:
-			popup_menu.add_icon_item(item.head_sprites[0].frames.get_frame_texture("idle_down", 0), item.name, i)
+		elif item is BasicRace and item.head_sprites_datas and item.head_sprites_datas.size() >= 1 and item.head_sprites_datas[0].frames:
+			popup_menu.add_icon_item(item.head_sprites_datas[0].frames.get_frame_texture("idle_down", 0), item.name, i)
 		elif item is UncontrollableRace and item.body_sprites and item.body_sprites.size() >= 1 and item.body_sprites[0].frames:
 			popup_menu.add_icon_item(item.body_sprites[0].frames.get_frame_texture("idle_down", 0), item.name, i)
 		else:
@@ -92,11 +92,11 @@ func _setup_sex_menu_popup(current_race: ControllableRace):
 	popup.clear()
 	if current_race.males_females_ratio == 1:
 		popup.add_item("Male", 1)
-		_current_sex = GlobalEnums.Sex.MALE
+		_current_sex = Enums.Sex.MALE
 		sex_menu_button.text = "Sex: Male"
 	elif current_race.males_females_ratio == 0:
 		popup.add_item("Female", 2)
-		_current_sex = GlobalEnums.Sex.FEMALE
+		_current_sex = Enums.Sex.FEMALE
 		sex_menu_button.text = "Sex: Female"
 	else:
 		popup.add_item("Male", 1)
@@ -106,10 +106,10 @@ func _setup_head_menu_popup():
 	var popup: PopupMenu = head_menu_button.get_popup()
 	popup.clear()
 	var i: int = 0
-	for head_sprite in _current_race.head_sprites:
+	for head_sprite in _current_race.head_sprites_datas:
 		popup.add_icon_item(head_sprite.frames.get_frame_texture("idle_down", 0), "", i)
 		i += 1
 	
-	if _current_head and not _current_head in _current_race.head_sprites:
+	if _current_head and not _current_head in _current_race.head_sprites_datas:
 		head_menu_button.text = "Head: Not picked"
 		_current_head = null
