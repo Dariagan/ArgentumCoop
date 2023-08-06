@@ -18,6 +18,7 @@ var _current_head: SpriteData
 var _current_class: Class
 var _current_follower: UncontrollableRace
 
+#MULTIPLICAR LA FONT SIZE POR LA WIDTH DIVIDIDA ENTRE ALGUNA CONSTANTE? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
 # MULTIPLICAR LA FONT SIZE POR LA WIDTH DIVIDIDA ENTRE ALGUNA CONSTANTE? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
 func _ready() -> void:
 	_found_races = global_game_data.controllable_races.values()
@@ -34,9 +35,10 @@ func _on_race_selected(id: int):
 	race_selected.emit(null)
 	
 	if _current_class and not _current_class in _current_race.available_classes:
-		class_menu_button.text = "Class: Not picked"
 		_current_class = null
 		class_selected.emit(null)
+	if not _current_class:
+		class_menu_button.text = "Class: Not picked"
 		
 	_setup_sex_menu_popup(_current_race)
 	
@@ -52,6 +54,12 @@ func _on_sex_selected(id: int):
 	_current_sex = id as Enums.Sex
 	sex_menu_button.text = "Sex: %s" % str(Enums.Sex.keys()[id])
 	
+	if _current_head and (_current_head.sex != Enums.Sex.ANY || _current_head.sex != _current_sex):
+		_current_head = null
+		head_menu_button.text = "Head: Not picked"
+		head_menu_button.icon = null
+		# emit signal head selected
+	
 	if _current_race and _current_sex > 0:
 		_setup_head_menu_popup(_current_sex)
 	
@@ -65,9 +73,10 @@ func _on_class_selected(id: int):
 	class_selected.emit(_current_class)
 	
 	if _current_follower and not _current_follower in _current_class.available_followers:
-		follower_menu_button.text = "Follower: Not picked"
 		_current_follower = null
 		follower_selected.emit(null)
+	if not _current_follower:
+		follower_menu_button.text = "Follower: Not picked"
 	
 	class_menu_button.text = "Class: %s" % _current_class.name
 	_update_popup_menu(follower_menu_button.get_popup(), _current_class.available_followers)
@@ -107,6 +116,8 @@ func _setup_sex_menu_popup(current_race: ControllableRace):
 		popup.add_item("Female", 2)
 
 func _setup_head_menu_popup(sex: Enums.Sex):
+	
+	
 	var popup: PopupMenu = head_menu_button.get_popup()
 	popup.clear()
 	var i: int = 0
@@ -116,5 +127,6 @@ func _setup_head_menu_popup(sex: Enums.Sex):
 		i += 1
 	
 	if _current_head and not _current_head in _current_race.head_sprites_datas:
-		head_menu_button.text = "Head: Not picked"
 		_current_head = null
+	if not _current_head:
+		head_menu_button.text = "Head: Not picked"

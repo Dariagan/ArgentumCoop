@@ -1,57 +1,56 @@
-[gd_scene load_steps=17 format=3 uid="uid://dvqq1banvf1yw"]
+[gd_scene load_steps=18 format=3 uid="uid://dvqq1banvf1yw"]
 
 [ext_resource type="Script" path="res://scripts/ui/lobby_interface.gd" id="1_gewq0"]
 [ext_resource type="PackedScene" uid="uid://cpat3jp6fu4q2" path="res://scenes/ui/lobby/chat_component.tscn" id="2_5fe4g"]
 [ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse-7021371.jpg" id="3_rncrb"]
 [ext_resource type="FontFile" uid="uid://ctrsrtkxeu85y" path="res://assets/fonts/Exocet2.ttf" id="4_n6a85"]
+[ext_resource type="StyleBox" uid="uid://c1i3svkycn37m" path="res://resources/ui/buttonhover.tres" id="5_43a4n"]
 [ext_resource type="PackedScene" uid="uid://vxv66o5h4qwi" path="res://scenes/ui/coolborder.tscn" id="5_msqxt"]
+[ext_resource type="StyleBox" uid="uid://e17urjuoqp4r" path="res://resources/ui/buttonpressed.tres" id="6_asl6y"]
+[ext_resource type="LabelSettings" uid="uid://cujwfyskppm3o" path="res://resources/ui/labelsettings.tres" id="6_nkp4f"]
 [ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resources/ui/lineeditname.tres" id="6_nuk4o"]
 [ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="7_d0fj4"]
 [ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/lobby/character_characterization.tscn" id="8_3i0au"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_efsbq"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o0l37"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yggfa"]
-bg_color = Color(0.607843, 0.623529, 0.356863, 0.133333)
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jgji4"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5jufm"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.6, 0.6, 0.6, 0)
-border_color = Color(0.117647, 0, 0.00784314, 0.372549)
-border_blend = true
-corner_radius_top_right = 7
-corner_radius_bottom_left = 7
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_liqcm"]
-bg_color = Color(0.498039, 0.537255, 0.309804, 0.372549)
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4bbal"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6li4x"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [sub_resource type="Theme" id="Theme_ouea4"]
 default_font = ExtResource("4_n6a85")
+Button/colors/font_color = Color(0.875, 0.875, 0.875, 1)
+Button/colors/font_disabled_color = Color(0.875, 0.875, 0.875, 0.5)
+Button/colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+Button/colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+Button/colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/font_outline_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_disabled_color = Color(1, 1, 1, 0.4)
+Button/colors/icon_focus_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_normal_color = Color(1, 1, 1, 1)
+Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
+Button/constants/h_separation = 2
+Button/constants/icon_max_width = 0
+Button/constants/outline_size = 0
+Button/font_sizes/font_size = 16
+Button/styles/disabled = SubResource("StyleBoxEmpty_o0l37")
+Button/styles/focus = SubResource("StyleBoxEmpty_jgji4")
+Button/styles/hover = ExtResource("5_43a4n")
+Button/styles/normal = SubResource("StyleBoxEmpty_4bbal")
+Button/styles/pressed = ExtResource("6_asl6y")
 MenuButton/font_sizes/font_size = 23
-MenuButton/styles/focus = SubResource("StyleBoxFlat_efsbq")
-MenuButton/styles/hover = SubResource("StyleBoxFlat_yggfa")
-MenuButton/styles/normal = SubResource("StyleBoxFlat_5jufm")
-MenuButton/styles/pressed = SubResource("StyleBoxFlat_liqcm")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_6li4x")
 PopupMenu/constants/icon_max_width = 300
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tggsu"]
 bg_color = Color(0.286275, 0.258824, 0.176471, 0.290196)
-
-[sub_resource type="LabelSettings" id="LabelSettings_43e4q"]
-line_spacing = 0.0
-font = ExtResource("4_n6a85")
-font_size = 49
-font_color = Color(0.137255, 0.137255, 0.137255, 1)
-outline_size = 2
-outline_color = Color(0.603922, 0, 0, 1)
-shadow_size = 0
 
 [node name="Node" type="Node"]
 script = ExtResource("1_gewq0")
@@ -120,7 +119,6 @@ layout_mode = 2
 text = "Create Character"
 
 [node name="TextureRect" type="TextureRect" parent="."]
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -129,7 +127,7 @@ grow_vertical = 2
 texture = ExtResource("3_rncrb")
 expand_mode = 5
 
-[node name="Control" type="Control" parent="TextureRect"]
+[node name="HasTheme" type="Control" parent="TextureRect"]
 custom_minimum_size = Vector2(1024, 600)
 layout_mode = 1
 anchor_left = 0.15
@@ -144,10 +142,10 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_ouea4")
 
-[node name="CoolBorder" parent="TextureRect/Control" instance=ExtResource("5_msqxt")]
+[node name="CoolBorder" parent="TextureRect/HasTheme" instance=ExtResource("5_msqxt")]
 layout_mode = 1
 
-[node name="TransparentBackground" type="Panel" parent="TextureRect/Control"]
+[node name="TransparentBackground" type="Panel" parent="TextureRect/HasTheme"]
 layout_direction = 1
 layout_mode = 1
 anchors_preset = 15
@@ -157,33 +155,36 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_tggsu")
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme"]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/Control/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer"]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 theme_override_constants/separation = 9
 
-[node name="Label" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 1
 text = "Character"
-label_settings = SubResource("LabelSettings_43e4q")
+label_settings = ExtResource("6_nkp4f")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Control" type="Control" parent="TextureRect/Control/MarginContainer/VBoxContainer"]
+[node name="Control" type="Control" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(420, 42)
 layout_mode = 2
 
-[node name="LineEdit" type="LineEdit" parent="TextureRect/Control/MarginContainer/VBoxContainer/Control"]
+[node name="LineEdit" type="LineEdit" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/Control"]
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -206,30 +207,27 @@ max_length = 28
 caret_blink = true
 caret_blink_interval = 1.5
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 15
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -241,15 +239,15 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="CharacterCharacterization" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer" instance=ExtResource("8_3i0au")]
+[node name="CharacterCharacterization" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer" instance=ExtResource("8_3i0au")]
 layout_mode = 2
 
-[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft2" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -261,30 +259,30 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 27
 text = "Follower stats"
 horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="Label2" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_d0fj4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -296,26 +294,26 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 27
 text = "Race Stats"
 horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
+[node name="Label2" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft2" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_d0fj4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -327,29 +325,29 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 27
 horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="Label2" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_d0fj4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -361,21 +359,21 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft/MarginContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 27
 text = "Class stats"
 horizontal_alignment = 1
 
-[node name="WhiteBorderTopLeft2" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft2" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_d0fj4")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -387,20 +385,20 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2/MarginContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TextureRect/Control/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 27
 text = "Net stats"
 horizontal_alignment = 1
 
-[node name="WhiteBorderTopLeft" parent="TextureRect/Control/MarginContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+[node name="WhiteBorderTopLeft" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
 visible = false
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="TextureRect/Control/MarginContainer/VBoxContainer/WhiteBorderTopLeft"]
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/WhiteBorderTopLeft"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -412,10 +410,41 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Button" type="Button" parent="TextureRect/Control/MarginContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer"]
+[node name="Button" type="Button" parent="TextureRect/HasTheme/MarginContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "To lobby"
+
+[node name="Control" type="Control" parent="TextureRect/HasTheme/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="WhiteBorderTopLeft" parent="TextureRect/HasTheme/MarginContainer/Control" instance=ExtResource("7_d0fj4")]
+layout_mode = 2
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_top = 18.0
+offset_right = 152.0
+offset_bottom = 89.0
+
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/HasTheme/MarginContainer/Control/WhiteBorderTopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="Button" type="Button" parent="TextureRect/HasTheme/MarginContainer/Control/WhiteBorderTopLeft/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "LOBBY"
 
 [connection signal="pressed" from="ChatContainer/VBoxContainer/HBoxContainer1/LeaveButton" to="." method="_on_leave_button_pressed"]
 [connection signal="pressed" from="ChatContainer/VBoxContainer/HBoxContainer3/CreateCharacterButton" to="." method="_on_create_character_button_pressed"]

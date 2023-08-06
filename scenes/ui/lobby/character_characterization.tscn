@@ -29,7 +29,7 @@ flat = false
 [node name="HeadMenuButton" type="MenuButton" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
-text = "Head: Not Picked"
+text = "Head: Pick race and sex first"
 flat = false
 icon_alignment = 1
 expand_icon = true
@@ -37,11 +37,11 @@ expand_icon = true
 [node name="ClassMenuButton" type="MenuButton" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
-text = "Class: Not Picked"
+text = "Class: Pick race first"
 flat = false
 
 [node name="FollowerMenuButton" type="MenuButton" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
-text = "Follower: Not Picked"
+text = "Follower: Pick class first"
 flat = false

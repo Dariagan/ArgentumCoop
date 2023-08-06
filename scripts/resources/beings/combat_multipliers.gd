@@ -50,3 +50,6 @@ class_name CombatMultipliers
 @export var healing_spells_effect: float = 1 #hacer los regeneration spells den más health x mana gasta, pero son mucho mas lentos
 @export var spells_damage: float = 1
 @export var mana_regeneration_rate: float = 1
+@export var summon_damage: float = 1
+@export var summon_duration: float = 1
+@export var summon_health: float = 1
