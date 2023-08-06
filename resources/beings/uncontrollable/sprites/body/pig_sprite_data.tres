@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SpriteData" load_steps=3 format=3 uid="uid://bp7djvx3emrtg"]
+
+[ext_resource type="SpriteFrames" uid="uid://d4jut4hh1pme0" path="res://resources/beings/uncontrollable/sprites/body/frames/pig_frames.tres" id="1_nvm42"]
+[ext_resource type="Script" path="res://scripts/resources/beings/sprite_data.gd" id="2_4j2do"]
+
+[resource]
+script = ExtResource("2_4j2do")
+name = &"Body"
+frames = ExtResource("1_nvm42")
+sex = 3
+animation_states = Array[StringName]([&"idle", &"walk"])
+offset_global = Vector2(0, 0)
+offset_down = Vector2(0, 0)
+offset_up = Vector2(0, 0)
+offset_sideways = Vector2(0, 0)
+scale_global = Vector2(1, 1)
+scale_vertical = Vector2(1, 1)
+scale_sideways = Vector2(1, 1)

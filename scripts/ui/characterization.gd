@@ -83,10 +83,10 @@ func _update_popup_menu(popup_menu: PopupMenu, items: Array):
 	for item in items:
 		if "icon" in item and item.icon:
 			popup_menu.add_icon_item(item.icon, item.name, i)
-		elif item is BasicRace and item.head_sprites_datas and item.head_sprites_datas.size() >= 1 and item.head_sprites_datas[0].frames:
+		elif item is BasicRace and item.head_sprites_datas and item.head_sprites_datas.size() >= 1 and item.head_sprites_datas[0] and item.head_sprites_datas[0].frames:
 			popup_menu.add_icon_item(item.head_sprites_datas[0].frames.get_frame_texture("idle_down", 0), item.name, i)
-		elif item is UncontrollableRace and item.body_sprites and item.body_sprites.size() >= 1 and item.body_sprites[0].frames:
-			popup_menu.add_icon_item(item.body_sprites[0].frames.get_frame_texture("idle_down", 0), item.name, i)
+		elif item is UncontrollableRace and item.body_sprites_datas and item.body_sprites_datas.size() >= 1 and item.body_sprites_datas[0] and item.body_sprites_datas[0].frames:
+			popup_menu.add_icon_item(item.body_sprites_datas[0].frames.get_frame_texture("idle_down", 0), item.name, i)
 		else:
 			popup_menu.add_item(item.name, i)
 		i += 1
