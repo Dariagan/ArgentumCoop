@@ -471,6 +471,5 @@ format = 2
 script = ExtResource("5_bro3w")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://scenes/character.tscn")
 spawn_path = NodePath("../OverWorldTileMap")
 spawn_limit = 1

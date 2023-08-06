@@ -1,6 +1,6 @@
 extends Node
 
-const item_data_directories: Array[String] = ["res://resources/things/items/", "res://resources/things/items/wear/body/"]
+const item_data_directories: Array[String] = []#["res://resources/things/items/", "res://resources/things/items/wear/body/"]
 const recipes_directories: Array[String] = []
 const building_data_directories: Array[String] = []
 const controllable_races_directories: Array[String] = ["res://resources/beings/controllable/races/"]

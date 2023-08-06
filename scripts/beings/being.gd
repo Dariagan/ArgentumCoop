@@ -21,10 +21,11 @@ var _facing_direction: String = "down"
 func _init(i_data: IndividualBeingSpawnData) -> void:
 	
 	for i in i_data.chosen_sprites:
-		var as2d: AnimatedSprite2D = AnimatedSprite2D.new()
-		as2d.name = i_data.race.animated_sprites[i].name
-		as2d.frames = i_data.race.animated_sprites[i].frames
 		
+		var node_name: StringName = i_data.race.body_sprites_datas[i].name
+		var frames:  = i_data.race.body_sprites_datas[i].frames
+		
+		var as2d: AnimatedSprite2D = AnimatedSprite2D.new()
 		
 
 

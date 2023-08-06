@@ -1,6 +1,8 @@
 extends Resource
 class_name IndividualBeingSpawnData
 
+@export var name: String
+
 @export var health_multiplier: float = 1
 
 @export var level: int = 1
@@ -18,3 +20,4 @@ class_name IndividualBeingSpawnData
 
 @export var starting_inventory: Dictionary
 
+# inicializar las variables con .nombre_variable = algo

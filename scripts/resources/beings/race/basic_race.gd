@@ -20,6 +20,7 @@ class_name BasicRace
 @export_range(0, 1) var filth_generation: float = 0
 @export_range(0, 3) var max_encumberance_multiplier: float = 1 #preferably leave at 1
 
+@export var comfortable_temp_range: Vector2i = Vector2i(16, 23)
 
 #@export var body: Body las partes del cuerpo, incluyendo si están incluidas en la generación de damage o no
 

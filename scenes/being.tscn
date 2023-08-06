@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c640ckrygghxk"]
 
-[ext_resource type="Script" path="res://scripts/being.gd" id="1_pbdjh"]
+[ext_resource type="Script" path="res://scripts/beings/being.gd" id="1_qp2au"]
 [ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/beings/controllable/sprites/head/frames/human_male_brunette_mullet.tres" id="2_utni8"]
 [ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/beings/controllable/sprites/body/frames/human_male_frames.tres" id="3_1p4di"]
 
@@ -18,7 +18,7 @@ properties/1/sync = true
 properties/1/watch = false
 
 [node name="Being" type="CharacterBody2D"]
-script = ExtResource("1_pbdjh")
+script = ExtResource("1_qp2au")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.4, 1.4)
