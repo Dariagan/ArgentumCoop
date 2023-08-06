@@ -7,8 +7,11 @@ extends VBoxContainer
 @onready var class_menu_button: MenuButton = $ClassMenuButton
 @onready var follower_menu_button: MenuButton = $FollowerMenuButton
 
+
 signal race_selected(race: ControllableRace)
 signal class_selected(klass: Class)
+signal sex_selected(sex: Enums.Sex)
+signal head_selected(index: int)
 signal follower_selected(follower: UncontrollableRace)
 
 var _found_races: Array
@@ -18,8 +21,8 @@ var _current_head: SpriteData
 var _current_class: Class
 var _current_follower: UncontrollableRace
 
-#MULTIPLICAR LA FONT SIZE POR LA WIDTH DIVIDIDA ENTRE ALGUNA CONSTANTE? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
-# MULTIPLICAR LA FONT SIZE POR LA WIDTH DIVIDIDA ENTRE ALGUNA CONSTANTE? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
+# MULTIPLICAR LA FONT SIZE POR (LA WIDTH ACTUAL * (LA WIDTH ORIGINAL/ LA FONT SIZE ORIGINAL) ? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
+# MULTIPLICAR LA FONT SIZE POR (LA WIDTH ACTUAL * (LA FONT SIZE ORIGINAL/LA WIDTH ORIGINAL) ? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
 func _ready() -> void:
 	_found_races = global_game_data.controllable_races.values()
 	var race_menu_popup = race_menu_button.get_popup()
@@ -39,6 +42,9 @@ func _on_race_selected(id: int):
 		class_selected.emit(null)
 	if not _current_class:
 		class_menu_button.text = "Class: Not picked"
+		class_menu_button.disabled = false
+		follower_menu_button.text = "Follower: Pick class first"
+		follower_menu_button.disabled = true
 		
 	_setup_sex_menu_popup(_current_race)
 	
@@ -54,17 +60,22 @@ func _on_sex_selected(id: int):
 	_current_sex = id as Enums.Sex
 	sex_menu_button.text = "Sex: %s" % str(Enums.Sex.keys()[id])
 	
+	sex_selected.emit(_current_sex)
+	
 	if _current_head and (_current_head.sex != Enums.Sex.ANY || _current_head.sex != _current_sex):
 		_current_head = null
-		head_menu_button.text = "Head: Not picked"
 		head_menu_button.icon = null
-		# emit signal head selected
-	
+		head_selected.emit(-1)
+	if not _current_head:
+		head_menu_button.text = "Head: Not picked"
+		head_menu_button.disabled = false
+		
 	if _current_race and _current_sex > 0:
 		_setup_head_menu_popup(_current_sex)
 	
 func _on_head_selected(id: int):
 	_current_head = _current_race.head_sprites_datas[id]
+	head_selected.emit(id)
 	head_menu_button.text = " "
 	head_menu_button.icon = _current_head.frames.get_frame_texture("idle_down", 0)
 
@@ -77,12 +88,14 @@ func _on_class_selected(id: int):
 		follower_selected.emit(null)
 	if not _current_follower:
 		follower_menu_button.text = "Follower: Not picked"
+		follower_menu_button.disabled = false
 	
 	class_menu_button.text = "Class: %s" % _current_class.name
 	_update_popup_menu(follower_menu_button.get_popup(), _current_class.available_followers)
 	
 func _on_follower_selected(id: int):
 	_current_follower = _current_class.available_followers[id]
+	follower_selected.emit(_current_follower)
 	follower_menu_button.text = "Follower: %s" % _current_follower.name
 	
 	
@@ -117,7 +130,6 @@ func _setup_sex_menu_popup(current_race: ControllableRace):
 
 func _setup_head_menu_popup(sex: Enums.Sex):
 	
-	
 	var popup: PopupMenu = head_menu_button.get_popup()
 	popup.clear()
 	var i: int = 0
@@ -130,3 +142,4 @@ func _setup_head_menu_popup(sex: Enums.Sex):
 		_current_head = null
 	if not _current_head:
 		head_menu_button.text = "Head: Not picked"
+		head_menu_button.disabled = false

@@ -7,7 +7,7 @@ script = ExtResource("1_8jcj2")
 
 [node name="CharacterizationLabel" type="Label" parent="."]
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 1
 theme_override_font_sizes/font_size = 27
 text = "Characterization"
 horizontal_alignment = 1
@@ -29,7 +29,8 @@ flat = false
 [node name="HeadMenuButton" type="MenuButton" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
-text = "Head: Pick race and sex first"
+disabled = true
+text = "Head: Pick race & sex first"
 flat = false
 icon_alignment = 1
 expand_icon = true
@@ -37,11 +38,13 @@ expand_icon = true
 [node name="ClassMenuButton" type="MenuButton" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
+disabled = true
 text = "Class: Pick race first"
 flat = false
 
 [node name="FollowerMenuButton" type="MenuButton" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
+disabled = true
 text = "Follower: Pick class first"
 flat = false
