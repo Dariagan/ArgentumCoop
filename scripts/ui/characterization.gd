@@ -31,27 +31,29 @@ func _ready() -> void:
 
 func _on_race_selected(id: int):
 	_current_race = _found_races[id]
+	race_selected.emit(null)
 	
 	if _current_class and not _current_class in _current_race.available_classes:
 		class_menu_button.text = "Class: Not picked"
 		_current_class = null
+		class_selected.emit(null)
 		
 	_setup_sex_menu_popup(_current_race)
 	
 	race_menu_button.text = "Race: %s" % _current_race.name
 	
 	if _current_race and _current_sex > 0:
-		_setup_head_menu_popup()
+		_setup_head_menu_popup(_current_sex)
 	
 	_update_popup_menu(class_menu_button.get_popup(), _current_race.available_classes)
 	#selected_race.emit(_current_race)
 
 func _on_sex_selected(id: int):
 	_current_sex = id as Enums.Sex
-	sex_menu_button.text = "Sex: %s" % str(Enums.Sex.keys()[id - 1])
+	sex_menu_button.text = "Sex: %s" % str(Enums.Sex.keys()[id])
 	
 	if _current_race and _current_sex > 0:
-		_setup_head_menu_popup()
+		_setup_head_menu_popup(_current_sex)
 	
 func _on_head_selected(id: int):
 	_current_head = _current_race.head_sprites_datas[id]
@@ -60,10 +62,12 @@ func _on_head_selected(id: int):
 
 func _on_class_selected(id: int):
 	_current_class = _current_race.available_classes[id]
+	class_selected.emit(_current_class)
 	
 	if _current_follower and not _current_follower in _current_class.available_followers:
 		follower_menu_button.text = "Follower: Not picked"
 		_current_follower = null
+		follower_selected.emit(null)
 	
 	class_menu_button.text = "Class: %s" % _current_class.name
 	_update_popup_menu(follower_menu_button.get_popup(), _current_class.available_followers)
@@ -102,12 +106,13 @@ func _setup_sex_menu_popup(current_race: ControllableRace):
 		popup.add_item("Male", 1)
 		popup.add_item("Female", 2)
 
-func _setup_head_menu_popup():
+func _setup_head_menu_popup(sex: Enums.Sex):
 	var popup: PopupMenu = head_menu_button.get_popup()
 	popup.clear()
 	var i: int = 0
 	for head_sprite in _current_race.head_sprites_datas:
-		popup.add_icon_item(head_sprite.frames.get_frame_texture("idle_down", 0), "", i)
+		if head_sprite.sex == Enums.Sex.ANY || head_sprite.sex == sex:
+			popup.add_icon_item(head_sprite.frames.get_frame_texture("idle_down", 0), "", i)
 		i += 1
 	
 	if _current_head and not _current_head in _current_race.head_sprites_datas:

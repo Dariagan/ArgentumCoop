@@ -1,8 +1,8 @@
 extends Resource
 class_name BasicRace
 
-@export var id: String
-@export var name: String = " "
+@export var id: StringName
+@export var name: StringName = &" "
 @export var icon: Texture2D
 
 @export var head_sprites_datas: Array[SpriteData]
@@ -15,7 +15,7 @@ class_name BasicRace
 
 @export_multiline var description: String 
 
-@export var can_equip_tools: bool 
+@export var can_equip_tools: bool
 
 @export_range(0, 1) var filth_generation: float = 0
 @export_range(0, 3) var max_encumberance_multiplier: float = 1 #preferably leave at 1

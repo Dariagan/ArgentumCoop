@@ -11,9 +11,6 @@ class_name Class
 
 @export var available_spells: Array[String]
 
-# class should have a hp multiplier
-# class should have a mana multiplier
-# class should change outgoing melee damage multiplier or magic damage multiplayer
 
 # class shouldn't change how much you are capable of carrying
 # class shouldn't give any type of damage reduction
