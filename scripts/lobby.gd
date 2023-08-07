@@ -40,7 +40,6 @@ func _on_player_join(peer_id: int) -> void:
 	_update_players_for_gui()
 	
 func _sync_state_for_clients() -> void: 
-	#each is executed on every client's machine
 	_give_player_list.rpc(_players) 
 	_give_peer_list.rpc(_peers)
 	_give_ready_peers_list.rpc(_ready_peers)
@@ -94,11 +93,11 @@ func _on_player_ready(ready: bool) -> void:
 
 @rpc("call_local", "any_peer")
 func _peer_is_ready(ready: bool) -> void:
-	var peer: int = multiplayer.get_remote_sender_id()
-	if ready and peer not in _ready_peers:
-		_ready_peers.push_back(peer)
+	var peer_id: int = multiplayer.get_remote_sender_id()
+	if ready and peer_id not in _ready_peers:
+		_ready_peers.push_back(peer_id)
 	elif not ready:
-		_ready_peers.erase(peer)
+		_ready_peers.erase(peer_id)
 	
 func _is_everybody_ready() -> bool:
 	return _ready_peers.size() + 1 == _peers.size()
@@ -122,10 +121,17 @@ func _receive_player_username(username: String) -> void:
 # for requesting a peer's username
 
 
+
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
 	_lobby_interface.update_username(_username)
 	_lobby_interface.ready_toggled.connect(_on_player_ready)
+	_lobby_interface.race_selected.connect(_on_race_selected)
+	_lobby_interface.sex_selected.connect(_on_sex_selected)
+	_lobby_interface.class_selected.connect(_on_class_selected)
+	_lobby_interface.follower_selected.connect(_on_follower_selected)
+	#_lobby_interface.follower_body_selected.connect(_on_follower_body_selected)
+	
 	if not joined_ip:
 		_lobby_interface.set_up_host_lobby(_username)
 		_lobby_interface.player_clicked_leave.connect(_cancel_host, CONNECT_ONE_SHOT)
@@ -134,6 +140,20 @@ func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: 
 		_lobby_interface.set_up_joiner_lobby()
 		_lobby_interface.player_clicked_leave.connect(_leave_as_client, CONNECT_ONE_SHOT)
 		_join(joined_ip)
+
+func _on_race_selected(race: ControllableRace):
+	pass
+	
+#@rpc
+#func _update_race_selcted_for_others(id: 
+
+func _on_sex_selected(sex: Enums.Sex):
+	pass
+	
+func _on_class_selected(klass: Class):
+	pass
+func _on_follower_selected(follower: UncontrollableRace):
+	pass
 
 # used by main.gd
 func update_username(username: String):
