@@ -13,7 +13,7 @@ func create_world():
 	# instanciar tilemap
 	pass
 
-func spawn_player(character: Character):
+func spawn_player(character: Being):
 	if tilemap.has_method("spawn_player"):
 		tilemap.spawn_player(character)
 	

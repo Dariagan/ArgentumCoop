@@ -1,0 +1,486 @@
+[gd_scene load_steps=18 format=3 uid="uid://dvqq1banvf1yw"]
+
+[ext_resource type="Script" path="res://scripts/ui/lobby_interface.gd" id="1_gewq0"]
+[ext_resource type="PackedScene" uid="uid://cpat3jp6fu4q2" path="res://scenes/ui/lobby/chat_component.tscn" id="2_5fe4g"]
+[ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse-7021371.jpg" id="3_rncrb"]
+[ext_resource type="FontFile" uid="uid://ctrsrtkxeu85y" path="res://assets/fonts/Exocet2.ttf" id="4_n6a85"]
+[ext_resource type="StyleBox" uid="uid://c1i3svkycn37m" path="res://resources/ui/buttonhover.tres" id="5_43a4n"]
+[ext_resource type="PackedScene" uid="uid://vxv66o5h4qwi" path="res://scenes/ui/coolborder.tscn" id="5_msqxt"]
+[ext_resource type="StyleBox" uid="uid://e17urjuoqp4r" path="res://resources/ui/buttonpressed.tres" id="6_asl6y"]
+[ext_resource type="LabelSettings" uid="uid://cujwfyskppm3o" path="res://resources/ui/labelsettings.tres" id="6_nkp4f"]
+[ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resources/ui/lineeditname.tres" id="6_nuk4o"]
+[ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="7_d0fj4"]
+[ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/lobby/character_characterization.tscn" id="8_3i0au"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o0l37"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jgji4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4bbal"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6li4x"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="Theme" id="Theme_ouea4"]
+default_font = ExtResource("4_n6a85")
+Button/colors/font_color = Color(0.875, 0.875, 0.875, 1)
+Button/colors/font_disabled_color = Color(0.875, 0.875, 0.875, 0.5)
+Button/colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+Button/colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+Button/colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/font_outline_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_disabled_color = Color(1, 1, 1, 0.4)
+Button/colors/icon_focus_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_normal_color = Color(1, 1, 1, 1)
+Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
+Button/constants/h_separation = 2
+Button/constants/icon_max_width = 0
+Button/constants/outline_size = 0
+Button/font_sizes/font_size = 23
+Button/styles/disabled = SubResource("StyleBoxEmpty_o0l37")
+Button/styles/focus = SubResource("StyleBoxEmpty_jgji4")
+Button/styles/hover = ExtResource("5_43a4n")
+Button/styles/normal = SubResource("StyleBoxEmpty_4bbal")
+Button/styles/pressed = ExtResource("6_asl6y")
+Label/font_sizes/font_size = 23
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_6li4x")
+PopupMenu/constants/icon_max_width = 300
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tggsu"]
+bg_color = Color(0.286275, 0.258824, 0.176471, 0.290196)
+
+[node name="UiSignalManagement" type="Node"]
+script = ExtResource("1_gewq0")
+
+[node name="ChatLobbyContainer" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ChatLobbyContainer"]
+layout_mode = 2
+
+[node name="ChatComponent" parent="ChatLobbyContainer/VBoxContainer" node_paths=PackedStringArray("chat_text_edit", "chat_label", "scroll_container") instance=ExtResource("2_5fe4g")]
+chat_text_edit = NodePath("../HBoxContainer3/WriteMsgBox")
+chat_label = NodePath("../HBoxContainer2/ScrollContainer/ChatLabel")
+scroll_container = NodePath("../HBoxContainer2/ScrollContainer")
+
+[node name="HBoxContainer1" type="HBoxContainer" parent="ChatLobbyContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="LeaveButton" type="Button" parent="ChatLobbyContainer/VBoxContainer/HBoxContainer1"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "Leave"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="ChatLobbyContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ChatLobbyContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+follow_focus = true
+
+[node name="ChatLabel" type="Label" parent="ChatLobbyContainer/VBoxContainer/HBoxContainer2/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="PlayersLabel" type="Label" parent="ChatLobbyContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 1
+horizontal_alignment = 1
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="ChatLobbyContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="WriteMsgBox" type="TextEdit" parent="ChatLobbyContainer/VBoxContainer/HBoxContainer3"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+caret_blink = true
+caret_multiple = false
+
+[node name="CreateCharacterButton" type="Button" parent="ChatLobbyContainer/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "Create Character"
+
+[node name="CharacterCreation" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_rncrb")
+expand_mode = 5
+
+[node name="HasTheme" type="Control" parent="CharacterCreation"]
+custom_minimum_size = Vector2(1024, 600)
+layout_mode = 1
+anchor_left = 0.13
+anchor_top = 0.1
+anchor_right = 0.87
+anchor_bottom = 0.9
+offset_left = -0.464005
+offset_top = -0.320004
+offset_right = -0.368042
+offset_bottom = 0.295959
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_ouea4")
+
+[node name="CoolBorder" parent="CharacterCreation/HasTheme" instance=ExtResource("5_msqxt")]
+layout_mode = 1
+
+[node name="TransparentBackground" type="Panel" parent="CharacterCreation/HasTheme"]
+layout_direction = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tggsu")
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+text = "Character"
+label_settings = ExtResource("6_nkp4f")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control" type="Control" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(420, 42)
+layout_mode = 2
+
+[node name="NameInput" type="LineEdit" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/Control"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_right = 0.7
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.721569, 0.713726, 0.435294, 1)
+theme_override_colors/font_placeholder_color = Color(0.721569, 0.713726, 0.435294, 1)
+theme_override_colors/caret_color = Color(0.733333, 0.501961, 0.298039, 1)
+theme_override_fonts/font = ExtResource("4_n6a85")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = ExtResource("6_nuk4o")
+theme_override_styles/focus = ExtResource("6_nuk4o")
+theme_override_styles/read_only = ExtResource("6_nuk4o")
+placeholder_text = "Name"
+alignment = 1
+max_length = 28
+caret_blink = true
+caret_blink_interval = 1.5
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_top = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="WhiteBorderTopLeft" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="CharacterCharacterization" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer" instance=ExtResource("8_3i0au")]
+layout_mode = 2
+
+[node name="WhiteBorderTopLeft2" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "Net stats"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="WhiteBorderTopLeft" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_d0fj4")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 27
+text = "Race Stats"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="WhiteBorderTopLeft2" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("7_d0fj4")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "Follower stats"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/WhiteBorderTopLeft2/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="WhiteBorderTopLeft" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_d0fj4")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "Class stats"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="WhiteBorderTopLeft2" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3" instance=ExtResource("7_d0fj4")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer3/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "unir con arriba"
+horizontal_alignment = 1
+
+[node name="WhiteBorderTopLeft" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer" instance=ExtResource("7_d0fj4")]
+visible = false
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/WhiteBorderTopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Button" type="Button" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "To lobby"
+
+[node name="Control" type="Control" parent="CharacterCreation/HasTheme/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="WhiteBorderTopLeft" parent="CharacterCreation/HasTheme/MarginContainer/Control" instance=ExtResource("7_d0fj4")]
+layout_mode = 2
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_top = 18.0
+offset_right = 152.0
+offset_bottom = 89.0
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterCreation/HasTheme/MarginContainer/Control/WhiteBorderTopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="LobbyButton" type="Button" parent="CharacterCreation/HasTheme/MarginContainer/Control/WhiteBorderTopLeft/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "LOBBY"
+
+[connection signal="pressed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer1/LeaveButton" to="." method="_on_leave_button_pressed"]
+[connection signal="pressed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer3/CreateCharacterButton" to="." method="_on_create_character_button_pressed"]
+[connection signal="text_changed" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/Control/NameInput" to="." method="_on_name_input_text_changed"]
+[connection signal="class_selected" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_class_selected"]
+[connection signal="follower_selected" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_follower_selected"]
+[connection signal="head_selected" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_head_selected"]
+[connection signal="race_selected" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_race_selected"]
+[connection signal="sex_selected" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_sex_selected"]
+[connection signal="pressed" from="CharacterCreation/HasTheme/MarginContainer/Control/WhiteBorderTopLeft/MarginContainer/LobbyButton" to="." method="_on_lobby_button_pressed"]

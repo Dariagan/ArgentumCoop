@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=3 uid="uid://drxjcl2mm30w4"]
+
+[ext_resource type="Script" path="res://scripts/ui/characterization.gd" id="1_8jcj2"]
+
+[node name="VBoxContainer" type="VBoxContainer"]
+script = ExtResource("1_8jcj2")
+
+[node name="CharacterizationLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 27
+text = "Characterization"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RaceMenuButton" type="MenuButton" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Race: Not Picked"
+flat = false
+icon_alignment = 2
+
+[node name="SexMenuButton" type="MenuButton" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Sex: Not Picked"
+flat = false
+
+[node name="HeadMenuButton" type="MenuButton" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+disabled = true
+text = "Head: Pick race & sex first"
+flat = false
+icon_alignment = 1
+expand_icon = true
+
+[node name="ClassMenuButton" type="MenuButton" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+disabled = true
+text = "Class: Pick race first"
+flat = false
+
+[node name="FollowerMenuButton" type="MenuButton" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+disabled = true
+text = "Follower: Pick class first"
+flat = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HeightLabel" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Height: x1.00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSlider" type="HSlider" parent="HBoxContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.94
+max_value = 1.06
+step = 0.001
+value = 1.0
+
+[connection signal="value_changed" from="HBoxContainer/HSlider" to="." method="_on_h_slider_value_changed"]

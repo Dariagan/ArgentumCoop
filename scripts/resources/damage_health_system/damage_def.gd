@@ -26,7 +26,7 @@ enum Invisibility { NONE, REMOVES, GIVES }
 # can be negative or positive
 @export_range(-15, 15) var speed: float
 
-
+@export var damage_multipliers_vs_races: Dictionary
 
 @export_category("Lasting damage")
 

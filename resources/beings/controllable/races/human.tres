@@ -1,0 +1,84 @@
+[gd_resource type="Resource" script_class="ControllableRace" load_steps=7 format=3 uid="uid://cseo6cvs4hokj"]
+
+[ext_resource type="Resource" uid="uid://b8lgllcsn3y18" path="res://resources/beings/controllable/classes/warrior.tres" id="1_8iuop"]
+[ext_resource type="Resource" uid="uid://br12t3auckinv" path="res://resources/beings/controllable/sprites/body/male/human_male.tres" id="1_72a8v"]
+[ext_resource type="Script" path="res://scripts/resources/beings/race/controllable_race.gd" id="1_766p0"]
+[ext_resource type="Resource" uid="uid://b1y2122k4wpa5" path="res://resources/beings/controllable/sprites/head/male/human_male_head.tres" id="2_d7k1k"]
+[ext_resource type="Script" path="res://scripts/resources/beings/combat_multipliers.gd" id="2_nkhd3"]
+
+[sub_resource type="Resource" id="Resource_rlw10"]
+script = ExtResource("2_nkhd3")
+max_health = 1.0
+max_speed = 1.0
+strength = 1.0
+stamina = 1.0
+sneaking_proficiency = 1.0
+incoming_damage_types_multipliers = {
+"rellenar": 1,
+"rellenar2": 1
+}
+war_cry_strength = 1.0
+global_melee_damage = 1.0
+global_melee_attack_speed = 1.0
+backstab_damage = 1.0
+body_attack_damage = 1.0
+body_attack_attack_speed = 1.0
+two_handed_damage = 1.0
+two_handed_attack_speed = 1.0
+two_handed_swing_damage = 1.0
+two_handed_swing_attack_speed = 1.0
+two_handed_stab_damage = 1.0
+two_handed_stab_attack_speed = 1.0
+one_handed_damage = 1.0
+one_handed_attack_speed = 1.0
+one_handed_swing_damage = 1.0
+one_handed_swing_speed = 1.0
+one_handed_stab_damage = 1.0
+one_handed_stab_speed = 1.0
+shield_proficiency = 1.0
+global_ranged_damage = 1.0
+global_ranged_attack_speed = 1.0
+global_range = 1.0
+throwable_damage = 1.0
+throwable_attack_speed = 1.0
+throwable_range = 1.0
+bow_damage = 1.0
+bow_attack_speed = 1.0
+bow_range = 1.0
+crossbow_arquebus_attack_speed = 1.0
+crossbow_arquebus_range = 1.0
+global_spells_effect = 1.0
+healing_spells_effect = 1.0
+spells_damage = 1.0
+mana_regeneration_rate = 1.0
+summon_damage = 1.0
+summon_duration = 1.0
+summon_health = 1.0
+
+[resource]
+script = ExtResource("1_766p0")
+id = "controllable_human"
+available_classes = Array[Resource("res://scripts/resources/beings/controllable/class.gd")]([ExtResource("1_8iuop")])
+global_learning_multiplier = 1.0
+smithing_learning_multiplier = 1.0
+manual_labor_multiplier = 1.0
+research_multiplier = 1.0
+trade_proficiency = 1.0
+name = &"Human "
+head_sprites_datas = Array[Resource("res://scripts/resources/beings/sprite_data.gd")]([ExtResource("2_d7k1k")])
+body_sprites_datas = Array[Resource("res://scripts/resources/beings/sprite_data.gd")]([ExtResource("1_72a8v")])
+other_sprites_datas = Array[Resource("res://scripts/resources/beings/sprite_data.gd")]([])
+demonym = ""
+singular_denomination = ""
+plural_denomination = ""
+description = ""
+can_equip_tools = true
+filth_generation = 0.0
+max_encumberance_multiplier = 1.0
+comfortable_temp_range = Vector2i(16, 23)
+hunger_rate = 1.0
+diets = Array[Resource("res://scripts/resources/beings/race/diet.gd")]([])
+can_vent = false
+can_climb = false
+combat_multipliers = SubResource("Resource_rlw10")
+males_females_ratio = 0.5
