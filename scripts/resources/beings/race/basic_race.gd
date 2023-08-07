@@ -1,7 +1,7 @@
 extends Resource
 class_name BasicRace
 
-@export var id: StringName
+
 @export var name: StringName = &" "
 @export var icon: Texture2D
 

@@ -138,14 +138,17 @@ func _on_name_input_text_changed(new_name: String) -> void:
 func _on_character_characterization_race_selected(race: ControllableRace) -> void:
 	race_selected.emit(race)
 	# mostrar stats en cuadradito
+	
 func _on_character_characterization_sex_selected(sex: Enums.Sex) -> void:
 	sex_selected.emit(sex)
 func _on_character_characterization_class_selected(klass: Class) -> void:
 	class_selected.emit(klass)
 	# mostrar stats en cuadradito
+	
 func _on_character_characterization_head_selected(index: int) -> void:
 	head_selected.emit(index)
 	# mostrar stats en cuadradito
+	
 func _on_character_characterization_follower_selected(follower: UncontrollableRace) -> void:
 	follower_selected.emit(follower)
 	# mostrar stats en cuadradito

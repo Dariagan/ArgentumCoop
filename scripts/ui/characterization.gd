@@ -13,6 +13,7 @@ signal class_selected(klass: Class)
 signal sex_selected(sex: Enums.Sex)
 signal head_selected(index: int)
 signal follower_selected(follower: UncontrollableRace)
+signal height_changed(height: float)
 
 var _found_races: Array
 var _current_race: ControllableRace
@@ -21,8 +22,10 @@ var _current_head: SpriteData
 var _current_class: Class
 var _current_follower: UncontrollableRace
 
+# HACER QUE SE PUEDA CAMBIAR EL NAME DE TU FOLLOWER
+
 # MULTIPLICAR LA FONT SIZE POR (LA WIDTH ACTUAL * (LA WIDTH ORIGINAL/ LA FONT SIZE ORIGINAL) ? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
-# MULTIPLICAR LA FONT SIZE POR (LA WIDTH ACTUAL * (LA FONT SIZE ORIGINAL/LA WIDTH ORIGINAL) ? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
+# NUEVA FONT SIZE = (FONT SIZE ORIGINAL * WIDTH ACTUAL/WIDTH ORIGINAL)  ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
 func _ready() -> void:
 	_found_races = global_game_data.controllable_races.values()
 	var race_menu_popup = race_menu_button.get_popup()
@@ -35,7 +38,7 @@ func _ready() -> void:
 
 func _on_race_selected(id: int):
 	_current_race = _found_races[id]
-	race_selected.emit(null)
+	race_selected.emit(_current_race)
 	
 	if _current_class and not _current_class in _current_race.available_classes:
 		_current_class = null
@@ -73,9 +76,9 @@ func _on_sex_selected(id: int):
 	if _current_race and _current_sex > 0:
 		_setup_head_menu_popup(_current_sex)
 	
-func _on_head_selected(id: int):
-	_current_head = _current_race.head_sprites_datas[id]
-	head_selected.emit(id)
+func _on_head_selected(i: int):
+	_current_head = _current_race.head_sprites_datas[i]
+	head_selected.emit(i)
 	head_menu_button.text = " "
 	head_menu_button.icon = _current_head.frames.get_frame_texture("idle_down", 0)
 
@@ -143,3 +146,11 @@ func _setup_head_menu_popup(sex: Enums.Sex):
 	if not _current_head:
 		head_menu_button.text = "Head: Not picked"
 		head_menu_button.disabled = false
+		
+#TODO: HACER Q DEJE DE MOVERSE AL USAR EL SLIDER
+@onready var height_label: Label = $HBoxContainer/HeightLabel
+
+
+func _on_h_slider_value_changed(value: float) -> void:
+	height_label.text = "Height: x%.3f" % value
+	height_changed.emit(value)

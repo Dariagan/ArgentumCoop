@@ -18,7 +18,7 @@ var body_state: BodyState = BodyState.IDLE
 		
 var _facing_direction: String = "down"
 
-func _init(i_data: IndividualBeingSpawnData) -> void:
+func _init(i_data: BeingSpawnData) -> void:
 	
 	for i in i_data.chosen_sprites:
 		

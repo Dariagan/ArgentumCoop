@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_pwm5g")
-id = "warrior"
+id = "class_warrior"
 name = "Warrior"
 available_followers = Array[Resource("res://scripts/resources/beings/race/uncontrollable_race.gd")]([ExtResource("1_cwgaw")])
 available_spells = Array[String]([])

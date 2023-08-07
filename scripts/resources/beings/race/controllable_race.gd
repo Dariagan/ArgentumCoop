@@ -1,6 +1,8 @@
 extends BasicRace
 class_name ControllableRace
 
+@export var id: String = "controllable_"
+
 @export var available_classes: Array[Class]
 
 @export_category("Work Multipliers")

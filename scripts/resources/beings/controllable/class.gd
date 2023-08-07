@@ -1,7 +1,7 @@
 extends Resource
 class_name Class
 
-@export var id: String
+@export var id: String = "class_"
 
 @export var name: String
 

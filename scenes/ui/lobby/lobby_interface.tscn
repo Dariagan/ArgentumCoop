@@ -39,13 +39,13 @@ Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
 Button/constants/h_separation = 2
 Button/constants/icon_max_width = 0
 Button/constants/outline_size = 0
-Button/font_sizes/font_size = 16
+Button/font_sizes/font_size = 23
 Button/styles/disabled = SubResource("StyleBoxEmpty_o0l37")
 Button/styles/focus = SubResource("StyleBoxEmpty_jgji4")
 Button/styles/hover = ExtResource("5_43a4n")
 Button/styles/normal = SubResource("StyleBoxEmpty_4bbal")
 Button/styles/pressed = ExtResource("6_asl6y")
-MenuButton/font_sizes/font_size = 23
+Label/font_sizes/font_size = 23
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_6li4x")
 PopupMenu/constants/icon_max_width = 300
 
@@ -130,9 +130,9 @@ expand_mode = 5
 [node name="HasTheme" type="Control" parent="CharacterCreation"]
 custom_minimum_size = Vector2(1024, 600)
 layout_mode = 1
-anchor_left = 0.15
+anchor_left = 0.13
 anchor_top = 0.1
-anchor_right = 0.85
+anchor_right = 0.87
 anchor_bottom = 0.9
 offset_left = -0.464005
 offset_top = -0.320004
@@ -234,9 +234,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 10
+theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 10
+theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 10
 
 [node name="CharacterCharacterization" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer" instance=ExtResource("8_3i0au")]

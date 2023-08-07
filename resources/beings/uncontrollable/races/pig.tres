@@ -5,9 +5,9 @@
 
 [resource]
 script = ExtResource("1_b1aba")
+id = "uncontrollable_pig"
 taming_difficulty = 0.5
 possible_loot = {}
-id = &"pig"
 name = &"Pig "
 head_sprites_datas = Array[Resource("res://scripts/resources/beings/sprite_data.gd")]([])
 body_sprites_datas = Array[Resource("res://scripts/resources/beings/sprite_data.gd")]([ExtResource("1_huhgd")])

@@ -18,10 +18,6 @@ config/features=PackedStringArray("4.1", "Forward Plus")
 
 GlobalGameData="*res://scripts/utils/global_game_data.gd"
 
-[display]
-
-window/size/mode=2
-
 [dotnet]
 
 project/assembly_name="ArgentumSurvival"
