@@ -1,16 +1,17 @@
-[gd_scene load_steps=10 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=11 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="PackedScene" uid="uid://b74gy5ftp0hpu" path="res://scenes/game_world.tscn" id="3_k1nw4"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
 [ext_resource type="PackedScene" uid="uid://dhuq261jv5fvi" path="res://scenes/character_creation_lobby.tscn" id="4_lphit"]
 [ext_resource type="Script" path="res://scripts/lobby.gd" id="4_vtap0"]
+[ext_resource type="Script" path="res://scripts/game.gd" id="5_2eji3"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 [ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
 
 [node name="GameWorld" parent="." instance=ExtResource("3_k1nw4")]
@@ -23,6 +24,9 @@ character_creation_scene = ExtResource("4_lphit")
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby"]
 _spawnable_scenes = PackedStringArray("res://scenes/character_creation_lobby.tscn")
 spawn_path = NodePath("..")
+
+[node name="Game" type="Node" parent="Lobby"]
+script = ExtResource("5_2eji3")
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 
@@ -66,4 +70,3 @@ layout_mode = 2
 [connection signal="lobby_started" from="Canvas/MenuControl" to="Lobby" method="_on_menu_control_lobby_started"]
 [connection signal="host_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_host_pressed"]
 [connection signal="join_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_join_pressed"]
-[connection signal="name_changed" from="Canvas/MenuControl/MainMenu" to="." method="_on_main_menu_name_changed"]

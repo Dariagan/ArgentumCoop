@@ -2,7 +2,7 @@ extends Resource #dejar como resource para q sea guardable el initial character,
 #pero va a haber q hacer otra clase q chequee q no se metan stats chiteados o incompatibles
 class_name BeingSpawnData
 
-@export var name: String = " "
+@export var name: String 
 @export var sex: Enums.Sex
 @export var race: BasicRace
 @export var klass: Class

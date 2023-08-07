@@ -11,19 +11,15 @@ var _lobby_interface: LobbyInterface
 var _players: Array = []
 var _peers: Array = []
 var _ready_peers: Array = []
-var _characters_spawn_data: Array = [] #hacer array de dict
-
+var _characters_spawn_data: Array = [] 
 
 
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
 	_lobby_interface.update_username(_username)
-	_lobby_interface.ready_toggled.connect(_on_player_ready)
-	_lobby_interface.race_selected.connect(_on_race_selected)
-	_lobby_interface.sex_selected.connect(_on_sex_selected)
-	_lobby_interface.head_selected.connect(_on_head_selected)
-	_lobby_interface.class_selected.connect(_on_class_selected)
-	_lobby_interface.follower_selected.connect(_on_follower_selected)
+	
+	_connect_signals(_lobby_interface)
+	
 	#_lobby_interface.follower_body_selected.connect(_on_follower_body_selected)
 	
 	if not joined_ip:
@@ -44,14 +40,13 @@ func _host() -> void:
 	_peers.push_back(1)
 	_characters_spawn_data.push_back({})
 	
-
 func _join(ip: String) -> void:
 	peer.create_client(ip, 135)
 	multiplayer.multiplayer_peer = peer
 	#TODO: check if connection is successful
 	
 	
-# executed ONLY server-side 
+# executed ONLY on the host's PC
 func _on_player_join(peer_id: int) -> void:
 	await get_tree().create_timer(0.5).timeout
 	_lobby_interface._update_lobby_title_for_client(peer_id)
@@ -61,7 +56,6 @@ func _on_player_join(peer_id: int) -> void:
 	_characters_spawn_data.push_back({})
 	_sync_state_for_clients()
 	_update_players_for_gui()
-	
 func _on_player_disconnect(peer_id: int) -> void:
 	var player_i: int = _peers.find(peer_id)
 	_players.remove_at(player_i)
@@ -116,8 +110,13 @@ func _on_player_ready(ready: bool) -> void:
 		_peer_is_ready.rpc(ready)
 		
 	elif _is_everybody_ready():
-		print("starting")
+		_on_game_start.rpc()
 		print(_characters_spawn_data)
+		
+@rpc("call_local")
+func _on_game_start():
+	_lobby_interface.queue_free()
+
 
 @rpc("call_local", "any_peer")
 func _peer_is_ready(ready: bool) -> void:
@@ -130,6 +129,14 @@ func _peer_is_ready(ready: bool) -> void:
 func _is_everybody_ready() -> bool:
 	return _ready_peers.size() + 1 == _peers.size()
 		
+func _connect_signals(lobby_interface: LobbyInterface):
+	lobby_interface.ready_toggled.connect(_on_player_ready)
+	lobby_interface.name_changed.connect(_on_name_selected)
+	lobby_interface.race_selected.connect(_on_race_selected)
+	lobby_interface.sex_selected.connect(_on_sex_selected)
+	lobby_interface.head_selected.connect(_on_head_selected)
+	lobby_interface.class_selected.connect(_on_class_selected)
+	lobby_interface.follower_selected.connect(_on_follower_selected)
 	
 # EN VEZ DE TODO ESTO HACER Q APENAS SE UNA EL PLAYER ESTE EJECUTE UN .RPC_ID(1, _username) Y EL SERVER SE LO QUEDA AHÍ
 # for requesting a peer's username
@@ -152,22 +159,21 @@ func _receive_player_username(username: String) -> void:
 # ----------------------------------------------------------------------------------
 # ----------------------- character creation synchronization -----------------------
 # ----------------------------------------------------------------------------------
+func _on_name_selected(new_name: String):
+	if new_name: _update_characterization_for_everyone.rpc("name", new_name)
+	else: _update_characterization_for_everyone.rpc("name")
 func _on_race_selected(race: ControllableRace):
 	if race: _update_characterization_for_everyone.rpc("race", race.id)
 	else: _update_characterization_for_everyone.rpc("race")
-	
 func _on_sex_selected(sex: Enums.Sex):
 	if sex > 0: _update_characterization_for_everyone.rpc("sex", sex)
 	else: _update_characterization_for_everyone.rpc("sex")
-	
 func _on_head_selected(i: int):
 	if i >= 0: _update_characterization_for_everyone.rpc("head", i)
 	else: _update_characterization_for_everyone.rpc("head")
-	
 func _on_class_selected(klass: Class):
 	if klass: _update_characterization_for_everyone.rpc("klass", klass.id)
 	else: _update_characterization_for_everyone.rpc("klass")
-	
 func _on_follower_selected(follower: UncontrollableRace):
 	if follower: _update_characterization_for_everyone.rpc("follower", [follower.id])
 	else: _update_characterization_for_everyone.rpc("follower")
