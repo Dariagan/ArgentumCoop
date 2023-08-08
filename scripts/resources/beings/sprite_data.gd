@@ -13,4 +13,6 @@ class_name SpriteData
 @export var offset_up: Vector2 = Vector2.ZERO
 @export var offset_sideways: Vector2 = Vector2.ZERO
 
+
+
 @export var width_frontally_sideways_height: Vector3 = Vector3.ONE

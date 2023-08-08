@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="UncontrollableRace" load_steps=3 format=3 uid="uid://ca5fgbgd8gch2"]
+[gd_resource type="Resource" script_class="UncontrollableRace" load_steps=2 format=3 uid="uid://ca5fgbgd8gch2"]
 
 [ext_resource type="Script" path="res://scripts/resources/beings/race/uncontrollable_race.gd" id="1_b1aba"]
-[ext_resource type="Resource" uid="uid://bp7djvx3emrtg" path="res://resources/beings/uncontrollable/sprites/body/pig_sprite_data.tres" id="1_huhgd"]
 
 [resource]
 script = ExtResource("1_b1aba")
@@ -10,7 +9,7 @@ taming_difficulty = 0.5
 possible_loot = {}
 name = &"Pig "
 head_sprites_datas = Array[Resource("res://scripts/resources/beings/sprite_data.gd")]([])
-body_sprites_datas = Array[Resource("res://scripts/resources/beings/sprite_data.gd")]([ExtResource("1_huhgd")])
+body_sprites_datas = Array[Resource("res://scripts/resources/beings/body_sprite_data.gd")]([])
 other_sprites_datas = Array[Resource("res://scripts/resources/beings/sprite_data.gd")]([])
 demonym = ""
 singular_denomination = ""

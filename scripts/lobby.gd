@@ -14,6 +14,7 @@ var _ready_peers: Array = []
 var _characters_spawn_data: Array = [] 
 
 
+
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
 	_lobby_interface.update_username(_username)
@@ -111,9 +112,9 @@ func _on_player_ready(ready: bool) -> void:
 	if multiplayer.get_unique_id() != 1:
 		_peer_is_ready.rpc(ready)
 		
-	elif _is_everybody_ready():
+	elif true or _is_everybody_ready():
 		_on_game_start.rpc()
-		game.start_new_game(_characters_spawn_data)
+		game.start_new_game(_characters_spawn_data, _peers)
 		print(_characters_spawn_data)
 		
 @rpc("call_local")
@@ -140,6 +141,7 @@ func _connect_signals(lobby_interface: LobbyInterface):
 	lobby_interface.head_selected.connect(_on_head_selected)
 	lobby_interface.class_selected.connect(_on_class_selected)
 	lobby_interface.follower_selected.connect(_on_follower_selected)
+	lobby_interface.body_scale_changed.connect(_on_body_scale_changed)
 	
 # EN VEZ DE TODO ESTO HACER Q APENAS SE UNA EL PLAYER ESTE EJECUTE UN .RPC_ID(1, _username) Y EL SERVER SE LO QUEDA AHÍ
 # for requesting a peer's username
@@ -180,6 +182,8 @@ func _on_class_selected(klass: Class):
 func _on_follower_selected(follower: UncontrollableRace):
 	if follower: _update_characterization_for_everyone.rpc("follower", [follower.id])
 	else: _update_characterization_for_everyone.rpc("follower")
+func _on_body_scale_changed(new_scale: Vector3):
+	_update_characterization_for_everyone("body_scale", new_scale)
 	
 @rpc("call_local", "any_peer")
 func _update_characterization_for_everyone(characterization_key: String, value = null): 

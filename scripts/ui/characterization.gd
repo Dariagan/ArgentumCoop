@@ -7,20 +7,19 @@ extends VBoxContainer
 @onready var class_menu_button: MenuButton = $ClassMenuButton
 @onready var follower_menu_button: MenuButton = $FollowerMenuButton
 
-
-signal race_selected(race: ControllableRace)
-signal class_selected(klass: Class)
-signal sex_selected(sex: Enums.Sex)
-signal head_selected(index: int)
-signal follower_selected(follower: UncontrollableRace)
-signal height_changed(height: float)
-
 var _found_races: Array
 var _current_race: ControllableRace
 var _current_sex: Enums.Sex
 var _current_head: SpriteData
 var _current_class: Class
 var _current_follower: UncontrollableRace
+
+signal race_selected(race: ControllableRace)
+signal class_selected(klass: Class)
+signal sex_selected(sex: Enums.Sex)
+signal head_selected(index: int)
+signal follower_selected(follower: UncontrollableRace)
+signal body_scale_changed(new_scale: Vector3)
 
 # HACER QUE SE PUEDA CAMBIAR EL NAME DE TU FOLLOWER
 
@@ -150,7 +149,8 @@ func _setup_head_menu_popup(sex: Enums.Sex):
 #TODO: HACER Q DEJE DE MOVERSE AL USAR EL SLIDER
 @onready var height_label: Label = $HBoxContainer/HeightLabel
 
-
+var _body_scale: Vector3 = Vector3.ONE
 func _on_h_slider_value_changed(value: float) -> void:
-	height_label.text = "Height: x%.3f" % value
-	height_changed.emit(value)
+	height_label.text = "Height: x%.2f" % value
+	_body_scale.z = value
+	body_scale_changed.emit(_body_scale)

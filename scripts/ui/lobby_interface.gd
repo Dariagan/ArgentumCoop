@@ -131,6 +131,7 @@ signal sex_selected(sex: Enums.Sex)
 signal class_selected(klass: Class)
 signal head_selected(index: int)
 signal follower_selected(follower: UncontrollableRace)
+signal body_scale_changed(new_scale: Vector3)
 #signal follower_body_selected
 
 func _on_name_input_text_changed(new_name: String) -> void:
@@ -153,5 +154,5 @@ func _on_character_characterization_follower_selected(follower: UncontrollableRa
 	follower_selected.emit(follower)
 	# mostrar stats en cuadradito
 
-
-
+func _on_character_characterization_body_scale_changed(new_scale: Vector3) -> void:
+	body_scale_changed.emit(new_scale)

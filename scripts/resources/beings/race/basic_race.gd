@@ -7,7 +7,7 @@ class_name BasicRace
 
 @export var head_sprites_datas: Array[SpriteData]
 
-@export var body_sprites_datas: Array[SpriteData]
+@export var body_sprites_datas: Array[BodySpriteData]
 
 @export var other_sprites_datas: Array[SpriteData]
 

@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="SpriteData" load_steps=3 format=3 uid="uid://br12t3auckinv"]
+[gd_resource type="Resource" script_class="BodySpriteData" load_steps=3 format=3 uid="uid://br12t3auckinv"]
 
 [ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/beings/controllable/sprites/body/frames/human_male_frames.tres" id="1_q17dm"]
-[ext_resource type="Script" path="res://scripts/resources/beings/sprite_data.gd" id="1_th1nl"]
+[ext_resource type="Script" path="res://scripts/resources/beings/body_sprite_data.gd" id="2_tdi6b"]
 
 [resource]
-script = ExtResource("1_th1nl")
+script = ExtResource("2_tdi6b")
+head_v_offset = -23.2
 name = &"Body"
 frames = ExtResource("1_q17dm")
 sex = 1
@@ -13,6 +14,4 @@ offset_global = Vector2(0, 0)
 offset_down = Vector2(0, 0)
 offset_up = Vector2(0, 0)
 offset_sideways = Vector2(0, 0)
-scale_global = Vector2(1, 1)
-scale_vertical = Vector2(1, 1)
-scale_sideways = Vector2(1, 1)
+width_frontally_sideways_height = Vector3(1, 1, 1)

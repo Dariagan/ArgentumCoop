@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://c640ckrygghxk"]
+[gd_scene load_steps=5 format=3 uid="uid://bxcw3yocig3he"]
 
 [ext_resource type="Script" path="res://scripts/beings/being.gd" id="1_qp2au"]
 [ext_resource type="PackedScene" uid="uid://drnrwdr86b4xw" path="res://scenes/animated_body_portion.tscn" id="2_7wa3q"]
@@ -6,19 +6,15 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mq83o"]
 size = Vector2(18, 38)
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_8qs0i"]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_p46nv"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/sync = true
 properties/0/watch = false
-properties/1/path = NodePath("Body/Body:speed_scale")
-properties/1/spawn = true
-properties/1/sync = true
-properties/1/watch = false
 
 [node name="Being" type="CharacterBody2D"]
 script = ExtResource("1_qp2au")
-body_portion_scene = ExtResource("2_7wa3q")
+animated_portion_scene = ExtResource("2_7wa3q")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.4, 1.4)
@@ -29,9 +25,9 @@ zoom = Vector2(1.4, 1.4)
 position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_mq83o")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_8qs0i")
-
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://scenes/animated_body_portion.tscn")
 spawn_path = NodePath("../BodyHolder")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_p46nv")

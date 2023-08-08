@@ -4,7 +4,8 @@ class_name BeingSpawnData
 
 @export var name: String 
 @export var sex: Enums.Sex
-@export var race: BasicRace
+
+@export var race: BasicRace = GlobalGameData.controllable_races.values()[0]#TEMPORAL, BORRAR DESP
 @export var klass: Class
 
 
@@ -13,7 +14,7 @@ class_name BeingSpawnData
 @export var head_scale: Vector3 = Vector3.ONE
 @export var body_scale: Vector3 = Vector3.ONE
 
-@export var head_i: int = -1
+@export var head_i: int = 0
 @export var body_i: int = 0
 
 @export var chosen_extra_sprites: Array[int] = []
@@ -51,6 +52,7 @@ func _init(serialized_data: Dictionary = {}) -> void:
 # inicializar las variables con .nombre_variable = algo
 	
 func deserialize(serialized_data: Dictionary) -> void:
+	var rng = RandomNumberGenerator.new()
 	
 	if serialized_data.has("name"):
 		name = serialized_data["name"]
@@ -61,19 +63,23 @@ func deserialize(serialized_data: Dictionary) -> void:
 		level = serialized_data["level"]
 		
 	var race_id: StringName = serialized_data["race"]
+	
+	
 	if race_id.begins_with("controllable_"):
-		race = GlobalGameData.controllable_races[race_id]
+		if not race_id.ends_with("random"):
+			race = GlobalGameData.controllable_races[race_id]
+		else:
+			var races = GlobalGameData.controllable_races.values()
+			race = races[rng.randi_range(0, races.size()-1)]
 	elif race_id.begins_with("uncontrollable_"):
 		race = GlobalGameData.uncontrollable_races[race_id]
-	
-	if serialized_data.has("head_scale"):
-		head_scale = serialized_data["head_scale"]
-	
-	if serialized_data.has("body_scale"):
-		body_scale = serialized_data["body_scale"]
 		
 	if serialized_data.has("klass"):
-		klass = GlobalGameData.classes[serialized_data["klass"]]
+		if serialized_data["klass"] != "random":
+			klass = GlobalGameData.classes[serialized_data["klass"]]
+		else:
+			var classes = (race as ControllableRace).available_classes
+			klass = classes[rng.randi_range(0, classes.size()-1)]
 		
 	if serialized_data.has("followers"):
 		followers = GlobalGameData.classes[serialized_data["followers"]]
@@ -82,6 +88,12 @@ func deserialize(serialized_data: Dictionary) -> void:
 		head_i = serialized_data["head_i"]
 	if serialized_data.has("body_i"):	
 		body_i = serialized_data["body_i"]	
+		
+	if serialized_data.has("head_scale"):
+		head_scale = serialized_data["head_scale"]
+	
+	if serialized_data.has("body_scale"):
+		body_scale = serialized_data["body_scale"]
 	
 	
 	#faction = serialized_data["faction"]
