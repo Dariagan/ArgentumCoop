@@ -1,8 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://c640ckrygghxk"]
+[gd_scene load_steps=5 format=3 uid="uid://c640ckrygghxk"]
 
 [ext_resource type="Script" path="res://scripts/beings/being.gd" id="1_qp2au"]
-[ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/beings/controllable/sprites/head/frames/human_male_brunette_mullet.tres" id="2_utni8"]
-[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/beings/controllable/sprites/body/frames/human_male_frames.tres" id="3_1p4di"]
+[ext_resource type="PackedScene" uid="uid://drnrwdr86b4xw" path="res://scenes/animated_body_portion.tscn" id="2_7wa3q"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mq83o"]
 size = Vector2(18, 38)
@@ -19,30 +18,12 @@ properties/1/watch = false
 
 [node name="Being" type="CharacterBody2D"]
 script = ExtResource("1_qp2au")
+body_portion_scene = ExtResource("2_7wa3q")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.4, 1.4)
 
 [node name="BodyHolder" type="Node2D" parent="."]
-
-[node name="Helmet" type="AnimatedSprite2D" parent="BodyHolder"]
-texture_filter = 1
-
-[node name="Head" type="AnimatedSprite2D" parent="BodyHolder"]
-texture_filter = 1
-sprite_frames = ExtResource("2_utni8")
-animation = &"idle_down"
-offset = Vector2(-0.2, -23)
-
-[node name="Body" type="AnimatedSprite2D" parent="BodyHolder"]
-texture_filter = 1
-sprite_frames = ExtResource("3_1p4di")
-animation = &"walk_down"
-speed_scale = 2.0
-
-[node name="Shield" type="AnimatedSprite2D" parent="BodyHolder"]
-
-[node name="Weapon" type="AnimatedSprite2D" parent="BodyHolder"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 2)
@@ -50,3 +31,7 @@ shape = SubResource("RectangleShape2D_mq83o")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_8qs0i")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://scenes/animated_body_portion.tscn")
+spawn_path = NodePath("../BodyHolder")

@@ -1,5 +1,5 @@
 extends CharacterBody2D
-class_name Being#Being
+class_name Being
 #así añadimos nueva funcionalidad en base a composición en vez de a herencia (sostenible a largo plazo) 
 
 @export var speed: float = 6
@@ -18,18 +18,23 @@ var body_state: BodyState = BodyState.IDLE
 		
 var _facing_direction: String = "down"
 
-func _init(i_data: BeingSpawnData) -> void:
+var animated_body_portions: Array[AnimatedBodyPortion] = []
+
+@export var body_portion_scene: PackedScene
+
+func initialize(data: BeingSpawnData) -> void:
 	
-	for i in i_data.chosen_sprites:
+	
+	_add_animated_portion(data.body_i, data.race.body_sprites_datas, data.body_scale)
+	_add_animated_portion(data.head_i, data.race.head_sprites_datas, data.head_scale)
+	
+func _add_animated_portion(i: int, sprite_datas_list:Array[SpriteData], extra_scale: Vector3):
+	if i > -1:
+		var body_portion = body_portion_scene.instantiate()
+		body_holder.add_child(body_portion)
+		body_portion.construct(sprite_datas_list[i], extra_scale)	
 		
-		var node_name: StringName = i_data.race.body_sprites_datas[i].name
-		var frames:  = i_data.race.body_sprites_datas[i].frames
-		
-		var as2d: AnimatedSprite2D = AnimatedSprite2D.new()
-		
-
-
-func _enter_tree() -> void:
+func asd_enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
 	print("controlado por %s" % name.to_int())
 	
@@ -106,20 +111,4 @@ func _play_animation(animation_name: String) -> void:
 	#creo q es mejor
 	for body_part in body_holder.get_children():
 		if body_part.sprite_frames:
-			body_part.play(animation_name)
-			#agregar un Node nombrado idle_only o un script a la body part con un bool q indique si es idle_only=true, en ese caso usar el replace
-			#puede q haya q hacer algo parecido si es solo run sin jog, asi q tal vez el script con un array es mejor. si el 
-			#TAL VEZ es mejor llamar a algun método con parámetro un enum-estado en cada body part scripteada y esta handlee la animación q debería playear
-	"""
-	if body.sprite_frames:
-		body.play(animation_name)
-	if weapon.sprite_frames:
-		weapon.play(animation_name)
-	if shield.sprite_frames:
-		shield.play(animation_name)
-	if head.sprite_frames:
-		head.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
-	if helmet.sprite_frames:
-		helmet.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
-	"""
-# esto debería ser un componente
+			body_part._play(animation_name)

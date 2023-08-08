@@ -6,7 +6,9 @@ class_name BasicRace
 @export var icon: Texture2D
 
 @export var head_sprites_datas: Array[SpriteData]
+
 @export var body_sprites_datas: Array[SpriteData]
+
 @export var other_sprites_datas: Array[SpriteData]
 
 @export var demonym: String #gentilicio

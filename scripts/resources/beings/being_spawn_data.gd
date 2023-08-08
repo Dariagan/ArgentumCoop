@@ -10,10 +10,11 @@ class_name BeingSpawnData
 
 @export var followers: Array[UncontrollableRace]  
 
-@export var size_multiplier: Vector2 = Vector2(1, 1) #width, height
+@export var head_scale: Vector3 = Vector3.ONE
+@export var body_scale: Vector3 = Vector3.ONE
 
-@export var head: int = 0
-@export var body: int = 0
+@export var head_i: int = -1
+@export var body_i: int = 0
 
 @export var chosen_extra_sprites: Array[int] = []
 
@@ -29,10 +30,10 @@ func serialize() -> Dictionary:
 	dict["race"] = race.id
 	dict["klass"] = klass.id
 	dict["followers"] = get_array_of_ids(followers)
-	dict["size_multiplier"] = size_multiplier
-	dict["head"] = head
-	dict["body"] = body
-	
+	dict["head_scale"] = head_scale
+	dict["body_scale"] = body_scale
+	dict["head_i"] = head_i
+	dict["body_i"] = body_i
 	dict["level"] = level
 	dict["extra_health_multiplier"] = extra_health_multiplier
 	dict["faction"] = faction.id
@@ -65,8 +66,11 @@ func deserialize(serialized_data: Dictionary) -> void:
 	elif race_id.begins_with("uncontrollable_"):
 		race = GlobalGameData.uncontrollable_races[race_id]
 	
-	if serialized_data.has("size_multiplier"):
-		size_multiplier = serialized_data["size_multiplier"]
+	if serialized_data.has("head_scale"):
+		head_scale = serialized_data["head_scale"]
+	
+	if serialized_data.has("body_scale"):
+		body_scale = serialized_data["body_scale"]
 		
 	if serialized_data.has("klass"):
 		klass = GlobalGameData.classes[serialized_data["klass"]]
@@ -74,10 +78,10 @@ func deserialize(serialized_data: Dictionary) -> void:
 	if serialized_data.has("followers"):
 		followers = GlobalGameData.classes[serialized_data["followers"]]
 	
-	if serialized_data.has("head"):
-		head = serialized_data["head"]
-	if serialized_data.has("body"):	
-		body = serialized_data["body"]	
+	if serialized_data.has("head_i"):
+		head_i = serialized_data["head_i"]
+	if serialized_data.has("body_i"):	
+		body_i = serialized_data["body_i"]	
 	
 	
 	#faction = serialized_data["faction"]
