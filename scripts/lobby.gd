@@ -2,7 +2,6 @@ extends Node
 # local peer
 var peer = ENetMultiplayerPeer.new()
 # local username
-var _username: String 
 
 
 @export var character_creation_scene: PackedScene
@@ -17,14 +16,14 @@ var _characters_spawn_data: Array = []
 
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
-	_lobby_interface.update_username(_username)
+	_lobby_interface.update_username(GlobalGameData.username)
 	
 	_connect_signals(_lobby_interface)
 	
 	#_lobby_interface.follower_body_i_selected.connect(_on_follower_body_selected)
 	
 	if not joined_ip:
-		_lobby_interface.set_up_host_lobby(_username)
+		_lobby_interface.set_up_host_lobby(GlobalGameData.username)
 		_lobby_interface.player_clicked_leave.connect(_cancel_host, CONNECT_ONE_SHOT)
 		_host()
 	else:
@@ -37,7 +36,7 @@ func _host() -> void:
 	multiplayer.multiplayer_peer = peer
 	multiplayer.peer_connected.connect(_on_player_join)
 	multiplayer.peer_disconnected.connect(_on_player_disconnect)
-	_players.push_back(_username)
+	_players.push_back(GlobalGameData.username)
 	_peers.push_back(1)
 	_characters_spawn_data.push_back({})
 	
@@ -152,7 +151,7 @@ func _request_player_username(peer_id: int) -> void:
 	_return_player_username.rpc_id(peer_id)
 @rpc 
 func _return_player_username() -> void:
-	_receive_player_username.rpc_id(multiplayer.get_remote_sender_id(), _username)
+	_receive_player_username.rpc_id(multiplayer.get_remote_sender_id(), GlobalGameData.username)
 @rpc("any_peer")
 func _receive_player_username(username: String) -> void:
 	if  multiplayer.get_remote_sender_id() == requested_peer:
@@ -193,6 +192,4 @@ func _update_characterization_for_everyone(characterization_key: String, value =
 	else:
 		_characters_spawn_data[sender_i].erase(characterization_key)
 
-# used by main.gd
-func update_username(username: String):
-	_username = username
+

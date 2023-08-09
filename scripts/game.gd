@@ -7,7 +7,6 @@ extends Node
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
 
 
-
 func start_new_game(players_start_data: Array, peers: Array) -> void:
 
 	var i: int = 0
@@ -31,13 +30,10 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		being.name = str(peers[i])
 		
 		tile_map.add_child(being)
-		
-		await get_tree().create_timer(0.4).timeout
-		
 		being.construct(being_spawn_data)
 		being.position.x = i*4
 		
-		being.cede_authority(peers[i])
+		being.cede_authority.rpc(peers[i])
 		
 		i+=1
 		

@@ -1,6 +1,9 @@
 extends Node
 
+var username: String
+
 const item_data_directories: Array[String] = []#["res://resources/things/items/", "res://resources/things/items/wear/body/"]
+const sprites_datas_directories: Array[String] = ["res://resources/beings/controllable/sprites/head/", "res://resources/beings/controllable/sprites/body/", "res://resources/beings/uncontrollable/sprites/body/"]
 const recipes_directories: Array[String] = []
 const building_data_directories: Array[String] = []
 const controllable_races_directories: Array[String] = ["res://resources/beings/controllable/races/"]
@@ -8,6 +11,7 @@ const uncontrollable_races_directories: Array[String] = ["res://resources/beings
 const classes_directories: Array[String] = ["res://resources/beings/controllable/classes/"]
 
 var item_data: Dictionary
+var sprites_datas: Dictionary
 var recipe_data: Dictionary
 var building_data: Dictionary
 var controllable_races: Dictionary
@@ -16,6 +20,7 @@ var classes: Dictionary
 
 func _init() -> void:
 	item_data = _index_all_found_resources(item_data_directories)
+	sprites_datas = _index_all_found_resources(sprites_datas_directories)
 	recipe_data = _index_all_found_resources(recipes_directories)
 	building_data = _index_all_found_resources(building_data_directories)
 	controllable_races = _index_all_found_resources(controllable_races_directories)

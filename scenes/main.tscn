@@ -71,3 +71,4 @@ layout_mode = 2
 [connection signal="lobby_started" from="Canvas/MenuControl" to="Lobby" method="_on_menu_control_lobby_started"]
 [connection signal="host_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_host_pressed"]
 [connection signal="join_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_join_pressed"]
+[connection signal="name_changed" from="Canvas/MenuControl/MainMenu" to="." method="_on_main_menu_name_changed"]

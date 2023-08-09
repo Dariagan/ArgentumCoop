@@ -20,35 +20,33 @@ func _set_scale_remotely(value: Vector3):
 		
 var _width_asimetrically_altered: bool = false
 
-func construct(sprite_data:SpriteData, character_width_frontally_sideways_height:Vector3, vertical_offset:float = 0, vertical_offset_mult:float = 1) -> void:
+func construct(sprite_data: SpriteData, character_width_frontally_sideways_height: Vector3, vertical_offset: float = 0, vertical_offset_mult:float = 1) -> void:
 	_vertical_offset = vertical_offset
 	_vertical_offset_mult = vertical_offset_mult
 	_starting_sprite_width_frontally_sideways_height = sprite_data.width_frontally_sideways_height
 	_character_width_frontally_sideways_height = character_width_frontally_sideways_height
 	_set_starting_sprite_data(sprite_data)
 
-	_set_scale_remotely(_starting_sprite_width_frontally_sideways_height * _character_width_frontally_sideways_height)
+	_set_scale_remotely.rpc(_starting_sprite_width_frontally_sideways_height * _character_width_frontally_sideways_height)
 
 # externally, change the frames instead of the sprite data
 func _set_starting_sprite_data(sprite_data: SpriteData) -> void:
 	assert (sprite_data != null)
-	self.name = sprite_data.name
 	sprite_frames = sprite_data.frames
 	for state in sprite_data.animation_states:
 		_animation_states.push_back(state)
 	position = sprite_data.offset_global
 	position.y += _vertical_offset
 	position.y *= pow(_vertical_offset_mult, 1/1.5)
-	
-	_set_starting_sprite_data_remotely.rpc([sprite_data.name, _animation_states, sprite_data.offset_global, position.y])
+	_set_starting_sprite_data_remotely.rpc([sprite_data.id, _animation_states, sprite_data.offset_global, position.y])
 
 @rpc
 func _set_starting_sprite_data_remotely(data: Array):
-	self.name = data[0]
+	sprite_frames = GlobalGameData.sprites_datas[data[0]].frames
 	_animation_states = data[1]
 	position = data[2]
 	position.y = data[3]
-
+	
 
 func change_sprite_data(sprite_data: SpriteData) -> void:
 	assert (sprite_data != null)

@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("1_t58nh")
 name = &"Head"
+id = "human_male_head_1"
 frames = ExtResource("1_qs566")
 sex = 1
 animation_states = Array[StringName]([&"idle"])

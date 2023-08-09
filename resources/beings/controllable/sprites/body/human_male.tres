@@ -7,6 +7,7 @@
 script = ExtResource("2_tdi6b")
 head_v_offset = -23.2
 name = &"Body"
+id = ""
 frames = ExtResource("1_q17dm")
 sex = 1
 animation_states = Array[StringName]([&"idle", &"walk", &"jog"])
