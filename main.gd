@@ -5,11 +5,11 @@ extends Node
 @onready var lobby: Node = $Lobby
 
 func _enter_tree() -> void:
-	GlobalGameData.username = "nameless_%s" % generate_random_string(4)
+	GlobalData.username = "nameless_%s" % generate_random_string(4)
 
 
 func _on_main_menu_name_changed(new_name: String) -> void:
-	GlobalGameData.username = new_name
+	GlobalData.username = new_name
 
 
 func generate_random_string(length: int) -> String:

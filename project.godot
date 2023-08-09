@@ -16,7 +16,8 @@ config/features=PackedStringArray("4.1", "Forward Plus")
 
 [autoload]
 
-GlobalGameData="*res://scripts/utils/global_game_data.gd"
+GlobalData="*res://scripts/singletons/global_data.gd"
+GameData="*res://scripts/singletons/game_data.gd"
 
 [dotnet]
 

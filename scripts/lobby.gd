@@ -16,14 +16,14 @@ var _characters_spawn_data: Array = []
 
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
-	_lobby_interface.update_username(GlobalGameData.username)
+	_lobby_interface.update_username(GlobalData.username)
 	
 	_connect_signals(_lobby_interface)
 	
 	#_lobby_interface.follower_body_i_selected.connect(_on_follower_body_selected)
 	
 	if not joined_ip:
-		_lobby_interface.set_up_host_lobby(GlobalGameData.username)
+		_lobby_interface.set_up_host_lobby(GlobalData.username)
 		_lobby_interface.player_clicked_leave.connect(_cancel_host, CONNECT_ONE_SHOT)
 		_host()
 	else:
@@ -36,7 +36,7 @@ func _host() -> void:
 	multiplayer.multiplayer_peer = peer
 	multiplayer.peer_connected.connect(_on_player_join)
 	multiplayer.peer_disconnected.connect(_on_player_disconnect)
-	_players.push_back(GlobalGameData.username)
+	_players.push_back(GlobalData.username)
 	_peers.push_back(1)
 	_characters_spawn_data.push_back({})
 	
@@ -151,7 +151,7 @@ func _request_player_username(peer_id: int) -> void:
 	_return_player_username.rpc_id(peer_id)
 @rpc 
 func _return_player_username() -> void:
-	_receive_player_username.rpc_id(multiplayer.get_remote_sender_id(), GlobalGameData.username)
+	_receive_player_username.rpc_id(multiplayer.get_remote_sender_id(), GlobalData.username)
 @rpc("any_peer")
 func _receive_player_username(username: String) -> void:
 	if  multiplayer.get_remote_sender_id() == requested_peer:
@@ -172,9 +172,13 @@ func _on_race_selected(race: ControllableRace):
 func _on_sex_selected(sex: Enums.Sex):
 	if sex > 0: _update_characterization_for_everyone.rpc("sex", sex)
 	else: _update_characterization_for_everyone.rpc("sex")
-func _on_head_selected(i: int):
-	if i >= 0: _update_characterization_for_everyone.rpc("head_i", i)
-	else: _update_characterization_for_everyone.rpc("head_i")
+	
+func _on_head_selected(head : SpriteData):
+	if head: 
+		_update_characterization_for_everyone.rpc("head", head.id)
+	else: 
+		_update_characterization_for_everyone.rpc("head")
+	
 func _on_class_selected(klass: Class):
 	if klass: _update_characterization_for_everyone.rpc("klass", klass.id)
 	else: _update_characterization_for_everyone.rpc("klass")
@@ -182,7 +186,7 @@ func _on_follower_selected(follower: UncontrollableRace):
 	if follower: _update_characterization_for_everyone.rpc("follower", [follower.id])
 	else: _update_characterization_for_everyone.rpc("follower")
 func _on_body_scale_changed(new_scale: Vector3):
-	_update_characterization_for_everyone("body_scale", new_scale)
+	_update_characterization_for_everyone.rpc("body_scale", new_scale)
 	
 @rpc("call_local", "any_peer")
 func _update_characterization_for_everyone(characterization_key: String, value = null): 

@@ -42,11 +42,10 @@ func _set_starting_sprite_data(sprite_data: SpriteData) -> void:
 
 @rpc
 func _set_starting_sprite_data_remotely(data: Array):
-	sprite_frames = GlobalGameData.sprites_datas[data[0]].frames
+	sprite_frames = GlobalData.sprites_datas[data[0]].frames
 	_animation_states = data[1]
 	position = data[2]
 	position.y = data[3]
-	
 
 func change_sprite_data(sprite_data: SpriteData) -> void:
 	assert (sprite_data != null)

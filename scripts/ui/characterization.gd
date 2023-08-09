@@ -1,6 +1,6 @@
 extends VBoxContainer
 
-@onready var global_game_data = get_node("/root/GlobalGameData")
+@onready var global_game_data = get_node("/root/GlobalData")
 @onready var race_menu_button: MenuButton = $RaceMenuButton
 @onready var sex_menu_button: MenuButton = $SexMenuButton
 @onready var head_menu_button: MenuButton = $HeadMenuButton
@@ -17,7 +17,7 @@ var _current_follower: UncontrollableRace
 signal race_selected(race: ControllableRace)
 signal class_selected(klass: Class)
 signal sex_selected(sex: Enums.Sex)
-signal head_selected(index: int)
+signal head_selected(head: SpriteData)
 signal follower_selected(follower: UncontrollableRace)
 signal body_scale_changed(new_scale: Vector3)
 
@@ -39,7 +39,7 @@ func _on_race_selected(id: int):
 	_current_race = _found_races[id]
 	race_selected.emit(_current_race)
 	
-	if _current_class and not _current_class in _current_race.available_classes:
+	if _current_class and not _current_class in _current_race.classes:
 		_current_class = null
 		class_selected.emit(null)
 	if not _current_class:
@@ -55,7 +55,7 @@ func _on_race_selected(id: int):
 	if _current_race and _current_sex > 0:
 		_setup_head_menu_popup(_current_sex)
 	
-	_update_popup_menu(class_menu_button.get_popup(), _current_race.available_classes)
+	_update_popup_menu(class_menu_button.get_popup(), _current_race.classes)
 	#selected_race.emit(_current_race)
 
 func _on_sex_selected(id: int):
@@ -67,7 +67,7 @@ func _on_sex_selected(id: int):
 	if _current_head and (_current_head.sex != Enums.Sex.ANY || _current_head.sex != _current_sex):
 		_current_head = null
 		head_menu_button.icon = null
-		head_selected.emit(-1)
+		head_selected.emit(null)
 	if not _current_head:
 		head_menu_button.text = "Head: Not picked"
 		head_menu_button.disabled = false
@@ -77,12 +77,12 @@ func _on_sex_selected(id: int):
 	
 func _on_head_selected(i: int):
 	_current_head = _current_race.head_sprites_datas[i]
-	head_selected.emit(i)
+	head_selected.emit(_current_head)
 	head_menu_button.text = " "
 	head_menu_button.icon = _current_head.frames.get_frame_texture("idle_down", 0)
 
 func _on_class_selected(id: int):
-	_current_class = _current_race.available_classes[id]
+	_current_class = _current_race.classes[id]
 	class_selected.emit(_current_class)
 	
 	if _current_follower and not _current_follower in _current_class.available_followers:

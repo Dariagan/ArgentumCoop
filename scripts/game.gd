@@ -15,14 +15,18 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		
 		if not player_start_data.has("race"):
 			player_start_data["race"] = "controllable_random"
-		elif not player_start_data.has("sex"):
+		if not player_start_data.has("sex"):
 			player_start_data["sex"] = "random"
-		elif not player_start_data.has("klass"):
+		if not player_start_data.has("klass"):
 			player_start_data["klass"] = "random"
-		elif not player_start_data.has("head_i"):
-			player_start_data["head_i"] = 0
-		elif not player_start_data.has("body_i"):
-			player_start_data["body_i"] = 0
+		if not player_start_data.has("head"):
+			player_start_data["head"] = "random"
+		if not player_start_data.has("body_i"):
+			player_start_data["body"] = "random"
+			
+		
+		
+		player_start_data["faction"] = "player"	
 		
 		var being_spawn_data = BeingSpawnData.new(player_start_data)
 		
@@ -33,7 +37,7 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		being.construct(being_spawn_data)
 		being.position.x = i*4
 		
-		being.cede_authority.rpc(peers[i])
+		being.give_control.rpc(peers[i])
 		
 		i+=1
 		

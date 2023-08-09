@@ -4,3 +4,5 @@
 
 [node name="AnimatedBodyPortion" type="AnimatedSprite2D"]
 script = ExtResource("1_mjd62")
+
+[node name="Area2D" type="Area2D" parent="."]

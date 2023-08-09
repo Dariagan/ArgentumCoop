@@ -2,7 +2,7 @@ extends CharacterBody2D
 class_name Being
 #así añadimos nueva funcionalidad en base a composición en vez de a herencia (sostenible a largo plazo) 
 
-@export var speed: float = 6
+@export var speed: float = 3
 @export var acceleration = 30
 
 @export var friction = 16 #hacer q provenga del piso
@@ -16,6 +16,8 @@ var body_state: BodyState = BodyState.IDLE
 		
 var _facing_direction: String = "down"
 
+var being_data: BeingPersonalData = BeingPersonalData.new()
+
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body
 @onready var head: AnimatedBodyPortion = $BodyHolder/Head
 func construct(data: BeingSpawnData) -> void:
@@ -25,21 +27,55 @@ func construct(data: BeingSpawnData) -> void:
 		if data.head_i > -1:
 			var head_sprite_data: SpriteData = data.race.head_sprites_datas[data.head_i]
 			head.construct(head_sprite_data, data.head_scale, body_sprite_data.head_v_offset, data.body_scale.z)
-		
-func asd_enter_tree() -> void:
-	set_multiplayer_authority(name.to_int())
+	
+	
 	
 @rpc("call_local")
-func cede_authority(peer_id: int) -> void:
-	if get_multiplayer_authority() == multiplayer.get_remote_sender_id():
+func construct_being_data(data: Dictionary):
+	pass
+
+
+var uncontrolled: bool = true
+
+@rpc("call_local")
+func give_control(peer_id: int) -> void:
+	if being_data.faction is PlayerFaction and being_data.race is ControllableRace:
+		uncontrolled = false
+		take_camera.rpc_id(peer_id)
 		set_multiplayer_authority(peer_id)
+		
+@rpc func take_camera(): if being_data.faction is PlayerFaction: camera_2d.make_current()
+
+@rpc("call_local", "any_peer")
+func take_control() -> void:
+	if being_data.faction is PlayerFaction and uncontrolled and being_data.race is ControllableRace:
+		uncontrolled = false
+		set_multiplayer_authority(multiplayer.get_remote_sender_id())
+		if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
+			#camera_2d.enabled = true
+			camera_2d.make_current()
+
+@rpc("call_local") 
+func free_control() -> void: 
+	uncontrolled = true
+	#if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
+		#camera_2d.enabled = false
+
 
 func _physics_process(delta: float) -> void:
-	if is_multiplayer_authority():
-		move_by_input(delta)
-		camera_2d.make_current()
-	else:
-		pass #AI control
+	
+	match [is_multiplayer_authority(), being_data.faction is PlayerFaction, uncontrolled]:
+		[false, ..]:
+			return
+		[_, false, _]:
+			ai_control()
+		[_, true, false]:
+			move_by_input(delta)
+		[_, true, true]:
+			owned_ai_control()
+		
+func owned_ai_control(): pass		
+func ai_control(): pass
 	
 var _input_axis: Vector2 = Vector2.ZERO
 var _velocity: Vector2 = Vector2.ZERO
@@ -71,7 +107,6 @@ func move_by_input(delta: float) -> void:
 		for body_part in body_holder.get_children():
 			body_part.speed_scale = distance_moved/0.8
 		body_state = BodyState.WALK
-		
 	else:
 		body_state = BodyState.IDLE
 	
@@ -100,7 +135,6 @@ func _process_animation() -> void:
 	 + "_" + _facing_direction)
 
 func _play_animation(animation_name: String) -> void:	
-	
 	for body_part in body_holder.get_children():
 		if body_part.sprite_frames:
 			body_part._play_handled(animation_name)
