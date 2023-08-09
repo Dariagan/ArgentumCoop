@@ -1,8 +1,6 @@
-extends RefCounted
+extends Resource
 
 class_name Faction
-
-var id: int = 0
 
 var name: String
 

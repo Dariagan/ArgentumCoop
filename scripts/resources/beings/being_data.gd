@@ -7,13 +7,16 @@ var carried_weight: int = 0
 var faction: Faction
 
 var race: BasicRace
-var body: Body
+var body: HarmeableBody
 
 var inventory_data: InventoryData
 
 
-func _init(data: BeingSpawnData = null) -> void:
-	race = data.race
+func _init(data: Dictionary = {}) -> void:
+	
+	race = GlobalData.races[data["race"]]
+	faction = GameData.factions[data["faction"]]
+	
 	
 	
 	

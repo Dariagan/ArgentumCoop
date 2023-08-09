@@ -21,10 +21,8 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 			player_start_data["klass"] = "random"
 		if not player_start_data.has("head"):
 			player_start_data["head"] = "random"
-		if not player_start_data.has("body_i"):
+		if not player_start_data.has("body"):
 			player_start_data["body"] = "random"
-			
-		
 		
 		player_start_data["faction"] = "player"	
 		

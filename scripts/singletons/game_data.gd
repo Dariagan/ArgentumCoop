@@ -1,5 +1,7 @@
 # singleton
 extends Node
 
-var factions: Dictionary = {}
+var factions: Dictionary = {
+	"player" = PlayerFaction.new()
+}
 

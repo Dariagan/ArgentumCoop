@@ -1,6 +1,8 @@
-[gd_resource type="SpriteFrames" load_steps=28 format=3 uid="uid://c3md1eeb7w5wg"]
+[gd_resource type="SpriteFrames" script_class="SpriteData" load_steps=30 format=3 uid="uid://c3md1eeb7w5wg"]
 
 [ext_resource type="Texture2D" uid="uid://1njxbubhni4j" path="res://assets/textures/wear/moss_short_tunic.png" id="1_svaac"]
+[ext_resource type="SpriteFrames" uid="uid://d4jut4hh1pme0" path="res://resources/beings/uncontrollable/sprites/body/frames/pig_frames.tres" id="2_48h36"]
+[ext_resource type="Script" path="res://scripts/resources/beings/sprites/sprite_data.gd" id="3_2un6u"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dhvcw"]
 atlas = ExtResource("1_svaac")
@@ -226,3 +228,14 @@ animations = [{
 "name": &"walk_up",
 "speed": 12.0
 }]
+script = ExtResource("3_2un6u")
+name = &"Pig"
+id = "pig"
+frames = ExtResource("2_48h36")
+sex = 0
+animation_states = Array[StringName]([&"idle", &"walk"])
+offset_global = Vector2(0, 0)
+offset_down = Vector2(0, 0)
+offset_up = Vector2(0, 0)
+offset_sideways = Vector2(0, 0)
+width_frontally_sideways_height = Vector3(1, 1, 1)

@@ -1,12 +1,12 @@
 [gd_resource type="Resource" script_class="SpriteData" load_steps=3 format=3 uid="uid://b1y2122k4wpa5"]
 
 [ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/beings/controllable/sprites/head/frames/human_male_brunette_mullet.tres" id="1_qs566"]
-[ext_resource type="Script" path="res://scripts/resources/beings/sprite_data.gd" id="1_t58nh"]
+[ext_resource type="Script" path="res://scripts/resources/beings/sprites/sprite_data.gd" id="2_f06jt"]
 
 [resource]
-script = ExtResource("1_t58nh")
+script = ExtResource("2_f06jt")
 name = &"Head"
-id = "human_male_head_1"
+id = "head_1"
 frames = ExtResource("1_qs566")
 sex = 1
 animation_states = Array[StringName]([&"idle"])

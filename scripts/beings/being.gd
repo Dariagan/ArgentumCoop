@@ -16,23 +16,20 @@ var body_state: BodyState = BodyState.IDLE
 		
 var _facing_direction: String = "down"
 
-var being_data: BeingPersonalData = BeingPersonalData.new()
+var being_data: BeingPersonalData
 
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body
 @onready var head: AnimatedBodyPortion = $BodyHolder/Head
 func construct(data: BeingSpawnData) -> void:
-	if data.body_i > -1:
-		var body_sprite_data: BodySpriteData = data.race.body_sprites_datas[data.body_i]
-		body.construct(body_sprite_data, data.body_scale)
-		if data.head_i > -1:
-			var head_sprite_data: SpriteData = data.race.head_sprites_datas[data.head_i]
-			head.construct(head_sprite_data, data.head_scale, body_sprite_data.head_v_offset, data.body_scale.z)
-	
-	
+	if data.body:
+		body.construct(data.body, data.body_scale)
+		if data.head:
+			head.construct(data.head, data.head_scale, data.body.head_v_offset, data.body_scale.z)
+	construct_being_data.rpc(data.serialize())
 	
 @rpc("call_local")
 func construct_being_data(data: Dictionary):
-	pass
+	being_data = BeingPersonalData.new(data)
 
 
 var uncontrolled: bool = true

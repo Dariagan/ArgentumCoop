@@ -4,7 +4,7 @@ class_name BeingSpawnData
 var name: String 
 var sex: Enums.Sex
 
-var race: BasicRace = GlobalData.controllable_races.values()[0]#TEMPORAL, BORRAR DESP
+var race: BasicRace
 var klass: Class
 
 var followers: Array[UncontrollableRace]  
@@ -22,10 +22,6 @@ var extra_health_multiplier: float = 1
 
 var faction: Faction
 var starting_inventory: Dictionary
-
-
-
-
 
 func _init(serialized_data: Dictionary = {}) -> void:
 	deserialize(serialized_data)
@@ -45,11 +41,7 @@ func deserialize(serialized_data: Dictionary) -> void:
 	returned = handle_key("level", serialized_data)
 	if returned: level = returned; returned = null
 		
-	var race_id: StringName = serialized_data["race"]
-	if race_id.begins_with("controllable_"):
-		race = handle_key("race", serialized_data, GlobalData.controllable_races)
-	elif race_id.begins_with("uncontrollable_"):
-		race =  handle_key("race", serialized_data, GlobalData.uncontrollable_races)
+	race = handle_key("race", serialized_data, GlobalData.races)
 		
 	klass = handle_key("klass", serialized_data, GlobalData.classes)
 		
@@ -57,9 +49,9 @@ func deserialize(serialized_data: Dictionary) -> void:
 		# BUG, ARREGLAR. DICE CLASSES AHÍ. HAY Q ARREGLAR ETO
 		followers = GlobalData.classes[serialized_data["followers"]]
 			
-	head = handle_key("head", serialized_data, GlobalData.sprites_datas)
+	head = handle_key("head", serialized_data, race.head_sprites_datas)
 			
-	body = handle_key("body", serialized_data, GlobalData.sprites_datas) as BodySpriteData
+	body = handle_key("body", serialized_data, race.body_sprites_datas) as BodySpriteData
 	
 	returned = handle_key("head_scale", serialized_data)
 	if returned: head_scale = returned; returned = null
@@ -67,7 +59,7 @@ func deserialize(serialized_data: Dictionary) -> void:
 	handle_key("body_scale", serialized_data)
 	if returned: body_scale = returned; returned = null
 
-	#faction = serialized_data["faction"]
+	faction = GameData.factions[serialized_data["faction"]]
 
 func serialize() -> Dictionary:
 	var dict: Dictionary = {}
@@ -94,17 +86,21 @@ func get_array_of_ids(array_of_objects: Array) ->  Array:
 		array_ids.push_back(o.id)
 	return array_ids
 
-func handle_key(key: String, serialized_data: Dictionary, data_dict: Dictionary = {}):
+func handle_key(key: String, serialized_data: Dictionary, data_structure = null):
 	if serialized_data.has(key):
-		if data_dict.keys().size() > 0:
+		if data_structure is Dictionary and data_structure.keys().size() > 0:
 			if not (serialized_data[key] as String).ends_with("random"):
-				return data_dict[serialized_data[key]]
+				return data_structure[serialized_data[key]]
 			else:
-				return get_random(data_dict.values())
+				return get_random(data_structure.values())
+		elif data_structure is Array and data_structure.size() > 0:
+			for item in data_structure:
+				if serialized_data[key] == item.id:
+					return item
+			return get_random(data_structure)
 		else: 
 			return serialized_data[key]
-			
 
 func get_random(list_for_random: Array):
 	if list_for_random.size() > 0: return list_for_random[randi() % list_for_random.size()]
-	else: return null #sacar este else?
+
