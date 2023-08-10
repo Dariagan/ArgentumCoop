@@ -5,14 +5,14 @@ extends Node
 @onready var lobby: Node = $Lobby
 
 func _enter_tree() -> void:
-	GlobalData.username = "nameless_%s" % generate_random_string(4)
+	GlobalData.username = "nameless_%s" % _generate_random_string(4)
 
 
 func _on_main_menu_name_changed(new_name: String) -> void:
 	GlobalData.username = new_name
 
 
-func generate_random_string(length: int) -> String:
+func _generate_random_string(length: int) -> String:
 	var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	var random_string = ""
 	for i in range(length):

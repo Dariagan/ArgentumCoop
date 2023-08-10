@@ -8,3 +8,9 @@ var members: Array[Being] = []
 func _init() -> void:
 	pass
 	
+
+func _serialize() -> Dictionary:
+	return {}
+	
+func _deserialize():
+	pass

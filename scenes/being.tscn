@@ -16,7 +16,7 @@ properties/0/watch = false
 script = ExtResource("1_qp2au")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.4, 1.4)
+zoom = Vector2(1.7, 1.7)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 0.5)
@@ -33,9 +33,7 @@ offset_right = 20.0
 offset_bottom = 19.0
 horizontal_alignment = 1
 
-[node name="EffectsHolder" type="Node2D" parent="."]
-
-[node name="Meditation" type="AnimatedSprite2D" parent="EffectsHolder"]
+[node name="Meditation" type="AnimatedSprite2D" parent="."]
 
 [node name="BodyHolder" type="Node2D" parent="."]
 
@@ -44,3 +42,7 @@ horizontal_alignment = 1
 [node name="Body" parent="BodyHolder" instance=ExtResource("2_7wa3q")]
 
 [node name="Head" parent="BodyHolder" instance=ExtResource("2_7wa3q")]
+
+[node name="LeftHand" type="Node" parent="BodyHolder"]
+
+[node name="RightHand" type="Node" parent="BodyHolder"]

@@ -2,7 +2,7 @@
 # IMPORTANTE: usar .duplicate(true) desp de arrastrar un .tres de este recurso a algun @export de una var
 
 extends Resource
-class_name HarmeableBody
+class_name HarmableBody
 
 @export var body_tree: BodyTree
 

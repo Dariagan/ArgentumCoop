@@ -55,7 +55,7 @@ func change_sprite_data(sprite_data: SpriteData) -> void:
 	var net_scale: Vector3 = _starting_sprite_width_frontally_sideways_height * _character_width_frontally_sideways_height * sprite_data.width_frontally_sideways_height
 	self.set("_scale", net_scale)
 
-# DON'T CALL "PLAY" WITHOUT A _ BY ACCIDENT
+
 func _play_handled(animation_name: String = "", custom_speed: float = 1.0, from_end: bool = false) -> void:
 	var split_string: PackedStringArray = animation_name.split("_", false, 1)
 	var animation_state: StringName = split_string[0]

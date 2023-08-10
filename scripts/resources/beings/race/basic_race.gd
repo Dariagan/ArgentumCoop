@@ -1,7 +1,6 @@
 extends Resource
 class_name BasicRace
 
-
 @export var name: StringName = &" "
 @export var icon: Texture2D
 
@@ -28,15 +27,14 @@ class_name BasicRace
 
 @export_category("Eating")
 @export_range(0, 3) var hunger_rate: float = 1
-@export var diets: Array[Diet]
-
-
+@export var diets: Array[Diet] = []
 
 @export_category("Abilities")
+@export var can_walk_on: Array[Enums.TerrainType] = [Enums.TerrainType.LAND]
 @export var can_vent: bool = false
 @export var can_climb: bool = false#hacer int de nivel 0-10?
 
-@export var combat_multipliers: CombatMultipliers
+@export var combat_multipliers: CombatMultipliers = CombatMultipliers.new()
 
 
 #export array de tupla biome_id: string preferrance: float

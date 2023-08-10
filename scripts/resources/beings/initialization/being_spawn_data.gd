@@ -41,7 +41,11 @@ func deserialize(serialized_data: Dictionary) -> void:
 	returned = handle_key("level", serialized_data)
 	if returned: level = returned; returned = null
 		
-	race = handle_key("race", serialized_data, GlobalData.races)
+	var race_id: String = serialized_data["race"]
+	if race_id.begins_with("controllable"):
+		race = handle_key("race", serialized_data, GlobalData.controllable_races)
+	else:
+		race = handle_key("race", serialized_data, GlobalData.uncontrollable_races)
 		
 	klass = handle_key("klass", serialized_data, GlobalData.classes)
 		
@@ -56,7 +60,7 @@ func deserialize(serialized_data: Dictionary) -> void:
 	returned = handle_key("head_scale", serialized_data)
 	if returned: head_scale = returned; returned = null
 	
-	handle_key("body_scale", serialized_data)
+	returned = handle_key("body_scale", serialized_data)
 	if returned: body_scale = returned; returned = null
 
 	faction = GameData.factions[serialized_data["faction"]]
@@ -77,7 +81,7 @@ func serialize() -> Dictionary:
 	dict["faction"] = faction.id
 	return dict
 	
-func _construct_from_saved_starter_character(starter_character) -> void:
+func _construct_from_saved_starter_character(starter_character: Resource) -> void:
 	pass
 
 func get_array_of_ids(array_of_objects: Array) ->  Array:

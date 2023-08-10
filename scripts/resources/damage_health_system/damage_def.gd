@@ -6,12 +6,12 @@ enum Invisibility { NONE, REMOVES, GIVES }
 
 @export_category("Damage Proportions")
 
-@export var damage_ratios: Array[AttackTypeMultiplier]
+@export var damage_ratios: Dictionary = {}
 
 #hacer q soo se exporte un array con todas las reductions opcionales?
 @export_category("Armor Reduction")
 
-@export var armor_reduction_ratios: Array[AttackTypeMultiplier]
+@export var armor_reduction_ratios: Dictionary = {}
 
 @export_category("Effects")
 
