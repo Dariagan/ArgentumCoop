@@ -4,14 +4,15 @@ class_name DamageDef
 enum Mobility { NONE, MOBILIZES, CONFUSES, IMMOBILIZES, PARALYZES }
 enum Invisibility { NONE, REMOVES, GIVES }
 
-@export_category("Damage Proportions")
+# se aplica después de que se hayan aplicado armor reductions. la armor actual del atacado resta damage. 
+# la damage que quede tras la resta se aplica sobre el body del character
+@export var damages: Dictionary = {"sharp": 0, "blunt": 0, "fire": 0, "magic": 0}
 
-@export var damage_ratios: Dictionary = {}
 
-#hacer q soo se exporte un array con todas las reductions opcionales?
+# reducción de armor (no produce daño)
 @export_category("Armor Reduction")
 
-@export var armor_reduction_ratios: Dictionary = {}
+@export var armor_reductions: Dictionary = {"sharp": 0, "blunt": 0, "fire": 0, "magic": 0}
 
 @export_category("Effects")
 
@@ -26,6 +27,7 @@ enum Invisibility { NONE, REMOVES, GIVES }
 # can be negative or positive
 @export_range(-15, 15) var speed: float
 
+#por ejemplo, dragones
 @export var damage_multipliers_vs_races: Dictionary
 
 @export_category("Lasting damage")

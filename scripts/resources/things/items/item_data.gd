@@ -9,8 +9,6 @@ class_name ItemData
 @export_range(0,50) var encumberance: float #should turn to 0 when worn
 @export var stackable: bool
 
-@export var max_uses: int = -1
-@export var use_cooldown: float = 0 
 
 @export var melee: MeleeEquipment
 @export var shootable: Shootable
@@ -18,6 +16,8 @@ class_name ItemData
 @export var combat_multipliers: CombatMultipliers #these take effect on item worn OR equipped
 
 @export var wear: Wear
+
+@export var item_carrier: ItemCarrier
 
 @export var tool: Resource #hacer un Array[Resource] más tarde (si resulta ser necesario)
 

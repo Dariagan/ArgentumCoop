@@ -16,7 +16,6 @@ var _characters_spawn_data: Array = []
 
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
-	_lobby_interface.update_username(GlobalData.username)
 	
 	_connect_signals(_lobby_interface)
 	

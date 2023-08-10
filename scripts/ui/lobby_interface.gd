@@ -17,7 +17,7 @@ TODO CHARACTER CREATION:
 @onready var h_box_container_3: HBoxContainer = $ChatLobbyContainer/VBoxContainer/HBoxContainer3
 
 
-var _username: String
+
 
 var lobby_title_line_edit: LineEdit 
 var lobby_title_label: Label 
@@ -103,10 +103,6 @@ func _update_lobby_title_client_side(new_text: String) -> void:
 	
 	if lobby_title_label:
 		lobby_title_label.text = new_text
-
-func update_username(new_username: String) -> void:
-	_username = new_username
-	chat_component.username = _username	
 
 func _on_leave_button_pressed() -> void:
 	player_clicked_leave.emit()

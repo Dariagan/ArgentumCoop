@@ -7,3 +7,4 @@ class_name MeleeEquipment
 @export var cooldown: float
 @export var range: float
 
+
