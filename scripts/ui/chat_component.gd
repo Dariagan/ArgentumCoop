@@ -7,7 +7,6 @@ extends Node
 
 var input_enabled: bool = true
 
-var username: String
 
 var current_text = ''
 var cursor_line = 0
@@ -21,7 +20,7 @@ func _on_input_event(event):
 		var key_event = event as InputEventKey 
 		if key_event.keycode == KEY_ENTER and key_event.pressed and !key_event.echo:
 			get_viewport().set_input_as_handled()
-			add_chat_message.rpc(chat_text_edit.text.strip_edges(), username)
+			add_chat_message.rpc(chat_text_edit.text.strip_edges(), GlobalData.username)
 			
 @rpc("any_peer", "call_local")
 func add_chat_message(new_text : String, sender: String) -> void:

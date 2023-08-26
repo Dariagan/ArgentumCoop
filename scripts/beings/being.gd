@@ -1,85 +1,119 @@
 extends CharacterBody2D
-class_name Being#Being
-#así añadimos nueva funcionalidad en base a composición en vez de a herencia (sostenible a largo plazo) 
+class_name Being
 
-@export var speed: float = 6
 @export var acceleration = 30
 
 @export var friction = 16 #hacer q provenga del piso
 
 @onready var body_holder: Node2D = $BodyHolder
 @onready var camera_2d: Camera2D = $Camera2D
-@onready var multiplayer_synchronizer: MultiplayerSynchronizer = $MultiplayerSynchronizer
-
 
 enum BodyState { IDLE, WALK, JOG }
 
-var body_state: BodyState = BodyState.IDLE
+var _body_state: BodyState = BodyState.IDLE
 		
 var _facing_direction: String = "down"
 
-func _init(i_data: BeingSpawnData) -> void:
+var being_data: BeingPersonalData
+
+@onready var body: AnimatedBodyPortion = $BodyHolder/Body
+@onready var head: AnimatedBodyPortion = $BodyHolder/Head
+func construct(data: BeingSpawnData) -> void:
+	if data.body:
+		body.construct(data.body, data.body_scale)
+		if data.head:
+			head.construct(data.head, data.head_scale, data.body.head_v_offset, data.body_scale.z)
+	construct_being_data.rpc(data.serialize())
 	
-	for i in i_data.chosen_sprites:
-		
-		var node_name: StringName = i_data.race.body_sprites_datas[i].name
-		var frames:  = i_data.race.body_sprites_datas[i].frames
-		
-		var as2d: AnimatedSprite2D = AnimatedSprite2D.new()
-		
+@rpc("call_local")
+func construct_being_data(data: Dictionary):
+	being_data = BeingPersonalData.new(data)
 
+var uncontrolled: bool = true
 
-func _enter_tree() -> void:
-	set_multiplayer_authority(name.to_int())
-	print("controlado por %s" % name.to_int())
+@rpc("call_local")
+func give_control(peer_id: int) -> void:
+	if being_data.faction is PlayerFaction and being_data.race is ControllableRace:
+		uncontrolled = false
+		set_multiplayer_authority(peer_id)
+		if peer_id == multiplayer.get_unique_id() and being_data.faction is PlayerFaction:
+			camera_2d.make_current()
 	
-func take_control(peer_id: int) -> void:
-	set_multiplayer_authority(peer_id)
 
+@rpc("call_local", "any_peer")
+func take_control() -> void:
+	if being_data.faction is PlayerFaction and uncontrolled and being_data.race is ControllableRace:
+		uncontrolled = false
+		set_multiplayer_authority(multiplayer.get_remote_sender_id())
+		if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
+			#camera_2d.enabled = true
+			camera_2d.make_current()
+
+@rpc("call_local") 
+func free_control() -> void: 
+	uncontrolled = true
+	#if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
+		#camera_2d.enabled = false
+
+var previous_position: Vector2 = position
 func _physics_process(delta: float) -> void:
-	if is_multiplayer_authority():
-		move_by_input(delta)
-		camera_2d.make_current()
+	
+	match [is_multiplayer_authority(), being_data.faction is PlayerFaction, uncontrolled]:
+		[false, ..]:
+			return
+		[_, false, _]:
+			ai_control()
+		[_, true, false]:
+			move_by_input(delta)
+		[_, true, true]:
+			owned_ai_control()
+
+	var distance_moved: float = position.distance_to(previous_position)
+
+	if distance_moved > 1:
+		_adjust_speed_scale.rpc(distance_moved, 1)
+		_change_body_state.rpc(BodyState.JOG)
+		
+	elif distance_moved > 0.01:
+		_adjust_speed_scale.rpc(distance_moved, 0.8)
+		_change_body_state.rpc(BodyState.WALK)
 	else:
-		pass #AI control
+		_change_body_state.rpc(BodyState.IDLE)
+	
+	_process_animation()
+	previous_position = position
+
+@rpc("call_local", "unreliable")
+func _change_body_state(new_body_state: BodyState):
+	_body_state = new_body_state
+@rpc ("call_local", "unreliable")
+func _adjust_speed_scale(distance_moved: float, factor: float):
+	for body_part in body_holder.get_children():
+		if body_part is AnimatedBodyPortion:
+			body_part.speed_scale = distance_moved/factor
+		
+		
+func owned_ai_control(): pass		
+func ai_control(): pass
 	
 var _input_axis: Vector2 = Vector2.ZERO
 var _velocity: Vector2 = Vector2.ZERO
-var previous_position: Vector2 = position
+
 func move_by_input(delta: float) -> void:
 	
 	_input_axis = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	
-	body_state = BodyState.IDLE
+	_body_state = BodyState.IDLE
 	
 	apply_friction(friction, delta)
 	
 	if _input_axis != Vector2.ZERO:
 		_input_axis = _input_axis.normalized()
 		_velocity += _input_axis * acceleration * delta
-		_velocity = _velocity.limit_length(speed)
+		_velocity = _velocity.limit_length(being_data.get_max_speed())
 		_update_facing_direction()
 	
 	move_and_collide(_velocity)
-	
-	var distance_moved: float = position.distance_to(previous_position)
-
-	if distance_moved > 1:
-		for body_part in body_holder.get_children():
-			body_part.speed_scale = distance_moved/1
-		body_state = BodyState.JOG
-		
-	elif distance_moved > 0.01:
-		for body_part in body_holder.get_children():
-			body_part.speed_scale = distance_moved/0.8
-		body_state = BodyState.WALK
-		
-	else:
-		body_state = BodyState.IDLE
-	
-	_process_animation()
-	
-	previous_position = position
 	
 func apply_friction(amount: float, delta: float):
 	var real_amount: float = amount * delta
@@ -98,28 +132,10 @@ func _update_facing_direction() -> void:
 
 # esto debería ser un componente
 func _process_animation() -> void:	
-	_play_animation.rpc(str(BodyState.keys()[body_state]).to_lower()
+	_play_animation(str(BodyState.keys()[_body_state]).to_lower()
 	 + "_" + _facing_direction)
-@rpc("call_local")
+
 func _play_animation(animation_name: String) -> void:	
-	
-	#creo q es mejor
 	for body_part in body_holder.get_children():
-		if body_part.sprite_frames:
-			body_part.play(animation_name)
-			#agregar un Node nombrado idle_only o un script a la body part con un bool q indique si es idle_only=true, en ese caso usar el replace
-			#puede q haya q hacer algo parecido si es solo run sin jog, asi q tal vez el script con un array es mejor. si el 
-			#TAL VEZ es mejor llamar a algun método con parámetro un enum-estado en cada body part scripteada y esta handlee la animación q debería playear
-	"""
-	if body.sprite_frames:
-		body.play(animation_name)
-	if weapon.sprite_frames:
-		weapon.play(animation_name)
-	if shield.sprite_frames:
-		shield.play(animation_name)
-	if head.sprite_frames:
-		head.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
-	if helmet.sprite_frames:
-		helmet.play(animation_name.replace("walk", "idle").replace("jog", "idle"))
-	"""
-# esto debería ser un componente
+		if body_part is AnimatedBodyPortion and body_part.sprite_frames:
+			body_part._play_handled(animation_name)

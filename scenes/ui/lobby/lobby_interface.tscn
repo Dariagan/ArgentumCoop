@@ -478,6 +478,7 @@ text = "LOBBY"
 [connection signal="pressed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer1/LeaveButton" to="." method="_on_leave_button_pressed"]
 [connection signal="pressed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer3/CreateCharacterButton" to="." method="_on_create_character_button_pressed"]
 [connection signal="text_changed" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/Control/NameInput" to="." method="_on_name_input_text_changed"]
+[connection signal="body_scale_changed" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_body_scale_changed"]
 [connection signal="class_selected" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_class_selected"]
 [connection signal="follower_selected" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_follower_selected"]
 [connection signal="head_selected" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_head_selected"]

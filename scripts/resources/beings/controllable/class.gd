@@ -7,7 +7,7 @@ class_name Class
 
 @export var available_followers: Array[UncontrollableRace]
 
-@export var combat_multipliers: CombatMultipliers
+@export var combat_multipliers: CombatMultipliers = CombatMultipliers.new()
 
 @export var available_spells: Array[String]
 

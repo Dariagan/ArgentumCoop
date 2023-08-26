@@ -1,52 +1,48 @@
-[gd_scene load_steps=6 format=3 uid="uid://c640ckrygghxk"]
+[gd_scene load_steps=5 format=3 uid="uid://bxcw3yocig3he"]
 
 [ext_resource type="Script" path="res://scripts/beings/being.gd" id="1_qp2au"]
-[ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resources/beings/controllable/sprites/head/frames/human_male_brunette_mullet.tres" id="2_utni8"]
-[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/beings/controllable/sprites/body/frames/human_male_frames.tres" id="3_1p4di"]
+[ext_resource type="PackedScene" uid="uid://dh6xc1ceawroh" path="res://scenes/animated_body_portion.tscn" id="2_7wa3q"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_mq83o"]
-size = Vector2(18, 38)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c0jbg"]
+size = Vector2(20, 20.7143)
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_8qs0i"]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_p46nv"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/sync = true
 properties/0/watch = false
-properties/1/path = NodePath("Body/Body:speed_scale")
-properties/1/spawn = true
-properties/1/sync = true
-properties/1/watch = false
 
 [node name="Being" type="CharacterBody2D"]
 script = ExtResource("1_qp2au")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.4, 1.4)
+zoom = Vector2(0.15, 0.15)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0.5)
+scale = Vector2(0.9, 1.4)
+shape = SubResource("RectangleShape2D_c0jbg")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_p46nv")
+
+[node name="Name" type="Label" parent="."]
+offset_left = -20.0
+offset_top = -4.0
+offset_right = 20.0
+offset_bottom = 19.0
+horizontal_alignment = 1
+
+[node name="Meditation" type="AnimatedSprite2D" parent="."]
 
 [node name="BodyHolder" type="Node2D" parent="."]
 
-[node name="Helmet" type="AnimatedSprite2D" parent="BodyHolder"]
-texture_filter = 1
+[node name="Helmet" parent="BodyHolder" instance=ExtResource("2_7wa3q")]
 
-[node name="Head" type="AnimatedSprite2D" parent="BodyHolder"]
-texture_filter = 1
-sprite_frames = ExtResource("2_utni8")
-animation = &"idle_down"
-offset = Vector2(-0.2, -23)
+[node name="Body" parent="BodyHolder" instance=ExtResource("2_7wa3q")]
 
-[node name="Body" type="AnimatedSprite2D" parent="BodyHolder"]
-texture_filter = 1
-sprite_frames = ExtResource("3_1p4di")
-animation = &"walk_down"
-speed_scale = 2.0
+[node name="Head" parent="BodyHolder" instance=ExtResource("2_7wa3q")]
 
-[node name="Shield" type="AnimatedSprite2D" parent="BodyHolder"]
+[node name="LeftHand" type="Node" parent="BodyHolder"]
 
-[node name="Weapon" type="AnimatedSprite2D" parent="BodyHolder"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 2)
-shape = SubResource("RectangleShape2D_mq83o")
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_8qs0i")
+[node name="RightHand" type="Node" parent="BodyHolder"]

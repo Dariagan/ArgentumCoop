@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BodySpriteData" load_steps=3 format=3 uid="uid://br6gqx36f275l"]
+
+[ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/beings/controllable/sprites/body/frames/human_male_frames.tres" id="1_4qqb3"]
+[ext_resource type="Script" path="res://scripts/resources/beings/sprites/body_sprite_data.gd" id="1_m3y1t"]
+
+[resource]
+script = ExtResource("1_m3y1t")
+head_v_offset = -23.0
+name = &"Body"
+id = "human_male_body_1"
+frames = ExtResource("1_4qqb3")
+sex = 0
+animation_states = Array[StringName]([&"idle", &"walk", &"jog"])
+offset_global = Vector2(0, 0)
+offset_down = Vector2(0, 0)
+offset_up = Vector2(0, 0)
+offset_sideways = Vector2(0, 0)
+simmetrical_sideways = false
+width_frontally_sideways_height = Vector3(1, 1, 1)

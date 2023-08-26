@@ -17,7 +17,7 @@ TODO CHARACTER CREATION:
 @onready var h_box_container_3: HBoxContainer = $ChatLobbyContainer/VBoxContainer/HBoxContainer3
 
 
-var _username: String
+
 
 var lobby_title_line_edit: LineEdit 
 var lobby_title_label: Label 
@@ -104,10 +104,6 @@ func _update_lobby_title_client_side(new_text: String) -> void:
 	if lobby_title_label:
 		lobby_title_label.text = new_text
 
-func update_username(new_username: String) -> void:
-	_username = new_username
-	chat_component.username = _username	
-
 func _on_leave_button_pressed() -> void:
 	player_clicked_leave.emit()
 
@@ -129,8 +125,9 @@ signal name_changed(new_name: StringName)
 signal race_selected(race: ControllableRace)
 signal sex_selected(sex: Enums.Sex)
 signal class_selected(klass: Class)
-signal head_selected(index: int)
+signal head_selected(head: SpriteData)
 signal follower_selected(follower: UncontrollableRace)
+signal body_scale_changed(new_scale: Vector3)
 #signal follower_body_selected
 
 func _on_name_input_text_changed(new_name: String) -> void:
@@ -145,13 +142,13 @@ func _on_character_characterization_class_selected(klass: Class) -> void:
 	class_selected.emit(klass)
 	# mostrar stats en cuadradito
 	
-func _on_character_characterization_head_selected(index: int) -> void:
-	head_selected.emit(index)
+func _on_character_characterization_head_selected(head: SpriteData) -> void:
+	head_selected.emit(head)
 	# mostrar stats en cuadradito
 	
 func _on_character_characterization_follower_selected(follower: UncontrollableRace) -> void:
 	follower_selected.emit(follower)
 	# mostrar stats en cuadradito
 
-
-
+func _on_character_characterization_body_scale_changed(new_scale: Vector3) -> void:
+	body_scale_changed.emit(new_scale)

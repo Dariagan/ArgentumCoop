@@ -3,7 +3,9 @@ class_name ControllableRace
 
 @export var id: String = "controllable_"
 
-@export var available_classes: Array[Class]
+@export var classes: Array[Class]
+
+@export var max_width_frontally_sideways_height: Vector3 = Vector3(1, 1, 1.3)
 
 @export_category("Work Multipliers")
 
