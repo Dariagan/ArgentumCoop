@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="ControllableRace" load_steps=5 format=3 uid="uid://p2kum18wbfv4"]
+[gd_resource type="Resource" script_class="ControllableRace" load_steps=5 format=3 uid="uid://p2k16l677mta"]
 
 [ext_resource type="Resource" uid="uid://b8lgllcsn3y18" path="res://resources/beings/controllable/classes/warrior.tres" id="1_8iuop"]
 [ext_resource type="Script" path="res://scripts/resources/beings/race/controllable_race.gd" id="1_766p0"]
-[ext_resource type="Resource" uid="uid://b2gydsmdfya55" path="res://resources/beings/controllable/sprites/body/human_male_body_1.tres" id="1_tpem5"]
-[ext_resource type="Resource" uid="uid://b1y2122k4wpa5" path="res://resources/beings/controllable/sprites/head/human_male_head.tres" id="2_d7k1k"]
+[ext_resource type="Resource" uid="uid://br6gqx36f275l" path="res://resources/beings/controllable/sprites/body/human_male_body_1.tres" id="1_tpem5"]
+[ext_resource type="Resource" uid="uid://bsfv14kk64tct" path="res://resources/beings/controllable/sprites/head/human_male_head.tres" id="2_d7k1k"]
 
 [resource]
 script = ExtResource("1_766p0")
@@ -29,6 +29,7 @@ max_encumberance_multiplier = 1.0
 comfortable_temp_range = Vector2i(16, 23)
 hunger_rate = 1.0
 diets = Array[Resource("res://scripts/resources/beings/race/diet.gd")]([])
+can_walk_on = Array[int]([0])
 can_vent = false
 can_climb = false
 males_females_ratio = 0.5

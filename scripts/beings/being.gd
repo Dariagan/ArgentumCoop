@@ -89,7 +89,8 @@ func _change_body_state(new_body_state: BodyState):
 @rpc ("call_local", "unreliable")
 func _adjust_speed_scale(distance_moved: float, factor: float):
 	for body_part in body_holder.get_children():
-		body_part.speed_scale = distance_moved/factor
+		if body_part is AnimatedBodyPortion:
+			body_part.speed_scale = distance_moved/factor
 		
 		
 func owned_ai_control(): pass		
@@ -136,5 +137,5 @@ func _process_animation() -> void:
 
 func _play_animation(animation_name: String) -> void:	
 	for body_part in body_holder.get_children():
-		if body_part.sprite_frames:
+		if body_part is AnimatedBodyPortion and body_part.sprite_frames:
 			body_part._play_handled(animation_name)

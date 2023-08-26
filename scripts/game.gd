@@ -1,7 +1,7 @@
 extends Node
 # PONER EN LA GUI ARRIBA A LA DERECHA DAYS SURVIVED: X, EN FUENTE DIABLESCA
 
-@onready var tile_map: TileMap = $TileMap
+@onready var tile_map: ProceduralTilemap = $TileMap
 
 @export var being_scene: PackedScene
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
@@ -38,4 +38,4 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		
 		i+=1
 		
-	
+	tile_map.generate_world()
