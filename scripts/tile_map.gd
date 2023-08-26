@@ -22,7 +22,7 @@ func generate_world(seed: int = 0) -> void:#randi()
 	
 	
 	
-	generate_continent(Vector2i.ZERO, Vector2i(1500, 1500))
+	generate_continent(Vector2i.ZERO, Vector2i(1500, 1500), seed)
 	
 	
 

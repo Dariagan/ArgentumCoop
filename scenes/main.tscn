@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=13 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/game.gd" id="5_2eji3"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 [ext_resource type="PackedScene" uid="uid://bxcw3yocig3he" path="res://scenes/being.tscn" id="5_nor5b"]
+[ext_resource type="TileSet" uid="uid://4862so22fuqq" path="res://resources/tile_set.tres" id="6_7e0w8"]
 [ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
 [ext_resource type="Script" path="res://scripts/tile_map.gd" id="7_hh7e5"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
@@ -28,6 +29,7 @@ _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
 spawn_path = NodePath("../TileMap")
 
 [node name="TileMap" type="TileMap" parent="Lobby/Game"]
+tile_set = ExtResource("6_7e0w8")
 format = 2
 script = ExtResource("7_hh7e5")
 
