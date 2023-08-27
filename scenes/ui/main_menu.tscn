@@ -23,10 +23,10 @@ text = "Quick Start"
 
 [node name="Host" type="Button" parent="TextureRect"]
 layout_mode = 0
-offset_left = 19.0
-offset_top = 152.0
-offset_right = 63.0
-offset_bottom = 183.0
+offset_left = 1051.0
+offset_top = 589.0
+offset_right = 1095.0
+offset_bottom = 620.0
 text = "Host"
 
 [node name="join" type="Button" parent="TextureRect"]

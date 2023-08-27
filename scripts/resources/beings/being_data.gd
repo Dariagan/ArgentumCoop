@@ -25,5 +25,5 @@ func get_max_speed() -> float:
 	var max_speed: float =  3 * race.combat_multipliers.speed 
 	if klass:
 		max_speed *= klass.combat_multipliers.speed
-	return max_speed
+	return max_speed * 20
 	

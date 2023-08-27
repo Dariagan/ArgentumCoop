@@ -54,6 +54,18 @@ func free_control() -> void:
 	uncontrolled = true
 	#if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
 		#camera_2d.enabled = false
+		
+var zoom_min = Vector2(0.05, 0.05)		
+var zoom_max = Vector2(9999999, 9999999)		
+		
+func _input(event: InputEvent) -> void:
+	if is_multiplayer_authority() and event is InputEventMouseButton and event.is_pressed():
+		if event.is_action("wheel_down"):
+			camera_2d.zoom *= 0.9
+		elif event.is_action("wheel_up"):
+			camera_2d.zoom *= 1.1
+	
+		camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
 
 var previous_position: Vector2 = position
 func _physics_process(delta: float) -> void:
