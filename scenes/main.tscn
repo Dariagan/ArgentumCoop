@@ -15,6 +15,9 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_m4pw2"]
 noise_type = 0
+frequency = 0.042
+fractal_type = 0
+fractal_octaves = 1
 
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
