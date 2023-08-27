@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=14 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -13,25 +13,8 @@
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_6dndl"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_m4pw2"]
 noise_type = 0
-frequency = 0.0826
-fractal_lacunarity = 2.8
-fractal_weighted_strength = 0.45
-domain_warp_type = 1
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_w8iw5"]
-noise_type = 3
-frequency = 0.0697
-fractal_type = 3
-fractal_octaves = 1
-fractal_gain = 0.2
-fractal_weighted_strength = 1.0
-domain_warp_type = 2
-domain_warp_amplitude = 12.0
-domain_warp_frequency = 0.035
-domain_warp_fractal_lacunarity = 3.0
-domain_warp_fractal_gain = 0.4
 
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
@@ -52,8 +35,7 @@ spawn_path = NodePath("../TileMap")
 tile_set = ExtResource("6_7e0w8")
 format = 2
 script = ExtResource("7_hh7e5")
-test = SubResource("FastNoiseLite_6dndl")
-test2 = SubResource("FastNoiseLite_w8iw5")
+test = SubResource("FastNoiseLite_m4pw2")
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 
