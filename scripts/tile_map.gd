@@ -27,10 +27,10 @@ func generate_world(seed: int = 0) -> void:#randi()
 	
 	
 
-const WATER_PROPORTION: float = -0.16
+const WATER_PROPORTION: float = -0.1
 
 func generate_continent(center: Vector2i, size: Vector2i, seed: int = 0) -> void:
-	seed=35
+	seed=59
 	
 	var continent_alt: FastNoiseLite = FastNoiseLite.new()
 	var peninsuler: FastNoiseLite = FastNoiseLite.new()
@@ -42,13 +42,13 @@ func generate_continent(center: Vector2i, size: Vector2i, seed: int = 0) -> void
 	laker.seed = seed
 	
 	continent_alt.noise_type = FastNoiseLite.TYPE_SIMPLEX
-	continent_alt.frequency = 0.37/size.length()
+	continent_alt.frequency = 0.3/size.length()
 	
 	continent_alt.fractal_lacunarity = 2.8
 	continent_alt.fractal_gain = 0.5
 	continent_alt.fractal_weighted_strength = 0.6
 
-	peninsuler.frequency = 6.4/size.length()
+	peninsuler.frequency = 5/size.length()
 	peninsuler.fractal_gain = 0.56
 	
 	var lake_inlandiness_threshold: float = 0.7
@@ -59,20 +59,15 @@ func generate_continent(center: Vector2i, size: Vector2i, seed: int = 0) -> void
 	#while peninsuler.get_noise_2dv(size/2) < WATER_PROPORTION + 0.1:
 	#	peninsuler.offset.x += 10
 	
-	var continental_threshold: float = 0.57 * pow(size.length()/1600, 0.05)
+	var continental_threshold: float = 0.5 * pow(size.length()/1600, 0.05)
 	print(continental_threshold)
 	
-	while continent_alt.get_noise_2dv(center) < continental_threshold + 0.2:
+	while continent_alt.get_noise_2dv(center) < continental_threshold + 0.1:
 		continent_alt.offset.x += 3
 	
 	var border_water_booster: Vector2 = Vector2.ZERO
 	
 	for i in range(-size.x/2, size.x/2):
-		
-		var bcf: float = calculate_border_closeness_factor(i, size.x)
-		if bcf > 0.7: 
-			border_water_booster.x = bcf
-		else: border_water_booster.x = 0
 		
 		#mejor hacerlo radial y usar un easing
 		
@@ -81,12 +76,9 @@ func generate_continent(center: Vector2i, size: Vector2i, seed: int = 0) -> void
 			var atlas_id: int
 			var atlas_tile: Vector2i
 			
-			bcf = calculate_border_closeness_factor(j, size.y)
-			if bcf > 0.7: 
-				border_water_booster.y = bcf
-			else: border_water_booster.y = 0
+			var bcf = (Vector2(i,j).distance_to(center))/(size.length()/float(2))
 			
-			if continent_alt.get_noise_2d(i,j) - border_water_booster.length_squared()/20 > continental_threshold and peninsuler.get_noise_2d(i,j) > WATER_PROPORTION:
+			if continent_alt.get_noise_2d(i,j) - ((pow(bcf,3)/2.6))> continental_threshold and peninsuler.get_noise_2d(i,j) > WATER_PROPORTION:
 				
 				atlas_id = 0
 				atlas_tile = Vector2i(0,1)
