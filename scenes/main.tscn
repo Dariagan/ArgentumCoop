@@ -15,9 +15,10 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_6dndl"]
 noise_type = 0
-frequency = 0.0383
-fractal_lacunarity = 3.0
-fractal_gain = 0.6
+frequency = 0.0826
+fractal_lacunarity = 2.8
+fractal_weighted_strength = 0.45
+domain_warp_type = 1
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_w8iw5"]
 noise_type = 3
