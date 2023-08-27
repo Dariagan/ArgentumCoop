@@ -21,14 +21,15 @@ func generate_world(seed: int = 0) -> void:#randi()
 	
 	var empty_tiles: Array[Vector2i] = []
 
-	generate_continent(Vector2i.ZERO, Vector2i(2100, 2100), seed)
+	var size = 1000
+	generate_continent(Vector2i.ZERO, Vector2i(size, size), seed)
 	
 	
 
 const peninsuler_cutoff: float = -0.1
 
 func generate_continent(center: Vector2i, size: Vector2i, seed) -> void:
-	seed=8
+	seed=4444
 	
 	var continent_alt: FastNoiseLite = FastNoiseLite.new()
 	var peninsuler: FastNoiseLite = FastNoiseLite.new()
@@ -89,10 +90,11 @@ func generate_continent(center: Vector2i, size: Vector2i, seed) -> void:
 			var away_from_coast: bool = continentness > continental_cutoff + 0.06 and peninsuler.get_noise_2d(i,j) > peninsuler_cutoff + 0.27
 			var lake_tile: bool = laker.get_noise_2d(i,j) > lake_cutoff
 			
-			var beach_cutoff: float = 0.86
-			var coastness: float = maxf(0.6 - pow((continentness - continental_cutoff), 0.58), (0.95 - pow((peninsuler.get_noise_2d(i,j) - peninsuler_cutoff), 0.50)))
+			var beach_cutoff: float = 0.71
+			var coastness: float = maxf(0.6 - pow((continentness - continental_cutoff), 0.48), (0.8 - pow((peninsuler.get_noise_2d(i,j) - peninsuler_cutoff), 0.4)))
 			
-			var beach: bool = beacher.get_noise_2d(i,j)/1.7 + coastness > beach_cutoff
+			
+			var beach: bool = beacher.get_noise_2d(i,j)/2.3 + coastness > beach_cutoff
 			var lake: bool = laker.get_noise_2d(i,j)/1.3 + 1 - pow(coastness, 0.67) > lake_cutoff
 			
 			
