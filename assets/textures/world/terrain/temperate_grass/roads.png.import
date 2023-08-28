@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bgw7cq5uihkel"
-path="res://.godot/imported/floors.png-22478329a9900f5b9a85b44af582fc15.ctex"
+uid="uid://dm0byqkrd0naw"
+path="res://.godot/imported/roads.png-eb01d3ef19de66c8ce15942425a188b4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/terrain/floors.png"
-dest_files=["res://.godot/imported/floors.png-22478329a9900f5b9a85b44af582fc15.ctex"]
+source_file="res://assets/textures/world/terrain/temperate_grass/roads.png"
+dest_files=["res://.godot/imported/roads.png-eb01d3ef19de66c8ce15942425a188b4.ctex"]
 
 [params]
 

@@ -14,10 +14,12 @@
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_m4pw2"]
-noise_type = 0
 frequency = 0.042
-fractal_octaves = 4
-fractal_gain = -0.12
+fractal_octaves = 3
+fractal_lacunarity = -0.49
+fractal_gain = 2.3
+domain_warp_amplitude = 21.335
+domain_warp_fractal_type = 2
 
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
