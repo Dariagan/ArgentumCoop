@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=15 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -14,12 +14,13 @@
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_m4pw2"]
-frequency = 0.042
-fractal_octaves = 3
-fractal_lacunarity = -0.49
-fractal_gain = 2.3
+noise_type = 0
+frequency = 0.0135
 domain_warp_amplitude = 21.335
 domain_warp_fractal_type = 2
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_rwgmq"]
+seed = 1
 
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
@@ -39,8 +40,17 @@ spawn_path = NodePath("../TileMap")
 [node name="TileMap" type="TileMap" parent="Lobby/Game"]
 tile_set = ExtResource("6_7e0w8")
 format = 2
+layer_0/name = "ground"
+layer_1/name = "objects"
+layer_1/enabled = true
+layer_1/modulate = Color(1, 1, 1, 1)
+layer_1/y_sort_enabled = false
+layer_1/y_sort_origin = 0
+layer_1/z_index = 1
+layer_1/tile_data = PackedInt32Array()
 script = ExtResource("7_hh7e5")
 test = SubResource("FastNoiseLite_m4pw2")
+test2 = SubResource("FastNoiseLite_rwgmq")
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 
