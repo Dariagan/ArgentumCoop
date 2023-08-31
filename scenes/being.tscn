@@ -13,6 +13,7 @@ properties/0/sync = true
 properties/0/watch = false
 
 [node name="Being" type="CharacterBody2D"]
+z_index = 15
 script = ExtResource("1_qp2au")
 
 [node name="Camera2D" type="Camera2D" parent="."]

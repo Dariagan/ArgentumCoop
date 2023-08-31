@@ -10,6 +10,7 @@ const controllable_races_directories: Array[String] = ["res://resources/beings/c
 const uncontrollable_races_directories: Array[String] = ["res://resources/beings/uncontrollable/races/"]
 const races_directories = controllable_races_directories + uncontrollable_races_directories
 const classes_directories: Array[String] = ["res://resources/beings/controllable/classes/"]
+const spawnable_scenes_directories: Array[String] = ["res://scenes/world/terrain/grass.tscn"]
 
 var item_data: Dictionary
 
@@ -23,6 +24,8 @@ var controllable_races: Dictionary
 var uncontrollable_races: Dictionary
 var classes: Dictionary
 
+var spawnable_scenes: Array[String]
+
 func _init() -> void:
 	
 	item_data = _index_all_found_resources(item_data_directories)
@@ -34,6 +37,8 @@ func _init() -> void:
 	races.merge(uncontrollable_races, true); races.merge(controllable_races, true)
 	
 	classes = _index_all_found_resources(classes_directories)
+	
+	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
 func _index_all_found_resources(directories: Array[String]) -> Dictionary:
 	var dir_access: DirAccess
@@ -63,3 +68,24 @@ func _index_all_found_resources(directories: Array[String]) -> Dictionary:
 	
 	return table
 
+func _list_all_spawnable_scenes(directories: Array[String]) -> Array[String]:
+	var dir_access: DirAccess
+	var found_scenes: Array[String]
+	
+	for directory in directories:
+		dir_access = DirAccess.open(directory) 
+		
+		if dir_access:
+			dir_access.list_dir_begin()
+			var file_name = dir_access.get_next()
+			
+			while file_name != "":
+				
+				if !dir_access.current_is_dir() and file_name.ends_with(".tscn"):
+					found_scenes.append(directory + file_name)
+					
+				file_name = dir_access.get_next()
+		else:
+			print("Couldn't open directory %s" % [directory])
+	
+	return found_scenes

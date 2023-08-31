@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=16 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 [ext_resource type="PackedScene" uid="uid://bxcw3yocig3he" path="res://scenes/being.tscn" id="5_nor5b"]
 [ext_resource type="TileSet" uid="uid://4862so22fuqq" path="res://resources/tile_set.tres" id="6_7e0w8"]
+[ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
 [ext_resource type="Script" path="res://scripts/tile_map.gd" id="7_hh7e5"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
@@ -36,18 +37,26 @@ being_scene = ExtResource("5_nor5b")
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
 spawn_path = NodePath("../TileMap")
+script = ExtResource("6_r3dut")
 
 [node name="TileMap" type="TileMap" parent="Lobby/Game"]
 tile_set = ExtResource("6_7e0w8")
 format = 2
 layer_0/name = "ground"
-layer_1/name = "objects"
+layer_1/name = "noise"
 layer_1/enabled = true
 layer_1/modulate = Color(1, 1, 1, 1)
 layer_1/y_sort_enabled = false
 layer_1/y_sort_origin = 0
-layer_1/z_index = 1
+layer_1/z_index = 0
 layer_1/tile_data = PackedInt32Array()
+layer_2/name = "objects"
+layer_2/enabled = true
+layer_2/modulate = Color(1, 1, 1, 1)
+layer_2/y_sort_enabled = false
+layer_2/y_sort_origin = 0
+layer_2/z_index = 1
+layer_2/tile_data = PackedInt32Array()
 script = ExtResource("7_hh7e5")
 test = SubResource("FastNoiseLite_m4pw2")
 test2 = SubResource("FastNoiseLite_rwgmq")

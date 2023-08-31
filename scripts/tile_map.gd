@@ -108,7 +108,10 @@ func generate_continent(center: Vector2i, size: Vector2i, seed) -> void:
 				
 				[true, false, ..]:#grass
 					#atlas_id = 0; atlas_tile = Vector2i(0,1)
-					tiles_to_place.append({"atlas_id": 0, "tile": Vector2i(0, 1)})
+					
+					#_place_main_continental_tile(biome: Biome)
+					
+					tiles_to_place.append({"atlas_id": 6, "tile": Vector2i(0, 0)})
 					
 					#tiles_to_place.append({"coords" = })
 					
