@@ -10,7 +10,8 @@ const controllable_races_directories: Array[String] = ["res://resources/beings/c
 const uncontrollable_races_directories: Array[String] = ["res://resources/beings/uncontrollable/races/"]
 const races_directories = controllable_races_directories + uncontrollable_races_directories
 const classes_directories: Array[String] = ["res://resources/beings/controllable/classes/"]
-const spawnable_scenes_directories: Array[String] = ["res://scenes/world/terrain/grass.tscn"]
+const tiles_directories: Array[String] = ["res://resources/world/terrain/", "res://resources/world/buildings/", "res://resources/world/buildings/dungeons/"]
+const spawnable_scenes_directories: Array[String] = ["res://scenes/world/terrain/", "res://scenes/world/buildings/"]
 
 var item_data: Dictionary
 
@@ -24,7 +25,12 @@ var controllable_races: Dictionary
 var uncontrollable_races: Dictionary
 var classes: Dictionary
 
+var tiles: Dictionary
+
 var spawnable_scenes: Array[String]
+
+#causa error al descomentar (ya está cargado)
+#var tile_set: TileSet = preload("res://resources/world/tile_set.tres")
 
 func _init() -> void:
 	
@@ -37,6 +43,7 @@ func _init() -> void:
 	races.merge(uncontrollable_races, true); races.merge(controllable_races, true)
 	
 	classes = _index_all_found_resources(classes_directories)
+	tiles = _index_all_found_resources(tiles_directories)
 	
 	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 

@@ -19,7 +19,8 @@ class_name ItemData
 
 @export var item_carrier: ItemCarrier
 
-@export var tool: Resource #hacer un Array[Resource] más tarde (si resulta ser necesario)
+@export var tool: Script 
+
 
 #@export var durability: float = -1
 #@export_exp_easing("inout") var decay 

@@ -15,6 +15,6 @@ normalize = false
 color_ramp = SubResource("Gradient_q1p8b")
 noise = SubResource("FastNoiseLite_4mibw")
 
-[node name="Noise" type="Sprite2D"]
+[node name="Base" type="Sprite2D"]
 texture = SubResource("NoiseTexture2D_5lqog")
 script = ExtResource("1_syky3")

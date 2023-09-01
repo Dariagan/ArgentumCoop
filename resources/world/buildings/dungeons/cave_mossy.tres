@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Tile" load_steps=2 format=3 uid="uid://ci370602mwpw0"]
+
+[ext_resource type="Script" path="res://scripts/resources/world/tile.gd" id="1_ld7wy"]
+
+[resource]
+script = ExtResource("1_ld7wy")
+id = &"cave_mossy"
+layer = 2
+source_id = 3
+atlas_pos = Vector2i(0, 3)
+alternative_id = 0
