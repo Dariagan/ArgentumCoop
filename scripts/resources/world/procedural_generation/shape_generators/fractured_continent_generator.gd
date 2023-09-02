@@ -1,13 +1,13 @@
 extends RefCounted
 # convertir a C#? https://ask.godotengine.org/56851/c%23-how-to-create-godot-collections-dictionary
 
-static var _tile_map: TileMap
+static var _world: Array[Array]
 
 #en extra info se pueden meter params para la randomización de parámetros
-static func generate(tile_map: TileMap, tile_picker: Script, center: Vector2i, size: Vector2i, extra_info: Dictionary, seed: int = 0) -> void:
+static func generate(world: Array[Array], tile_picker: Script, center: Vector2i, size: Vector2i, extra_info: Dictionary, seed: int = 0) -> void:
 	#in extra_info se pasan noise maps globales al mundo, parámatros de configuración de la generation, etc
 	
-	_tile_map = tile_map
+	_world = world
 	
 	var continenter: FastNoiseLite = FastNoiseLite.new()
 	var peninsuler: FastNoiseLite = FastNoiseLite.new()
@@ -58,10 +58,8 @@ static func generate(tile_map: TileMap, tile_picker: Script, center: Vector2i, s
 		for j in range(-size.y/2, size.y/2):
 			
 			var bcf: float = _get_bcf(i, j, size, center)
-			#hacer función para poder usar fuera de los fors. toma como parámetro i y j la func, center y size
 			
 			var continentness: float = _get_continentness(i, j, continenter, bcf)
-			#hacer función para poder usar fuera de los fors. toma como parámetro i y j la func
 			
 			var continental: bool = continentness > continental_cutoff
 			var peninsuler_caved: bool = peninsuler.get_noise_2d(i,j) < peninsuler_cutoff
@@ -81,23 +79,20 @@ static func generate(tile_map: TileMap, tile_picker: Script, center: Vector2i, s
 				&"lake": lake,
 				&"beach": beach
 			}
-		
 			_place_tiles(Vector2i(i, j) + center, tile_picker.get_tiles(info))
 			
-
 static func _place_tiles(coords: Vector2i, tiles_to_place: Array[StringName]) -> void:
 	for tile_id in tiles_to_place:
 		var tile: Tile = GlobalData.tiles[tile_id]
-		_tile_map.set_cell(tile.layer, coords, tile.source_id, tile.atlas_pos, tile.alternative_id)
-		
+		(_world[coords.x + _world.size()/2][coords.y + _world[0].size()/2] as Array).append(tile)
 		
 static func _place_dungeon_entrances(size: Vector2i, center: Vector2i, rng: RandomNumberGenerator,
 	continenter: FastNoiseLite, continental_cutoff: float, 
 	peninsuler: FastNoiseLite, peninsuler_cutoff: float,
 	laker: FastNoiseLite, lake_cutoff: float):
 	
-	var ri: float = rng.randi_range(-size.x/2, size.x/2)
-	var rj: float = rng.randi_range(-size.y/2, size.y/2)
+	var ri: int = rng.randi_range(-size.x/2, size.x/2)
+	var rj: int = rng.randi_range(-size.y/2, size.y/2)
 	var dungeon_coords: Array[Vector2i]
 	
 	var tries: int = 0
