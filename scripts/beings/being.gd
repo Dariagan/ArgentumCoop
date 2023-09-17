@@ -16,7 +16,7 @@ var _facing_direction: String = "down"
 
 var being_data: BeingPersonalData
 
-signal load_tiles_around_me(being: Being)
+signal load_tiles_around_me(being: Being, distance_moved: float)
 
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body
 @onready var head: AnimatedBodyPortion = $BodyHolder/Head
@@ -114,8 +114,8 @@ func ai_control(): pass
 var _input_axis: Vector2 = Vector2.ZERO
 var _velocity: Vector2 = Vector2.ZERO
 
-var time_elapsed_wout_load: float = 0
-var distance_moved_since_load: float = 0
+
+var distance_moved_since_load: float = 501
 func move_by_input(delta: float) -> void:
 	
 	_input_axis = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
@@ -134,11 +134,11 @@ func move_by_input(delta: float) -> void:
 	
 	distance_moved_since_load += distance_moved
 	
-	if distance_moved_since_load > 400:
+	if distance_moved_since_load > 500:
 		load_tiles_around_me.emit(self)
 		distance_moved_since_load = 0
 		
-	clampf(time_elapsed_wout_load, 0, 100)
+
 	
 func apply_friction(amount: float, delta: float):
 	var real_amount: float = amount * delta

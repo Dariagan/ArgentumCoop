@@ -63,7 +63,7 @@ func _on_player_disconnect(peer_id: int) -> void:
 	_ready_peers.erase(peer_id)
 	_sync_state_for_clients()
 	_update_players_for_gui()
-# executed ONLY server-side 
+# executed ONLY on the host's PC
 	
 func _sync_state_for_clients() -> void: 
 	_give_player_list.rpc(_players) 

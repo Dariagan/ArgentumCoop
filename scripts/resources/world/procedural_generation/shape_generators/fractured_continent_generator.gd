@@ -108,12 +108,14 @@ static func _place_dungeon_entrances(size: Vector2i, center: Vector2i, rng: Rand
 			
 			var far_from_dungeons: bool = true
 			for coord in dungeon_coords:
-				if far_from_dungeons and Vector2(ri, rj).distance_to(coord) < size.length()* 0.25 * min_distance_mult:
+				if Vector2(ri, rj).distance_to(coord) < size.length()* 0.25 * min_distance_mult:
 					far_from_dungeons = false
+					break
 				
 			if far_from_dungeons:
 				_place_tiles(center + Vector2i(ri, rj), [&"cave_mossy"])
 				dungeon_coords.append(Vector2i(ri, rj))
+				print(Vector2i(ri, rj))
 			else:
 				min_distance_mult = clampf(1500 / float(tries), 0, 1)
 
