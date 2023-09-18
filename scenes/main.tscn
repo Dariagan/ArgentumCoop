@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=14 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -9,19 +9,10 @@
 [ext_resource type="PackedScene" uid="uid://bxcw3yocig3he" path="res://scenes/being.tscn" id="5_nor5b"]
 [ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
-[ext_resource type="Script" path="res://scripts/tile_map.gd" id="7_hh7e5"]
 [ext_resource type="TileSet" uid="uid://cnwxuvwhryd5d" path="res://resources/world/tile_set.tres" id="7_os580"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
+[ext_resource type="Script" path="res://scripts/resources/world/ProceduralTileMap.cs" id="8_klrkd"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_m4pw2"]
-noise_type = 0
-frequency = 0.0135
-domain_warp_amplitude = 21.335
-domain_warp_fractal_type = 2
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_rwgmq"]
-seed = 1
 
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
@@ -57,9 +48,7 @@ layer_2/y_sort_enabled = false
 layer_2/y_sort_origin = 0
 layer_2/z_index = 30
 layer_2/tile_data = PackedInt32Array()
-script = ExtResource("7_hh7e5")
-test = SubResource("FastNoiseLite_m4pw2")
-test2 = SubResource("FastNoiseLite_rwgmq")
+script = ExtResource("8_klrkd")
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 

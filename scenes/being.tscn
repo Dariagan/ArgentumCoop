@@ -17,6 +17,7 @@ z_index = 15
 script = ExtResource("1_qp2au")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(0, -5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 0.5)
@@ -46,3 +47,6 @@ horizontal_alignment = 1
 [node name="LeftHand" type="Node" parent="BodyHolder"]
 
 [node name="RightHand" type="Node" parent="BodyHolder"]
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+debug_enabled = true

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/resources/world/procedural_generation/landmass_generator.gd" id="1_3gjip"]
 [ext_resource type="Script" path="res://scripts/resources/world/procedural_generation/shape_generators/fractured_continent_generator.gd" id="2_bxg6u"]
-[ext_resource type="Script" path="res://scripts/resources/world/procedural_generation/tile_pickers/default_fc_tile_picker.gd" id="3_87str"]
+[ext_resource type="Script" path="res://scripts/resources/world/procedural_generation/tile_pickers/temperate_tile_picker.gd" id="3_87str"]
 
 [resource]
 script = ExtResource("1_3gjip")

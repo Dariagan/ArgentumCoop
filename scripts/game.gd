@@ -1,7 +1,7 @@
 extends Node
 # PONER EN LA GUI ARRIBA A LA DERECHA DAYS SURVIVED: X, EN FUENTE DIABLESCA
 
-@onready var tile_map: ProceduralTilemap = $TileMap
+@onready var tile_map = $TileMap
 
 @export var being_scene: PackedScene
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
@@ -9,7 +9,7 @@ extends Node
 
 func start_new_game(players_start_data: Array, peers: Array) -> void:
 
-	tile_map.generate_world.rpc()
+	generate_world.rpc()
 
 	var i: int = 0
 	for player_start_data in players_start_data:
@@ -33,11 +33,13 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		var being: Being = being_scene.instantiate()
 		being.name = str(peers[i])
 		being.position.x = i*40
-		tile_map.spawn_active_being(being)
+		tile_map.add_child(being)
 		being.construct(being_spawn_data)
 		
 		being.give_control.rpc(peers[i])
 		
 		i+=1
 		
-	
+@rpc("call_local")
+func generate_world() -> void:
+	tile_map.GenerateWorld({}, 0)

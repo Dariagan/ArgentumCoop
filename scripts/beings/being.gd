@@ -8,15 +8,9 @@ class_name Being
 @onready var body_holder: Node2D = $BodyHolder
 @onready var camera_2d: Camera2D = $Camera2D
 
-enum BodyState { IDLE, WALK, JOG }
-
-var _body_state: BodyState = BodyState.IDLE
-		
-var _facing_direction: String = "down"
-
 var being_data: BeingPersonalData
 
-signal load_tiles_around_me(being: Being, distance_moved: float)
+signal load_tiles_around_me(cords: Vector2)
 
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body
 @onready var head: AnimatedBodyPortion = $BodyHolder/Head
@@ -30,6 +24,10 @@ func construct(data: BeingSpawnData) -> void:
 @rpc("call_local")
 func construct_being_data(data: Dictionary):
 	being_data = BeingPersonalData.new(data)
+	
+	var tile_map = get_parent()
+	
+	load_tiles_around_me.connect(tile_map.LoadTilesAround)
 
 var uncontrolled: bool = true
 
@@ -40,7 +38,6 @@ func give_control(peer_id: int) -> void:
 		set_multiplayer_authority(peer_id)
 		if peer_id == multiplayer.get_unique_id() and being_data.faction is PlayerFaction:
 			camera_2d.make_current()
-	
 
 @rpc("call_local", "any_peer")
 func take_control() -> void:
@@ -48,17 +45,12 @@ func take_control() -> void:
 		uncontrolled = false
 		set_multiplayer_authority(multiplayer.get_remote_sender_id())
 		if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
-			#camera_2d.enabled = true
 			camera_2d.make_current()
 
 @rpc("call_local") 
-func free_control() -> void: 
-	uncontrolled = true
-	#if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
-		#camera_2d.enabled = false
+func free_control() -> void: uncontrolled = true
 		
-var zoom_min = Vector2(0.05, 0.05)		
-var zoom_max = Vector2(9999999, 9999999)		
+var zoom_min = Vector2(0.05, 0.05); var zoom_max = Vector2(9999999, 9999999)		
 		
 func _input(event: InputEvent) -> void:
 	if is_multiplayer_authority() and event is InputEventMouseButton and event.is_pressed():
@@ -69,8 +61,6 @@ func _input(event: InputEvent) -> void:
 	
 		camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
 
-var previous_position: Vector2 = position
-var distance_moved: float = 0
 func _physics_process(delta: float) -> void:
 	
 	match [is_multiplayer_authority(), being_data.faction is PlayerFaction, uncontrolled]:
@@ -79,24 +69,36 @@ func _physics_process(delta: float) -> void:
 		[_, false, _]:
 			ai_control()
 		[_, true, false]:
-			move_by_input(delta)
+			_update_direction_axis_by_input(delta)
 		[_, true, true]:
 			owned_ai_control()
+			
+	_update_distance_moved()
+	_update_body_state()
+	
+	_process_animation()
 
-	distance_moved = position.distance_to(previous_position)
-
+var distance_moved: float; var _previous_position: Vector2 = position
+func _update_distance_moved() -> void:
+	distance_moved = position.distance_to(_previous_position)
+	_previous_position = position
+	
+func _update_body_state() -> void:
 	if distance_moved > 1:
 		_adjust_speed_scale.rpc(distance_moved, 1)
 		_change_body_state.rpc(BodyState.JOG)
-		
 	elif distance_moved > 0.01:
 		_adjust_speed_scale.rpc(distance_moved, 0.8)
 		_change_body_state.rpc(BodyState.WALK)
 	else:
 		_change_body_state.rpc(BodyState.IDLE)
 	
-	_process_animation()
-	previous_position = position
+
+enum BodyState { IDLE, WALK, JOG }
+
+var _body_state: BodyState = BodyState.IDLE
+		
+var _facing_direction: String = "down"
 
 @rpc("call_local", "unreliable")
 func _change_body_state(new_body_state: BodyState):
@@ -107,26 +109,22 @@ func _adjust_speed_scale(distance_moved: float, factor: float):
 		if body_part is AnimatedBodyPortion:
 			body_part.speed_scale = distance_moved/factor
 		
-		
 func owned_ai_control(): pass		
 func ai_control(): pass
 	
-var _input_axis: Vector2 = Vector2.ZERO
+var _direction_axis: Vector2 = Vector2.ZERO
 var _velocity: Vector2 = Vector2.ZERO
 
-
 var distance_moved_since_load: float = 501
-func move_by_input(delta: float) -> void:
+func _update_direction_axis_by_input(delta: float) -> void:
 	
-	_input_axis = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	
-	_body_state = BodyState.IDLE
+	_direction_axis = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	
 	apply_friction(friction, delta)
 	
-	if _input_axis != Vector2.ZERO:
-		_input_axis = _input_axis.normalized()
-		_velocity += _input_axis * acceleration * delta
+	if _direction_axis != Vector2.ZERO:
+		_direction_axis = _direction_axis.normalized()
+		_velocity += _direction_axis * acceleration * delta
 		_velocity = _velocity.limit_length(being_data.get_max_speed())
 		_update_facing_direction()
 	
@@ -135,25 +133,17 @@ func move_by_input(delta: float) -> void:
 	distance_moved_since_load += distance_moved
 	
 	if distance_moved_since_load > 500:
-		load_tiles_around_me.emit(self)
+		load_tiles_around_me.emit(position)
 		distance_moved_since_load = 0
 		
-
-	
 func apply_friction(amount: float, delta: float):
-	var real_amount: float = amount * delta
-	
-	# _velocity = _velocity.move_toward(Vector2.ZERO, real_amount)
-	if _velocity.length() > real_amount:
-		_velocity -= _velocity.normalized() * real_amount
-	else:
-		_velocity = Vector2.ZERO
+	_velocity = _velocity.move_toward(Vector2.ZERO, amount * delta)
 		
 func _update_facing_direction() -> void:
-	if abs(_input_axis.x) > abs(_input_axis.y): 
-		_facing_direction = "left" if _input_axis.x < 0 else "right"
+	if abs(_direction_axis.x) > abs(_direction_axis.y): 
+		_facing_direction = "left" if _direction_axis.x < 0 else "right"
 	else: 
-		_facing_direction = "up" if _input_axis.y < 0 else "down"
+		_facing_direction = "up" if _direction_axis.y < 0 else "down"
 
 # esto debería ser un componente
 func _process_animation() -> void:	
