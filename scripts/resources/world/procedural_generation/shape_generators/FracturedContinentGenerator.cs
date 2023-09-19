@@ -68,6 +68,8 @@ public partial class FracturedContinentGenerator: ShapeGenerator
                 float beachness = GetBeachness(i, j, cBeacher, continentness, continentalCutoff, pBeacher, peninsuler, peninsulerCutoff);
                 bool beach = beachness > beachCutoff;
                 bool lake = laker.GetNoise2D(i, j) / 1.3f + 1 - Mathf.Pow(beachness, 0.6f) > lakeCutoff - 0.04f;
+
+
                 Godot.Collections.Dictionary info = new()
                 {
                     ["continental"] = continental,
@@ -76,22 +78,28 @@ public partial class FracturedContinentGenerator: ShapeGenerator
                     ["lake"] = lake,
                     ["beach"] = beach
                 };
-                Godot.Collections.Array tilesToPlace = (Godot.Collections.Array)tilePicker.Call("getTiles", info);
+
+                //esto requiere marshalling lo cual atrasa, transformar a c# local
+                Godot.Collections.Array tilesToPlace = (Godot.Collections.Array)tilePicker.Call("get_tiles", info);
 
                 foreach (string tileId in tilesToPlace.Select(v => (string)v))
-                {
+                {   
                     PlaceTile(new Vector2I(i, j) + generationCenter, tileId);
                 }
-                
             }
         }
-
+     
         return WorldMatrix;
     }
 
     public void PlaceTile(Vector2I coords, string tileId)
     {
-        WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] = tileId;
+        if (WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] == null)
+            WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] = tileId;
+        else 
+            WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] += "&" + tileId;
+
+
     }
 
     public void PlaceDungeonEntrances(Vector2I size, Vector2I center, RandomNumberGenerator rng, FastNoiseLite continenter, float continentalCutoff, FastNoiseLite peninsuler, float peninsulerCutoff, FastNoiseLite laker, float lakeCutoff)
