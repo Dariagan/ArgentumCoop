@@ -8,7 +8,8 @@ extends Node
 
 
 func start_new_game(players_start_data: Array, peers: Array) -> void:
-
+	
+	
 	generate_world.rpc()
 
 	var i: int = 0

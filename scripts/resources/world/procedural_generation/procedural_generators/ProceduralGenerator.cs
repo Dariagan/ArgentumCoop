@@ -10,9 +10,9 @@ public partial class ProceduralGenerator: Resource
     private CSharpScript ShapeGenerator;
 
     [Export]
-    private GDScript TilePicker;
+    private CSharpScript TilePicker;
 
-    public string[,] Generate(string[,] worldMatrix, Vector2I generationCenter, Vector2I generationSize, Dictionary data = null, int seed = 0)
+    public List<string>[,] Generate(List<string>[,] worldMatrix, Vector2I generationCenter, Vector2I generationSize, Dictionary data = null, int seed = 0)
     {
         Debug.Assert(worldMatrix.GetLength(0) >= generationSize.X && worldMatrix.GetLength(1) >= generationSize.Y);
 

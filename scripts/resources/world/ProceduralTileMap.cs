@@ -6,83 +6,86 @@ using System.Linq;
 public partial class ProceduralTileMap : TileMap
 {
 	
-	private string[,] WorldMatrix;
+	private List<string>[,] WorldMatrix; // hacer un Dictionary<Vector2I, List<string>>?
 
 	
-	private (int, int) WorldSize;
+	private Vector2I WorldSize;
 
-	/*public override void _Ready()
+	public override void _Ready()
 	{
+
+		Node globalData = GetNode("/root/GlobalData");
+		Tiles = (Godot.Collections.Dictionary)globalData.Get("tiles");
 	}
+	/*
 	public override void _Process(double delta)
 	{
 	}*/
 
 	public void GenerateWorld(Godot.Collections.Dictionary data = null, int seed = 0){
 		
-		(int, int) worldSize = (6000, 6000);
+		Vector2I worldSize = new(5000, 5000);
 		WorldSize = worldSize;
 		
 
-		WorldMatrix = new string[WorldSize.Item1, WorldSize.Item2];
+		WorldMatrix = new List<string>[WorldSize.X, WorldSize.Y];
 
 		ProceduralGenerator pg = (ProceduralGenerator)GD.Load("res://resources/world/temperate_continent_generator.tres");
 		
 		//ProceduralGenerator pg = (ProceduralGenerator)script.New();
-		pg.Generate(WorldMatrix, Vector2I.Zero, new Vector2I(2500, 2500));
+		pg.Generate(WorldMatrix, Vector2I.Zero, new Vector2I(4000, 4000));
 	}
 
-	private HashSet<(int, int)> LoadedTiles = new();
-	//private int LoadedTilesCount = 0;
+	private HashSet<Vector2I> LoadedTiles = new();
 
-	//creo q esto es más rapido dejarlo en gdscript
+	private Godot.Collections.Dictionary Tiles;
+
 	public void LoadTilesAround(Vector2 coords){
 
 		Vector2I beingCoords = LocalToMap(coords);
 
-		(int, int) chunkSize = (90, 53);
+		Vector2I chunkSize = new(90, 53);
 
-		for (int i = -chunkSize.Item1/2; i < chunkSize.Item1/2; i++) 
+		for (int i = -chunkSize.X/2; i < chunkSize.X/2; i++) 
 		{
-			for (int j = -chunkSize.Item2/2; j < chunkSize.Item2/2; j++) 
+			for (int j = -chunkSize.Y/2; j < chunkSize.Y/2; j++) 
 			{
-				(int, int) matrixCoords = (WorldSize.Item1/2 + beingCoords.X + i, WorldSize.Item2/2 + beingCoords.Y + j);
-                if (matrixCoords.Item1 < (WorldSize.Item1 - 1) && matrixCoords.Item2 < (WorldSize.Item2 - 1) && matrixCoords.Item1 >= 0 && matrixCoords.Item2 >= 0)
-                    foreach (string tile_id in WorldMatrix[matrixCoords.Item1, matrixCoords.Item2].Split("&"))
+				Vector2I matrixCoords = new(WorldSize.X/2 + beingCoords.X + i, WorldSize.Y/2 + beingCoords.Y + j);
+                if (matrixCoords.X < (WorldSize.X - 1) && matrixCoords.Y < (WorldSize.Y - 1) && matrixCoords.X >= 0 && matrixCoords.Y >= 0)
+                    foreach (string tile_id in WorldMatrix[matrixCoords.X, matrixCoords.Y])
 					{
-						Node globalData = GetNode("/root/GlobalData");
-						Godot.Collections.Dictionary tiles = (Godot.Collections.Dictionary)globalData.Get("tiles");
-
-						Resource tile = (Resource)tiles[tile_id]  ;
-
+						Resource tile = (Resource)Tiles[tile_id] ;
 						Vector2I tilemap_tile_coords = new Vector2I(beingCoords.X + i, beingCoords.Y + j);
 						
-						if (!LoadedTiles.Contains((matrixCoords.Item1, matrixCoords.Item2)))
+						if (!LoadedTiles.Contains(tilemap_tile_coords))
 						{
 							SetCell((int)tile.Call("get_layer"), tilemap_tile_coords, (int)tile.Call("get_source_id"), (Vector2I)tile.Call("get_atlas_pos"), (int)tile.Call("get_alt_id"));
-							LoadedTiles.Add((matrixCoords.Item1, matrixCoords.Item2));
+							LoadedTiles.Add(tilemap_tile_coords);
 						}
 					}
 				//else poner otra cosa, como fog, así no queda todo gris
 			}
 		}
+		UnloadExcessTiles(beingCoords, LoadedTiles);
+	}
+	
+	private void UnloadExcessTiles(Vector2I beingCoords, HashSet<Vector2I> loadedTiles)
+	{
+		const int MAX_LOADED_TILES = 30000;
+
+		if (loadedTiles.Count > MAX_LOADED_TILES)
+		{
+			foreach (Vector2I tile in LoadedTiles)
+			{
+				if (((Vector2)tile).DistanceSquaredTo(beingCoords) > 27000)
+				{
+					for (int layer_i = 0; layer_i < GetLayersCount(); layer_i++)
+					{
+						EraseCell(layer_i, tile);
+					}
+					loadedTiles.Remove(tile);	
+				}			
+			}
+		}
 	}
 }
-
-
-/*
-for i in range(-chunk_size.x/2, chunk_size.x/2):
-		for j in range(-chunk_size.y/2, chunk_size.y/2):
-			var matrixCoords: Vector2i = Vector2i(MapSize.Item1/2 + being_coords.x + i, MapSize.Item2/2 + being_coords.y + j)
-			if matrixCoords.Item1 < (MapSize.Item1 - 1) && matrixCoords.Item2 < (MapSize.Item2 - 1) && matrixCoords.Item1 >= 0 && matrixCoords.Item2 >= 0:
-				for tile in world[matrixCoords.Item1][matrixCoords.Item2] as Array[Tile]:
-					var tilemap_tile_coords: Vector2i = Vector2i(being_coords.x + i, being_coords.y + j)
-					
-					if not loaded_tiles[matrixCoords.Item1][matrixCoords.Item2]:
-						set_cell(tile.layer, tilemap_tile_coords, tile.source_id, tile.atlas_pos, tile.alternative_id)
-						loaded_tiles[matrixCoords.Item1][matrixCoords.Item2] = tilemap_tile_coords
-						loaded_tiles_count += 1
-			else:
-				#poner otra cosa, como fog, así no queda todo gris
-				pass
-*/

@@ -7,6 +7,7 @@ class_name SpriteData
 @export var id: String
 
 @export var frames: SpriteFrames
+
 @export var sex: Enums.Sex = Enums.Sex.ANY
 @export var animation_states: Array[StringName] = [&"idle"]
 

@@ -2,7 +2,7 @@ extends TileMap
 class_name ProceduralTilemap
 
 #2000x2000: 56 secs
-const MAP_SIZE: Vector2i = Vector2i(5000, 5000)
+const MAP_SIZE: Vector2i = Vector2i(2000, 2000)
 #var temperature_submultiplier: FastNoiseLite = FastNoiseLite.new()
 
 # si no está en el diccionario, la tile usa modulation default (1,1,1,1)
@@ -30,15 +30,15 @@ func generate_world(seed: int = 0, data: Dictionary = {}) -> void:
 	
 	var dcg: LandMassGenerator = preload("res://resources/world/default_continent_generator.tres")
 	
-	dcg.generate(world, Vector2i.ZERO, Vector2i(1500,1500), 0)
+	dcg.generate(world, Vector2i.ZERO, Vector2i(2000,2000), 0)
 
 
 #hacer esto en C#?
 var loaded_tiles: Array[Array] = get_world_matrix(MAP_SIZE, false)
 var loaded_tiles_count: int = 0
 
-func load_tiles_for_being(being: Being) -> void:
-	var being_coords: Vector2i = local_to_map(being.position)
+func load_tiles_for_being(being_pos: Vector2) -> void:
+	var being_coords: Vector2i = local_to_map(being_pos)
 	
 	var chunk_size: Vector2 = Vector2(90, 53)
 	#var chunk_size: Vector2 = Vector2(70, 50) / being.camera_2d.zoom

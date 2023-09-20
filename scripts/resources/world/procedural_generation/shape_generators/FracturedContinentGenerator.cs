@@ -1,14 +1,15 @@
 
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 
 public partial class FracturedContinentGenerator: ShapeGenerator
 {
-    private string[,] WorldMatrix;
+    private List<string>[,] WorldMatrix;
 
-    public override string[,] Generate(GDScript tilePicker, string[,] worldMatrix, Vector2I generationCenter, Vector2I generationSize, Godot.Collections.Dictionary data = null, int seed = 0)
+    public override List<string>[,] Generate(CSharpScript tilePickerScript, List<string>[,] worldMatrix, Vector2I generationCenter, Vector2I generationSize, Godot.Collections.Dictionary data = null, int seed = 0)
     {
         WorldMatrix = worldMatrix;
 
@@ -53,6 +54,7 @@ public partial class FracturedContinentGenerator: ShapeGenerator
         {
             continenter.Offset += new Vector3(3, 3, 0);
         }
+        TilePicker tilePicker = (TilePicker)tilePickerScript.New();
 
         PlaceDungeonEntrances(generationSize, generationCenter, rng, continenter, continentalCutoff, peninsuler, peninsulerCutoff, laker, lakeCutoff);
 
@@ -70,7 +72,7 @@ public partial class FracturedContinentGenerator: ShapeGenerator
                 bool lake = laker.GetNoise2D(i, j) / 1.3f + 1 - Mathf.Pow(beachness, 0.6f) > lakeCutoff - 0.04f;
 
 
-                Godot.Collections.Dictionary info = new()
+                Dictionary<string, object> info = new()
                 {
                     ["continental"] = continental,
                     ["peninsuler_caved"] = peninsulerCaved,
@@ -79,10 +81,7 @@ public partial class FracturedContinentGenerator: ShapeGenerator
                     ["beach"] = beach
                 };
 
-                //esto requiere marshalling lo cual atrasa, transformar a c# local
-                Godot.Collections.Array tilesToPlace = (Godot.Collections.Array)tilePicker.Call("get_tiles", info);
-
-                foreach (string tileId in tilesToPlace.Select(v => (string)v))
+                foreach (string tileId in tilePicker.GetTiles(info))
                 {   
                     PlaceTile(new Vector2I(i, j) + generationCenter, tileId);
                 }
@@ -95,11 +94,10 @@ public partial class FracturedContinentGenerator: ShapeGenerator
     public void PlaceTile(Vector2I coords, string tileId)
     {
         if (WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] == null)
-            WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] = tileId;
-        else 
-            WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] += "&" + tileId;
-
-
+        {
+            WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] = new List<string>(3);  
+        }
+        WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2].Add(tileId);
     }
 
     public void PlaceDungeonEntrances(Vector2I size, Vector2I center, RandomNumberGenerator rng, FastNoiseLite continenter, float continentalCutoff, FastNoiseLite peninsuler, float peninsulerCutoff, FastNoiseLite laker, float lakeCutoff)

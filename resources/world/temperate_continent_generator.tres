@@ -1,10 +1,10 @@
 [gd_resource type="Resource" load_steps=4 format=3 uid="uid://b0mm0hamvpsxq"]
 
 [ext_resource type="Script" path="res://scripts/resources/world/procedural_generation/shape_generators/FracturedContinentGenerator.cs" id="1_axf2t"]
-[ext_resource type="Script" path="res://scripts/resources/world/procedural_generation/tile_pickers/temperate_tile_picker.gd" id="2_md4qt"]
+[ext_resource type="Script" path="res://scripts/resources/world/procedural_generation/tile_pickers/TemperateTilePicker.cs" id="2_7jnx0"]
 [ext_resource type="Script" path="res://scripts/resources/world/procedural_generation/procedural_generators/ProceduralGenerator.cs" id="3_6dqvd"]
 
 [resource]
 script = ExtResource("3_6dqvd")
 ShapeGenerator = ExtResource("1_axf2t")
-TilePicker = ExtResource("2_md4qt")
+TilePicker = ExtResource("2_7jnx0")
