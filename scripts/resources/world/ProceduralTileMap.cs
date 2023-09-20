@@ -24,27 +24,28 @@ public partial class ProceduralTileMap : TileMap
 
 	public void GenerateWorld(Godot.Collections.Dictionary data = null, int seed = 0){
 		
-		Vector2I worldSize = new(5000, 5000);
+		Vector2I worldSize = new(3000, 3000);
 		WorldSize = worldSize;
 		
-
 		WorldMatrix = new List<string>[WorldSize.X, WorldSize.Y];
 
 		ProceduralGenerator pg = (ProceduralGenerator)GD.Load("res://resources/world/temperate_continent_generator.tres");
 		
 		//ProceduralGenerator pg = (ProceduralGenerator)script.New();
-		pg.Generate(WorldMatrix, Vector2I.Zero, new Vector2I(4000, 4000));
+		pg.Generate(WorldMatrix, Vector2I.Zero, new Vector2I(3000, 3000));
 	}
 
 	private HashSet<Vector2I> LoadedTiles = new();
 
 	private Godot.Collections.Dictionary Tiles;
 
+
+	//hacer que solo genere chunks en direccion donde esté mirando el being
 	public void LoadTilesAround(Vector2 coords){
 
 		Vector2I beingCoords = LocalToMap(coords);
 
-		Vector2I chunkSize = new(90, 53);
+		Vector2I chunkSize = new(100, 60);
 
 		for (int i = -chunkSize.X/2; i < chunkSize.X/2; i++) 
 		{
@@ -71,7 +72,7 @@ public partial class ProceduralTileMap : TileMap
 	
 	private void UnloadExcessTiles(Vector2I beingCoords, HashSet<Vector2I> loadedTiles)
 	{
-		const int MAX_LOADED_TILES = 30000;
+		const int MAX_LOADED_TILES = 50000_0000;
 
 		if (loadedTiles.Count > MAX_LOADED_TILES)
 		{
