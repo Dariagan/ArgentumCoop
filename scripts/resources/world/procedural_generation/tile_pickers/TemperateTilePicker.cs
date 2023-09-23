@@ -8,15 +8,17 @@ public partial class TemperateTilePicker: TilePicker
     {
         List<string> tilesToPlace = new();
 
-        if ((bool)info["continental"] && !(bool)info["peninsuler_caved"] && !(bool)info["away_from_coast"] && (bool)info["beach"])
+        if ((bool)info["continental"] && !(bool)info["peninsuler_caved"] && (bool)info["away_from_coast"] && (bool)info["lake"])
+        {
+            tilesToPlace.Add("lake");
+        }
+
+        else if ((bool)info["continental"] && !(bool)info["peninsuler_caved"] && (bool)info["beach"] && !(bool)info["away_from_coast"])
         {
             tilesToPlace.Add("beach_sand");
         }
 
-        else if ((bool)info["continental"] && !(bool)info["peninsuler_caved"] && (bool)info["away_from_coast"] && (bool)info["lake"])
-        {
-            tilesToPlace.Add("lake");
-        }
+        
 
         else if (!(bool)info["continental"] || ((bool)info["continental"] && (bool)info["peninsuler_caved"]))
         {

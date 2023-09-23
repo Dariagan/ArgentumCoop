@@ -29,6 +29,10 @@ var tiles: Dictionary
 
 var spawnable_scenes: Array[String]
 
+var debug: bool = true
+
+var debug_speed_mult:float = 160;
+
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resources/world/tile_set.tres")
 

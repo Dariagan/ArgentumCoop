@@ -8,12 +8,12 @@ class_name Tile
 @export var atlas_pos: Vector2i = Vector2.ZERO
 @export var alt_id: int
 
-func get_id() -> StringName: return id
+func get_data() -> Dictionary:
+	return {
+		"id" = id, 
+		"layer" = layer, 
+		"source_id" = source_id,
+		"atlas_pos" = atlas_pos,
+		"alt_id" = alt_id
+		}
 
-func get_layer() -> int: return layer
-
-func get_source_id() -> int: return source_id
-
-func get_atlas_pos() -> Vector2i: return atlas_pos
-
-func get_alt_id() -> int: return alt_id

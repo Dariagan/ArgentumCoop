@@ -1,4 +1,4 @@
-extends Node
+extends Control
 
 @onready var main_menu: Container = $MainMenu
 
@@ -11,7 +11,8 @@ signal lobby_started(lobby_interface: LobbyInterface, joined_ip: String)
 
 
 func _ready() -> void:
-	pass
+	if GlobalData.debug:
+		hide()
 	
 
 func _on_lobby_player_list_updated(players: Array) -> void:

@@ -6,10 +6,11 @@ extends Node
 @export var being_scene: PackedScene
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
 
+func _ready() -> void:
+	if GlobalData.debug:
+		start_new_game([{}], [1])
 
 func start_new_game(players_start_data: Array, peers: Array) -> void:
-	
-	
 	generate_world.rpc()
 
 	var i: int = 0

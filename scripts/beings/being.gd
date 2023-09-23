@@ -128,7 +128,10 @@ func _update_direction_axis_by_input(delta: float) -> void:
 		_velocity = _velocity.limit_length(being_data.get_max_speed())
 		_update_facing_direction()
 	
-	move_and_collide(_velocity)
+	if not GlobalData.debug:
+		move_and_collide(_velocity)
+	else:
+		position += _direction_axis * GlobalData.debug_speed_mult
 	
 	distance_moved_since_load += distance_moved
 	
@@ -138,6 +141,7 @@ func _update_direction_axis_by_input(delta: float) -> void:
 		
 func apply_friction(amount: float, delta: float):
 	_velocity = _velocity.move_toward(Vector2.ZERO, amount * delta)
+	
 		
 func _update_facing_direction() -> void:
 	if abs(_direction_axis.x) > abs(_direction_axis.y): 

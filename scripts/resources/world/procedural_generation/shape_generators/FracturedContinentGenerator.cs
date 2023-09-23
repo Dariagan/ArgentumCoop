@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
+//recommended size: 4000x4000
 public partial class FracturedContinentGenerator: ShapeGenerator
 {
     private List<string>[,] WorldMatrix;
@@ -15,49 +15,63 @@ public partial class FracturedContinentGenerator: ShapeGenerator
 
         FastNoiseLite continenter = new();
         FastNoiseLite peninsuler = new();
-        FastNoiseLite laker = new();
-        FastNoiseLite cBeacher = new();
-        FastNoiseLite pBeacher = new();
+        FastNoiseLite bigLaker = new();
+        FastNoiseLite smallLaker = new();
+        FastNoiseLite bigBeacher = new();
+        FastNoiseLite smallBeacher = new();
+        FastNoiseLite treeDensity = new();
 
         continenter.Seed = seed;
-        peninsuler.Seed = seed;
-        laker.Seed = seed;
-        cBeacher.Seed = seed;
-        pBeacher.Seed = seed + 1;
+        peninsuler.Seed = seed + 1;
+        bigLaker.Seed = seed + 2;
+        smallLaker.Seed = seed + 3;
+        bigBeacher.Seed = seed + 4;
+        smallBeacher.Seed = seed + 5;
+        treeDensity.Seed = seed + 6;
 
         RandomNumberGenerator rng = new(){Seed = (ulong)seed};
 
         continenter.NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex;
-        continenter.Frequency = 0.15f / Mathf.Pow(generationSize.Length(), 0.97f);
+        continenter.Frequency = 0.15f / Mathf.Pow(generationSize.Length(), 0.995f);
 
         continenter.FractalLacunarity = 2.8f;
         continenter.FractalWeightedStrength = 0.5f;
         float continentalCutoff = 0.6f * Mathf.Pow(generationSize.Length() / 1600f, 0.05f);
 
         peninsuler.NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex;
-        peninsuler.Frequency = 5.5f / Mathf.Pow(generationSize.Length(), 0.98f);
+        peninsuler.Frequency = 5.5f / Mathf.Pow(generationSize.Length(), 0.995f);
         peninsuler.FractalGain = 0.56f;
-        const float peninsulerCutoff = 0.3f;
+        const float peninsulerCutoff = -0.1f;
 
-        cBeacher.NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth;
-        cBeacher.Frequency = 5.5f / Mathf.Pow(generationSize.Length(), 0.98f);
+        bigBeacher.NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth;
+        bigBeacher.Frequency = 3f / Mathf.Pow(generationSize.Length(), 0.99f);
         float beachCutoff = 0.8f;
 
-        pBeacher.NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth;
-        pBeacher.Frequency = 10.1f / Mathf.Pow(generationSize.Length(), 0.98f);
-        pBeacher.FractalOctaves = 1;
+        treeDensity.NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth;
 
-        laker.Frequency = 15.15f / Mathf.Pow(generationSize.Length(), 0.98f);
-        const float lakeCutoff = 0.5f;
+        smallBeacher.NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth;
+        smallBeacher.Frequency = 9f / Mathf.Pow(generationSize.Length(), 0.995f);
+        smallBeacher.FractalOctaves = 1;
+
+        bigLaker.NoiseType = FastNoiseLite.NoiseTypeEnum.ValueCubic;
+        bigLaker.FractalOctaves = 2;
+        bigLaker.FractalLacunarity = 1.3f;
+        bigLaker.Frequency = 110 / Mathf.Pow(generationSize.Length(), 0.995f);
+        const float bigLakeCutoff = 0.2f;
+
+        smallLaker.NoiseType = FastNoiseLite.NoiseTypeEnum.ValueCubic;
+        smallLaker.FractalOctaves = 2;
+        
+        smallLaker.Frequency = 230 / Mathf.Pow(generationSize.Length(), 0.991f);
+        const float smallLakeCutoff = 0.4f;
 
         while (continenter.GetNoise2Dv(generationCenter) < continentalCutoff + 0.13f)
         {
             continenter.Offset += new Vector3(3, 3, 0);
         }
+        PlaceDungeonEntrances(generationSize, generationCenter, rng, continenter, continentalCutoff, peninsuler, peninsulerCutoff, smallLaker, smallLakeCutoff);
+        
         TilePicker tilePicker = (TilePicker)tilePickerScript.New();
-
-        PlaceDungeonEntrances(generationSize, generationCenter, rng, continenter, continentalCutoff, peninsuler, peninsulerCutoff, laker, lakeCutoff);
-
         for (int i = -generationSize.X / 2; i < generationSize.X / 2; i++)
         {
             for (int j = -generationSize.Y / 2; j < generationSize.Y / 2; j++)
@@ -65,12 +79,12 @@ public partial class FracturedContinentGenerator: ShapeGenerator
                 float bcf = GetBCF(i, j, generationSize, generationCenter);
                 float continentness = GetContinentness(i, j, continenter, bcf);
                 bool continental = continentness > continentalCutoff;
-                bool peninsulerCaved = peninsuler.GetNoise2D(i, j) < peninsulerCutoff - 0.1;
-                bool awayFromCoast = continentness > continentalCutoff + 0.05f && peninsuler.GetNoise2D(i, j) > peninsulerCutoff;
-                float beachness = GetBeachness(i, j, cBeacher, continentness, continentalCutoff, pBeacher, peninsuler, peninsulerCutoff);
+                bool peninsulerCaved = peninsuler.GetNoise2D(i, j) < peninsulerCutoff;
+                bool awayFromCoast = continentness > continentalCutoff + 0.01 && peninsuler.GetNoise2D(i, j) > peninsulerCutoff + 0.27;
+                float beachness = GetBeachness(i, j, bigBeacher, continentness, continentalCutoff, smallBeacher, peninsuler, peninsulerCutoff);
                 bool beach = beachness > beachCutoff;
-                bool lake = laker.GetNoise2D(i, j) / 1.3f + 1 - Mathf.Pow(beachness, 0.6f) > lakeCutoff - 0.04f;
 
+                bool lake = (smallLaker.GetNoise2D(i, j) / 1.3f + 1 - Mathf.Pow(beachness, 0.6f) > smallLakeCutoff) || (bigLaker.GetNoise2D(i, j) / 1.3f + 0.8 - Mathf.Pow(beachness, 0.6f) > bigLakeCutoff);
 
                 Dictionary<string, object> info = new()
                 {
@@ -91,16 +105,20 @@ public partial class FracturedContinentGenerator: ShapeGenerator
         return WorldMatrix;
     }
 
-    public void PlaceTile(Vector2I coords, string tileId)
+    private Dictionary<string, object> GetData(Vector2I pos){
+        return null;
+    }
+
+    private void PlaceTile(Vector2I coords, string tileId)
     {
         if (WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] == null)
         {
-            WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] = new List<string>(3);  
+            WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2] = new List<string>(2);  
         }
         WorldMatrix[coords.X + WorldMatrix.GetLength(0)/2, coords.Y + WorldMatrix.GetLength(1)/2].Add(tileId);
     }
 
-    public void PlaceDungeonEntrances(Vector2I size, Vector2I center, RandomNumberGenerator rng, FastNoiseLite continenter, float continentalCutoff, FastNoiseLite peninsuler, float peninsulerCutoff, FastNoiseLite laker, float lakeCutoff)
+    private void PlaceDungeonEntrances(Vector2I size, Vector2I center, RandomNumberGenerator rng, FastNoiseLite continenter, float continentalCutoff, FastNoiseLite peninsuler, float peninsulerCutoff, FastNoiseLite laker, float lakeCutoff)
     {
         int ri;
         int rj;
@@ -142,21 +160,21 @@ public partial class FracturedContinentGenerator: ShapeGenerator
         }
     }
 
-    public static float GetBCF(int i, int j, Vector2I size, Vector2I center)
+    private static float GetBCF(int i, int j, Vector2I size, Vector2I center)
     {
         return Math.Max(Mathf.Abs(i - center.X) / (size.X / 2f), Mathf.Abs(j - center.Y) / (size.Y / 2f));
     }
 
-    public static float GetContinentness(int i, int j, FastNoiseLite continenter, float bcf)
+    private static float GetContinentness(int i, int j, FastNoiseLite continenter, float bcf)
     {
-        return continenter.GetNoise2D(i, j) - Mathf.Pow(bcf, 43) - bcf / 4f;
+        return continenter.GetNoise2D(i, j) - Mathf.Pow(bcf, 43) - bcf / 4.2f;
     }
 
-    public static float GetBeachness(int i, int j, FastNoiseLite cBeacher, float continentness, float continentalCutoff, FastNoiseLite pBeacher, FastNoiseLite peninsuler, float peninsulerCutoff)
+    private static float GetBeachness(int i, int j, FastNoiseLite cBeacher, float continentness, float continentalCutoff, FastNoiseLite pBeacher, FastNoiseLite peninsuler, float peninsulerCutoff)
     {
         return Math.Max(
-            0.72f + cBeacher.GetNoise2D(i, j) / 2.3f - Mathf.Pow(continentness - continentalCutoff, 0.55f), 
-            0.8f + pBeacher.GetNoise2D(i, j) / 2.3f - Mathf.Pow(peninsuler.GetNoise2D(i, j) - peninsulerCutoff, 0.6f));
+            0.72f + cBeacher.GetNoise2D(i, j) / 2.3f - Mathf.Pow(continentness - continentalCutoff, 0.6f), 
+            0.8f + pBeacher.GetNoise2D(i, j) / 2.3f - Mathf.Pow(peninsuler.GetNoise2D(i, j) - peninsulerCutoff, 0.45f));
     }
 
 }

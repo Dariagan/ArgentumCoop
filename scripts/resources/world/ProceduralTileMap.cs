@@ -13,18 +13,17 @@ public partial class ProceduralTileMap : TileMap
 
 	public override void _Ready()
 	{
-
 		Node globalData = GetNode("/root/GlobalData");
-		Tiles = (Godot.Collections.Dictionary)globalData.Get("tiles");
+		TilesData = (Godot.Collections.Dictionary)globalData.Get("tiles");
 	}
 	/*
 	public override void _Process(double delta)
 	{
 	}*/
 
-	public void GenerateWorld(Godot.Collections.Dictionary data = null, int seed = 0){
-		
-		Vector2I worldSize = new(3000, 3000);
+	public void GenerateWorld(Godot.Collections.Dictionary data = null, int seed = 0)
+	{	
+		Vector2I worldSize = new(4000, 4000);
 		WorldSize = worldSize;
 		
 		WorldMatrix = new List<string>[WorldSize.X, WorldSize.Y];
@@ -32,13 +31,12 @@ public partial class ProceduralTileMap : TileMap
 		ProceduralGenerator pg = (ProceduralGenerator)GD.Load("res://resources/world/temperate_continent_generator.tres");
 		
 		//ProceduralGenerator pg = (ProceduralGenerator)script.New();
-		pg.Generate(WorldMatrix, Vector2I.Zero, new Vector2I(3000, 3000));
+		pg.Generate(WorldMatrix, Vector2I.Zero, new Vector2I(4000, 4000), null, 30);
 	}
 
-	private HashSet<Vector2I> LoadedTiles = new();
+	private readonly HashSet<Vector2I> LoadedTiles = new();
 
-	private Godot.Collections.Dictionary Tiles;
-
+	private Godot.Collections.Dictionary TilesData;
 
 	//hacer que solo genere chunks en direccion donde esté mirando el being
 	public void LoadTilesAround(Vector2 coords){
@@ -53,38 +51,46 @@ public partial class ProceduralTileMap : TileMap
 			{
 				Vector2I matrixCoords = new(WorldSize.X/2 + beingCoords.X + i, WorldSize.Y/2 + beingCoords.Y + j);
                 if (matrixCoords.X < (WorldSize.X - 1) && matrixCoords.Y < (WorldSize.Y - 1) && matrixCoords.X >= 0 && matrixCoords.Y >= 0)
-                    foreach (string tile_id in WorldMatrix[matrixCoords.X, matrixCoords.Y])
+				{
+                    Vector2I tileMapTileCoords = new(beingCoords.X + i, beingCoords.Y + j);
+					if (!LoadedTiles.Contains(tileMapTileCoords))
 					{
-						Resource tile = (Resource)Tiles[tile_id] ;
-						Vector2I tilemap_tile_coords = new Vector2I(beingCoords.X + i, beingCoords.Y + j);
+						if (WorldMatrix[matrixCoords.X, matrixCoords.Y] != null)
 						
-						if (!LoadedTiles.Contains(tilemap_tile_coords))
-						{
-							SetCell((int)tile.Call("get_layer"), tilemap_tile_coords, (int)tile.Call("get_source_id"), (Vector2I)tile.Call("get_atlas_pos"), (int)tile.Call("get_alt_id"));
-							LoadedTiles.Add(tilemap_tile_coords);
-						}
+							foreach (string tile_id in WorldMatrix[matrixCoords.X, matrixCoords.Y])
+							{								
+								Resource tile = (Resource)TilesData[tile_id];
+								Godot.Collections.Dictionary tileData = (Godot.Collections.Dictionary)tile.Call("get_data");
+
+								SetCell((int)tileData["layer"], tileMapTileCoords, (int)tileData["source_id"], (Vector2I)tileData["atlas_pos"], (int)tileData["alt_id"]);
+
+								LoadedTiles.Add(tileMapTileCoords);
+							}
+						else
+							//ocean water
+							SetCell(0, tileMapTileCoords, 2, new Vector2I(0,0), 0);
+							LoadedTiles.Add(tileMapTileCoords);
 					}
-				//else poner otra cosa, como fog, así no queda todo gris
+				}
 			}
 		}
 		UnloadExcessTiles(beingCoords, LoadedTiles);
 	}
-	
 	private void UnloadExcessTiles(Vector2I beingCoords, HashSet<Vector2I> loadedTiles)
 	{
-		const int MAX_LOADED_TILES = 50000_0000;
+		const int MAX_LOADED_TILES = 30000;
 
 		if (loadedTiles.Count > MAX_LOADED_TILES)
 		{
-			foreach (Vector2I tile in LoadedTiles)
+			foreach (Vector2I tileCoord in LoadedTiles)
 			{
-				if (((Vector2)tile).DistanceSquaredTo(beingCoords) > 27000)
+				if (((Vector2)tileCoord).DistanceSquaredTo(beingCoords) > 27000)
 				{
 					for (int layer_i = 0; layer_i < GetLayersCount(); layer_i++)
 					{
-						EraseCell(layer_i, tile);
+						EraseCell(layer_i, tileCoord);
 					}
-					loadedTiles.Remove(tile);	
+					loadedTiles.Remove(tileCoord);	
 				}			
 			}
 		}
