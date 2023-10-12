@@ -12,10 +12,10 @@ public partial class ProceduralGenerator: Resource
     [Export]
     private CSharpScript TilePicker;
 
-    public List<string>[,] Generate(List<string>[,] worldMatrix, Vector2I generationCenter, Vector2I generationSize, Dictionary data = null, int seed = 0)
+    public List<string>[,] Generate(List<string>[,] worldMatrix, Vector2I generationOrigin, Vector2I generationSize, Dictionary data = null, int seed = 0)
     {
         Debug.Assert(worldMatrix.GetLength(0) >= generationSize.X && worldMatrix.GetLength(1) >= generationSize.Y);
 
-        return ((ShapeGenerator)ShapeGenerator.New()).Generate(TilePicker, worldMatrix, generationCenter, generationSize, data, seed);
+        return ((ShapeGenerator)ShapeGenerator.New()).Generate(TilePicker, worldMatrix, generationOrigin, generationSize, data, seed);
     }
 }

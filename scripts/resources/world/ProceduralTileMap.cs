@@ -23,7 +23,7 @@ public partial class ProceduralTileMap : TileMap
 
 	public void GenerateWorld(Godot.Collections.Dictionary data = null, int seed = 0)
 	{	
-		Vector2I worldSize = new(4000, 4000);
+		Vector2I worldSize = new(400, 400);
 		WorldSize = worldSize;
 		
 		WorldMatrix = new List<string>[WorldSize.X, WorldSize.Y];
@@ -31,7 +31,7 @@ public partial class ProceduralTileMap : TileMap
 		ProceduralGenerator pg = (ProceduralGenerator)GD.Load("res://resources/world/temperate_continent_generator.tres");
 		
 		//ProceduralGenerator pg = (ProceduralGenerator)script.New();
-		pg.Generate(WorldMatrix, Vector2I.Zero, new Vector2I(4000, 4000), null, 30);
+		pg.Generate(WorldMatrix, Vector2I.Zero, new Vector2I(400, 400), null, 30);
 	}
 
 	private readonly HashSet<Vector2I> LoadedTiles = new();
