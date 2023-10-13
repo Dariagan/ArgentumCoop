@@ -53,13 +53,19 @@ func free_control() -> void: uncontrolled = true
 var zoom_min = Vector2(0.05, 0.05); var zoom_max = Vector2(9999999, 9999999)		
 		
 func _input(event: InputEvent) -> void:
-	if is_multiplayer_authority() and event is InputEventMouseButton and event.is_pressed():
-		if event.is_action("wheel_down"):
-			camera_2d.zoom *= 0.9
-		elif event.is_action("wheel_up"):
-			camera_2d.zoom *= 1.1
+	if is_multiplayer_authority() and event.is_pressed():
+		
+		if event is InputEventMouseButton:
+			if event.is_action("wheel_down"):
+				camera_2d.zoom *= 0.9
+			elif event.is_action("wheel_up"):
+				camera_2d.zoom *= 1.1
+			camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
+			
+		if GlobalData.debug and event.is_action("f1"):
+			print((get_parent() as TileMap).local_to_map(position))
 	
-		camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
+		
 
 func _physics_process(delta: float) -> void:
 	
