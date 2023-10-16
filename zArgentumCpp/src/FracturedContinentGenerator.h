@@ -5,17 +5,17 @@
 
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/fast_noise_lite.hpp>
-
+#include <godot_cpp/classes/random_number_generator.hpp>
 
 namespace godot {
-
 
     class FracturedContinentGenerator : public FormationGenerator{
         GDCLASS(FracturedContinentGenerator, FormationGenerator)
 
         private:
-            FastNoiseLite continenter, peninsuler, bigLaker, smallLaker, bigbeacher, smallBeacher;
-
+                FastNoiseLite continenter, peninsuler, bigLaker, smallLaker, bigbeacher, smallBeacher;
+                RandomNumberGenerator rng;    
+                
         protected:
             static void _bind_methods();
 
@@ -23,7 +23,9 @@ namespace godot {
             FracturedContinentGenerator();
             ~FracturedContinentGenerator();
 
-            void generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, Vector2i origin, Vector2i area, TilePicker tilePicker = TEMPERATE, int64_t seed = 0) override;
+            void generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, 
+                const Vector2i& origin, const Vector2i& area, const TilePicker tilePicker = TEMPERATE,
+                const int seed = 0, const Dictionary& data = Dictionary()) override;
     };
 }
 

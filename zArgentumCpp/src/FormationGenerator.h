@@ -16,17 +16,18 @@ namespace godot {
 
         protected:
             static void _bind_methods();
-            static std::vector<StringName> getTiles(TilePicker tilePicker, std::unordered_map<std::string, bool> &data);
-            static void placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, Vector2i origin, Vector2i relativeCoords, StringName tileId);
-
+            static std::vector<StringName> getTiles(const TilePicker tilePicker, std::unordered_map<std::string, bool> &data);
+            static void placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
+                const Vector2i& origin, const Vector2i& relativeCoords, const StringName& tileId);
         public:
             FormationGenerator();
             ~FormationGenerator();
 
-            virtual void generate(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, Vector2i origin, Vector2i area, TilePicker tilePicker = TEMPERATE, int64_t seed = 0);//TODO ENUM TILEPICKER
+            virtual void generate(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
+                const Vector2i& origin, const Vector2i& area, const TilePicker tilePicker = TEMPERATE, 
+                const int seed = 0, const Dictionary& data = Dictionary());//TODO ENUM TILEPICKER
     };
 }
-
 VARIANT_ENUM_CAST(TilePicker);
 
 #endif // __FORMATION_GENERATOR_H__

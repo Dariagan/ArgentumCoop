@@ -13,7 +13,6 @@ var _ready_peers: Array = []
 var _characters_spawn_data: Array = [] 
 
 
-
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
 	

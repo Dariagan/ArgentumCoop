@@ -10,16 +10,16 @@ void FormationGenerator::_bind_methods()
     BIND_ENUM_CONSTANT(TEMPERATE);
 }
 
-void FormationGenerator::placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, Vector2i origin, Vector2i relativeCoords, StringName tileId){
-
+void FormationGenerator::placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
+    const Vector2i& origin, const Vector2i& relativeCoords, const StringName& tileId)
+{
     Vector2i absoluteCoords = Vector2i(worldMatrix.size()/2, worldMatrix[0].size()/2) + origin + relativeCoords;
-
-    worldMatrix[absoluteCoords.AXIS_X][absoluteCoords.AXIS_Y].push_back(tileId);
-
+    
+    worldMatrix[absoluteCoords.x][absoluteCoords.y].push_back(tileId);
 }
 
-std::vector<StringName> FormationGenerator::getTiles(TilePicker tilePicker, std::unordered_map<std::string, bool> &data){
-
+std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker, std::unordered_map<std::string, bool> &data)
+{
     std::vector<StringName> tilesToPlace(2);
 
     switch (tilePicker)
@@ -50,8 +50,13 @@ std::vector<StringName> FormationGenerator::getTiles(TilePicker tilePicker, std:
         break;
     }
 }
-
-void FormationGenerator::generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, Vector2i origin, Vector2i area, TilePicker tilePicker, int64_t seed){}
+void FormationGenerator::generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, 
+    const Vector2i& origin, const Vector2i& area, const TilePicker tilePicker, const int seed,
+    const Dictionary& data
+    )
+{
+    UtilityFunctions::printerr("Inside FormationGenerator abstract method");
+}
 
 FormationGenerator::FormationGenerator(){}
 FormationGenerator::~FormationGenerator(){}

@@ -33,13 +33,14 @@ namespace godot {
             ArgentumTilemap();
             ~ArgentumTilemap();
 
-            int64_t seed = 0; int64_t get_seed(); void set_seed(int64_t seed);
+            int seed = 0; int get_seed(); void set_seed(int seed);
 
             Dictionary tiles_data; Dictionary get_tiles_data(); void set_tiles_data(Dictionary data);
 
-            void generate_world_matrix(Vector2i size);
-            void generate_formation(Ref<FormationGenerator> formation_generator, Vector2i origin, Vector2i area, TilePicker tile_picker = TEMPERATE, int64_t seed = 0);
-            void load_tiles_around(Vector2 coords, Vector2i chunk_size = Vector2i(100,60));
+            void generate_world_matrix(const Vector2i& size);
+            void generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, const Vector2i& area, 
+                 const TilePicker tile_picker = TEMPERATE, int seed = 0);
+            void load_tiles_around(const Vector2& coords, const Vector2i& chunk_size = Vector2i(100,60));
     };
 }
 

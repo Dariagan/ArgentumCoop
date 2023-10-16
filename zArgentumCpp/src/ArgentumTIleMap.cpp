@@ -8,9 +8,10 @@
 using namespace godot;
 
 void ArgentumTilemap::_bind_methods()
-{
+{   
     ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "area", "tile_picker", "seed"), &ArgentumTilemap::generate_formation);
     ClassDB::bind_method(D_METHOD("generate_world_matrix", "size"), &ArgentumTilemap::generate_world_matrix);
+    
     ClassDB::bind_method(D_METHOD("load_tiles_around", "coords", "chunk_size"), &ArgentumTilemap::load_tiles_around);
 
     ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ArgentumTilemap::set_seed);
@@ -22,19 +23,21 @@ void ArgentumTilemap::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
 }
 
-void ArgentumTilemap::generate_world_matrix(Vector2i size)
+void ArgentumTilemap::generate_world_matrix(const Vector2i& size)
 {
     if(!worldGenerated){
-        worldMatrix.resize(size.AXIS_X, std::vector<std::vector<StringName>>(size.AXIS_Y));
+        worldMatrix.resize(size.x, std::vector<std::vector<StringName>>(size.y, std::vector<StringName>()));
+
         this->worldSize = size;
         worldGenerated = true;
+
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be resized.");
     }
 }
 
-int64_t ArgentumTilemap::get_seed(){return seed;}; 
-void ArgentumTilemap::set_seed(int64_t seed){this->seed = seed;};
+int ArgentumTilemap::get_seed(){return seed;}; 
+void ArgentumTilemap::set_seed(int seed){this->seed = seed;};
 
 Dictionary ArgentumTilemap::get_tiles_data(){return tiles_data;}; 
 void ArgentumTilemap::set_tiles_data(Dictionary tiles_data){
@@ -57,33 +60,33 @@ void ArgentumTilemap::set_tiles_data(Dictionary tiles_data){
 
         cppTilesData.insert({tiles_data.keys()[i], std::move(cppTileData)});
     }
-    return;
 };
 
-void ArgentumTilemap::generate_formation(Ref<FormationGenerator> formation_generator, Vector2i origin, Vector2i area, TilePicker tile_picker, int64_t seed)
+void ArgentumTilemap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
+    const Vector2i& area, const TilePicker tile_picker, int seed)
 {
     if(seed < 0) seed *= -1;
 
     formation_generator->generate(worldMatrix, origin, area, tile_picker, seed);
 }
 
-void ArgentumTilemap::load_tiles_around(Vector2 coords, Vector2i chunk_size){
-
+void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& chunk_size){
+    
     Vector2i beingCoords = local_to_map(coords);
 
-    for (int i = -chunk_size.AXIS_X/2; i < chunk_size.AXIS_X/2; i++) 
+    for (int i = -chunk_size.x/2; i < chunk_size.x/2; i++) 
     {
-        for (int j = -chunk_size.AXIS_Y/2; j < chunk_size.AXIS_Y/2; j++) 
+        for (int j = -chunk_size.y/2; j < chunk_size.y/2; j++) 
         {
-            Vector2i matrixCoords(worldSize.AXIS_X/2  + beingCoords.AXIS_X + i, worldSize.AXIS_Y/2 + beingCoords.AXIS_Y + j);
-            if (matrixCoords.AXIS_X < (worldSize.AXIS_X - 1) && matrixCoords.AXIS_Y < (worldSize.AXIS_Y - 1) && matrixCoords.AXIS_X >= 0 && matrixCoords.AXIS_Y >= 0)
+            Vector2i matrixCoords(worldSize.x/2  + beingCoords.x + i, worldSize.y/2 + beingCoords.y + j);
+            if (matrixCoords.x < (worldSize.x - 1) && matrixCoords.y < (worldSize.y - 1) && matrixCoords.x >= 0 && matrixCoords.y >= 0)
             {
-                Vector2i tileMapTileCoords(beingCoords.AXIS_X + i, beingCoords.AXIS_Y + j);
+                Vector2i tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
                 if (loadedTiles.count(tileMapTileCoords) == 0)
                 {
-                    if (worldMatrix[matrixCoords.AXIS_X][matrixCoords.AXIS_Y].size() > 0)
+                    if (worldMatrix[matrixCoords.x][matrixCoords.y].size() > 0)
                     
-                        for (StringName tile_id : worldMatrix[matrixCoords.AXIS_X][matrixCoords.AXIS_Y])
+                        for (StringName tile_id : worldMatrix[matrixCoords.x][matrixCoords.y])
                         {					
                             std::unordered_map<StringName, Variant>& tileData = cppTilesData.at(tile_id);
 
@@ -98,7 +101,7 @@ void ArgentumTilemap::load_tiles_around(Vector2 coords, Vector2i chunk_size){
         }
     }
     //unloadExcessTiles(beingCoords);
-
+    return;
 }
 
 ArgentumTilemap::ArgentumTilemap()
