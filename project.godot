@@ -23,10 +23,6 @@ GameData="*res://scripts/singletons/game_data.gd"
 
 project/assembly_name="ArgentumSurvival"
 
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/godot-vim/plugin.cfg")
-
 [importer_defaults]
 
 texture={

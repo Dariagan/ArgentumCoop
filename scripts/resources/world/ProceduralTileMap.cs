@@ -50,9 +50,9 @@ public partial class ProceduralTileMap : TileMap
 			for (int j = -chunkSize.Y/2; j < chunkSize.Y/2; j++) 
 			{
 				Vector2I matrixCoords = new(WorldSize.X/2 + beingCoords.X + i, WorldSize.Y/2 + beingCoords.Y + j);
-                if (matrixCoords.X < (WorldSize.X - 1) && matrixCoords.Y < (WorldSize.Y - 1) && matrixCoords.X >= 0 && matrixCoords.Y >= 0)
+				if (matrixCoords.X < (WorldSize.X - 1) && matrixCoords.Y < (WorldSize.Y - 1) && matrixCoords.X >= 0 && matrixCoords.Y >= 0)
 				{
-                    Vector2I tileMapTileCoords = new(beingCoords.X + i, beingCoords.Y + j);
+					Vector2I tileMapTileCoords = new(beingCoords.X + i, beingCoords.Y + j);
 					if (!LoadedTiles.Contains(tileMapTileCoords))
 					{
 						if (WorldMatrix[matrixCoords.X, matrixCoords.Y] != null)
