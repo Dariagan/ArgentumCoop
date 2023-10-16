@@ -38,7 +38,7 @@ namespace godot {
             Dictionary tiles_data; Dictionary get_tiles_data(); void set_tiles_data(Dictionary data);
 
             void generate_world_matrix(Vector2i size);
-            void generate_formation(Ref<FormationGenerator> formation_generator, Vector2i origin, Vector2i size, TilePicker tilePicker = TEMPERATE, int64_t seed = 0);
+            void generate_formation(Ref<FormationGenerator> formation_generator, Vector2i origin, Vector2i area, TilePicker tile_picker = TEMPERATE, int64_t seed = 0);
             void load_tiles_around(Vector2 coords, Vector2i chunk_size = Vector2i(100,60));
     };
 }

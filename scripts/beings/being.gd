@@ -25,9 +25,9 @@ func construct(data: BeingSpawnData) -> void:
 func construct_being_data(data: Dictionary):
 	being_data = BeingPersonalData.new(data)
 	
-	var tile_map = get_parent()
+	var tile_map: ArgentumTilemap = get_parent()
 	
-	load_tiles_around_me.connect(tile_map.LoadTilesAround)
+	load_tiles_around_me.connect(tile_map.load_tiles_around)
 
 var uncontrolled: bool = true
 
@@ -142,7 +142,7 @@ func _update_direction_axis_by_input(delta: float) -> void:
 	distance_moved_since_load += distance_moved
 	
 	if distance_moved_since_load > 500:
-		load_tiles_around_me.emit(position)
+		load_tiles_around_me.emit(position, Vector2i(100, 60))
 		distance_moved_since_load = 0
 		
 func apply_friction(amount: float, delta: float):

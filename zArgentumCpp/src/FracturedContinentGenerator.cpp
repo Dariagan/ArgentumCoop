@@ -17,6 +17,7 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
 {
 
 
+    placeTile(worldMatrix, origin, Vector2i(0,0), "grass");
 }
 
 FracturedContinentGenerator::FracturedContinentGenerator(){}

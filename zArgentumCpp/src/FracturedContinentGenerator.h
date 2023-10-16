@@ -23,7 +23,7 @@ namespace godot {
             FracturedContinentGenerator();
             ~FracturedContinentGenerator();
 
-            void generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, Vector2i origin, Vector2i area, TilePicker tilePicker = TEMPERATE, int64_t seed = 0) override;//TODO ENUM TILEPICKER
+            void generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, Vector2i origin, Vector2i area, TilePicker tilePicker = TEMPERATE, int64_t seed = 0) override;
     };
 }
 

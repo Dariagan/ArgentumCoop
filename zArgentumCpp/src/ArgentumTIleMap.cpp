@@ -57,6 +57,7 @@ void ArgentumTilemap::set_tiles_data(Dictionary tiles_data){
 
         cppTilesData.insert({tiles_data.keys()[i], std::move(cppTileData)});
     }
+    return;
 };
 
 void ArgentumTilemap::generate_formation(Ref<FormationGenerator> formation_generator, Vector2i origin, Vector2i area, TilePicker tile_picker, int64_t seed)

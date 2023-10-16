@@ -1,7 +1,7 @@
 extends Node
 # PONER EN LA GUI ARRIBA A LA DERECHA DAYS SURVIVED: X, EN FUENTE DIABLESCA
 
-@onready var tile_map = $TileMap
+@onready var tile_map = $ArgentumTilemap
 
 @export var being_scene: PackedScene
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
@@ -44,4 +44,8 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		
 @rpc("call_local")
 func generate_world() -> void:
-	tile_map.GenerateWorld({}, 0)
+	await tile_map.ready
+	tile_map.generate_world_matrix(Vector2(500, 500))
+	var asd: FracturedContinentGenerator = FracturedContinentGenerator.new()
+
+	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i.ONE, FracturedContinentGenerator.TEMPERATE, 0)
