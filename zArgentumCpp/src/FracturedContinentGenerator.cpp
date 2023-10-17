@@ -3,13 +3,19 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
-#include <algorithm>
-#include <unordered_map>
+#include <unordered_set>
 
 using namespace godot;
 
-void FracturedContinentGenerator::_bind_methods(){}
+void FracturedContinentGenerator::_bind_methods()
+{
+    ClassDB::bind_method(D_METHOD("set_continental_cutoff", "continental_cutoff"), &FracturedContinentGenerator::set_continental_cutoff);
+    ClassDB::bind_method(D_METHOD("get_continental_cutoff"), &FracturedContinentGenerator::get_continental_cutoff);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "continental_cutoff"), "set_continental_cutoff", "get_continental_cutoff");
+}
 
+float FracturedContinentGenerator::get_continental_cutoff()const{return continental_cutoff;}
+void FracturedContinentGenerator::set_continental_cutoff(float cutoff){continental_cutoff = cutoff;} 
 
 void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, 
     const Vector2i& origin, const Vector2i& size, const TilePicker tilePicker, 
@@ -17,20 +23,18 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
 {
     this->origin = origin;
     this->size = size;
-    
     {
-        continenter.set_seed(seed); peninsuler.set_seed(seed+1); bigLaker.set_seed(seed+2); smallLaker.set_seed(seed+3);
-        bigBeacher.set_seed(seed+4); smallBeacher.set_seed(seed+5); rng.set_seed(seed);
+    continenter.set_seed(seed); peninsuler.set_seed(seed+1); bigLaker.set_seed(seed+2); smallLaker.set_seed(seed+3);
+    bigBeacher.set_seed(seed+4); smallBeacher.set_seed(seed+5); rng.set_seed(seed);
 //hacer un for multiplicativo de la frequency en vez de separar en big y small. aumentar el cutoff. sumarle 1 a la seed en cada iteracion del for
-        continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.5f/powf(size.length(), 0.995f));
-        bigBeacher.set_frequency(3.f/powf(size.length(), 0.99f)); smallBeacher.set_frequency(9.f/powf(size.length(), 0.995f));
-        bigLaker.set_frequency(110.f/powf(size.length(), 0.995f)); smallLaker.set_frequency(240.f/powf(size.length(), 0.991f));
+    continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.5f/powf(size.length(), 0.995f));
+    bigBeacher.set_frequency(3.f/powf(size.length(), 0.99f)); smallBeacher.set_frequency(9.f/powf(size.length(), 0.995f));
+    bigLaker.set_frequency(110.f/powf(size.length(), 0.995f)); smallLaker.set_frequency(240.f/powf(size.length(), 0.991f));
 
-        continentalCutoff = 0.f;
+    continental_cutoff = 0.6f * powf(size.length() / 1600.f, 0.05f);;
     }
       
-
-    while(continenter.get_noise_2dv(origin) < continentalCutoff + 0.13f){
+    while(continenter.get_noise_2dv(origin) < continental_cutoff + 0.13f){
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
@@ -39,25 +43,28 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
     {   
         float bcf = getBorderClosenessFactor(i, j);
         float continentness = getContinentness(i, j, bcf);
-        bool continental = continentness > continentalCutoff;
-        bool peninsulerCaved = (float)peninsuler.get_noise_2d(i, j) < peninsulerCutoff;
+        bool continental = continentness > continental_cutoff;
+        bool peninsulerCaved = peninsuler.get_noise_2d(i, j) < peninsuler_cutoff;
+        /*
+        if(i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
+            printf("pc=%d", peninsulerCaved);if (j % 2 == 0) std::cout << "\n"; else std::cout << "||| ";} 
+        */
+        bool awayFromCoast = continentness > continental_cutoff + 0.01f && peninsuler.get_noise_2d(i, j) > peninsuler_cutoff + 0.27f;
 
-        //if(i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){printf("pc=%d", peninsulerCaved);if (j % 2 == 0) std::cout << "\n"; else std::cout << "||| ";} 
+        float beachness = getBeachness(i, j, continentness);
 
-        bool awayFromCoast = continentness > continentalCutoff + 0.01f && peninsuler.get_noise_2d(i, j) > peninsulerCutoff + 0.27f;
-        float beachness = (float)getBeachness(i, j, continentness);
         bool beach = beachness > beachCutoff;
         
         bool lake = (((smallLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > smallLakeCutoff) 
                     || (((bigLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > bigLakeCutoff);
         
-        std::unordered_map<std::string, bool> data = {
-            {"continental", continental},
-            {"peninsuler_caved", peninsulerCaved},
-            {"away_from_coast", awayFromCoast},
-            {"lake", lake},
-            {"beach", beach}
-        };        
+        std::unordered_set<std::string> data;
+        if (continental) data.insert("continental");
+        if (peninsulerCaved) data.insert("peninsuler_caved");
+        if (awayFromCoast) data.insert("away_from_coast");
+        if (lake) data.insert("lake");
+        if (beach) data.insert("beach");
+
         auto tiles = FormationGenerator::getTiles(tilePicker, data);
 
         for(auto tileId: tiles){
@@ -67,23 +74,34 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
     }}
 }
 
-float FracturedContinentGenerator::getBorderClosenessFactor(int i, int j)
-{
-    //if (i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){printf("%d %d", i, j);printf(", bcf %.2f = max(%.2f, %.2f)", std::max((float)abs(i - size.x) / ((float)size.x/2.f), (float)abs(j - size.y) / ((float)size.y/2.f)), (float)abs(i - size.x) / ((float)size.x/2.f), (float)abs(j - size.y) / ((float)size.y/2.f));}
+float FracturedContinentGenerator::getBorderClosenessFactor(int i, int j) const
+{   /*
+    if (i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
+        printf("%d %d", i, j); 
+        printf(", bcf %.2f = max(%.2f, %.2f)", 
+            std::max(abs(i - size.x) / (size.x/2.f), abs(j - size.y) / (size.y/2.f)), 
+            abs(i - size.x) / (size.x/2.f), 
+            abs(j - size.y) / (size.y/2.f));}
+    */
     return std::max(
-        (float)abs(i - origin.x) / ((float)size.x/2.f), 
-        (float)abs(j - origin.y) / ((float)size.y/2.f));
+        abs(i - origin.x) / (size.x/2.f), 
+        abs(j - origin.y) / (size.y/2.f));
 }
-float FracturedContinentGenerator::getContinentness(int i, int j, float bcf)
-{
-    //if (i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){printf(", cntness %.3f = %.3f - %.3f, ", (float)continenter.get_noise_2d(i, j) - bcf / 4.2f, (float)continenter.get_noise_2d(i, j), bcf/4.2f);}
+float FracturedContinentGenerator::getContinentness(int i, int j, float bcf) const
+{   /*
+    if (i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
+        printf(", cntness %.3f = %.3f - %.3f, ", 
+            continenter.get_noise_2d(i, j) - bcf / 4.2f, 
+            (float)continenter.get_noise_2d(i, j), 
+            bcf / 4.2f);}
+    */
     return (float)continenter.get_noise_2d(i, j) -  bcf / 4.2f - powf(bcf, 43.f);
 }
-float FracturedContinentGenerator::getBeachness(int i, int j, float continentness)
+float FracturedContinentGenerator::getBeachness(int i, int j, float continentness) const
 {
     return std::max(
-        0.72f + (float)bigBeacher.get_noise_2d(i, j) / 2.3f - powf(continentness - continentalCutoff, 0.6f), 
-        0.8f + (float)smallBeacher.get_noise_2d(i, j) / 2.3f - powf((float)peninsuler.get_noise_2d(i, j) - peninsulerCutoff, 0.45f));
+    0.72f + bigBeacher.get_noise_2d(i, j) / 2.3f - powf(continentness - continental_cutoff, 0.6f), 
+    0.8f + smallBeacher.get_noise_2d(i, j) / 2.3f - powf(peninsuler.get_noise_2d(i, j) - peninsuler_cutoff, 0.45f));
 }
 
 FracturedContinentGenerator::FracturedContinentGenerator()
@@ -96,8 +114,9 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     bigBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
     smallBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
     
-    continentalCutoff = 0.6f;//overriden
-    peninsulerCutoff = -0.1f; bigLakeCutoff = -0.9f; smallLakeCutoff = -0.9f; beachCutoff = 0.8f;
+    continental_cutoff = 0.6f;//overriden inside generate() method
+
+    peninsuler_cutoff = -0.1f; bigLakeCutoff = -0.9f; smallLakeCutoff = -0.9f; beachCutoff = 0.8f;
 
     continenter.set_fractal_lacunarity(2.8f); continenter.set_fractal_weighted_strength(0.5f);
     peninsuler.set_fractal_gain(0.56f);

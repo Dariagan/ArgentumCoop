@@ -46,8 +46,8 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 func generate_world() -> void:
 	#tile_map.GenerateWorld({}, 0)
 	
-	tile_map.generate_world_matrix(Vector2i(5000, 5000))
+	tile_map.generate_world_matrix(Vector2i(2500, 2500))
 	var asd: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i(5000,5000), FormationGenerator.TEMPERATE, 0, {})
+	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i(2500,2500), FormationGenerator.TEMPERATE, 0, {})
 
 	#await tile_map.formation_formed

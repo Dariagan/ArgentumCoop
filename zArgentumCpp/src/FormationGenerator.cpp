@@ -2,7 +2,6 @@
 
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
-#include <memory>
 
 using namespace godot;
 
@@ -18,32 +17,33 @@ void FormationGenerator::placeTile(std::vector<std::vector<std::vector<StringNam
     
     worldMatrix[absoluteCoords.x][absoluteCoords.y].push_back(tileId);
 }
-
-std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker, std::unordered_map<std::string, bool> &data)
+//USAR OPTIONAL?
+std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker, std::unordered_set<std::string> &data)
 {
     std::vector<StringName> tilesToPlace;
 
     switch (tilePicker)
     {
-        case TEMPERATE:    
-            if (data.at("continental") && !data.at("peninsuler_caved") && data.at("away_from_coast") && data.at("lake"))
+        case TEMPERATE:
+        {
+            if (data.count("continental") && !data.count("peninsuler_caved") && data.count("away_from_coast") && data.count("lake"))
             {
                 tilesToPlace.push_back("lake");
             }
-            else if (data.at("continental") && !data.at("peninsuler_caved") && data["beach"])
+            else if (data.count("continental") && !data.count("peninsuler_caved") && data.count("beach"))
             {
                 tilesToPlace.push_back("beach_sand");
             }
-            else if (!data.at("continental") ||  data.at("peninsuler_caved"))
+            else if (!data.count("continental") || data.count("peninsuler_caved"))
             {
                 tilesToPlace.push_back("ocean");
             }
-            else if (data.at("continental") && !data["peninsuler_caved"])
+            else if (data.count("continental") && !data.count("peninsuler_caved"))
             {
                 tilesToPlace.push_back("grass");
             }
             return tilesToPlace;
-        break;
+        }break;
 
         default:
             UtilityFunctions::printerr("passed tile picker not implemented");

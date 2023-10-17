@@ -3,7 +3,7 @@
 
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/godot.hpp>
-
+#include <unordered_set>
 
 namespace godot {
 
@@ -16,7 +16,7 @@ namespace godot {
 
         protected:
             static void _bind_methods();
-            static std::vector<StringName> getTiles(const TilePicker tilePicker, std::unordered_map<std::string, bool> &data);
+            static std::vector<StringName> getTiles(const TilePicker tilePicker, std::unordered_set<std::string> &data);
             static void placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
                 const Vector2i& origin, const Vector2i& relativeCoords, const StringName& tileId);
         public:

@@ -8,36 +8,39 @@
 #include <godot_cpp/classes/random_number_generator.hpp>
 #include <memory>
 
-namespace godot {
+namespace godot 
+{
+class FracturedContinentGenerator : public FormationGenerator
+{
+    GDCLASS(FracturedContinentGenerator, FormationGenerator)
 
-    class FracturedContinentGenerator : public FormationGenerator{
-        GDCLASS(FracturedContinentGenerator, FormationGenerator)
+    private:
+        Vector2i origin, size;
 
-        private:
-            Vector2i origin, size;
+        int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
 
-            int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
+        RandomNumberGenerator rng;    
+        float getBorderClosenessFactor(int i, int j) const;
+        float getContinentness(int i, int j, float bcf) const;
+        float getBeachness(int i, int j, float continentness) const;
+            
+    protected:
+        static void _bind_methods();
 
-            RandomNumberGenerator rng;    
-            float getBorderClosenessFactor(int i, int j);
-            float getContinentness(int i, int j, float bcf);
-            float getBeachness(int i, int j, float continentness);
-                
-        protected:
-            static void _bind_methods();
+    public:
+        FracturedContinentGenerator();
+        ~FracturedContinentGenerator();
 
-        public:
-            FracturedContinentGenerator();
-            ~FracturedContinentGenerator();
+        FastNoiseLite continenter, peninsuler, bigLaker, smallLaker, bigBeacher, smallBeacher;
+        float continental_cutoff, peninsuler_cutoff, bigLakeCutoff, smallLakeCutoff, beachCutoff;
 
-            FastNoiseLite continenter, peninsuler, bigLaker, smallLaker, bigBeacher, smallBeacher;
-            float continentalCutoff, peninsulerCutoff, bigLakeCutoff, smallLakeCutoff, beachCutoff;
+        float get_continental_cutoff() const; void set_continental_cutoff(float cutoff);
 
 //en vez de poner optional parameters así, declarar varios métodos overloaded, hacer q el de menos llame al de más, y bindear los dos
-            void generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, 
-                const Vector2i& origin, const Vector2i& size, const TilePicker tilePicker = TEMPERATE,
-                const signed int seed = 0, const Dictionary& data = Dictionary()) override;
-    };
+        void generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, 
+            const Vector2i& origin, const Vector2i& size, const TilePicker tilePicker = TEMPERATE,
+            const signed int seed = 0, const Dictionary& data = Dictionary()) override;
+};
 }
 
 #endif // __FRACTUREDCONTINENT_GENERATOR_H__
