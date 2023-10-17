@@ -10,7 +10,7 @@ class_name Being
 
 var being_data: BeingPersonalData
 
-signal load_tiles_around_me(cords: Vector2)
+signal load_tiles_around_me(cords: Vector2, chunk_size: Vector2i)
 
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body
 @onready var head: AnimatedBodyPortion = $BodyHolder/Head

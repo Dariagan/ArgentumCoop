@@ -24,8 +24,8 @@ namespace godot {
             ~FormationGenerator();
 
             virtual void generate(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
-                const Vector2i& origin, const Vector2i& area, const TilePicker tilePicker = TEMPERATE, 
-                const int seed = 0, const Dictionary& data = Dictionary());//TODO ENUM TILEPICKER
+                const Vector2i& origin, const Vector2i& size, const TilePicker tilePicker = TEMPERATE, 
+                const signed int seed = 0, const Dictionary& data = Dictionary());//TODO ENUM TILEPICKER
     };
 }
 VARIANT_ENUM_CAST(TilePicker);

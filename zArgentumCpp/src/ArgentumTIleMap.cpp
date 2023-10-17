@@ -9,7 +9,7 @@ using namespace godot;
 
 void ArgentumTilemap::_bind_methods()
 {   
-    ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "area", "tile_picker", "seed"), &ArgentumTilemap::generate_formation);
+    ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "size", "tile_picker", "seed", "data"), &ArgentumTilemap::generate_formation);
     ClassDB::bind_method(D_METHOD("generate_world_matrix", "size"), &ArgentumTilemap::generate_world_matrix);
     
     ClassDB::bind_method(D_METHOD("load_tiles_around", "coords", "chunk_size"), &ArgentumTilemap::load_tiles_around);
@@ -21,6 +21,8 @@ void ArgentumTilemap::_bind_methods()
     ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTilemap::set_tiles_data);
     ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTilemap::get_tiles_data);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
+
+    ADD_SIGNAL(MethodInfo("formation_formed"));
 }
 
 void ArgentumTilemap::generate_world_matrix(const Vector2i& size)
@@ -37,12 +39,11 @@ void ArgentumTilemap::generate_world_matrix(const Vector2i& size)
 }
 
 int ArgentumTilemap::get_seed(){return seed;}; 
-void ArgentumTilemap::set_seed(int seed){this->seed = seed;};
+void ArgentumTilemap::set_seed(signed int seed){this->seed = seed;};
 
 Dictionary ArgentumTilemap::get_tiles_data(){return tiles_data;}; 
 void ArgentumTilemap::set_tiles_data(Dictionary tiles_data){
     this->tiles_data = tiles_data;
-
     for(auto cppTileData : cppTilesData)
         cppTileData.second.clear();
     cppTilesData.clear();
@@ -63,17 +64,19 @@ void ArgentumTilemap::set_tiles_data(Dictionary tiles_data){
 };
 
 void ArgentumTilemap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
-    const Vector2i& area, const TilePicker tile_picker, int seed)
+    const Vector2i& size, const TilePicker tile_picker, signed int seed, const Dictionary& data)
 {
     if(seed < 0) seed *= -1;
 
-    formation_generator->generate(worldMatrix, origin, area, tile_picker, seed);
+    UtilityFunctions::print("in2");
+    formation_generator->generate(worldMatrix, origin, size, tile_picker, seed, data);
+    emit_signal("formation_formed");
 }
 
 void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& chunk_size){
     
     Vector2i beingCoords = local_to_map(coords);
-
+    
     for (int i = -chunk_size.x/2; i < chunk_size.x/2; i++) 
     {
         for (int j = -chunk_size.y/2; j < chunk_size.y/2; j++) 
@@ -85,21 +88,22 @@ void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& c
                 if (loadedTiles.count(tileMapTileCoords) == 0)
                 {
                     if (worldMatrix[matrixCoords.x][matrixCoords.y].size() > 0)
-                    
+                    {
                         for (StringName tile_id : worldMatrix[matrixCoords.x][matrixCoords.y])
                         {					
                             std::unordered_map<StringName, Variant>& tileData = cppTilesData.at(tile_id);
-
                             set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), tileData.at("atlas_pos"), tileData.at("alt_id"));
                         }
-                    else
-                        set_cell(0, tileMapTileCoords, 2, Vector2i(0,0), 0);
-
+                    }else{
+                        set_cell(0, tileMapTileCoords, 2, Vector2i(6,0), 0);
+    
+                    }                   
                     loadedTiles.insert(tileMapTileCoords);
                 }
             }
         }
     }
+    
     //unloadExcessTiles(beingCoords);
     return;
 }
