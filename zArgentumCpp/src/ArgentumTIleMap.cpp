@@ -68,7 +68,6 @@ void ArgentumTilemap::generate_formation(const Ref<FormationGenerator>& formatio
 {
     if(seed < 0) seed *= -1;
 
-    UtilityFunctions::print("in2");
     formation_generator->generate(worldMatrix, origin, size, tile_picker, seed, data);
     emit_signal("formation_formed");
 }
@@ -77,35 +76,58 @@ void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& c
     
     Vector2i beingCoords = local_to_map(coords);
     
-    for (int i = -chunk_size.x/2; i < chunk_size.x/2; i++) 
+    for (int i = -chunk_size.x/2; i < chunk_size.x/2; i++) {
+    for (int j = -chunk_size.y/2; j < chunk_size.y/2; j++) 
     {
-        for (int j = -chunk_size.y/2; j < chunk_size.y/2; j++) 
+        Vector2i matrixCoords(worldSize.x/2  + beingCoords.x + i, worldSize.y/2 + beingCoords.y + j);
+        if (matrixCoords.x < (worldSize.x) && matrixCoords.y < (worldSize.y) && matrixCoords.x >= 0 && matrixCoords.y >= 0)
         {
-            Vector2i matrixCoords(worldSize.x/2  + beingCoords.x + i, worldSize.y/2 + beingCoords.y + j);
-            if (matrixCoords.x < (worldSize.x - 1) && matrixCoords.y < (worldSize.y - 1) && matrixCoords.x >= 0 && matrixCoords.y >= 0)
+            Vector2i tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
+            if (loadedTiles.count(tileMapTileCoords) == 0)
             {
-                Vector2i tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
-                if (loadedTiles.count(tileMapTileCoords) == 0)
+                if (worldMatrix[matrixCoords.x][matrixCoords.y].size() > 0)
                 {
-                    if (worldMatrix[matrixCoords.x][matrixCoords.y].size() > 0)
-                    {
-                        for (StringName tile_id : worldMatrix[matrixCoords.x][matrixCoords.y])
-                        {					
-                            std::unordered_map<StringName, Variant>& tileData = cppTilesData.at(tile_id);
-                            set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), tileData.at("atlas_pos"), tileData.at("alt_id"));
-                        }
-                    }else{
-                        set_cell(0, tileMapTileCoords, 2, Vector2i(6,0), 0);
-    
-                    }                   
-                    loadedTiles.insert(tileMapTileCoords);
-                }
+                    for (StringName tile_id : worldMatrix[matrixCoords.x][matrixCoords.y])
+                    {					
+                        std::unordered_map<StringName, Variant>& tileData = cppTilesData.at(tile_id);
+                        set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), 
+                                 tileData.at("atlas_pos"), tileData.at("alt_id"));
+                    }
+                }else{
+                    set_cell(0, tileMapTileCoords, 2, Vector2i(6,0), 0);
+
+                }                   
+                loadedTiles.insert(tileMapTileCoords);
             }
         }
-    }
+    }}    
+    unloadExcessTiles(beingCoords);
+}
+
+void ArgentumTilemap::unloadExcessTiles(const Vector2i& coords)
+{
+    const int MAX_LOADED_TILES = 30000;
+
+    std::vector<Vector2i> tilesToErase;
     
-    //unloadExcessTiles(beingCoords);
-    return;
+    if (loadedTiles.size() > MAX_LOADED_TILES)
+    {
+        for (const Vector2i& tileCoord : loadedTiles)
+        {
+            if (((Vector2)tileCoord).distance_squared_to(coords) > 27000)
+            {
+                for (int layer_i = 0; layer_i < get_layers_count(); layer_i++)
+                {
+                    erase_cell(layer_i, tileCoord);
+                }
+                tilesToErase.push_back(tileCoord);
+                
+            }			
+        }
+        for (const Vector2i& tileCoord : tilesToErase){
+            loadedTiles.erase(tileCoord);
+        }
+    }
 }
 
 ArgentumTilemap::ArgentumTilemap()
@@ -124,5 +146,7 @@ ArgentumTilemap::~ArgentumTilemap()
             tile.clear();
         worldRow.clear();
     }worldMatrix.clear();
+
+    loadedTiles.clear();
 }
 

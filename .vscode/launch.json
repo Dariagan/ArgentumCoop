@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "lldb",
+            "type": "by-gdb",
             "request": "launch",
             "preLaunchTask": "build",
             "name": "Debugjeje",
             "program": "/usr/bin/godot",
-            "args": ["--path","/home/stefan/ApocalypseArgentum"],
+            "programArgs": "--path /home/stefan/ApocalypseArgentum",
             "cwd": "${workspaceFolder}"
         }
     ]

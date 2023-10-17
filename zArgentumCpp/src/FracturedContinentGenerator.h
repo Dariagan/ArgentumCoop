@@ -16,6 +16,8 @@ namespace godot {
         private:
             Vector2i origin, size;
 
+            int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
+
             RandomNumberGenerator rng;    
             float getBorderClosenessFactor(int i, int j);
             float getContinentness(int i, int j, float bcf);

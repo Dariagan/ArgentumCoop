@@ -29,7 +29,7 @@ var tiles: Dictionary
 
 var spawnable_scenes: Array[String]
 
-var debug: bool = true
+var debug: bool = false
 
 var debug_speed_mult:float = 160;
 

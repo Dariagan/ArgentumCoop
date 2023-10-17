@@ -32,7 +32,6 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		
 		var being_spawn_data = BeingSpawnData.new(player_start_data)
 		
-		
 		var being: Being = being_scene.instantiate()
 		being.name = str(peers[i])
 		being.position.x = i*40
@@ -45,11 +44,10 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		
 @rpc("call_local")
 func generate_world() -> void:
+	#tile_map.GenerateWorld({}, 0)
 	
-	tile_map.generate_world_matrix(Vector2i(1000, 1000))
-
+	tile_map.generate_world_matrix(Vector2i(5000, 5000))
 	var asd: FracturedContinentGenerator = FracturedContinentGenerator.new()
-
-	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i(1000,1000), FormationGenerator.TEMPERATE, 0, {})
+	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i(5000,5000), FormationGenerator.TEMPERATE, 0, {})
 
 	#await tile_map.formation_formed
