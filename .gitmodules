@@ -1,0 +1,3 @@
+[submodule "zArgentumCpp/godot-cpp"]
+	path = zArgentumCpp/godot-cpp
+	url = https://github.com/godotengine/godot-cpp.git

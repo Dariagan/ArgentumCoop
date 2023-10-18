@@ -27,12 +27,12 @@ void ArgentumTilemap::_bind_methods()
 
 void ArgentumTilemap::generate_world_matrix(const Vector2i& size)
 {
-    if(!worldGenerated){
+    if(!worldGenerated)
+    {
         worldMatrix.resize(size.x, std::vector<std::vector<StringName>>(size.y, std::vector<StringName>()));
 
         this->worldSize = size;
         worldGenerated = true;
-
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be resized.");
     }
@@ -79,15 +79,15 @@ void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& c
     for (int i = -chunk_size.x/2; i < chunk_size.x/2; i++) {
     for (int j = -chunk_size.y/2; j < chunk_size.y/2; j++) 
     {
-        Vector2i matrixCoords(worldSize.x/2  + beingCoords.x + i, worldSize.y/2 + beingCoords.y + j);
-        if (matrixCoords.x < (worldSize.x) && matrixCoords.y < (worldSize.y) && matrixCoords.x >= 0 && matrixCoords.y >= 0)
+        Vector2i matrixPos(worldSize.x/2  + beingCoords.x + i, worldSize.y/2 + beingCoords.y + j);
+        if (matrixPos.x < (worldSize.x) && matrixPos.y < (worldSize.y) && matrixPos.x >= 0 && matrixPos.y >= 0)
         {
             Vector2i tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
             if (loadedTiles.count(tileMapTileCoords) == 0)
             {
-                if (worldMatrix[matrixCoords.x][matrixCoords.y].size() > 0)
+                if (worldMatrix[matrixPos.x][matrixPos.y].size() > 0)
                 {
-                    for (StringName tile_id : worldMatrix[matrixCoords.x][matrixCoords.y])
+                    for (StringName tile_id : worldMatrix[matrixPos.x][matrixPos.y])
                     {					
                         std::unordered_map<StringName, Variant>& tileData = cppTilesData.at(tile_id);
                         set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), 
@@ -108,10 +108,9 @@ void ArgentumTilemap::unloadExcessTiles(const Vector2i& coords)
 {
     const int MAX_LOADED_TILES = 30000;
 
-    std::vector<Vector2i> tilesToErase;
-    
     if (loadedTiles.size() > MAX_LOADED_TILES)
     {
+        std::vector<Vector2i> tilesToErase;
         for (const Vector2i& tileCoord : loadedTiles)
         {
             if (((Vector2)tileCoord).distance_squared_to(coords) > 27000)
@@ -137,16 +136,6 @@ ArgentumTilemap::ArgentumTilemap()
 
 ArgentumTilemap::~ArgentumTilemap()
 {
-    for(auto cppTileData : cppTilesData)
-        cppTileData.second.clear();
-    cppTilesData.clear();
-
-    for(auto worldRow : worldMatrix){
-        for(auto tile : worldRow)
-            tile.clear();
-        worldRow.clear();
-    }worldMatrix.clear();
-
-    loadedTiles.clear();
+    
 }
 
