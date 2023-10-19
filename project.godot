@@ -23,6 +23,11 @@ GameData="*res://scripts/singletons/game_data.gd"
 
 project/assembly_name="ArgentumSurvival"
 
+[editor]
+
+movie_writer/movie_file="/home/stefan/Videos/asd.avi"
+movie_writer/fps=50
+
 [importer_defaults]
 
 texture={

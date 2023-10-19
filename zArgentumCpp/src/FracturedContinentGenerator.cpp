@@ -29,7 +29,7 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
 //hacer un for multiplicativo de la frequency en vez de separar en big y small. aumentar el cutoff. sumarle 1 a la seed en cada iteracion del for
     continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.5f/powf(size.length(), 0.995f));
     bigBeacher.set_frequency(3.f/powf(size.length(), 0.99f)); smallBeacher.set_frequency(9.f/powf(size.length(), 0.995f));
-    bigLaker.set_frequency(110.f/powf(size.length(), 0.995f)); smallLaker.set_frequency(240.f/powf(size.length(), 0.991f));
+    bigLaker.set_frequency(60.f/powf(size.length(), 0.991f)); smallLaker.set_frequency(130.f/powf(size.length(), 0.991f));
 
     continental_cutoff = 0.6f * powf(size.length() / 1600.f, 0.05f);;
     }
@@ -116,13 +116,14 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     
     continental_cutoff = 0.6f;//overriden inside generate() method
 
-    peninsuler_cutoff = -0.1f; bigLakeCutoff = -0.9f; smallLakeCutoff = -0.9f; beachCutoff = 0.8f;
+
+    peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.6f; smallLakeCutoff = 0.25f; beachCutoff = 0.8f;
 
     continenter.set_fractal_lacunarity(2.8f); continenter.set_fractal_weighted_strength(0.5f);
     peninsuler.set_fractal_gain(0.56f);
     smallBeacher.set_fractal_octaves(1);
-    bigLaker.set_fractal_lacunarity(1.3f); bigLaker.set_fractal_octaves(2);
-    smallLaker.set_fractal_octaves(2);
+    bigLaker.set_fractal_lacunarity(1.1); bigLaker.set_fractal_octaves(1);
+    smallLaker.set_fractal_octaves(1);
 
 }
 FracturedContinentGenerator::~FracturedContinentGenerator(){}
