@@ -1,6 +1,5 @@
 #include "FormationGenerator.h"
 
-#include <godot_cpp/godot.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
 using namespace godot;
@@ -26,7 +25,12 @@ std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker
     {
         case TEMPERATE:
         {
-            if (data.count("continental") && !data.count("peninsuler_caved") && data.count("away_from_coast") && data.count("lake"))
+            if (data.count("tree"))
+            {
+                tilesToPlace.push_back("tree_temp_" + (char)('0' + rand()%8));
+            }
+
+            else if (data.count("continental") && !data.count("peninsuler_caved") && data.count("away_from_coast") && data.count("lake"))
             {
                 tilesToPlace.push_back("lake");
             }

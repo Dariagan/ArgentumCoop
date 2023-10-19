@@ -155,7 +155,7 @@ func _update_facing_direction() -> void:
 	else: 
 		_facing_direction = "up" if _direction_axis.y < 0 else "down"
 
-# esto debería ser un componente
+# esto debería ser un componente?
 func _process_animation() -> void:	
 	_play_animation(str(BodyState.keys()[_body_state]).to_lower()
 	 + "_" + _facing_direction)

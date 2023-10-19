@@ -2,7 +2,7 @@
 #define __FORMATION_GENERATOR_H__
 
 #include <godot_cpp/classes/ref_counted.hpp>
-#include <godot_cpp/godot.hpp>
+#include <godot_cpp/core/binder_common.hpp>
 #include <unordered_set>
 
 namespace godot {

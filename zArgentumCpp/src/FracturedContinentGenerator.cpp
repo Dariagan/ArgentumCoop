@@ -4,6 +4,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <unordered_set>
+#include <algorithm>
 
 using namespace godot;
 
@@ -28,8 +29,8 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
     bigBeacher.set_seed(seed+4); smallBeacher.set_seed(seed+5); rng.set_seed(seed);
 //hacer un for multiplicativo de la frequency en vez de separar en big y small. aumentar el cutoff. sumarle 1 a la seed en cada iteracion del for
     continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.5f/powf(size.length(), 0.995f));
-    bigBeacher.set_frequency(3.f/powf(size.length(), 0.99f)); smallBeacher.set_frequency(9.f/powf(size.length(), 0.995f));
-    bigLaker.set_frequency(60.f/powf(size.length(), 0.991f)); smallLaker.set_frequency(130.f/powf(size.length(), 0.991f));
+    bigBeacher.set_frequency(4.3f/powf(size.length(), 0.99f)); smallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
+    bigLaker.set_frequency(50.f/powf(size.length(), 0.991f)); smallLaker.set_frequency(80.f/powf(size.length(), 0.991f));
 
     continental_cutoff = 0.6f * powf(size.length() / 1600.f, 0.05f);;
     }
@@ -58,20 +59,43 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
         bool lake = (((smallLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > smallLakeCutoff) 
                     || (((bigLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > bigLakeCutoff);
         
+        bool tree;
+        if(continental && !beach && !lake){
+            bool diceRollSuccessfull = rng.randi_range(0,3);
+
+            tree = diceRollSuccessfull && spaceIsClearForTreeAtPos(i, j, worldMatrix);
+        }
+
         std::unordered_set<std::string> data;
         if (continental) data.insert("continental");
         if (peninsulerCaved) data.insert("peninsuler_caved");
         if (awayFromCoast) data.insert("away_from_coast");
         if (lake) data.insert("lake");
         if (beach) data.insert("beach");
+        if (tree) data.insert("tree");
 
         auto tiles = FormationGenerator::getTiles(tilePicker, data);
 
         for(auto tileId: tiles){
             FormationGenerator::placeTile(worldMatrix, origin, Vector2i(i, j), tileId);
         }
-        tiles.clear();       
+
+
     }}
+}
+
+//se podría reusar esta función para otras cosas
+bool spaceIsClearForTreeAtPos(int i, int j, std::vector<std::vector<std::vector<StringName>>> & worldMatrix){
+    for (int x = 0; x < 5;x++){
+        for (int y = 0; y < 5;y++){
+            auto tileIdVector = worldMatrix[i - x][i - y];
+            for (StringName tileId : tileIdVector){
+                if(tileId.begins_with("tree_")){
+                    return false;
+                }
+            }
+        }
+    }return true;
 }
 
 float FracturedContinentGenerator::getBorderClosenessFactor(int i, int j) const
@@ -117,13 +141,11 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     continental_cutoff = 0.6f;//overriden inside generate() method
 
 
-    peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.6f; smallLakeCutoff = 0.25f; beachCutoff = 0.8f;
+    peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.7f; smallLakeCutoff = 0.35f; beachCutoff = 0.8f;
 
     continenter.set_fractal_lacunarity(2.8f); continenter.set_fractal_weighted_strength(0.5f);
     peninsuler.set_fractal_gain(0.56f);
     smallBeacher.set_fractal_octaves(1);
-    bigLaker.set_fractal_lacunarity(1.1); bigLaker.set_fractal_octaves(1);
-    smallLaker.set_fractal_octaves(1);
 
 }
 FracturedContinentGenerator::~FracturedContinentGenerator(){}
