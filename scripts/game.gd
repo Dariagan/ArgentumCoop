@@ -47,6 +47,6 @@ func generate_world() -> void:
 
 	tile_map.generate_world_matrix(Vector2i(5000, 5000))
 	var asd: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i(4000,4000), FormationGenerator.TEMPERATE, 2, {})
+	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i(4000,4000), FormationGenerator.TEMPERATE, 0, {})
 
 	#await tile_map.formation_formed
