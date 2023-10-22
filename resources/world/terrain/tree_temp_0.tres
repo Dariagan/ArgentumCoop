@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_qb043")
-id = &"tree_temp"
+id = &"tree_temp_0"
 layer = 2
 source_id = 4
-atlas_pos = Vector2i(0, 0)
+atlas_pos = Vector2i(0, 3)
 alt_id = 0

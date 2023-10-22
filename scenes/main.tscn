@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=16 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -14,6 +14,14 @@
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_o47dn"]
+noise_type = 0
+fractal_lacunarity = 3.0
+fractal_gain = 0.7
+domain_warp_amplitude = 25.725
+domain_warp_frequency = -0.115
+domain_warp_fractal_type = 0
+
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_miptc"]
 noise_type = 3
 seed = 1
@@ -25,6 +33,7 @@ domain_warp_fractal_type = 2
 
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
+asd = SubResource("FastNoiseLite_o47dn")
 
 [node name="Lobby" type="Node" parent="."]
 script = ExtResource("4_vtap0")
@@ -36,12 +45,10 @@ being_scene = ExtResource("5_nor5b")
 
 [node name="ArgentumTilemap" type="ArgentumTilemap" parent="Lobby/Game"]
 tile_set = ExtResource("7_os580")
-layer_0/name = "foundation"
 script = ExtResource("7_itdl2")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
-spawn_path = NodePath("../ArgentumTilemap")
 script = ExtResource("6_r3dut")
 noise = SubResource("FastNoiseLite_miptc")
 

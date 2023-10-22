@@ -1,6 +1,6 @@
 extends Node
 
-
+@export var asd: FastNoiseLite
 @onready var menu_control: Container = $Canvas/MenuControl
 @onready var lobby: Node = $Lobby
 

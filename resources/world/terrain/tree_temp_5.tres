@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Tile" load_steps=2 format=3 uid="uid://bkcfo8g1j0ik2"]
+
+[ext_resource type="Script" path="res://scripts/resources/world/tile.gd" id="1_xi2ye"]
+
+[resource]
+script = ExtResource("1_xi2ye")
+id = &"tree_temp_5"
+layer = 2
+source_id = 4
+atlas_pos = Vector2i(41, 0)
+alt_id = 0

@@ -16,8 +16,9 @@ void FormationGenerator::placeTile(std::vector<std::vector<std::vector<StringNam
     
     worldMatrix[absoluteCoords.x][absoluteCoords.y].push_back(tileId);
 }
+
 //USAR OPTIONAL?
-std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker, std::unordered_set<std::string> &data)
+std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker, std::unordered_set<std::string> &data, unsigned int seed)
 {
     std::vector<StringName> tilesToPlace;
 
@@ -27,10 +28,15 @@ std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker
         {
             if (data.count("tree"))
             {
-                tilesToPlace.push_back("tree_temp_" + (char)('0' + rand()%8));
-            }
+                char result[12] = "tree_temp_";
+                char randChar = '0' + rand() % 8;
+                result[10] = randChar;
+                result[11] = '\0';
 
-            else if (data.count("continental") && !data.count("peninsuler_caved") && data.count("away_from_coast") && data.count("lake"))
+                tilesToPlace.push_back(result);
+            } 
+
+            if (data.count("continental") && !data.count("peninsuler_caved") && data.count("away_from_coast") && data.count("lake"))
             {
                 tilesToPlace.push_back("lake");
             }

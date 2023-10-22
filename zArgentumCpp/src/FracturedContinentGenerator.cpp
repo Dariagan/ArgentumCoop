@@ -5,6 +5,7 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <unordered_set>
 #include <algorithm>
+#include <string>
 
 using namespace godot;
 
@@ -26,11 +27,12 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
     this->size = size;
     {
     continenter.set_seed(seed); peninsuler.set_seed(seed+1); bigLaker.set_seed(seed+2); smallLaker.set_seed(seed+3);
-    bigBeacher.set_seed(seed+4); smallBeacher.set_seed(seed+5); rng.set_seed(seed);
+    bigBeacher.set_seed(seed+4); smallBeacher.set_seed(seed+5); rng.set_seed(seed); forest.set_seed(seed + 9);
 //hacer un for multiplicativo de la frequency en vez de separar en big y small. aumentar el cutoff. sumarle 1 a la seed en cada iteracion del for
     continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.5f/powf(size.length(), 0.995f));
     bigBeacher.set_frequency(4.3f/powf(size.length(), 0.99f)); smallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
     bigLaker.set_frequency(50.f/powf(size.length(), 0.991f)); smallLaker.set_frequency(80.f/powf(size.length(), 0.991f));
+    forest.set_frequency(3.f/powf(size.length(), 0.991f));
 
     continental_cutoff = 0.6f * powf(size.length() / 1600.f, 0.05f);;
     }
@@ -59,14 +61,15 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
         bool lake = (((smallLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > smallLakeCutoff) 
                     || (((bigLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > bigLakeCutoff);
         
-        bool tree;
-        if(continental && !beach && !lake){
-            bool diceRollSuccessfull = rng.randi_range(0,3);
+        bool tree = false;
+        if(continental && !peninsulerCaved && beachness < beachCutoff - 0.03f && !lake){
+            bool diceRollSuccessfull = rng.randf_range(0,4) + forest.get_noise_2d(i, j)*1.5f > 3.3f;
 
-            tree = diceRollSuccessfull && spaceIsClearForTreeAtPos(i, j, worldMatrix);
-        }
+            tree = diceRollSuccessfull && i % 4 == 0 && j % 4 == 0;
+        } 
 
         std::unordered_set<std::string> data;
+
         if (continental) data.insert("continental");
         if (peninsulerCaved) data.insert("peninsuler_caved");
         if (awayFromCoast) data.insert("away_from_coast");
@@ -74,7 +77,7 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
         if (beach) data.insert("beach");
         if (tree) data.insert("tree");
 
-        auto tiles = FormationGenerator::getTiles(tilePicker, data);
+        auto tiles = FormationGenerator::getTiles(tilePicker, data, seed);
 
         for(auto tileId: tiles){
             FormationGenerator::placeTile(worldMatrix, origin, Vector2i(i, j), tileId);
@@ -82,20 +85,6 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
 
 
     }}
-}
-
-//se podría reusar esta función para otras cosas
-bool spaceIsClearForTreeAtPos(int i, int j, std::vector<std::vector<std::vector<StringName>>> & worldMatrix){
-    for (int x = 0; x < 5;x++){
-        for (int y = 0; y < 5;y++){
-            auto tileIdVector = worldMatrix[i - x][i - y];
-            for (StringName tileId : tileIdVector){
-                if(tileId.begins_with("tree_")){
-                    return false;
-                }
-            }
-        }
-    }return true;
 }
 
 float FracturedContinentGenerator::getBorderClosenessFactor(int i, int j) const
@@ -137,6 +126,7 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     smallLaker.set_noise_type(FastNoiseLite::NoiseType::TYPE_VALUE_CUBIC);
     bigBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
     smallBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
+    forest.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
     
     continental_cutoff = 0.6f;//overriden inside generate() method
 
@@ -145,8 +135,12 @@ FracturedContinentGenerator::FracturedContinentGenerator()
 
     continenter.set_fractal_lacunarity(2.8f); continenter.set_fractal_weighted_strength(0.5f);
     peninsuler.set_fractal_gain(0.56f);
-    smallBeacher.set_fractal_octaves(1);
 
+    smallBeacher.set_fractal_octaves(3);
+
+    forest.set_fractal_lacunarity(3);
+    forest.set_fractal_gain(0.7);
+    //forest.set_fractal_octaves(1);
 }
 FracturedContinentGenerator::~FracturedContinentGenerator(){}
 

@@ -23,6 +23,7 @@ class FracturedContinentGenerator : public FormationGenerator
         float getBorderClosenessFactor(int i, int j) const;
         float getContinentness(int i, int j, float bcf) const;
         float getBeachness(int i, int j, float continentness) const;
+
             
     protected:
         static void _bind_methods();
@@ -31,7 +32,7 @@ class FracturedContinentGenerator : public FormationGenerator
         FracturedContinentGenerator();
         ~FracturedContinentGenerator();
 
-        FastNoiseLite continenter, peninsuler, bigLaker, smallLaker, bigBeacher, smallBeacher;
+        FastNoiseLite continenter, peninsuler, bigLaker, smallLaker, bigBeacher, smallBeacher, forest;
         float continental_cutoff, peninsuler_cutoff, bigLakeCutoff, smallLakeCutoff, beachCutoff;
 
         float get_continental_cutoff() const; void set_continental_cutoff(float cutoff);
