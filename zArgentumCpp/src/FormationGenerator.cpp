@@ -7,6 +7,7 @@ using namespace godot;
 void FormationGenerator::_bind_methods()
 {
     BIND_ENUM_CONSTANT(TEMPERATE);
+    BIND_ENUM_CONSTANT(DESERT);
 }
 
 void FormationGenerator::placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
@@ -55,9 +56,14 @@ std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker
             return tilesToPlace;
         }break;
 
+        case DESERT:{
+            if (data.count("continental"))
+                tilesToPlace.push_back("beach_sand");
+            return tilesToPlace;
+        }break;
+
         default:
             UtilityFunctions::printerr("passed tile picker not implemented");
-            throw std::logic_error("passed tile picker not implemented");
         break;
     }
 }

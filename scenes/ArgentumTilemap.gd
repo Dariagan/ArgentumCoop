@@ -7,7 +7,6 @@ func _ready():
 	add_layer(0);add_layer(1);add_layer(2)
 	set_layer_z_index(2, 10)
 	set_layer_y_sort_enabled(2, true)
-	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

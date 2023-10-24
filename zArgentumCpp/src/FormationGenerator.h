@@ -8,7 +8,8 @@
 namespace godot {
 
     enum TilePicker{
-        TEMPERATE = 0
+        TEMPERATE = 0,
+        DESERT = 1
     };
 
     class FormationGenerator : public RefCounted{

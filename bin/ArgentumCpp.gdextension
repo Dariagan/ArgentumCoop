@@ -1,7 +1,7 @@
 [configuration]
 
 entry_symbol = "argentum_cpp_init"
-compatibility_minimum = "4.1"
+compatibility_minimum = "4.2"
 reloadable = true
 
 [libraries]
@@ -10,7 +10,7 @@ macos.debug = "res://bin/libArgentumCpp.macos.template_debug.framework"
 macos.release = "res://bin/libArgentumCpp.macos.template_release.framework"
 windows.debug.x86_32 = "res://bin/libArgentumCpp.windows.template_debug.x86_32.dll"
 windows.release.x86_32 = "res://bin/libArgentumCpp.windows.template_release.x86_32.dll"
-windows.debug.x86_64 = "res://bin/libArgentumCpp.windows.template_debug.x86_64.dll"
+windows.debug.x86_64 = "res://bin/ArgentumCpp.windows.template_debug.x86_64.dll"
 windows.release.x86_64 = "res://bin/libArgentumCpp.windows.template_release.x86_64.dll"
 linux.debug.x86_64 = "res://bin/libArgentumCpp.linux.template_debug.x86_64.so"
 linux.release.x86_64 = "res://bin/libArgentumCpp.linux.template_release.x86_64.so"
