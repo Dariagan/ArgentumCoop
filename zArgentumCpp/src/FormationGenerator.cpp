@@ -17,9 +17,9 @@ void FormationGenerator::placeTile(std::vector<std::vector<std::vector<StringNam
     worldMatrix[absoluteCoords.x][absoluteCoords.y].push_back(tileId);
 }
 
-//USAR OPTIONAL?
 std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker, std::unordered_set<std::string> &data, unsigned int seed)
 {
+    //TODO, LEER LAS IDS A PONER DE UN .JSON. EN VEZ DE UN TILEPICKER, PONER UN string. precargar la data de los json en alguna colección
     std::vector<StringName> tilesToPlace;
 
     switch (tilePicker)

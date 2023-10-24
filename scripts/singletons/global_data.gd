@@ -1,5 +1,12 @@
 extends Node
 
+var ignore_joiners_readiness_on_start: bool = true
+var insta_start: bool = true
+var debug: bool = false
+var debug_walk_mult:float = 3
+var noclip: bool = false
+var noclip_speed_mult:float = 6;
+
 var username: String
 
 const item_data_directories: Array[String] = []#["res://resources/things/items/", "res://resources/things/items/wear/body/"]
@@ -29,9 +36,7 @@ var tiles: Dictionary
 
 var spawnable_scenes: Array[String]
 
-var debug: bool = true
 
-var debug_speed_mult:float = 160;
 
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resources/world/tile_set.tres")

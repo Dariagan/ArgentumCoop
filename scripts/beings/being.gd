@@ -23,6 +23,8 @@ func construct(data: BeingSpawnData) -> void:
 	
 @rpc("call_local")
 func construct_being_data(data: Dictionary):
+	z_index = 10
+	z_as_relative = false
 	being_data = BeingPersonalData.new(data)
 	
 	var tile_map: ArgentumTilemap = get_parent()
@@ -134,10 +136,10 @@ func _update_direction_axis_by_input(delta: float) -> void:
 		_velocity = _velocity.limit_length(being_data.get_max_speed())
 		_update_facing_direction()
 	
-	if not GlobalData.debug:
-		move_and_collide(_velocity)
+	if not GlobalData.noclip:
+		move_and_collide(_velocity*GlobalData.debug_walk_mult)
 	else:
-		position += _direction_axis * GlobalData.debug_speed_mult
+		position += _direction_axis * GlobalData.noclip_speed_mult
 	
 	distance_moved_since_load += distance_moved
 	

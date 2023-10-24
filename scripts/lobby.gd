@@ -109,7 +109,7 @@ func _on_player_ready(ready: bool) -> void:
 	if multiplayer.get_unique_id() != 1:
 		_peer_is_ready.rpc(ready)
 		
-	elif true or _is_everybody_ready():
+	elif GlobalData.ignore_joiners_readiness_on_start or _is_everybody_ready():
 		_on_game_start.rpc()
 		game.start_new_game(_characters_spawn_data, _peers)
 		print(_characters_spawn_data)

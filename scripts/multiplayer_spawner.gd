@@ -6,4 +6,3 @@ func _ready() -> void:
 	for path in GlobalData.spawnable_scenes:
 		add_spawnable_scene(path)
 
-@export var noise: FastNoiseLite

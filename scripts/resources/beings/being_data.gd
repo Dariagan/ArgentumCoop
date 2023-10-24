@@ -22,7 +22,7 @@ func _init(data: Dictionary = {}) -> void:
 	faction = GameData.factions[data["faction"]]
 	
 func get_max_speed() -> float:
-	var max_speed: float =  10 * race.combat_multipliers.speed 
+	var max_speed: float =  7 * race.combat_multipliers.speed 
 	if klass:
 		max_speed *= klass.combat_multipliers.speed
 	return max_speed

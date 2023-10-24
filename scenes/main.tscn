@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=15 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -22,15 +22,6 @@ domain_warp_amplitude = 25.725
 domain_warp_frequency = -0.115
 domain_warp_fractal_type = 0
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_miptc"]
-noise_type = 3
-seed = 1
-frequency = 0.0756
-fractal_octaves = 2
-fractal_lacunarity = 1.4
-fractal_weighted_strength = 0.7
-domain_warp_fractal_type = 2
-
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
 asd = SubResource("FastNoiseLite_o47dn")
@@ -44,13 +35,17 @@ script = ExtResource("5_2eji3")
 being_scene = ExtResource("5_nor5b")
 
 [node name="ArgentumTilemap" type="ArgentumTilemap" parent="Lobby/Game"]
+z_as_relative = false
+y_sort_enabled = true
 tile_set = ExtResource("7_os580")
 script = ExtResource("7_itdl2")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
+spawn_path = NodePath("../ArgentumTilemap")
 script = ExtResource("6_r3dut")
-noise = SubResource("FastNoiseLite_miptc")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Lobby/Game"]
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 

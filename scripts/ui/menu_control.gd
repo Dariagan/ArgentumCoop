@@ -11,7 +11,7 @@ signal lobby_started(lobby_interface: LobbyInterface, joined_ip: String)
 
 
 func _ready() -> void:
-	if GlobalData.debug:
+	if GlobalData.insta_start:
 		hide()
 	
 

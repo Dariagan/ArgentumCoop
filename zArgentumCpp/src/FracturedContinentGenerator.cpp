@@ -131,7 +131,7 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     continental_cutoff = 0.6f;//overriden inside generate() method
 
 
-    peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.4f; smallLakeCutoff = 0.35f; beachCutoff = 0.8f;
+    peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.2f; smallLakeCutoff = 0.20f; beachCutoff = 0.8f;
 
     continenter.set_fractal_lacunarity(2.8f); continenter.set_fractal_weighted_strength(0.5f);
     peninsuler.set_fractal_gain(0.56f);

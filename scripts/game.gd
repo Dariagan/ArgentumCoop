@@ -7,7 +7,7 @@ extends Node
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
 
 func _ready() -> void:
-	if GlobalData.debug:
+	if GlobalData.insta_start:
 		start_new_game([{}], [1])
 
 func start_new_game(players_start_data: Array, peers: Array) -> void:
@@ -45,8 +45,8 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 @rpc("call_local")
 func generate_world() -> void:
 
-	tile_map.generate_world_matrix(Vector2i(5000, 5000))
+	tile_map.generate_world_matrix(Vector2i(2000, 2000))
 	var asd: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i(4000,4000), FormationGenerator.TEMPERATE, 0, {})
+	tile_map.generate_formation(asd, Vector2i.ZERO, Vector2i(2000,2000), FormationGenerator.TEMPERATE, 0, {})
 
 	#await tile_map.formation_formed
