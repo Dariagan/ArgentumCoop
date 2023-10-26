@@ -19,7 +19,7 @@ namespace godot {
             static void _bind_methods();
             static std::vector<StringName> getTiles(const TilePicker tilePicker, std::unordered_set<std::string> &data, unsigned int seed = 0);
             static void placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
-                const Vector2i& origin, const Vector2i& relativeCoords, const StringName& tileId);
+                const Vector2i& origin, const Vector2i& relativeCoords, const StringName& tileId, bool deleteOthers = false);
         public:
             FormationGenerator();
             ~FormationGenerator();

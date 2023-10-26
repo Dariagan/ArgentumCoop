@@ -11,7 +11,7 @@ void FormationGenerator::_bind_methods()
 }
 
 void FormationGenerator::placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
-    const Vector2i& origin, const Vector2i& relativeCoords, const StringName& tileId)
+    const Vector2i& origin, const Vector2i& relativeCoords, const StringName& tileId, bool deleteOthers)
 {
     Vector2i absoluteCoords = Vector2i(worldMatrix.size()/2, worldMatrix[0].size()/2) + origin + relativeCoords;
     

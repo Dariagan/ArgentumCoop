@@ -385,7 +385,7 @@ class Command:
 		for from in [Position.new(symbol.line, 0), Position.new(0, 0)]:
 			var parser = GDScriptParser.new(ed, from)
 			if not parser.parse_until(symbol):
-			   continue
+				continue
 
 			if symbol.char in ")]}":
 				parser.stack.reverse()

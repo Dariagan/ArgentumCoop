@@ -31,3 +31,5 @@ else:
     )
 
 Default(library)
+
+#IMPORTANTE: PARA PASAR EL .DLL A ULISES, SACARLE EL "lib" para que se lo detecte
