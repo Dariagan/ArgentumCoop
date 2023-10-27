@@ -3,6 +3,8 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+#include <regex>
+#include <string>
 
 using namespace godot;
 
@@ -28,7 +30,7 @@ void ArgentumTilemap::generate_world_matrix(const Vector2i& size)
 {
     if(!worldGenerated)
     {
-        worldMatrix.resize(size.x, std::vector<std::vector<StringName>>(size.y, std::vector<StringName>()));
+        worldMatrix.resize(size.x, std::vector<std::vector<std::string>>(size.y, std::vector<std::string>()));
 
         this->worldSize = size;
         worldGenerated = true;
@@ -41,10 +43,11 @@ int ArgentumTilemap::get_seed(){return seed;};
 void ArgentumTilemap::set_seed(signed int seed){this->seed = seed;};
 
 Dictionary ArgentumTilemap::get_tiles_data(){return tiles_data;}; 
-void ArgentumTilemap::set_tiles_data(Dictionary tiles_data){
+void ArgentumTilemap::set_tiles_data(Dictionary tiles_data)
+{
     this->tiles_data = tiles_data;
-    for(auto cppTileData : cppTilesData)
-        cppTileData.second.clear();
+    for(auto &tileData : cppTilesData)
+        tileData.second.clear();
     cppTilesData.clear();
     
     for(int i = 0; i < tiles_data.values().size(); i++){
@@ -52,49 +55,88 @@ void ArgentumTilemap::set_tiles_data(Dictionary tiles_data){
         Ref<Resource> tile = Object::cast_to<Resource>(tiles_data.values()[i]);
         Dictionary tile_data = tile->call("get_data");
 
-        std::unordered_map<StringName, Variant> cppTileData;
+        std::unordered_map<StringName, Variant> tileData;
 
-        for(int j = 0; j < tile_data.values().size(); j++){
-            cppTileData.insert({tile_data.keys()[j], tile_data.values()[j]});
+        for(int j = 0; j < tile_data.values().size(); j++)
+        {
+            tileData.insert({tile_data.keys()[j], tile_data.values()[j]});
         }
-
-        cppTilesData.insert({tiles_data.keys()[i], std::move(cppTileData)});
+        std::string keyAsCppString = ((String)tiles_data.keys()[i]).utf8().get_data();
+        cppTilesData.insert({keyAsCppString, tileData});                
     }
 };
 
 void ArgentumTilemap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
-    const Vector2i& size, const TilePicker tile_picker, signed int seed, const Dictionary& data)
+    const Vector2i& size, const TileSetCase tile_picker, signed int seed, const Dictionary& data)
 {
-    if(seed < 0) seed *= -1;
-
     formation_generator->generate(worldMatrix, origin, size, tile_picker, seed, data);
     emit_signal("formation_formed");
 }
 
-void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& chunk_size){
-    
+void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& chunk_size)
+{    
     Vector2i beingCoords = local_to_map(coords);
     
     for (int i = -chunk_size.x/2; i < chunk_size.x/2; i++) {
     for (int j = -chunk_size.y/2; j < chunk_size.y/2; j++) 
     {
-        Vector2i matrixPos(worldSize.x/2  + beingCoords.x + i, worldSize.y/2 + beingCoords.y + j);
-        if (matrixPos.x < (worldSize.x) && matrixPos.y < (worldSize.y) && matrixPos.x >= 0 && matrixPos.y >= 0)
+        const Vector2i matrixPos(worldSize.x/2  + beingCoords.x + i, worldSize.y/2 + beingCoords.y + j);
+        if (matrixPos.x < worldSize.x && matrixPos.y < worldSize.y && matrixPos.x >= 0 && matrixPos.y >= 0)
         {
-            Vector2i tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
+            const Vector2i tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
             if (loadedTiles.count(tileMapTileCoords) == 0)
             {
                 if (worldMatrix[matrixPos.x][matrixPos.y].size() > 0)
                 {
-                    for (StringName tile_id : worldMatrix[matrixPos.x][matrixPos.y])
+                    for (const std::string &TILE_ID : worldMatrix[matrixPos.x][matrixPos.y])
                     {					
-                        std::unordered_map<StringName, Variant>& tileData = cppTilesData.at(tile_id);
-                        set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), 
-                                 tileData.at("atlas_pos"), tileData.at("alt_id"));
-                    }
-                }else{
-                    set_cell(0, tileMapTileCoords, 2, Vector2i(6,0), 0);
+                        int atlas_position_i = 0;
+                        std::regex pattern("(.*)_([0-9]+)$"); std::smatch matches;
+                        std::string key;
 
+                        if (std::regex_match(TILE_ID, matches, pattern))
+                        {
+                            atlas_position_i = std::stoi(matches[matches.size()-1]);
+                            key = matches[1];
+                        }
+                        else key = TILE_ID;
+
+                        std::unordered_map<StringName, Variant> tileData;
+                        try{tileData = cppTilesData.at(key);}
+                        catch(const std::out_of_range& e)
+                        {UtilityFunctions::printerr(TILE_ID.c_str(), 
+                        " not found in cppTilesData (ArgentumTileMap.cpp::load_tiles_around)");}
+
+                        Vector2i atlasPositionV;
+                        try
+                        {
+                            Array atlasPositions = ((Array)tileData.at("atlas_positions"));
+                            //UtilityFunctions::print(atlasPositions, key.c_str());
+                            if (atlasPositions.size() == 0)
+                            {
+                                UtilityFunctions::printerr("list of atlas positions for ", key.c_str()," is empty");
+                                atlasPositionV = Vector2i(0,0);
+                            }
+                            else if (atlasPositions.size() > atlas_position_i)
+                            {
+                                atlasPositionV = atlasPositions[atlas_position_i];
+                            }
+                            else UtilityFunctions::printerr(
+                                "atlas position ", atlas_position_i, "out of bounds in ", key.c_str());
+                        }
+                        catch(...)
+                        {
+                            UtilityFunctions::printerr(
+                                "couldn't get atlas positions array");
+                        }
+
+                        set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), 
+                                 atlasPositionV, tileData.at("alt_id"));
+                    }
+                }else
+                {
+                    //if (matrixpos.x + 1)%4=0 && (matrixpos.y+1)%4=0->  
+                    set_cell(0, tileMapTileCoords, 2, Vector2i(6,0), 0);
                 }                   
                 loadedTiles.insert(tileMapTileCoords);
             }

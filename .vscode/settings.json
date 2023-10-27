@@ -57,6 +57,10 @@
         "unordered_set": "cpp",
         "optional": "cpp",
         "span_ext": "cpp",
-        "util": "cpp"
+        "util": "cpp",
+        "bitset": "cpp",
+        "map": "cpp",
+        "regex": "cpp",
+        "sstream": "cpp"
     }
 }

@@ -38,8 +38,8 @@ class FracturedContinentGenerator : public FormationGenerator
         float get_continental_cutoff() const; void set_continental_cutoff(float cutoff);
 
 //en vez de poner optional parameters así, declarar varios métodos overloaded, hacer q el de menos llame al de más, y bindear los dos
-        void generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, 
-            const Vector2i& origin, const Vector2i& size, const TilePicker tilePicker = TEMPERATE,
+        void generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
+            const Vector2i& origin, const Vector2i& size, const TileSetCase tilePicker = TEMPERATE,
             const signed int seed = 0, const Dictionary& data = Dictionary()) override;
 };
 }

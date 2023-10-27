@@ -19,11 +19,11 @@ namespace godot {
         };
 
         private:
-            std::vector<std::vector<std::vector<StringName>>> worldMatrix;
+            std::vector<std::vector<std::vector<std::string>>> worldMatrix;
             Vector2i worldSize;
             bool worldGenerated = false;
             std::unordered_set<Vector2i, pair_hash> loadedTiles;
-            std::unordered_map<StringName, std::unordered_map<StringName, Variant>> cppTilesData;
+            std::unordered_map<std::string, std::unordered_map<StringName, Variant>> cppTilesData;
             
 
         protected:
@@ -39,7 +39,7 @@ namespace godot {
 
             void generate_world_matrix(const Vector2i& size);
             void generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, const Vector2i& size, 
-                 const TilePicker tile_picker, signed int seed, const Dictionary& data);
+                 const TileSetCase tile_picker, signed int seed, const Dictionary& data);
             void unloadExcessTiles(const Vector2i& coords);
             void load_tiles_around(const Vector2& coords, const Vector2i& chunk_size);
     };

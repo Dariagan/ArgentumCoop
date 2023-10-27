@@ -7,5 +7,5 @@ script = ExtResource("1_10hly")
 id = &"beach_sand"
 layer = 0
 source_id = 1
-atlas_pos = Vector2i(0, 0)
-alternative_id = 0
+atlas_positions = Array[Vector2i]([Vector2i(0, 0)])
+alt_id = 0

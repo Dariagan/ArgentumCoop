@@ -8,75 +8,50 @@ void FormationGenerator::_bind_methods()
 {
     BIND_ENUM_CONSTANT(TEMPERATE);
     BIND_ENUM_CONSTANT(DESERT);
+
+    //TODO BINDEAR generate_pre_check
 }
 
-void FormationGenerator::placeTile(std::vector<std::vector<std::vector<StringName>>>& worldMatrix, 
-    const Vector2i& origin, const Vector2i& relativeCoords, const StringName& tileId, bool deleteOthers)
+void FormationGenerator::placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
+    const Vector2i& origin, const Vector2i& relativeCoords, const std::string& tileId, bool deleteOthers)
 {
     Vector2i absoluteCoords = Vector2i(worldMatrix.size()/2, worldMatrix[0].size()/2) + origin + relativeCoords;
     
-    worldMatrix[absoluteCoords.x][absoluteCoords.y].push_back(tileId);
+    auto tilesAtPos = worldMatrix[absoluteCoords.x][absoluteCoords.y];
+
+    if (deleteOthers) tilesAtPos.clear();
+
+    tilesAtPos.push_back(tileId);
 }
 
-std::vector<StringName> FormationGenerator::getTiles(const TilePicker tilePicker, std::unordered_set<std::string> &data, unsigned int seed)
+void FormationGenerator::generate_pre_check(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
+    Vector2i origin, const Vector2i& size, const TileSetCase tilePicker, const signed int seed,
+    const Dictionary& data
+    )
 {
-    //TODO, LEER LAS IDS A PONER DE UN .JSON. EN VEZ DE UN TILEPICKER, PONER UN string. precargar la data de los json en alguna colección
-    std::vector<StringName> tilesToPlace;
+    if (origin.x >= 0) origin.x -= (origin.x + 1) % 4;
+    else origin.x += abs(origin.x) % 4;
 
-    switch (tilePicker)
-    {
-        case TEMPERATE:
-        {
-            if (data.count("tree"))
-            {
-                char result[12] = "tree_temp_";
-                char randChar = '0' + rand() % 8;
-                result[10] = randChar;
-                result[11] = '\0';
+    if (origin.y >= 0) origin.y -= (origin.y + 1) % 4;
+    else origin.y += abs(origin.y) % 4;
 
-                tilesToPlace.push_back(result);
-            } 
-
-            if (data.count("continental") && !data.count("peninsuler_caved") && data.count("away_from_coast") && data.count("lake"))
-            {
-                tilesToPlace.push_back("lake");
-            }
-            else if (data.count("continental") && !data.count("peninsuler_caved") && data.count("beach"))
-            {
-                tilesToPlace.push_back("beach_sand");
-            }
-            else if (!data.count("continental") || data.count("peninsuler_caved"))
-            {
-                tilesToPlace.push_back("ocean");
-            }
-            else if (data.count("continental") && !data.count("peninsuler_caved"))
-            {
-                tilesToPlace.push_back("grass");
-            }
-            return tilesToPlace;
-        }break;
-
-        case DESERT:{
-            if (data.count("continental"))
-                tilesToPlace.push_back("beach_sand");
-            return tilesToPlace;
-        }break;
-
-        default:
-            UtilityFunctions::printerr("passed tile picker not implemented");
-        break;
-    }
+    generate(worldMatrix, origin, size, tilePicker, seed, data);
 }
-void FormationGenerator::generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, 
-    const Vector2i& origin, const Vector2i& size, const TilePicker tilePicker, const signed int seed,
+
+void FormationGenerator::generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
+    const Vector2i& origin, const Vector2i& size, const TileSetCase tilePicker, const signed int seed,
     const Dictionary& data
     )
 {
     UtilityFunctions::printerr("Inside FormationGenerator abstract method");
 }
 
-FormationGenerator::FormationGenerator(){}
-FormationGenerator::~FormationGenerator(){}
+FormationGenerator::FormationGenerator(){
+    this->tilePicker = std::unique_ptr<TilePicker>(new TilePicker());
+}
+FormationGenerator::~FormationGenerator(){
+   
+}
 
 
 

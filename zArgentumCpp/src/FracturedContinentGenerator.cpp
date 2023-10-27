@@ -19,8 +19,8 @@ void FracturedContinentGenerator::_bind_methods()
 float FracturedContinentGenerator::get_continental_cutoff()const{return continental_cutoff;}
 void FracturedContinentGenerator::set_continental_cutoff(float cutoff){continental_cutoff = cutoff;} 
 
-void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<StringName>>> & worldMatrix, 
-    const Vector2i& origin, const Vector2i& size, const TilePicker tilePicker, 
+void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
+    const Vector2i& origin, const Vector2i& size, const TileSetCase tilePicker, 
     const signed int seed, const Dictionary& data)
 {
     this->origin = origin;
@@ -41,8 +41,8 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
-    for (int i = -size.x/2; i < size.x/2; i++){
-    for (int j = -size.y/2; j < size.y/2; j++)
+    for (int i = -size.x/2; i < size.x/2; i+=4){
+    for (int j = -size.y/2; j < size.y/2; j+=4)
     {   
         float bcf = getBorderClosenessFactor(i, j);
         float continentness = getContinentness(i, j, bcf);
@@ -62,9 +62,9 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
                     || (((bigLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > bigLakeCutoff);
         
         bool tree = false;
-        if(continental && !peninsulerCaved && beachness < beachCutoff - 0.03f && !lake){
+        if(continental && !peninsulerCaved && beachness < beachCutoff - 0.03f && !lake)
+        {
             bool diceRollSuccessfull = rng.randf_range(0,4) + forest.get_noise_2d(i, j)*1.5f > 3.3f;
-
             tree = diceRollSuccessfull && i % 4 == 0 && j % 4 == 0;
         } 
 
@@ -77,13 +77,11 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<S
         if (beach) data.insert("beach");
         if (tree) data.insert("tree");
 
-        auto tiles = FormationGenerator::getTiles(tilePicker, data, seed);
+        auto tiles = FormationGenerator::tilePicker->getTiles(tilePicker, data, seed);
 
         for(auto tileId: tiles){
             FormationGenerator::placeTile(worldMatrix, origin, Vector2i(i, j), tileId);
         }
-
-
     }}
 }
 
@@ -128,8 +126,6 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     smallBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
     forest.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
     
-    continental_cutoff = 0.6f;//overriden inside generate() method
-
 
     peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.2f; smallLakeCutoff = 0.20f; beachCutoff = 0.8f;
 
