@@ -20,10 +20,6 @@ namespace godot {
             FormationGenerator();
             ~FormationGenerator();
             
-            void generate_pre_check(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
-                Vector2i origin, const Vector2i& size, const TileSelectionSet tileSelectionSet = TEMPERATE, 
-                const signed int seed = 0, const Dictionary& data = Dictionary());
-
             virtual void generate(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
                 const Vector2i& origin, const Vector2i& size, const TileSelectionSet tileSelectionSet = TEMPERATE, 
                 const signed int seed = 0, const Dictionary& data = Dictionary());

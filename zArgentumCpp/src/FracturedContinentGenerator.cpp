@@ -43,8 +43,9 @@ void FracturedContinentGenerator::generate(
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
-    for (int i = -size.x/2; i < size.x/2; i+=4){
-    for (int j = -size.y/2; j < size.y/2; j+=4)
+    Rect2i rect;
+    for (int i = -size.x/2; i < size.x/2; i++){
+    for (int j = -size.y/2; j < size.y/2; j++)
     {   
         float bcf = getBorderClosenessFactor(i, j);
         float continentness = getContinentness(i, j, bcf);
@@ -70,14 +71,14 @@ void FracturedContinentGenerator::generate(
             tree = diceRollSuccessfull && i % 4 == 0 && j % 4 == 0;
         } 
 
-        std::unordered_set<std::string> data;
+        std::unordered_map<std::string, std::string> data;
 
-        if (continental) data.insert("continental");
-        if (peninsulerCaved) data.insert("peninsuler_caved");
-        if (awayFromCoast) data.insert("away_from_coast");
-        if (lake) data.insert("lake");
-        if (beach) data.insert("beach");
-        if (tree) data.insert("tree");
+        if (continental) data.insert({"continental",""});
+        if (peninsulerCaved) data.insert({"peni_caved",""});
+        if (awayFromCoast) data.insert({"afc", ""});
+        if (lake) data.insert({"lake", ""});
+        if (beach) data.insert({"beach", ""});
+        if (tree) data.insert({"tree", ""});
 
         auto tiles = this->tilePicker.getTiles(tileSelectionSet, data, seed);
 

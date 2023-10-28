@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c70rprfwrpnkq"
-path="res://.godot/imported/sand.png-d8f539a0f4c6c14fe92006afe3dfa440.ctex"
+uid="uid://ypax42p8xn4"
+path="res://.godot/imported/coastlines.png-9c158b5e51078222e0c076c76c909b7f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/world/terrain/sand.png"
-dest_files=["res://.godot/imported/sand.png-d8f539a0f4c6c14fe92006afe3dfa440.ctex"]
+source_file="res://assets/textures/world/terrain/coastlines.png"
+dest_files=["res://.godot/imported/coastlines.png-9c158b5e51078222e0c076c76c909b7f.ctex"]
 
 [params]
 

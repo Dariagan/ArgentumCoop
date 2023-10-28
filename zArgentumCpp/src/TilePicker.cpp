@@ -9,7 +9,7 @@
 using namespace godot;
 
 std::vector<std::string> TilePicker::getTiles(
-    const TileSelectionSet tileSelectionSet, std::unordered_set<std::string> &data, unsigned int seed)
+    const TileSelectionSet tileSelectionSet, std::unordered_map<std::string, std::string> &data, unsigned int seed)
 {
     std::vector<std::string> tilesToPlace;
     switch (tileSelectionSet)
@@ -22,22 +22,21 @@ std::vector<std::string> TilePicker::getTiles(
                 std::string result = "tree_temp_" + std::to_string(rand() % 8);
                 tilesToPlace.push_back(result);
             } 
-            if (data.count("continental") && !data.count("peninsuler_caved") && data.count("away_from_coast") && data.count("lake"))
+            if (data.count("continental") && !data.count("peni_caved") && data.count("afc") && data.count("lake"))
             {
                 tilesToPlace.push_back("lake");
             }
-            else if (data.count("continental") && !data.count("peninsuler_caved") && data.count("beach"))
+            else if (data.count("continental") && !data.count("peni_caved") && data.count("beach"))
             {
                 tilesToPlace.push_back("beach_sand");
             }
-            else if (!data.count("continental") || data.count("peninsuler_caved"))
+            else if (!data.count("continental") || data.count("peni_caved"))
             {
                 tilesToPlace.push_back("ocean");
             }
-            else if (data.count("continental") && !data.count("peninsuler_caved"))
+            else if (data.count("continental") && !data.count("peni_caved"))
             {
-                std::string result = "grass_" + std::to_string(rand() % 4);
-                tilesToPlace.push_back(result);
+                tilesToPlace.push_back("grass");//+_data.at("variant") el valor de variant se determina en el fracturedCG según un módulo
             }
             return tilesToPlace;
         }break;

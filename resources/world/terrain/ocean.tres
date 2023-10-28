@@ -7,5 +7,6 @@ script = ExtResource("1_avear")
 id = &"ocean"
 layer = 0
 source_id = 2
-atlas_positions = Array[Vector2i]([Vector2i(0, 0)])
+tile_variants_atlas_origin_position = Array[Vector2i]([Vector2i(0, 0)])
+modulo_tile_picking_area = Vector2i(4, 4)
 alt_id = 0

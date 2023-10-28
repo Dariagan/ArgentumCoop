@@ -11,3 +11,9 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
+
+func generate_world():
+	generate_world_matrix(Vector2i(2000, 2000))
+	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
+	generate_formation(fcg, Vector2i.ZERO, Vector2i(2000,2000), FormationGenerator.TEMPERATE, 0, {})
+	

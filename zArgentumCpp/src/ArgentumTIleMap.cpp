@@ -2,6 +2,7 @@
 
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <regex>
 #include <string>
@@ -107,31 +108,42 @@ void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& c
                         {UtilityFunctions::printerr(TILE_ID.c_str(), 
                         " not found in cppTilesData (ArgentumTileMap.cpp::load_tiles_around)");}
 
+                        //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
+                        //PONER EL AGUA EN UNA LAYER INFERIOR? 
+
                         Vector2i atlasPositionV;
-                        try
-                        {
+                        try{
                             Array atlasPositions = ((Array)tileData.at("atlas_positions"));
                             //UtilityFunctions::print(atlasPositions, key.c_str());
                             if (atlasPositions.size() == 0)
                             {
-                                UtilityFunctions::printerr("list of atlas positions for ", key.c_str()," is empty");
+                                UtilityFunctions::printerr("array of variant tiles atlas origin positions for ", key.c_str()," is empty, defaulting to (0,0)");
                                 atlasPositionV = Vector2i(0,0);
                             }
                             else if (atlasPositions.size() > atlas_position_i)
                             {
                                 atlasPositionV = atlasPositions[atlas_position_i];
                             }
-                            else UtilityFunctions::printerr(
-                                "atlas position ", atlas_position_i, "out of bounds in ", key.c_str());
+                            else UtilityFunctions::printerr("atlas i ", atlas_position_i, " out of bounds in ", key.c_str());
                         }
-                        catch(...)
-                        {
-                            UtilityFunctions::printerr(
-                                "couldn't get atlas positions array");
-                        }
+                        catch(...){UtilityFunctions::printerr("couldn't get array of variants atlas positions for tile_id \"",TILE_ID.c_str(),"\"");continue;}
 
+                        Vector2i atlasPositionOffset = Vector2i(0, 0);
+
+                        try{
+                            Vector2i moduloTilePickingArea = (Vector2i)tileData.at("ma");
+                            if(moduloTilePickingArea.x >= 1 && moduloTilePickingArea.y >= 1)
+                            {
+                                atlasPositionOffset.x = matrixPos.x % moduloTilePickingArea.x;
+                                atlasPositionOffset.y = matrixPos.y % moduloTilePickingArea.y;
+                            }
+                            else UtilityFunctions::printerr("moduloTilePickingArea ",moduloTilePickingArea," not admitted for ",TILE_ID.c_str());
+                        }
+                        catch(...){UtilityFunctions::printerr("couldn't access \"ma\" key for ", TILE_ID.c_str());}
+
+                        //hacer q la atlas positionV se mueva según el mod de la global position, dentro de la tile 4x4
                         set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), 
-                                 atlasPositionV, tileData.at("alt_id"));
+                                atlasPositionV + atlasPositionOffset, tileData.at("alt_id"));
                     }
                 }else
                 {

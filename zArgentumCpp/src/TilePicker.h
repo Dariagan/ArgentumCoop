@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include <unordered_map>
 #include <godot_cpp/core/binder_common.hpp>
 #include <godot_cpp/classes/object.hpp>
 
@@ -22,7 +23,7 @@ namespace godot
             TilePicker();
             ~TilePicker();
             
-            std::vector<std::string> getTiles(const TileSelectionSet tileSelectionSet, std::unordered_set<std::string> &data, unsigned int seed);
+            std::vector<std::string> getTiles(const TileSelectionSet tileSelectionSet, std::unordered_map<std::string, std::string> &data, unsigned int seed);
     };
 } // namespace godot
 
