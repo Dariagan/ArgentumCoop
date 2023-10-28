@@ -10,7 +10,7 @@ using namespace godot;
 
 void ArgentumTilemap::_bind_methods()
 {   
-    ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "size", "tile_picker", "seed", "data"), &ArgentumTilemap::generate_formation);
+    ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "size", "tile_selection_set", "seed", "data"), &ArgentumTilemap::generate_formation);
     ClassDB::bind_method(D_METHOD("generate_world_matrix", "size"), &ArgentumTilemap::generate_world_matrix);
     
     ClassDB::bind_method(D_METHOD("load_tiles_around", "coords", "chunk_size"), &ArgentumTilemap::load_tiles_around);
@@ -67,9 +67,9 @@ void ArgentumTilemap::set_tiles_data(Dictionary tiles_data)
 };
 
 void ArgentumTilemap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
-    const Vector2i& size, const TileSetCase tile_picker, signed int seed, const Dictionary& data)
+    const Vector2i& size, const TileSelectionSet tileSelectionSet, signed int seed, const Dictionary& data)
 {
-    formation_generator->generate(worldMatrix, origin, size, tile_picker, seed, data);
+    formation_generator->generate(worldMatrix, origin, size, tileSelectionSet, seed, data);
     emit_signal("formation_formed");
 }
 
@@ -135,7 +135,7 @@ void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& c
                     }
                 }else
                 {
-                    //if (matrixpos.x + 1)%4=0 && (matrixpos.y+1)%4=0->  
+                    //TODO if (matrixpos.x + 1)%4=0 && (matrixpos.y+1)%4=0->  
                     set_cell(0, tileMapTileCoords, 2, Vector2i(6,0), 0);
                 }                   
                 loadedTiles.insert(tileMapTileCoords);

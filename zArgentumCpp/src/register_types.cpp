@@ -18,7 +18,6 @@ void initialize_argentum_cpp(ModuleInitializationLevel p_level)
     ClassDB::register_class<ArgentumTilemap>();
     ClassDB::register_abstract_class<FormationGenerator>();
     ClassDB::register_class<FracturedContinentGenerator>();
-    
 }
 void uninitialize_argentum_cpp(ModuleInitializationLevel p_level)
 {

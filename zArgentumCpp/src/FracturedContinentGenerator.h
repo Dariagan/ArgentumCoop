@@ -39,7 +39,7 @@ class FracturedContinentGenerator : public FormationGenerator
 
 //en vez de poner optional parameters así, declarar varios métodos overloaded, hacer q el de menos llame al de más, y bindear los dos
         void generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
-            const Vector2i& origin, const Vector2i& size, const TileSetCase tilePicker = TEMPERATE,
+            const Vector2i& origin, const Vector2i& size, const TileSelectionSet tileSelectionSet = TEMPERATE,
             const signed int seed = 0, const Dictionary& data = Dictionary()) override;
 };
 }

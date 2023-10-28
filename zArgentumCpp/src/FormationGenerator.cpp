@@ -17,7 +17,7 @@ void FormationGenerator::placeTile(std::vector<std::vector<std::vector<std::stri
 {
     Vector2i absoluteCoords = Vector2i(worldMatrix.size()/2, worldMatrix[0].size()/2) + origin + relativeCoords;
     
-    auto tilesAtPos = worldMatrix[absoluteCoords.x][absoluteCoords.y];
+    auto& tilesAtPos = worldMatrix[absoluteCoords.x][absoluteCoords.y];
 
     if (deleteOthers) tilesAtPos.clear();
 
@@ -25,7 +25,7 @@ void FormationGenerator::placeTile(std::vector<std::vector<std::vector<std::stri
 }
 
 void FormationGenerator::generate_pre_check(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
-    Vector2i origin, const Vector2i& size, const TileSetCase tilePicker, const signed int seed,
+    Vector2i origin, const Vector2i& size, const TileSelectionSet tileSelectionSet, const signed int seed,
     const Dictionary& data
     )
 {
@@ -35,11 +35,11 @@ void FormationGenerator::generate_pre_check(std::vector<std::vector<std::vector<
     if (origin.y >= 0) origin.y -= (origin.y + 1) % 4;
     else origin.y += abs(origin.y) % 4;
 
-    generate(worldMatrix, origin, size, tilePicker, seed, data);
+    generate(worldMatrix, origin, size, tileSelectionSet, seed, data);
 }
 
 void FormationGenerator::generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
-    const Vector2i& origin, const Vector2i& size, const TileSetCase tilePicker, const signed int seed,
+    const Vector2i& origin, const Vector2i& size, const TileSelectionSet tileSelectionSet, const signed int seed,
     const Dictionary& data
     )
 {
@@ -47,7 +47,7 @@ void FormationGenerator::generate(std::vector<std::vector<std::vector<std::strin
 }
 
 FormationGenerator::FormationGenerator(){
-    this->tilePicker = std::unique_ptr<TilePicker>(new TilePicker());
+
 }
 FormationGenerator::~FormationGenerator(){
    

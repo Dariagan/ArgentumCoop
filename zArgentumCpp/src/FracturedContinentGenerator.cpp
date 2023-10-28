@@ -19,10 +19,12 @@ void FracturedContinentGenerator::_bind_methods()
 float FracturedContinentGenerator::get_continental_cutoff()const{return continental_cutoff;}
 void FracturedContinentGenerator::set_continental_cutoff(float cutoff){continental_cutoff = cutoff;} 
 
-void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
-    const Vector2i& origin, const Vector2i& size, const TileSetCase tilePicker, 
+void FracturedContinentGenerator::generate(
+    std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
+    const Vector2i& origin, const Vector2i& size, const TileSelectionSet tileSelectionSet, 
     const signed int seed, const Dictionary& data)
 {
+    //TODO SNAPPEAR EL ORIGIN AL GRID (CON EL % 4)
     this->origin = origin;
     this->size = size;
     {
@@ -77,7 +79,7 @@ void FracturedContinentGenerator::generate(std::vector<std::vector<std::vector<s
         if (beach) data.insert("beach");
         if (tree) data.insert("tree");
 
-        auto tiles = FormationGenerator::tilePicker->getTiles(tilePicker, data, seed);
+        auto tiles = this->tilePicker.getTiles(tileSelectionSet, data, seed);
 
         for(auto tileId: tiles){
             FormationGenerator::placeTile(worldMatrix, origin, Vector2i(i, j), tileId);
