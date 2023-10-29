@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Class" load_steps=3 format=3 uid="uid://b8lgllcsn3y18"]
 
-[ext_resource type="Resource" uid="uid://bm5mlop6d50eo" path="res://resources/beings/uncontrollable/races/pig.tres" id="1_cwgaw"]
+[ext_resource type="Resource" uid="uid://bm5mlop6d50eo" path="res://resources/beings/races/uncontrollable/pig.tres" id="1_cwgaw"]
 [ext_resource type="Script" path="res://scripts/resources/beings/controllable/class.gd" id="1_pwm5g"]
 
 [resource]

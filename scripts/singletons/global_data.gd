@@ -12,14 +12,14 @@ var noclip_speed_mult:float = 100
 var username: String
 
 const item_data_directories: Array[String] = []#["res://resources/things/items/", "res://resources/things/items/wear/body/"]
-const sprites_datas_directories: Array[String] = ["res://resources/beings/controllable/sprites/head/", "res://resources/beings/controllable/sprites/body/", "res://resources/beings/uncontrollable/sprites/body/"]
+const sprites_datas_directories: Array[String] = ["res://resources/beings/sprites/spritesdatas/"]
 const recipes_directories: Array[String] = []
 const building_data_directories: Array[String] = []
-const controllable_races_directories: Array[String] = ["res://resources/beings/controllable/races/"]
-const uncontrollable_races_directories: Array[String] = ["res://resources/beings/uncontrollable/races/"]
-const races_directories = controllable_races_directories + uncontrollable_races_directories
-const classes_directories: Array[String] = ["res://resources/beings/controllable/classes/"]
-const tiles_directories: Array[String] = ["res://resources/world/terrain/", "res://resources/world/buildings/", "res://resources/world/buildings/dungeons/"]
+const controllable_races_directories: Array[String] = ["res://resources/beings/races/controllable/"]
+const uncontrollable_races_directories: Array[String] = ["res://resources/beings/races/uncontrollable/"]
+
+const classes_directories: Array[String] = ["res://resources/beings/classes/"]
+const tiles_directories: Array[String] = ["res://resources/world/terrain/", "res://resources/world/buildings/"]
 const spawnable_scenes_directories: Array[String] = ["res://scenes/world/terrain/", "res://scenes/world/buildings/"]
 
 var item_data: Dictionary
@@ -37,8 +37,6 @@ var classes: Dictionary
 var tiles: Dictionary
 
 var spawnable_scenes: Array[String]
-
-
 
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resources/world/tile_set.tres")
@@ -58,7 +56,7 @@ func _init() -> void:
 	
 	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
-func _index_all_found_resources(directories: Array[String]) -> Dictionary:
+func _index_all_found_resources(directories: Array[String], recursive: bool = true) -> Dictionary:
 	var dir_access: DirAccess
 	var table: Dictionary = {}
 	
@@ -74,15 +72,17 @@ func _index_all_found_resources(directories: Array[String]) -> Dictionary:
 				if !dir_access.current_is_dir():
 					var resource = ResourceLoader.load(directory + file_name)
 			
-					if resource:
+					if resource && "id" in resource:
 						table[resource.id] = resource
-						print("Resource %s at %s loaded" % [file_name, directory])
+						print("Resource %s%s loaded" % [directory, file_name])
 					else:
-						print("File %s at %s couldn't be loaded as a resource" % [file_name, directory])
+						printerr("File %s%s couldn't be loaded as a resource" % [directory, file_name])
+				elif recursive:
+					table.merge(_index_all_found_resources([directory+file_name+"/"]), true)
 					
 				file_name = dir_access.get_next()
 		else:
-			print("Couldn't open directory %s" % [directory])
+			printerr("Couldn't open directory %s" % [directory])
 	
 	return table
 

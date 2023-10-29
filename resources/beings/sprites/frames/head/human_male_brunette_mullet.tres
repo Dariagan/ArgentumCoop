@@ -1,21 +1,21 @@
 [gd_resource type="SpriteFrames" load_steps=6 format=3 uid="uid://bdxi1q8fxxdwi"]
 
-[ext_resource type="Texture2D" uid="uid://dtelupi6gv0la" path="res://assets/textures/beings/controllable/head/human/2.png" id="1_e7k88"]
+[ext_resource type="Texture2D" uid="uid://dtelupi6gv0la" path="res://assets/textures/beings/controllable/head/human/2.png" id="1_83a40"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mf41u"]
-atlas = ExtResource("1_e7k88")
+atlas = ExtResource("1_83a40")
 region = Rect2(0, 0, 17, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_a78fe"]
-atlas = ExtResource("1_e7k88")
+atlas = ExtResource("1_83a40")
 region = Rect2(34, 0, 17, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jarth"]
-atlas = ExtResource("1_e7k88")
+atlas = ExtResource("1_83a40")
 region = Rect2(17, 0, 17, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_uhjno"]
-atlas = ExtResource("1_e7k88")
+atlas = ExtResource("1_83a40")
 region = Rect2(51, 0, 17, 16)
 
 [resource]

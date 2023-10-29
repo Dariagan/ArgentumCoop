@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BodySpriteData" load_steps=3 format=3 uid="uid://cms52k2dbl8ho"]
 
-[ext_resource type="SpriteFrames" uid="uid://d4jut4hh1pme0" path="res://resources/beings/uncontrollable/sprites/body/frames/pig_frames.tres" id="1_jgjwc"]
+[ext_resource type="SpriteFrames" uid="uid://d4jut4hh1pme0" path="res://resources/beings/sprites/frames/body/pig_frames.tres" id="1_jgjwc"]
 [ext_resource type="Script" path="res://scripts/resources/beings/sprites/body_sprite_data.gd" id="1_xuc2u"]
 
 [resource]

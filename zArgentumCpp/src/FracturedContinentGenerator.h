@@ -14,21 +14,27 @@ class FracturedContinentGenerator : public FormationGenerator
 {
     GDCLASS(FracturedContinentGenerator, FormationGenerator)
 
+    struct pair_hash {
+        inline std::size_t operator()(const Vector2i & v) const {
+            return v.x*31+v.y;
+        }
+    };
+
     private:
         Vector2i origin, size;
 
         int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
 
         RandomNumberGenerator rng;    
+        std::unordered_set<Vector2i, pair_hash> treesCoords;
 
         bool isPeninsulerCaved(int i, int j) const;
-        bool isTree(int i, int j) const;
         bool isLake(int i, int j) const;
         bool isContinental(int i, int j) const;
         float getBorderClosenessFactor(int i, int j) const;
         float getContinentness(int i, int j) const;
         float getBeachness(int i, int j) const;
-        void placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix);
+        std::vector<Vector2i> placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix);
             
     protected:
         static void _bind_methods();

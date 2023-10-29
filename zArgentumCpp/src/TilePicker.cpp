@@ -21,8 +21,8 @@ std::vector<std::string> TilePicker::getTiles(
             if (data.count("tree"))
             {
                 //TODO USAR RESOURCELOADER PARA VER LA DATA DE LA TILE EN VEZ DE HACER ESTO
-                //std::string result = "tree_temp_" + std::to_string(rand() % 8);
-                tilesToPlace.push_back("tree_temp");
+                std::string result = "tree_temp_" + std::to_string(rand() % 8);
+                tilesToPlace.push_back(result);
             } 
             if (data.count("continental") && !data.count("peni_caved") && data.count("afc") && data.count("lake"))
             {

@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="ControllableRace" load_steps=5 format=3 uid="uid://p2k16l677mta"]
 
-[ext_resource type="Resource" uid="uid://b8lgllcsn3y18" path="res://resources/beings/controllable/classes/warrior.tres" id="1_8iuop"]
+[ext_resource type="Resource" uid="uid://b8lgllcsn3y18" path="res://resources/beings/classes/melee/warrior.tres" id="1_8iuop"]
 [ext_resource type="Script" path="res://scripts/resources/beings/race/controllable_race.gd" id="1_766p0"]
-[ext_resource type="Resource" uid="uid://br6gqx36f275l" path="res://resources/beings/controllable/sprites/body/human_male_body_1.tres" id="1_tpem5"]
-[ext_resource type="Resource" uid="uid://bsfv14kk64tct" path="res://resources/beings/controllable/sprites/head/human_male_head.tres" id="2_d7k1k"]
+[ext_resource type="Resource" uid="uid://br6gqx36f275l" path="res://resources/beings/sprites/spritesdatas/body/human_male_body_1.tres" id="1_tpem5"]
+[ext_resource type="Resource" uid="uid://bsfv14kk64tct" path="res://resources/beings/sprites/spritesdatas/head/human_male_head.tres" id="2_d7k1k"]
 
 [resource]
 script = ExtResource("1_766p0")

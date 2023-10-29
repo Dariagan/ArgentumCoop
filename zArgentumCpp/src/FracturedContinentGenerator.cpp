@@ -44,12 +44,14 @@ void FracturedContinentGenerator::generate(
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
+    auto dungeons = placeDungeonEntrances(worldMatrix);
+
     for (int i = -size.x/2; i < size.x/2; i++){
     for (int j = -size.y/2; j < size.y/2; j++)
     {   
         bool continental = isContinental(i, j);
 
-        bool peninsulerCaved = peninsuler.get_noise_2d(i, j) < peninsuler_cutoff;
+        bool peninsulerCaved = isPeninsulerCaved(i, j);
         /*
         if(i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
             printf("pc=%d", peninsulerCaved);if (j % 2 == 0) std::cout << "\n"; else std::cout << "||| ";} 
@@ -61,8 +63,26 @@ void FracturedContinentGenerator::generate(
         bool beach = beachness > beachCutoff;
         
         bool lake = isLake(i, j);
+
         
-        bool tree = isTree(i, j);
+        
+        bool tree = false;
+        if(continental && !peninsulerCaved && beachness < beachCutoff - 0.03f && !lake)
+        {
+            bool diceRollSuccessfull = rng.randf_range(0, 4) + forest.get_noise_2d(i, j)*1.5f > 3.3f;
+            
+            if (diceRollSuccessfull && (i % 3 == 0) && (j % 3 == 0))
+            {
+                bool farAwayFromDungeons = true;
+                Vector2 pos(i,j);
+                for (auto dCoord : dungeons){
+                    if (pos.distance_squared_to(dCoord) < 25){
+                        farAwayFromDungeons = false; break;
+                    }
+                }tree = (farAwayFromDungeons == true);
+                
+            }
+        } 
 
         std::unordered_map<std::string, std::string> data;
 
@@ -79,11 +99,7 @@ void FracturedContinentGenerator::generate(
             FormationGenerator::placeTile(worldMatrix, origin, Vector2i(i, j), tileId);
         }
     }}
-
-    placeDungeonEntrances(worldMatrix);
 }
-
-
 
 bool FracturedContinentGenerator::isContinental(int i, int j) const
 {return getContinentness(i, j) > continental_cutoff;}
@@ -125,18 +141,8 @@ bool FracturedContinentGenerator::isPeninsulerCaved(int i, int j) const
     return peninsuler.get_noise_2d(i, j) < peninsuler_cutoff;
 }
 
-bool FracturedContinentGenerator::isTree(int i, int j) const
-{
-    bool tree = false;
-    if(isContinental(i,j) && !isPeninsulerCaved(i, j) && getBeachness(i,j) < beachCutoff - 0.03f && !isLake(i,j))
-    {
-        bool diceRollSuccessfull = ((RandomNumberGenerator)rng).randf_range(0.f,4.f) + forest.get_noise_2d(i, j)*1.5f > 3.3f;
-        tree = diceRollSuccessfull && (i % 3 == 0) && (j % 3 == 0);
-    } 
-    return tree;
-}
 
-bool godot::FracturedContinentGenerator::isLake(int i, int j) const
+bool FracturedContinentGenerator::isLake(int i, int j) const
 {
     return (((smallLaker.get_noise_2d(i, j) + 1)*0.65f) - getBeachness(i, j) > smallLakeCutoff) 
         || (((bigLaker.get_noise_2d(i, j) + 1)*0.65f) - getBeachness(i, j) > bigLakeCutoff);;
@@ -168,7 +174,7 @@ FracturedContinentGenerator::FracturedContinentGenerator()
 FracturedContinentGenerator::~FracturedContinentGenerator(){}
 
 
-void FracturedContinentGenerator::placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix)
+std::vector<Vector2i> FracturedContinentGenerator::placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix)
 {
     int ri, rj, tries = 0;
     
@@ -182,7 +188,6 @@ void FracturedContinentGenerator::placeDungeonEntrances(std::vector<std::vector<
         rj = rng.randi_range(-size.y/2, size.y/2);
         Vector2i newDungeonCoords(ri,rj);
 
-        //TODO lejos de árboles
         if (getContinentness(ri,rj) > continental_cutoff + 0.005 && peninsuler.get_noise_2d(ri,rj) > peninsuler_cutoff + 0.1f && !isLake(ri, rj))//TODO PONER BIEN
         {
             bool farFromDungeons = true;
@@ -209,4 +214,5 @@ void FracturedContinentGenerator::placeDungeonEntrances(std::vector<std::vector<
         if (tries == 1000000)
             UtilityFunctions::printerr("dungeon placement condition unmeetable");
     }
+    return dungeonsCoords;
 }
