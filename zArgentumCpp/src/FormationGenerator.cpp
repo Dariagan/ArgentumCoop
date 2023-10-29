@@ -12,6 +12,7 @@ void FormationGenerator::_bind_methods()
     //TODO BINDEAR generate_pre_check
 }
 
+
 void FormationGenerator::placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
     const Vector2i& origin, const Vector2i& relativeCoords, const std::string& tileId, bool deleteOthers)
 {
@@ -20,17 +21,14 @@ void FormationGenerator::placeTile(std::vector<std::vector<std::vector<std::stri
     auto& tilesAtPos = worldMatrix[absoluteCoords.x][absoluteCoords.y];
 
     if (deleteOthers) tilesAtPos.clear();
-
+    
     tilesAtPos.push_back(tileId);
 }
 
 void FormationGenerator::generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
     const Vector2i& origin, const Vector2i& size, const TileSelectionSet tileSelectionSet, const signed int seed,
-    const Dictionary& data
-    )
-{
-    UtilityFunctions::printerr("Inside FormationGenerator abstract method");
-}
+    const Dictionary& data)
+{UtilityFunctions::printerr("Inside FormationGenerator abstract method");}
 
 FormationGenerator::FormationGenerator(){
 

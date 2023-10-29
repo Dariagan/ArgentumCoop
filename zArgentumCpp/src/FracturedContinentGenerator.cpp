@@ -3,6 +3,7 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+
 #include <unordered_set>
 #include <algorithm>
 #include <string>
@@ -43,33 +44,25 @@ void FracturedContinentGenerator::generate(
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
-    Rect2i rect;
     for (int i = -size.x/2; i < size.x/2; i++){
     for (int j = -size.y/2; j < size.y/2; j++)
     {   
-        float bcf = getBorderClosenessFactor(i, j);
-        float continentness = getContinentness(i, j, bcf);
-        bool continental = continentness > continental_cutoff;
+        bool continental = isContinental(i, j);
+
         bool peninsulerCaved = peninsuler.get_noise_2d(i, j) < peninsuler_cutoff;
         /*
         if(i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
             printf("pc=%d", peninsulerCaved);if (j % 2 == 0) std::cout << "\n"; else std::cout << "||| ";} 
         */
-        bool awayFromCoast = continentness > continental_cutoff + 0.01f && peninsuler.get_noise_2d(i, j) > peninsuler_cutoff + 0.27f;
+        bool awayFromCoast = getContinentness(i, j) > continental_cutoff + 0.01f && peninsuler.get_noise_2d(i, j) > peninsuler_cutoff + 0.27f;
 
-        float beachness = getBeachness(i, j, continentness);
+        float beachness = getBeachness(i, j);
 
         bool beach = beachness > beachCutoff;
         
-        bool lake = (((smallLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > smallLakeCutoff) 
-                    || (((bigLaker.get_noise_2d(i, j) + 1)*0.65f) - beachness > bigLakeCutoff);
+        bool lake = isLake(i, j);
         
-        bool tree = false;
-        if(continental && !peninsulerCaved && beachness < beachCutoff - 0.03f && !lake)
-        {
-            bool diceRollSuccessfull = rng.randf_range(0,4) + forest.get_noise_2d(i, j)*1.5f > 3.3f;
-            tree = diceRollSuccessfull && i % 4 == 0 && j % 4 == 0;
-        } 
+        bool tree = isTree(i, j);
 
         std::unordered_map<std::string, std::string> data;
 
@@ -82,11 +75,18 @@ void FracturedContinentGenerator::generate(
 
         auto tiles = this->tilePicker.getTiles(tileSelectionSet, data, seed);
 
-        for(auto tileId: tiles){
+        for(auto& tileId: tiles){
             FormationGenerator::placeTile(worldMatrix, origin, Vector2i(i, j), tileId);
         }
     }}
+
+    placeDungeonEntrances(worldMatrix);
 }
+
+
+
+bool FracturedContinentGenerator::isContinental(int i, int j) const
+{return getContinentness(i, j) > continental_cutoff;}
 
 float FracturedContinentGenerator::getBorderClosenessFactor(int i, int j) const
 {   /*
@@ -101,7 +101,7 @@ float FracturedContinentGenerator::getBorderClosenessFactor(int i, int j) const
         abs(i - origin.x) / (size.x/2.f), 
         abs(j - origin.y) / (size.y/2.f));
 }
-float FracturedContinentGenerator::getContinentness(int i, int j, float bcf) const
+float FracturedContinentGenerator::getContinentness(int i, int j) const
 {   /*
     if (i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
         printf(", cntness %.3f = %.3f - %.3f, ", 
@@ -109,13 +109,37 @@ float FracturedContinentGenerator::getContinentness(int i, int j, float bcf) con
             (float)continenter.get_noise_2d(i, j), 
             bcf / 4.2f);}
     */
-    return (float)continenter.get_noise_2d(i, j) -  bcf / 4.2f - powf(bcf, 43.f);
+    float bcf = getBorderClosenessFactor(i, j);
+    return continenter.get_noise_2d(i, j) - bcf/4.2f - powf(bcf, 43.f);
 }
-float FracturedContinentGenerator::getBeachness(int i, int j, float continentness) const
+float FracturedContinentGenerator::getBeachness(int i, int j) const
 {
+    float continentness = getContinentness(i, j);
     return std::max(
     0.72f + bigBeacher.get_noise_2d(i, j) / 2.3f - powf(continentness - continental_cutoff, 0.6f), 
     0.8f + smallBeacher.get_noise_2d(i, j) / 2.3f - powf(peninsuler.get_noise_2d(i, j) - peninsuler_cutoff, 0.45f));
+}
+
+bool FracturedContinentGenerator::isPeninsulerCaved(int i, int j) const
+{
+    return peninsuler.get_noise_2d(i, j) < peninsuler_cutoff;
+}
+
+bool FracturedContinentGenerator::isTree(int i, int j) const
+{
+    bool tree = false;
+    if(isContinental(i,j) && !isPeninsulerCaved(i, j) && getBeachness(i,j) < beachCutoff - 0.03f && !isLake(i,j))
+    {
+        bool diceRollSuccessfull = ((RandomNumberGenerator)rng).randf_range(0.f,4.f) + forest.get_noise_2d(i, j)*1.5f > 3.3f;
+        tree = diceRollSuccessfull && (i % 3 == 0) && (j % 3 == 0);
+    } 
+    return tree;
+}
+
+bool godot::FracturedContinentGenerator::isLake(int i, int j) const
+{
+    return (((smallLaker.get_noise_2d(i, j) + 1)*0.65f) - getBeachness(i, j) > smallLakeCutoff) 
+        || (((bigLaker.get_noise_2d(i, j) + 1)*0.65f) - getBeachness(i, j) > bigLakeCutoff);;
 }
 
 FracturedContinentGenerator::FracturedContinentGenerator()
@@ -143,3 +167,46 @@ FracturedContinentGenerator::FracturedContinentGenerator()
 }
 FracturedContinentGenerator::~FracturedContinentGenerator(){}
 
+
+void FracturedContinentGenerator::placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix)
+{
+    int ri, rj, tries = 0;
+    
+    std::vector<Vector2i> dungeonsCoords;
+    float minDistanceMult = 1;
+
+    while (dungeonsCoords.size() < 3)
+    {
+        tries++;
+        ri = rng.randi_range(-size.x/2, size.x/2);
+        rj = rng.randi_range(-size.y/2, size.y/2);
+        Vector2i newDungeonCoords(ri,rj);
+
+        //TODO lejos de árboles
+        if (getContinentness(ri,rj) > continental_cutoff + 0.005 && peninsuler.get_noise_2d(ri,rj) > peninsuler_cutoff + 0.1f && !isLake(ri, rj))//TODO PONER BIEN
+        {
+            bool farFromDungeons = true;
+
+            for (Vector2i& coord : dungeonsCoords)
+            {
+                if (((Vector2)newDungeonCoords).distance_to(coord) <  size.length() * 0.25f * minDistanceMult)
+                {
+                    farFromDungeons = false;
+                    break;
+                }
+            }
+            if (farFromDungeons)
+            {
+                FormationGenerator::placeTile(worldMatrix, origin, newDungeonCoords, "cave_mossy");
+                dungeonsCoords.push_back(newDungeonCoords);
+                UtilityFunctions::print(newDungeonCoords);
+            }
+            else
+            {   
+                minDistanceMult = std::clamp(1500.f / tries, 0.f, 1.f);
+            }
+        }
+        if (tries == 1000000)
+            UtilityFunctions::printerr("dungeon placement condition unmeetable");
+    }
+}

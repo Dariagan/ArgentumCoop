@@ -8,6 +8,8 @@
 
 using namespace godot;
 
+// "afc" significa: away from coast
+
 std::vector<std::string> TilePicker::getTiles(
     const TileSelectionSet tileSelectionSet, std::unordered_map<std::string, std::string> &data, unsigned int seed)
 {
@@ -19,8 +21,8 @@ std::vector<std::string> TilePicker::getTiles(
             if (data.count("tree"))
             {
                 //TODO USAR RESOURCELOADER PARA VER LA DATA DE LA TILE EN VEZ DE HACER ESTO
-                std::string result = "tree_temp_" + std::to_string(rand() % 8);
-                tilesToPlace.push_back(result);
+                //std::string result = "tree_temp_" + std::to_string(rand() % 8);
+                tilesToPlace.push_back("tree_temp");
             } 
             if (data.count("continental") && !data.count("peni_caved") && data.count("afc") && data.count("lake"))
             {
@@ -36,7 +38,7 @@ std::vector<std::string> TilePicker::getTiles(
             }
             else if (data.count("continental") && !data.count("peni_caved"))
             {
-                tilesToPlace.push_back("grass");//+_data.at("variant") el valor de variant se determina en el fracturedCG según un módulo
+                tilesToPlace.push_back("grass");
             }
             return tilesToPlace;
         }break;

@@ -89,7 +89,7 @@ void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& c
             {
                 if (worldMatrix[matrixPos.x][matrixPos.y].size() > 0)
                 {
-                    for (const std::string &TILE_ID : worldMatrix[matrixPos.x][matrixPos.y])
+                    for (const std::string& TILE_ID : worldMatrix[matrixPos.x][matrixPos.y])
                     {					
                         int atlas_position_i = 0;
                         std::regex pattern("(.*)_([0-9]+)$"); std::smatch matches;
@@ -111,24 +111,28 @@ void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& c
                         //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
                         //PONER EL AGUA EN UNA LAYER INFERIOR? 
 
-                        Vector2i atlasPositionV;
+                        //get the atlas origin-position of the tile
+                        Vector2i atlasOriginPosition = ((Vector2i)tileData.at("op"));
+                        /*
                         try{
-                            Array atlasPositions = ((Array)tileData.at("atlas_positions"));
+                            const Array& tileVariants = ((Array&)tileData.at("variants"));
                             //UtilityFunctions::print(atlasPositions, key.c_str());
-                            if (atlasPositions.size() == 0)
+                            if (tileVariants.size() == 0)
                             {
-                                UtilityFunctions::printerr("array of variant tiles atlas origin positions for ", key.c_str()," is empty, defaulting to (0,0)");
-                                atlasPositionV = Vector2i(0,0);
+                                UtilityFunctions::printerr("array of variant tiles atlas origin positions for ", key.c_str()," is empty, defaulting to (0,0) (ArgentumTileMap.cpp::load_tiles_around)");
+                                atlasOriginPosition = Vector2i(0,0);
                             }
-                            else if (atlasPositions.size() > atlas_position_i)
+                            else if (tileVariants.size() > atlas_position_i)
                             {
-                                atlasPositionV = atlasPositions[atlas_position_i];
+                                atlasOriginPosition = tileVariants[atlas_position_i];
                             }
-                            else UtilityFunctions::printerr("atlas i ", atlas_position_i, " out of bounds in ", key.c_str());
+                            else UtilityFunctions::printerr("atlas_pos_i:", atlas_position_i, " out of bounds in ", key.c_str()," (ArgentumTileMap.cpp::load_tiles_around)");
                         }
-                        catch(...){UtilityFunctions::printerr("couldn't get array of variants atlas positions for tile_id \"",TILE_ID.c_str(),"\"");continue;}
+                        catch(...){UtilityFunctions::printerr("couldn't get array of variants atlas positions for tile_id \"",key.c_str(),"\" (ArgentumTileMap.cpp::load_tiles_around)");
+                        continue;}
+                        */
 
-                        Vector2i atlasPositionOffset = Vector2i(0, 0);
+                        Vector2i atlasPositionOffset(0, 0);
 
                         try{
                             Vector2i moduloTilePickingArea = (Vector2i)tileData.at("ma");
@@ -137,17 +141,17 @@ void ArgentumTilemap::load_tiles_around(const Vector2& coords, const Vector2i& c
                                 atlasPositionOffset.x = matrixPos.x % moduloTilePickingArea.x;
                                 atlasPositionOffset.y = matrixPos.y % moduloTilePickingArea.y;
                             }
-                            else UtilityFunctions::printerr("moduloTilePickingArea ",moduloTilePickingArea," not admitted for ",TILE_ID.c_str());
+                            else UtilityFunctions::printerr("moduloTilePickingArea ",moduloTilePickingArea," not admitted for ",key.c_str()," (ArgentumTileMap.cpp::load_tiles_around)");
                         }
-                        catch(...){UtilityFunctions::printerr("couldn't access \"ma\" key for ", TILE_ID.c_str());}
-
+                        catch(...){UtilityFunctions::printerr("couldn't access \"ma\" key for ", key.c_str()," (ArgentumTileMap.cpp::load_tiles_around)");}
+             
                         //hacer q la atlas positionV se mueva según el mod de la global position, dentro de la tile 4x4
                         set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), 
-                                atlasPositionV + atlasPositionOffset, tileData.at("alt_id"));
+                                atlasOriginPosition + atlasPositionOffset, tileData.at("alt_id"));
                     }
                 }else
                 {
-                    //TODO if (matrixpos.x + 1)%4=0 && (matrixpos.y+1)%4=0->  
+                    //TODO (matrixpos.x)%4 && (matrixpos.y)%4->  
                     set_cell(0, tileMapTileCoords, 2, Vector2i(6,0), 0);
                 }                   
                 loadedTiles.insert(tileMapTileCoords);
@@ -173,7 +177,6 @@ void ArgentumTilemap::unloadExcessTiles(const Vector2i& coords)
                     erase_cell(layer_i, tileCoord);
                 }
                 tilesToErase.push_back(tileCoord);
-                
             }			
         }
         for (const Vector2i& tileCoord : tilesToErase){

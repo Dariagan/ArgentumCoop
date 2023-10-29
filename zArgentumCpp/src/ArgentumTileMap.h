@@ -41,8 +41,9 @@ namespace godot {
             void generate_world_matrix(const Vector2i& size);
             void generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, const Vector2i& size, 
                  const TileSelectionSet tileSelectionSet, signed int seed, const Dictionary& data);
-            void unloadExcessTiles(const Vector2i& coords);
+            
             void load_tiles_around(const Vector2& coords, const Vector2i& chunk_size);
+            void unloadExcessTiles(const Vector2i& coords);
     };
 }
 

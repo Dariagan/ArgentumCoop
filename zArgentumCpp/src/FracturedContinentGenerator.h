@@ -20,10 +20,15 @@ class FracturedContinentGenerator : public FormationGenerator
         int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
 
         RandomNumberGenerator rng;    
-        float getBorderClosenessFactor(int i, int j) const;
-        float getContinentness(int i, int j, float bcf) const;
-        float getBeachness(int i, int j, float continentness) const;
 
+        bool isPeninsulerCaved(int i, int j) const;
+        bool isTree(int i, int j) const;
+        bool isLake(int i, int j) const;
+        bool isContinental(int i, int j) const;
+        float getBorderClosenessFactor(int i, int j) const;
+        float getContinentness(int i, int j) const;
+        float getBeachness(int i, int j) const;
+        void placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix);
             
     protected:
         static void _bind_methods();
