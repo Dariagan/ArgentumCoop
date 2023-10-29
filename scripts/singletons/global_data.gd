@@ -4,8 +4,8 @@ var ignore_joiners_readiness_on_start: bool = true
 var insta_start: bool = true
 var debug: bool = true
 var debug_walk_mult:float = 3
-var noclip: bool = false
-var noclip_speed_mult:float = 100
+var noclip: bool = true
+var noclip_speed_mult:float = 600
 
 # PRESIONA F1 PARA IMPRIMIR TU POSICIÓN ACTUAL EN EL TILEMAP POR CONSOLA!
 

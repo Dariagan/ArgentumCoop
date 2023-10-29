@@ -13,7 +13,7 @@ func _process(delta):
 	pass
 
 func generate_world():
-	generate_world_matrix(Vector2i(2000, 2000))
+	generate_world_matrix(Vector2i(4500, 4500))
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	generate_formation(fcg, Vector2i.ZERO, Vector2i(2000,2000), FormationGenerator.TEMPERATE, 0, {})
+	generate_formation(fcg, Vector2i.ZERO, Vector2i(4500,4500), FormationGenerator.TEMPERATE, 1, {})
 	

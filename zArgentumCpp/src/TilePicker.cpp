@@ -24,11 +24,11 @@ std::vector<std::string> TilePicker::getTiles(
                 std::string result = "tree_temp_" + std::to_string(rand() % 8);
                 tilesToPlace.push_back(result);
             } 
-            if (data.count("continental") && !data.count("peni_caved") && data.count("afc") && data.count("lake"))
+            if (data.count("lake"))
             {
                 tilesToPlace.push_back("lake");
             }
-            else if (data.count("continental") && !data.count("peni_caved") && data.count("beach"))
+            else if (data.count("beach"))
             {
                 tilesToPlace.push_back("beach_sand");
             }

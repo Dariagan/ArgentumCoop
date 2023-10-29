@@ -63,6 +63,7 @@ void ArgentumTilemap::set_tiles_data(Dictionary tiles_data)
             tileData.insert({tile_data.keys()[j], tile_data.values()[j]});
         }
         std::string keyAsCppString = ((String)tiles_data.keys()[i]).utf8().get_data();
+        UtilityFunctions::print(keyAsCppString.c_str());
         cppTilesData.insert({keyAsCppString, tileData});                
     }
 };
