@@ -1,7 +1,7 @@
 extends Node
 # PONER EN LA GUI ARRIBA A LA DERECHA DAYS SURVIVED: X, EN FUENTE DIABLESCA
 
-@onready var tile_map = $ArgentumTilemap
+@onready var tile_map = $ArgentumTileMap
 
 @export var being_scene: PackedScene
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner

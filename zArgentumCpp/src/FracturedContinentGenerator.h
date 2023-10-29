@@ -6,7 +6,6 @@
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/fast_noise_lite.hpp>
 #include <godot_cpp/classes/random_number_generator.hpp>
-#include <memory>
 
 namespace godot 
 {

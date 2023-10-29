@@ -10,14 +10,10 @@
 
 namespace godot {
 
-    class ArgentumTilemap : public TileMap{
-        GDCLASS(ArgentumTilemap, TileMap)
+    class ArgentumTileMap : public TileMap{
+        GDCLASS(ArgentumTileMap, TileMap)
 
-        struct pair_hash {
-            inline std::size_t operator()(const Vector2i & v) const {
-                return v.x*31+v.y;
-            }
-        };
+        struct pair_hash {inline std::size_t operator()(const Vector2i & v) const {return v.x*31+v.y;}};
 
         private:
             std::vector<std::vector<std::vector<std::string>>> worldMatrix;
@@ -26,13 +22,12 @@ namespace godot {
             std::unordered_set<Vector2i, pair_hash> loadedTiles;
             std::unordered_map<std::string, std::unordered_map<StringName, Variant>> cppTilesData;
             
-
         protected:
             static void _bind_methods();
 
         public:
-            ArgentumTilemap();
-            ~ArgentumTilemap();
+            ArgentumTileMap();
+            ~ArgentumTileMap();
 
             signed int seed = 0; int get_seed(); void set_seed(signed int seed);
 

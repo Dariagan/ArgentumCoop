@@ -27,7 +27,7 @@ func construct_being_data(data: Dictionary):
 	z_as_relative = false
 	being_data = BeingPersonalData.new(data)
 	
-	var tile_map: ArgentumTilemap = get_parent()
+	var tile_map: ArgentumTileMap = get_parent()
 	
 	load_tiles_around_me.connect(tile_map.load_tiles_around)
 

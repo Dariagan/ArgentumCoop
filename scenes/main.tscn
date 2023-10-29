@@ -9,15 +9,17 @@
 [ext_resource type="PackedScene" uid="uid://bxcw3yocig3he" path="res://scenes/being.tscn" id="5_nor5b"]
 [ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
-[ext_resource type="Script" path="res://scenes/ArgentumTilemap.gd" id="7_itdl2"]
+[ext_resource type="Script" path="res://scenes/ArgentumTileMap.gd" id="7_itdl2"]
 [ext_resource type="TileSet" uid="uid://cnwxuvwhryd5d" path="res://resources/world/tile_set.tres" id="7_os580"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_o47dn"]
-noise_type = 0
-fractal_lacunarity = 3.0
-fractal_gain = 0.7
+frequency = 0.003
+offset = Vector3(0, 1, 0)
+fractal_lacunarity = 2.8
+fractal_gain = 0.51
+fractal_weighted_strength = 0.3
 domain_warp_amplitude = 25.725
 domain_warp_frequency = -0.115
 domain_warp_fractal_type = 0
@@ -34,15 +36,12 @@ character_creation_scene = ExtResource("4_lphit")
 script = ExtResource("5_2eji3")
 being_scene = ExtResource("5_nor5b")
 
-[node name="ArgentumTilemap" type="ArgentumTilemap" parent="Lobby/Game"]
-z_as_relative = false
-y_sort_enabled = true
+[node name="ArgentumTileMap" type="ArgentumTileMap" parent="Lobby/Game"]
 tile_set = ExtResource("7_os580")
 script = ExtResource("7_itdl2")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
-spawn_path = NodePath("../ArgentumTilemap")
 script = ExtResource("6_r3dut")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Lobby/Game"]

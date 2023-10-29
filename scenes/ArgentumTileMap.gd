@@ -1,4 +1,4 @@
-extends ArgentumTilemap
+extends ArgentumTileMap
 
 
 # Called when the node enters the scene tree for the first time.
@@ -15,5 +15,5 @@ func _process(delta):
 func generate_world():
 	generate_world_matrix(Vector2i(4500, 4500))
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	generate_formation(fcg, Vector2i.ZERO, Vector2i(4500,4500), FormationGenerator.TEMPERATE, 1, {})
+	generate_formation(fcg, Vector2i.ZERO, Vector2i(4000,4000), FormationGenerator.TEMPERATE, 0, {})
 	

@@ -15,7 +15,7 @@ void initialize_argentum_cpp(ModuleInitializationLevel p_level)
     if(p_level != MODULE_INITIALIZATION_LEVEL_SCENE){
         return;
     }
-    ClassDB::register_class<ArgentumTilemap>();
+    ClassDB::register_class<ArgentumTileMap>();
     ClassDB::register_abstract_class<FormationGenerator>();
     ClassDB::register_class<FracturedContinentGenerator>();
 }
