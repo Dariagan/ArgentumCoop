@@ -18,7 +18,6 @@ namespace godot {
         private:
             std::vector<std::vector<std::vector<std::string>>> worldMatrix;
             Vector2i worldSize;
-            bool worldGenerated = false;
             std::unordered_set<Vector2i, pair_hash> loadedTiles;
             std::unordered_map<std::string, std::unordered_map<StringName, Variant>> cppTilesData;
             

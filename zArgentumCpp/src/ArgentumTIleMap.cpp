@@ -6,6 +6,7 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <regex>
 #include <string>
+#include <typeinfo>
 
 using namespace godot;
 
@@ -29,14 +30,13 @@ void ArgentumTileMap::_bind_methods()
 
 void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
 {
-    if(!worldGenerated)
+    if(worldMatrix.size() == 0)
     {
         worldMatrix.resize(size.x, std::vector<std::vector<std::string>>(size.y, std::vector<std::string>()));
 
         this->worldSize = size;
-        worldGenerated = true;
     } else{
-        UtilityFunctions::printerr("World matrix was already generated, cannot be resized.");
+        UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
     }
 }
 
@@ -51,8 +51,8 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
         tileData.second.clear();
     cppTilesData.clear();
     
-    for(int i = 0; i < tiles_data.values().size(); i++){
-
+    for(int i = 0; i < tiles_data.values().size(); i++)
+    {
         Ref<Resource> tile = Object::cast_to<Resource>(tiles_data.values()[i]);
         Dictionary tile_data = tile->call("get_data");
 
@@ -70,13 +70,26 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
     const Vector2i& size, const TileSelectionSet tileSelectionSet, signed int seed, const Dictionary& data)
 {
-    if (worldSize.x >= size.x && worldSize.y >= size.y){
+    bool outOfBoundsEast = origin.x + size.x > worldSize.x;
+    bool outOfBoundsSouth = origin.y + size.y > worldSize.y;
+    bool negativeOrigin = origin.x < 0 || origin.y < 0;
+    bool outOfBounds = outOfBoundsEast || outOfBoundsSouth || negativeOrigin;
+
+    if (outOfBounds){
+        UtilityFunctions::printerr("CANCELLED FORMATION: out of bounds in the world matrix. make the world matrix bigger, move the origin, or resize the formation. Reasons:");
+        if(negativeOrigin) UtilityFunctions::printerr("-Negative origin is never allowed for any formation");
+        if(outOfBoundsEast||outOfBoundsSouth){
+            UtilityFunctions::printerr("-Formation starting at:",origin," of size:",size," is out of worldbounds: ");
+            if(outOfBoundsEast) UtilityFunctions::printerr("    -East");
+            if(outOfBoundsSouth) UtilityFunctions::printerr("   -South");
+        }
+    }
+    else
+    {
         formation_generator->generate(worldMatrix, origin, size, tileSelectionSet, seed, data);
         emit_signal("formation_formed");
     }
-    else UtilityFunctions::printerr
-    ("passed formation size is bigger than the world matrix's size, the formation doesn't fit in the world boundaries. (at ArgentumTileMap::generate_formation())");
-}
+ }
 
 void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& chunk_size)
 {    
@@ -85,7 +98,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& c
     for (int i = -chunk_size.x/2; i < chunk_size.x/2; i++) {
     for (int j = -chunk_size.y/2; j < chunk_size.y/2; j++) 
     {
-        const Vector2i matrixPos(worldSize.x/2  + beingCoords.x + i, worldSize.y/2 + beingCoords.y + j);
+        const Vector2i matrixPos(beingCoords.x + i, beingCoords.y + j);
         if (matrixPos.x < worldSize.x && matrixPos.y < worldSize.y && matrixPos.x >= 0 && matrixPos.y >= 0)
         {
             const Vector2i tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
@@ -109,8 +122,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& c
                     try{
                         atlasOriginPosition = ((Vector2i)tileData.at("op"));
                     }
-                    catch(...){UtilityFunctions::printerr("couldn't get atlas origin position for tile_id \"",TILE_ID.c_str(),
-                    "\" (at ArgentumTileMap.cpp::load_tiles_around())");
+                    catch(...){UtilityFunctions::printerr("couldn't get atlas origin position for tile_id \"",TILE_ID.c_str(),"\" (at ArgentumTileMap.cpp::load_tiles_around())");
                     continue;}
 
                     Vector2i atlasPositionOffset(0, 0);
@@ -124,7 +136,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& c
                         }
                         else UtilityFunctions::printerr("non-positive moduloTilePickingArea ",moduloTilePickingArea,"is not admitted. tile_id:",TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");
                     }
-                    catch(...){UtilityFunctions::printerr("couldn't access \"ma\" key for ", TILE_ID.c_str()," (ArgentumTileMap.cpp::load_tiles_around)");}
+                    catch(...){UtilityFunctions::printerr("couldn't access \"ma\" key for ", TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");}
             
                     //hacer q la atlas positionV se mueva según el mod de la global position, dentro de la tile 4x4
                     set_cell(tileData.at("layer"), tileMapTileCoords, tileData.at("source_id"), 

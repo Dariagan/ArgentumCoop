@@ -25,12 +25,11 @@ class FracturedContinentGenerator : public FormationGenerator
         int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
 
         RandomNumberGenerator rng;    
-        std::unordered_set<Vector2i, pair_hash> treesCoords;
-        bool clearOfTrees(int i, int j, int radius = 3, bool checkForward = false) const;
+        std::unordered_set<Vector2i, pair_hash> blockingObjectsCoords;
+        bool clearOfObjects(int i, int j, int radius = 3, bool checkForward = false) const;
         bool isPeninsulerCaved(int i, int j) const;
         bool isLake(int i, int j) const;
         bool isContinental(int i, int j) const;
-        float getBorderClosenessFactor(int i, int j) const;
         float getContinentness(int i, int j) const;
         float getBeachness(int i, int j) const;
         void placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix);

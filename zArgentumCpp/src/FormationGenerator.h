@@ -11,14 +11,17 @@ namespace godot {
     class FormationGenerator : public RefCounted{
         GDCLASS(FormationGenerator, RefCounted)
 
+
         protected:
             static void _bind_methods();
             void placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
-                const Vector2i& origin, const Vector2i& relativeCoords, const std::string& tileId, bool deleteOthers = false);
+                const Vector2i& origin, const Vector2i& tileCoordsRelativeToFormationOrigin, const std::string& tileId, bool deleteOthers = false);
             TilePicker tilePicker;
         public:
             FormationGenerator();
-            ~FormationGenerator();
+            virtual ~FormationGenerator();
+            
+            static float getBorderClosenessFactor(int i, int j, const Vector2i& size);
             
             virtual void generate(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
                 const Vector2i& origin, const Vector2i& size, const TileSelectionSet tileSelectionSet = TEMPERATE, 

@@ -13,7 +13,10 @@ func _process(delta):
 	pass
 
 func generate_world():
-	generate_world_matrix(Vector2i(4500, 4500))
+	#TODO CAMBIAR TODO A COORDENADAS ABSOLUTAS Y HACER Q LA I VAYA DE 0 A SIZE, ES MUCHO MÁS FACIL DE PENSAR. PONER TODO EN ABSOLUTO
+	#NADA EN RELATIVO
+	generate_world_matrix(Vector2i(4000, 4000))
+	
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
 	generate_formation(fcg, Vector2i.ZERO, Vector2i(4000,4000), FormationGenerator.TEMPERATE, 0, {})
-	
+
