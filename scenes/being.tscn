@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dh6xc1ceawroh" path="res://scenes/animated_body_portion.tscn" id="2_7wa3q"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c0jbg"]
-size = Vector2(9.44444, 5.52427)
+size = Vector2(11.7222, 5.52427)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_p46nv"]
 properties/0/path = NodePath(".:position")
@@ -12,7 +12,7 @@ properties/0/spawn = true
 properties/0/replication_mode = 1
 
 [node name="Being" type="CharacterBody2D"]
-z_index = 15
+z_index = 10
 collision_layer = 2
 collision_mask = 15
 slide_on_ceiling = false

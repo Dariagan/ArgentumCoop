@@ -16,7 +16,7 @@ namespace godot {
         struct pair_hash {inline std::size_t operator()(const Vector2i & v) const {return v.x*31+v.y;}};
 
         private:
-            std::vector<std::vector<std::vector<std::string>>> worldMatrix;
+            std::vector<std::vector<std::vector<std::string>>> worldMatrix;//hacer esto un array bidimensional de C predimensionado y usar el Vec2i worldsize como bound?
             Vector2i worldSize;
             std::unordered_set<Vector2i, pair_hash> loadedTiles;
             std::unordered_map<std::string, std::unordered_map<StringName, Variant>> cppTilesData;
@@ -27,6 +27,9 @@ namespace godot {
         public:
             ArgentumTileMap();
             ~ArgentumTileMap();
+            
+            //TODO algún método para escribir en un archivo el estado del mapa actual
+            //TODO algún método para cargar el worldMatrix a partir de un archivo
 
             signed int seed = 0; int get_seed(); void set_seed(signed int seed);
 

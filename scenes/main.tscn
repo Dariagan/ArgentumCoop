@@ -7,10 +7,10 @@
 [ext_resource type="Script" path="res://scripts/game.gd" id="5_2eji3"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 [ext_resource type="PackedScene" uid="uid://bxcw3yocig3he" path="res://scenes/being.tscn" id="5_nor5b"]
+[ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resources/world/tile_set.tres" id="6_67353"]
 [ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
 [ext_resource type="Script" path="res://scenes/ArgentumTileMap.gd" id="7_itdl2"]
-[ext_resource type="TileSet" uid="uid://cnwxuvwhryd5d" path="res://resources/world/tile_set.tres" id="7_os580"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
@@ -37,11 +37,29 @@ script = ExtResource("5_2eji3")
 being_scene = ExtResource("5_nor5b")
 
 [node name="ArgentumTileMap" type="ArgentumTileMap" parent="Lobby/Game"]
-tile_set = ExtResource("7_os580")
+y_sort_enabled = true
+tile_set = ExtResource("6_67353")
+layer_1/name = ""
+layer_1/enabled = true
+layer_1/modulate = Color(1, 1, 1, 1)
+layer_1/y_sort_enabled = false
+layer_1/y_sort_origin = 0
+layer_1/z_index = 5
+layer_1/navigation_enabled = true
+layer_1/tile_data = PackedInt32Array()
+layer_2/name = ""
+layer_2/enabled = true
+layer_2/modulate = Color(1, 1, 1, 1)
+layer_2/y_sort_enabled = true
+layer_2/y_sort_origin = 0
+layer_2/z_index = 10
+layer_2/navigation_enabled = true
+layer_2/tile_data = PackedInt32Array()
 script = ExtResource("7_itdl2")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
+spawn_path = NodePath("../ArgentumTileMap")
 script = ExtResource("6_r3dut")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Lobby/Game"]

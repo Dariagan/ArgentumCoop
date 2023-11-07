@@ -33,7 +33,7 @@ project/assembly_name="ArgentumSurvival"
 
 movie_writer/mjpeg_quality=1.0
 movie_writer/movie_file="/home/stefan/Videos/asd.avi"
-movie_writer/fps=12
+movie_writer/fps=8
 
 [importer_defaults]
 

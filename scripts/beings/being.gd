@@ -144,7 +144,7 @@ func _update_direction_axis_by_input(delta: float) -> void:
 	distance_moved_since_load += distance_moved
 	
 	if distance_moved_since_load > 500:
-		load_tiles_around_me.emit(position, Vector2i(110, 66))
+		load_tiles_around_me.emit(position, Vector2i(130, 80))
 		distance_moved_since_load = 0
 		
 func apply_friction(amount: float, delta: float):

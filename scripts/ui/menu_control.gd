@@ -27,11 +27,11 @@ func _on_main_menu_host_pressed() -> void:
 	lobby_interface.player_clicked_leave.connect(_return_from_lobby_to_menu, CONNECT_ONE_SHOT)
 
 
-func _on_main_menu_join_pressed() -> void:
+func _on_main_menu_join_pressed(ip: String) -> void:
 	
 	lobby_interface = lobby_interface_scene.instantiate()
 	add_child(lobby_interface)
-	lobby_started.emit(lobby_interface, "localhost")
+	lobby_started.emit(lobby_interface, ip)
 	lobby_interface.player_clicked_leave.connect(_return_from_lobby_to_menu, CONNECT_ONE_SHOT)
 	
 
@@ -39,7 +39,7 @@ func _return_from_lobby_to_menu() -> void:
 	lobby_interface.queue_free()
 	main_menu.show()
 	
-func _on_lobby_removed_from_lobby(kicked: bool) -> void:
+func _on_lobby_removed_from_lobby(_kicked: bool) -> void:
 	_return_from_lobby_to_menu()
 # for joiner
 

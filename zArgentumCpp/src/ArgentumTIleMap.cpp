@@ -10,63 +10,6 @@
 
 using namespace godot;
 
-void ArgentumTileMap::_bind_methods()
-{   
-    ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "size", "tile_selection_set", "seed", "data"), &ArgentumTileMap::generate_formation);
-    ClassDB::bind_method(D_METHOD("generate_world_matrix", "size"), &ArgentumTileMap::generate_world_matrix);
-    
-    ClassDB::bind_method(D_METHOD("load_tiles_around", "coords", "chunk_size"), &ArgentumTileMap::load_tiles_around);
-
-    ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ArgentumTileMap::set_seed);
-    ClassDB::bind_method(D_METHOD("get_seed"), &ArgentumTileMap::get_seed);
-    ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
-
-    ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
-    ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
-    ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
-
-    ADD_SIGNAL(MethodInfo("formation_formed"));
-}
-
-void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
-{
-    if(worldMatrix.size() == 0)
-    {
-        worldMatrix.resize(size.x, std::vector<std::vector<std::string>>(size.y, std::vector<std::string>()));
-
-        this->worldSize = size;
-    } else{
-        UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
-    }
-}
-
-int ArgentumTileMap::get_seed(){return seed;}; 
-void ArgentumTileMap::set_seed(signed int seed){this->seed = seed;};
-
-Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
-void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
-{
-    this->tiles_data = tiles_data;
-    for(auto &tileData : cppTilesData)
-        tileData.second.clear();
-    cppTilesData.clear();
-    
-    for(int i = 0; i < tiles_data.values().size(); i++)
-    {
-        Ref<Resource> tile = Object::cast_to<Resource>(tiles_data.values()[i]);
-        Dictionary tile_data = tile->call("get_data");
-
-        std::unordered_map<StringName, Variant> tileData;
-
-        for(int j = 0; j < tile_data.values().size(); j++)
-        {
-            tileData.insert({tile_data.keys()[j], tile_data.values()[j]});
-        }
-        std::string keyAsCppString = ((String)tiles_data.keys()[i]).utf8().get_data();
-        cppTilesData.insert({keyAsCppString, tileData});                
-    }
-};
-
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
     const Vector2i& size, const TileSelectionSet tileSelectionSet, signed int seed, const Dictionary& data)
 {
@@ -89,7 +32,7 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         formation_generator->generate(worldMatrix, origin, size, tileSelectionSet, seed, data);
         emit_signal("formation_formed");
     }
- }
+}
 
 void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& chunk_size)
 {    
@@ -177,6 +120,45 @@ void ArgentumTileMap::unloadExcessTiles(const Vector2i& coords)
     }
 }
 
+void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
+{
+    if(worldMatrix.size() == 0)
+    {
+        worldMatrix.resize(size.x, std::vector<std::vector<std::string>>(size.y, std::vector<std::string>()));
+
+        this->worldSize = size;
+    } else{
+        UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
+    }
+}
+
+int ArgentumTileMap::get_seed(){return seed;}; 
+void ArgentumTileMap::set_seed(signed int seed){this->seed = seed;};
+
+Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
+void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
+{
+    this->tiles_data = tiles_data;
+    for(auto &tileData : cppTilesData)
+        tileData.second.clear();
+    cppTilesData.clear();
+    
+    for(int i = 0; i < tiles_data.values().size(); i++)
+    {
+        Ref<Resource> tile = Object::cast_to<Resource>(tiles_data.values()[i]);
+        Dictionary tile_data = tile->call("get_data");
+
+        std::unordered_map<StringName, Variant> tileData;
+
+        for(int j = 0; j < tile_data.values().size(); j++)
+        {
+            tileData.insert({tile_data.keys()[j], tile_data.values()[j]});
+        }
+        std::string keyAsCppString = ((String)tiles_data.keys()[i]).utf8().get_data();
+        cppTilesData.insert({keyAsCppString, tileData});                
+    }
+};
+
 ArgentumTileMap::ArgentumTileMap()
 {
      
@@ -187,3 +169,20 @@ ArgentumTileMap::~ArgentumTileMap()
     
 }
 
+void ArgentumTileMap::_bind_methods()
+{   
+    ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "size", "tile_selection_set", "seed", "data"), &ArgentumTileMap::generate_formation);
+    ClassDB::bind_method(D_METHOD("generate_world_matrix", "size"), &ArgentumTileMap::generate_world_matrix);
+    
+    ClassDB::bind_method(D_METHOD("load_tiles_around", "coords", "chunk_size"), &ArgentumTileMap::load_tiles_around);
+
+    ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ArgentumTileMap::set_seed);
+    ClassDB::bind_method(D_METHOD("get_seed"), &ArgentumTileMap::get_seed);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
+
+    ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
+    ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
+    ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
+
+    ADD_SIGNAL(MethodInfo("formation_formed"));
+}

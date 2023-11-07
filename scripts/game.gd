@@ -1,7 +1,7 @@
 extends Node
 # PONER EN LA GUI ARRIBA A LA DERECHA DAYS SURVIVED: X, EN FUENTE DIABLESCA
 
-@onready var tile_map = $ArgentumTileMap
+@onready var tile_map: GdTileMap = $ArgentumTileMap
 
 @export var being_scene: PackedScene
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
@@ -12,7 +12,7 @@ func _ready() -> void:
 
 func start_new_game(players_start_data: Array, peers: Array) -> void:
 	generate_world.rpc()
-
+	
 	var i: int = 0
 	for player_start_data in players_start_data:
 		player_start_data = player_start_data as Dictionary
@@ -29,15 +29,16 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 			player_start_data["body"] = "random"
 		
 		player_start_data["faction"] = "player"	
-		printerr()
+
 		var being_spawn_data = BeingSpawnData.new(player_start_data)
 		
 		var being: Being = being_scene.instantiate()
 		being.name = str(peers[i])
-		being.position.x = i*40
-		tile_map.add_child(being)
-		being.construct(being_spawn_data)
+		tile_map.spawn_starting_player(being)
 		
+		
+		being.construct(being_spawn_data)
+		await get_tree().create_timer(0.0001).timeout
 		being.give_control.rpc(peers[i])
 		
 		i+=1
@@ -45,3 +46,6 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 @rpc("call_local")
 func generate_world() -> void:
 	tile_map.generate_world()
+
+
+

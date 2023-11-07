@@ -20,7 +20,7 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     smallBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
     forest.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
     
-    peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.2f; smallLakeCutoff = 0.20f; beachCutoff = 0.8f;
+    peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.33f; smallLakeCutoff = 0.25f; beachCutoff = 0.8f;
 
     continenter.set_fractal_lacunarity(2.8f); continenter.set_fractal_weighted_strength(0.5f);
 
@@ -44,11 +44,11 @@ void FracturedContinentGenerator::generate(
 //hacer un for multiplicativo de la frequency en vez de separar en big y small. aumentar el cutoff. sumarle 1 a la seed en cada iteracion del for
     continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.5f/powf(size.length(), 0.995f));
     bigBeacher.set_frequency(4.3f/powf(size.length(), 0.995f)); smallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
-    bigLaker.set_frequency(37.f/powf(size.length(), 0.995f)); smallLaker.set_frequency(80.f/powf(size.length(), 0.995f));
-    forest.set_frequency(0.9f/powf(size.length(), 0.998f));
+    bigLaker.set_frequency(40.f/powf(size.length(), 0.995f)); smallLaker.set_frequency(80.f/powf(size.length(), 0.995f));
+    forest.set_frequency(1.8f/powf(size.length(), 0.995f));
     //TODO hacer cada frequency ajustable desde gdscript,
 
-    continental_cutoff = 0.6f * powf(size.length() / 1600.f, 0.05f);;
+    continental_cutoff = 0.61f * powf(size.length() / 1600.f, 0.05f);;
     }
 
     while(continenter.get_noise_2dv(origin+size/2) < continental_cutoff + 0.13f){//NO METER EL PENINSULER EN ESTA CONDICIÓN, DESCENTRA LA FORMACIÓN
@@ -56,7 +56,7 @@ void FracturedContinentGenerator::generate(
 // ASÍ QUE, ANTES DE SPAWNEAR AL PLAYER ELEGIR UN PUNTO RANDOM HASTA Q TENGA TIERRA (COMO HAGO CON LOS DUNGEONS) 
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
-
+    // COMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     for (int i = 0; i < size.x; i++){
     for (int j = 0; j < size.y; j++)
     {   
@@ -77,34 +77,36 @@ void FracturedContinentGenerator::generate(
             bool beach = beachness > beachCutoff;
             
             if (beach) data.insert({"beach", ""});
-            else{
+            else
+            {
                 bool awayFromCoast = getContinentness(i, j) > continental_cutoff + 0.01f 
                             && peninsuler.get_noise_2d(i, j) > peninsuler_cutoff + 0.27f;
                 
                 bool lake = isLake(i, j) && awayFromCoast;
 
                 if (lake) data.insert({"lake", ""});
-                else 
+                else if(!beachness < beachCutoff - 0.05f ) 
                 {
                     bool tree = false;
-                    if(!beachness < beachCutoff - 0.05f )
+
+                    // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
+                    bool diceRollSuccessfull = rng.randf_range(0, 4) + forest.get_noise_2d(i, j) * 1.4f > 4.18f;
+                    bool luckyTree = rng.randi_range(0, 1000) == 0;
+
+                    tree = (luckyTree || diceRollSuccessfull) && clearOfObjects(i, j, 3);
+                    if (tree)
                     {
-                            //HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
-                        bool diceRollSuccessfull = rng.randf_range(0, 4) + forest.get_noise_2d(i, j)*1.4f > 4.15f;
-                        bool luckyTree = rng.randi_range(0,900) == 0;
-                        
-                        tree = (luckyTree || diceRollSuccessfull) && clearOfObjects(i, j, 3);
-                        if (tree) {
-                            blockingObjectsCoords.insert(Vector2i(i,j));
-                            data.insert({"tree", ""});
-                        }
-                    } 
+                        blockingObjectsCoords.insert(Vector2i(i, j));
+                        data.insert({"tree", ""});
+                    }
                 }
             }
         }
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
 
         auto tiles = this->tilePicker.getTiles(tileSelectionSet, data, seed);
+//TODO hacer el tilepicker local al generator? se basa en un dictionary pasado desde gdscript (que es un recurso), ese dictionary se transpasa a un hashmap
+//ese hashmap mapea la tile q hay q poner segun el tipo de formacion (ej: small lake->lava, big lake->evilmarsh, bigbeach->dirt, smallbeach->lunarrock)
 
         for(auto& tileId: tiles){
             FormationGenerator::placeTile(worldMatrix, origin, Vector2i(i, j), tileId);
@@ -126,6 +128,7 @@ float FracturedContinentGenerator::getContinentness(int i, int j) const
             bcf / 4.2f);}
     */
     float bcf = FormationGenerator::getBorderClosenessFactor(i, j, size);
+
     return continenter.get_noise_2d(i, j) - bcf/4.2f - powf(bcf, 43.f);
 }
 float FracturedContinentGenerator::getBeachness(int i, int j) const
@@ -145,10 +148,7 @@ bool FracturedContinentGenerator::clearOfObjects(int i, int j, int radius, bool 
 }
 
 bool FracturedContinentGenerator::isPeninsulerCaved(int i, int j) const
-{
-    return peninsuler.get_noise_2d(i, j) < peninsuler_cutoff;
-}
-
+{return peninsuler.get_noise_2d(i, j) < peninsuler_cutoff;}
 
 bool FracturedContinentGenerator::isLake(int i, int j) const
 {

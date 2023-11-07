@@ -32,7 +32,7 @@ func add_chat_message(new_text : String, sender: String) -> void:
 		chat_text_edit.set_caret_column(0)
 		
 		await get_tree().create_timer(0.001).timeout
-		scroll_container.scroll_vertical = scroll_container.get_v_scroll_bar().max_value
+		scroll_container.scroll_vertical = scroll_container.get_v_scroll_bar().max_value as float
 
 func _on_write_msg_box_text_changed() -> void:
 	var new_text : String = chat_text_edit.text

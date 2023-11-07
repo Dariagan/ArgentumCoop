@@ -29,8 +29,10 @@ func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: 
 		_lobby_interface.player_clicked_leave.connect(_leave_as_client, CONNECT_ONE_SHOT)
 		_join(joined_ip)
 
+const PORT: int = 1025 #PORTS BELOW 1024 MAY NOT WORK
+
 func _host() -> void:
-	peer.create_server(135)
+	peer.create_server(PORT)
 	multiplayer.multiplayer_peer = peer
 	multiplayer.peer_connected.connect(_on_player_join)
 	multiplayer.peer_disconnected.connect(_on_player_disconnect)
@@ -39,8 +41,10 @@ func _host() -> void:
 	_characters_spawn_data.push_back({})
 	
 func _join(ip: String) -> void:
-	peer.create_client(ip, 135)
+	peer.create_client(ip, PORT)
+	
 	multiplayer.multiplayer_peer = peer
+
 	#TODO: check if connection is successful
 	
 	
@@ -105,14 +109,13 @@ func _update_players_for_gui() -> void:
 @onready var game: Node = $Game
 
 # when ready is pressed in the GUI
-func _on_player_ready(ready: bool) -> void:
+func _on_player_ready(_ready: bool) -> void:
 	if multiplayer.get_unique_id() != 1:
-		_peer_is_ready.rpc(ready)
+		_peer_is_ready.rpc(_ready)
 		
 	elif GlobalData.ignore_joiners_readiness_on_start or _is_everybody_ready():
 		_on_game_start.rpc()
 		game.start_new_game(_characters_spawn_data, _peers)
-		print(_characters_spawn_data)
 		
 @rpc("call_local")
 func _on_game_start():
@@ -120,11 +123,11 @@ func _on_game_start():
 
 
 @rpc("call_local", "any_peer")
-func _peer_is_ready(ready: bool) -> void:
+func _peer_is_ready(_ready: bool) -> void:
 	var peer_id: int = multiplayer.get_remote_sender_id()
-	if ready and peer_id not in _ready_peers:
+	if _ready and peer_id not in _ready_peers:
 		_ready_peers.push_back(peer_id)
-	elif not ready:
+	elif not _ready:
 		_ready_peers.erase(peer_id)
 	
 func _is_everybody_ready() -> bool:
@@ -158,9 +161,7 @@ func _receive_player_username(username: String) -> void:
 # for requesting a peer's username
 
 
-# ----------------------------------------------------------------------------------
-# ----------------------- character creation synchronization -----------------------
-# ----------------------------------------------------------------------------------
+#region Character creation synchronization
 func _on_name_selected(new_name: String):
 	if new_name: _update_characterization_for_everyone.rpc("name", new_name)
 	else: _update_characterization_for_everyone.rpc("name")
@@ -193,5 +194,6 @@ func _update_characterization_for_everyone(characterization_key: String, value =
 		_characters_spawn_data[sender_i][characterization_key] = value
 	else:
 		_characters_spawn_data[sender_i].erase(characterization_key)
+#endregion
 
 
