@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TileSelection" load_steps=2 format=3 uid="uid://dewua1lavi80"]
+
+[ext_resource type="Script" path="res://scripts/resources/world/tile_selection.gd" id="1_vucnq"]
+
+[resource]
+script = ExtResource("1_vucnq")
+id = &"temperate"
+targets = Array[String](["cont", "ocean", "lake", "beach", "tree"])
+tile_to_place = Array[String](["grass", "ocean_water", "lake_water", "beach_sand", "_temperate_trees"])
+grouped_prob_weighted_tiles = Array[Dictionary]([{}, {}, {}, {}, {
+"tree_temp_0": 10,
+"tree_temp_1": 10,
+"tree_temp_2": 10,
+"tree_temp_3": 10,
+"tree_temp_4": 10,
+"tree_temp_5": 10,
+"tree_temp_6": 10,
+"tree_temp_7": 10
+}])

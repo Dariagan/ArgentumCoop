@@ -2,9 +2,8 @@ extends Resource
 class_name TileSelection
 
 @export var id: StringName
+@export var targets: Array[String] 
+@export var tile_to_place: Array[String] # empezar con _ (underscore) si es un grupo de tiles con probs
+@export var grouped_prob_weighted_tiles: Array[Dictionary]
+#ES MUCHO MÁS FÁCIL EDITAR EL RECURSO DESDE UN TEXT EDITOR SOBRE EL .TRES
 
-@export var tiles: Dictionary
-#key: lake/beach/continental/tree. value: id del tile/id definida abajo del grupo de tiles
-
-@export var grouped_prob_weighted_tiles: Dictionary
-# key = id definida del grupo de tiles agrupadas. value = Array[(tile_id, assigned_weight)]

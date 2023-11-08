@@ -11,8 +11,14 @@
 using namespace godot;
 
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
-    const Vector2i& size, const TileSelectionSet tileSelectionSet, signed int seed, const Dictionary& data)
+    const Vector2i& size, const Ref<Resource>& tileSelectionSet, signed int seed, const Dictionary& data)
 {
+    if (size.x < 0 || size.y < 0)
+    {
+        UtilityFunctions::printerr("Negatively sized formation not allowed");
+        return;
+    }
+
     bool outOfBoundsEast = origin.x + size.x > worldSize.x;
     bool outOfBoundsSouth = origin.y + size.y > worldSize.y;
     bool negativeOrigin = origin.x < 0 || origin.y < 0;
@@ -29,7 +35,7 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
     }
     else
     {
-        formation_generator->generate(worldMatrix, origin, size, tileSelectionSet, seed, data);
+        formation_generator->generate(worldMatrix, MatrixCoords(origin), MatrixCoords(size), tileSelectionSet, seed, data);
         emit_signal("formation_formed");
     }
 }
@@ -44,7 +50,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& c
         const Vector2i matrixPos(beingCoords.x + i, beingCoords.y + j);
         if (matrixPos.x < worldSize.x && matrixPos.y < worldSize.y && matrixPos.x >= 0 && matrixPos.y >= 0)
         {
-            const Vector2i tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
+            const MatrixCoords tileMapTileCoords(beingCoords.x + i, beingCoords.y + j);
             if (loadedTiles.count(tileMapTileCoords) == 0)
             {
                 if (worldMatrix[matrixPos.x][matrixPos.y].size() > 0)
@@ -60,7 +66,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& c
                     //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
                     //PONER EL AGUA EN UNA LAYER INFERIOR? 
 
-                    Vector2i atlasOriginPosition; 
+                    MatrixCoords atlasOriginPosition; 
                         
                     try{
                         atlasOriginPosition = ((Vector2i)tileData.at("op"));
@@ -68,16 +74,16 @@ void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& c
                     catch(...){UtilityFunctions::printerr("couldn't get atlas origin position for tile_id \"",TILE_ID.c_str(),"\" (at ArgentumTileMap.cpp::load_tiles_around())");
                     continue;}
 
-                    Vector2i atlasPositionOffset(0, 0);
+                    MatrixCoords atlasPositionOffset(0, 0);
 
                     try{
-                        Vector2i moduloTilePickingArea = (Vector2i)tileData.at("ma");
-                        if(moduloTilePickingArea.x >= 1 && moduloTilePickingArea.y >= 1)
+                        MatrixCoords moduloTilePickingArea = (Vector2i)tileData.at("ma");
+                        if(moduloTilePickingArea.i >= 1 && moduloTilePickingArea.j >= 1)
                         {
-                            atlasPositionOffset.x = matrixPos.x % moduloTilePickingArea.x;
-                            atlasPositionOffset.y = matrixPos.y % moduloTilePickingArea.y;
+                            atlasPositionOffset.i = matrixPos.x % moduloTilePickingArea.i;
+                            atlasPositionOffset.j = matrixPos.y % moduloTilePickingArea.j;
                         }
-                        else UtilityFunctions::printerr("non-positive moduloTilePickingArea ",moduloTilePickingArea,"is not admitted. tile_id:",TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");
+                        else UtilityFunctions::printerr("non-positive moduloTilePickingArea ",moduloTilePickingArea.c_str(),"is not admitted. tile_id:",TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");
                     }
                     catch(...){UtilityFunctions::printerr("couldn't access \"ma\" key for ", TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");}
             
@@ -96,16 +102,17 @@ void ArgentumTileMap::load_tiles_around(const Vector2& coords, const Vector2i& c
     }}unloadExcessTiles(beingCoords);
 }
 
-void ArgentumTileMap::unloadExcessTiles(const Vector2i& coords)
+//todo hacer en vez de por distancia q se borren las tiles de loadedtiles cuyas coords no esten dentro del cuadrado actual
+void ArgentumTileMap::unloadExcessTiles(const Vector2i& coords)//coords PUEDE SER NEGATIVO, ARREGLAR
 {
     const int MAX_LOADED_TILES = 30000;
 
     if (loadedTiles.size() > MAX_LOADED_TILES)
     {
-        std::vector<Vector2i> tilesToErase;
-        for (const Vector2i& tileCoord : loadedTiles)
+        std::vector<MatrixCoords> tilesToErase;
+        for (const MatrixCoords& tileCoord : loadedTiles)
         {
-            if (((Vector2)tileCoord).distance_squared_to(coords) > 27000)
+            if (tileCoord.distanceSquaredTo(coords) > 27000)
             {
                 for (int layer_i = 0; layer_i < get_layers_count(); layer_i++)
                 {
@@ -114,7 +121,7 @@ void ArgentumTileMap::unloadExcessTiles(const Vector2i& coords)
                 tilesToErase.push_back(tileCoord);
             }			
         }
-        for (const Vector2i& tileCoord : tilesToErase){
+        for (const MatrixCoords& tileCoord : tilesToErase){
             loadedTiles.erase(tileCoord);
         }
     }
@@ -122,6 +129,12 @@ void ArgentumTileMap::unloadExcessTiles(const Vector2i& coords)
 
 void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
 {
+    if (size.x < 0 || size.y < 0)
+    {
+        UtilityFunctions::printerr("Negatively sized world matrix not allowed");
+        return;
+    }
+
     if(worldMatrix.size() == 0)
     {
         worldMatrix.resize(size.x, std::vector<std::vector<std::string>>(size.y, std::vector<std::string>()));
@@ -146,6 +159,7 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
     for(int i = 0; i < tiles_data.values().size(); i++)
     {
         Ref<Resource> tile = Object::cast_to<Resource>(tiles_data.values()[i]);
+
         Dictionary tile_data = tile->call("get_data");
 
         std::unordered_map<StringName, Variant> tileData;
@@ -159,18 +173,13 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
     }
 };
 
-ArgentumTileMap::ArgentumTileMap()
-{
-     
-}
+ArgentumTileMap::ArgentumTileMap(){}
 
-ArgentumTileMap::~ArgentumTileMap()
-{
-    
-}
+ArgentumTileMap::~ArgentumTileMap(){}
 
 void ArgentumTileMap::_bind_methods()
 {   
+    //TODO hacer el tileselector compartible de alguna forma así no hay q hacer las godot calls cada vez q se llame un formation generator?
     ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "size", "tile_selection_set", "seed", "data"), &ArgentumTileMap::generate_formation);
     ClassDB::bind_method(D_METHOD("generate_world_matrix", "size"), &ArgentumTileMap::generate_world_matrix);
     

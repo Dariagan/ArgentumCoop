@@ -13,19 +13,13 @@ class FracturedContinentGenerator : public FormationGenerator
 {
     GDCLASS(FracturedContinentGenerator, FormationGenerator)
 
-    struct pair_hash {
-            inline std::size_t operator()(const Vector2i & v) const {
-                return v.x*31+v.y;
-            }
-        };
-
     private:
-        Vector2i origin, size;
+        MatrixCoords origin, size;
 
-        int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
+        short int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
 
         RandomNumberGenerator rng;    
-        std::unordered_set<Vector2i, pair_hash> blockingObjectsCoords;
+        std::unordered_set<MatrixCoords, MatrixCoords::hash> blockingObjectsCoords;
         bool clearOfObjects(int i, int j, int radius = 3, bool checkForward = false) const;
         bool isPeninsulerCaved(int i, int j) const;
         bool isLake(int i, int j) const;
@@ -42,13 +36,13 @@ class FracturedContinentGenerator : public FormationGenerator
         ~FracturedContinentGenerator();
 
         FastNoiseLite continenter, peninsuler, bigLaker, smallLaker, bigBeacher, smallBeacher, forest;
-        float continental_cutoff, peninsuler_cutoff, bigLakeCutoff, smallLakeCutoff, beachCutoff;
+        float continental_cutoff, peninsuler_cutoff, bigLakeCutoff, smallLakeCutoff, beachCutoff, treeCutoff;
 
         float get_continental_cutoff() const; void set_continental_cutoff(float cutoff);
 
 //en vez de poner optional parameters así, declarar varios métodos overloaded, hacer q el de menos llame al de más, y bindear los dos
         void generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
-            const Vector2i& origin, const Vector2i& size, const TileSelectionSet tileSelectionSet = TEMPERATE,
+            const MatrixCoords& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet,
             const signed int seed = 0, const Dictionary& data = Dictionary()) override;
 };
 }

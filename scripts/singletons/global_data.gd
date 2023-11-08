@@ -1,14 +1,14 @@
 extends Node
 
-#region Debugging
+#region Debugging configuration
 var ignore_joiners_readiness_on_start: bool = true
-var insta_start: bool = false
+var insta_start: bool = true
 var debug: bool = false
 var debug_walk_mult:float = 3
-var noclip: bool = false
+var noclip: bool = true
 var noclip_speed_mult:float = 600
 var default_ip_to_join: String = "localhost"
-#endregion
+#endregion Debugging configuration
 
 # PRESIONA F1 PARA IMPRIMIR TU POSICIÓN ACTUAL EN EL TILEMAP POR CONSOLA!
 
@@ -20,6 +20,7 @@ const recipes_directories: Array[String] = []
 const building_data_directories: Array[String] = []
 const controllable_races_directories: Array[String] = ["res://resources/beings/races/controllable/"]
 const uncontrollable_races_directories: Array[String] = ["res://resources/beings/races/uncontrollable/"]
+const tile_selections_directories: Array[String] =["res://resources/world/tile_selections/"]
 
 const classes_directories: Array[String] = ["res://resources/beings/classes/"]
 const tiles_directories: Array[String] = ["res://resources/world/terrain/", "res://resources/world/buildings/"]
@@ -39,6 +40,8 @@ var classes: Dictionary
 
 var tiles: Dictionary
 
+var tile_selections: Dictionary
+
 var spawnable_scenes: Array[String]
 
 #causa error al descomentar (ya está cargado)
@@ -53,6 +56,8 @@ func _init() -> void:
 	controllable_races = _index_all_found_resources(controllable_races_directories)
 	uncontrollable_races = _index_all_found_resources(uncontrollable_races_directories)
 	races.merge(uncontrollable_races, true); races.merge(controllable_races, true)
+	
+	tile_selections = _index_all_found_resources(tile_selections_directories)
 	
 	classes = _index_all_found_resources(classes_directories)
 	tiles = _index_all_found_resources(tiles_directories)

@@ -12,14 +12,18 @@ func _process(_delta):
 	pass
 
 func generate_world():
-
-	generate_world_matrix(Vector2i(5000, 5000))
+	
+	const WORLD_SIZE: Vector2i = Vector2i(5000, 5000)
+	
+	generate_world_matrix(WORLD_SIZE)
 	
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), FormationGenerator.TEMPERATE, 40, {})
+	generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), GlobalData.tile_selections["temperate"], 0, {})
 		
 	
-	_players_start_position = 2500*Vector2.ONE;
+	_players_start_position = WORLD_SIZE/2
+	#HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
+	# OJO SI APARECE TODO VACÍO PUEDE SER PORQUE EL SPAWN POINT ESTÁ DESPLAZADO
 
 #region Spawning 
 var _players_start_position: Vector2i
