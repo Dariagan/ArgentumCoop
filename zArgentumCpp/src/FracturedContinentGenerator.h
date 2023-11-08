@@ -20,12 +20,12 @@ class FracturedContinentGenerator : public FormationGenerator
 
         RandomNumberGenerator rng;    
         std::unordered_set<MatrixCoords, MatrixCoords::hash> blockingObjectsCoords;
-        bool clearOfObjects(int i, int j, int radius = 3, bool checkForward = false) const;
-        bool isPeninsulerCaved(int i, int j) const;
-        bool isLake(int i, int j) const;
-        bool isContinental(int i, int j) const;
-        float getContinentness(int i, int j) const;
-        float getBeachness(int i, int j) const;
+        bool clearOfObjects(uint16_t i, uint16_t j, uint16_t radius = 3, bool checkForward = false) const;
+        bool isPeninsulerCaved(uint16_t i, uint16_t j) const;
+        bool isLake(uint16_t i, uint16_t j) const;
+        bool isContinental(uint16_t i, uint16_t j) const;
+        float getContinentness(uint16_t i, uint16_t j) const;
+        float getBeachness(uint16_t i, uint16_t j) const;
         void placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix);
             
     protected:
