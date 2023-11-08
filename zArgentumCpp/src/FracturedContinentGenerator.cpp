@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <algorithm>
 #include <string>
+#include <format>
 using namespace godot;
 
 FracturedContinentGenerator::FracturedContinentGenerator()
@@ -64,9 +65,9 @@ void FracturedContinentGenerator::generate(
     for (uint16_t i = 0; i < size.i; i++){
     for (uint16_t j = 0; j < size.j; j++)
     {   
-        bool continental = isContinental(i, j);
+        const bool continental = isContinental(i, j);
 
-        bool peninsulerCaved = isPeninsulerCaved(i, j);
+        const bool peninsulerCaved = isPeninsulerCaved(i, j);
 
         std::array<std::string, 3> targetsToFill;
         unsigned char addedTargets = 0;
@@ -77,16 +78,16 @@ void FracturedContinentGenerator::generate(
             if(i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
                 printf("pc=%d", peninsulerCaved);if (j % 2 == 0) std::cout << "\n"; else std::cout << "||| ";} 
             */
-            float beachness = getBeachness(i, j);
-            bool beach = beachness > beachCutoff;
+            const float beachness = getBeachness(i, j);
+            const bool beach = beachness > beachCutoff;
             
             if (beach) targetsToFill[addedTargets++] = "beach";
             else
             {
-                bool awayFromCoast = getContinentness(i, j) > continental_cutoff + 0.01f 
+                const bool awayFromCoast = getContinentness(i, j) > continental_cutoff + 0.01f 
                             && peninsuler.get_noise_2d(i, j) > peninsuler_cutoff + 0.27f;
                 
-                bool lake = isLake(i, j) && awayFromCoast;
+                const bool lake = isLake(i, j) && awayFromCoast;
 
                 if (lake) targetsToFill[addedTargets++] = "lake";
                 else {
@@ -96,10 +97,10 @@ void FracturedContinentGenerator::generate(
                         bool tree = false;
 
                         // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
-                        bool diceRollSuccessfull = rng.randf_range(0, 4) + forest.get_noise_2d(i, j) * 1.4f > treeCutoff;
-                        bool luckyTree = rng.randi_range(0, 1000) == 0;
+                        const bool GOOD_DICE_ROLL = rng.randf_range(0, 4) + forest.get_noise_2d(i, j) * 1.4f > treeCutoff;
+                        const bool LUCKY_TREE = rng.randi_range(0, 1000) == 0;
 
-                        tree = (luckyTree || diceRollSuccessfull) && clearOfObjects(i, j, 3);
+                        tree = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOfObjects(i, j, 3);
                         if (tree)
                         {
                             blockingObjectsCoords.insert(MatrixCoords(i, j));
@@ -113,16 +114,17 @@ void FracturedContinentGenerator::generate(
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
 
         std::array<std::string, 3> collectedTileIds;
-        for(int l = 0; l < addedTargets; l++)
+        for(unsigned char l = 0; l < addedTargets; l++)
         {
             collectedTileIds[l] = (this->tileSelector->getTileId(targetsToFill[l]));
         }
         
-        for(int l = 0; l < addedTargets; l++){
+        for(unsigned char l = 0; l < addedTargets; l++){
             FormationGenerator::placeTile(worldMatrix, origin, MatrixCoords(i, j), collectedTileIds[l]);
         }
     }}
-    placeDungeonEntrances(worldMatrix); blockingObjectsCoords.clear();
+    placeDungeonEntrances(worldMatrix, 3);
+    blockingObjectsCoords.clear();
 }
 
 
@@ -170,22 +172,20 @@ bool FracturedContinentGenerator::isLake(uint16_t i, uint16_t j) const
 
 // MUST GO AFTER TREES/ROCKS/WHATEVER BLOCKING OBJECTS ARE INSERTED
 void FracturedContinentGenerator::placeDungeonEntrances(
-    std::vector<std::vector<std::vector<std::string>>> & worldMatrix)
+    std::vector<std::vector<std::vector<std::string>>> & worldMatrix, const int DUNGEONS_COUNT)
 {
    //"cave_i"
 
     uint16_t ri, rj;
     
-    uint64_t tries = 0;
+    float tries = 0;
 
-    constexpr unsigned DUNGEON_COUNT = 3;
-
-    std::array<MatrixCoords, DUNGEON_COUNT> dungeonsCoords;
+    std::array<MatrixCoords, 3> dungeonsCoords;
     unsigned char dungeonsI = 0;
 
     float minDistanceMult = 1;
 
-    while (dungeonsI < DUNGEON_COUNT)
+    while (dungeonsI < DUNGEONS_COUNT)
     {
         tries++;
         ri = rng.randi_range(0, size.i);
@@ -208,13 +208,16 @@ void FracturedContinentGenerator::placeDungeonEntrances(
             }
             if (farFromDungeons)
             {
-                FormationGenerator::placeTile(worldMatrix, origin, newDungeonCoords, "cave_mossy");
+                char buffer[9];
+                sprintf(buffer, "cave_%d", dungeonsI);
+                const std::string TILE_ID = this->tileSelector->getTileId(buffer);
+                FormationGenerator::placeTile(worldMatrix, origin, newDungeonCoords, TILE_ID);
                 dungeonsCoords[dungeonsI++] = newDungeonCoords;
                 //UtilityFunctions::print(newDungeonCoords);
             }
             else{minDistanceMult = std::clamp(1500.f / tries, 0.f, 1.f);}
         }
-        if (tries == 1000000){
+        if (tries > 1000000){
             UtilityFunctions::printerr("Dungeon placement condition unmeetable! (FracturedContinentGenerator::placeDungeonEntrances())");
             break;
         }

@@ -26,7 +26,7 @@ class FracturedContinentGenerator : public FormationGenerator
         bool isContinental(uint16_t i, uint16_t j) const;
         float getContinentness(uint16_t i, uint16_t j) const;
         float getBeachness(uint16_t i, uint16_t j) const;
-        void placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix);
+        void placeDungeonEntrances(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, const int DUNGEON_COUNT);
             
     protected:
         static void _bind_methods();

@@ -18,7 +18,8 @@ class TileSelector
     private:
         std::default_random_engine randomEngine;
 
-        std::vector<std::string> targetsToFill;//HACER UN ARRAY DE C PRE-ALOCADO EN EL STACK? (SERÍA MÁS RÁPIDO, AUNQUE, HABRÍA QUE GUARDAR UN MAX_I)
+        std::vector<std::string> targetsToFill; 
+        unsigned char targetsCount;
         std::vector<std::string> tileIdOrDesignationAsGroup;
         std::vector<std::pair<std::vector<std::string>, std::discrete_distribution<int>>> idsDistributionOfGroups;
 

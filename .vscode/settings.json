@@ -61,6 +61,9 @@
         "bitset": "cpp",
         "map": "cpp",
         "regex": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "charconv": "cpp",
+        "format": "cpp",
+        "variant": "cpp"
     }
 }
