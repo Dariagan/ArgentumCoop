@@ -1,12 +1,16 @@
 extends ArgentumTileMap
 class_name GdTileMap
 
-func _ready():
+func _setup_config():
 	self.tiles_data = GlobalData.tiles
+	self.tile_set = preload("res://resources/world/tile_set.tres")
 	add_layer(0);add_layer(1);add_layer(2)
 	set_layer_z_index(2, 10)
 	set_layer_y_sort_enabled(2, true)
 	y_sort_enabled = true
+
+func _ready():
+	_setup_config()
 
 func _process(_delta):
 	pass
@@ -22,10 +26,10 @@ func generate_world():
 		
 	
 	_players_start_position = WORLD_SIZE/2
-	#HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
+	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
 	# OJO SI APARECE TODO VACÍO PUEDE SER PORQUE EL SPAWN POINT ESTÁ DESPLAZADO
 
-#region Spawning 
+#region SPAWNING 
 var _players_start_position: Vector2i
 
 var player_i: int = 0
@@ -38,6 +42,4 @@ func spawn_being_at(being: Being, pos: Vector2i):
 	being.position = map_to_local(pos)
 	being.z_index = 10
 
-
-	
-#endregion
+#endregion SPAWNING

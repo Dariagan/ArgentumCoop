@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="TileSelection" load_steps=2 format=3 uid="uid://dewua1lavi80"]
 
-[ext_resource type="Script" path="res://scripts/resources/world/tile_selection.gd" id="1_vucnq"]
+[ext_resource type="Script" path="res://scripts/resources/world/tile_selection.gd" id="1_bwu3d"]
 
 [resource]
-script = ExtResource("1_vucnq")
+script = ExtResource("1_bwu3d")
 id = &"temperate"
 targets = Array[String](["cont", "ocean", "lake", "beach", "tree", "cave_0", "cave_1", "cave_2"])
 tile_to_place = Array[String](["grass", "ocean_water", "lake_water", "beach_sand", "_temperate_trees", "cave_mossy", "cave_mossy", "cave_mossy"])

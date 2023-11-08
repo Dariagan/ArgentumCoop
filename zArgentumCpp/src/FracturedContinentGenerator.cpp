@@ -35,15 +35,15 @@ FracturedContinentGenerator::FracturedContinentGenerator()
 void FracturedContinentGenerator::generate(
     std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
     const MatrixCoords& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
-    const signed int seed, const Dictionary& data)
+    const unsigned int SEED, const Dictionary& data)
 {
     this->origin = origin; this->size = size;
 
-    this->tileSelector = std::make_unique<TileSelector>(tileSelectionSet, seed);
+    this->tileSelector = std::make_unique<TileSelector>(tileSelectionSet, SEED);
 
     {
-    continenter.set_seed(seed); peninsuler.set_seed(seed+1); bigLaker.set_seed(seed+2); smallLaker.set_seed(seed+3);
-    bigBeacher.set_seed(seed+4); smallBeacher.set_seed(seed+5); rng.set_seed(seed); forest.set_seed(seed + 9);
+    continenter.set_seed(SEED); peninsuler.set_seed(SEED+1); bigLaker.set_seed(SEED+2); smallLaker.set_seed(SEED+3);
+    bigBeacher.set_seed(SEED+4); smallBeacher.set_seed(SEED+5); rng.set_seed(SEED); forest.set_seed(SEED + 9);
     
 //hacer un for multiplicativo de la frequency en vez de separar en big y small. aumentar el cutoff. sumarle 1 a la seed en cada iteracion del for
     continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.5f/powf(size.length(), 0.995f));
@@ -65,43 +65,40 @@ void FracturedContinentGenerator::generate(
     for (uint16_t i = 0; i < size.i; i++){
     for (uint16_t j = 0; j < size.j; j++)
     {   
-        const bool continental = isContinental(i, j);
+        const bool CONTINENTAL = isContinental(i, j);
 
-        const bool peninsulerCaved = isPeninsulerCaved(i, j);
+        const bool PENINSULER_CAVED = isPeninsulerCaved(i, j);
 
         std::array<std::string, 3> targetsToFill;
         unsigned char addedTargets = 0;
 
-        if (continental && !peninsulerCaved)
+        if (CONTINENTAL && !PENINSULER_CAVED)
         {
             /*
             if(i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
                 printf("pc=%d", peninsulerCaved);if (j % 2 == 0) std::cout << "\n"; else std::cout << "||| ";} 
             */
-            const float beachness = getBeachness(i, j);
-            const bool beach = beachness > beachCutoff;
+            const float BEACHNESS = getBeachness(i, j);
+            const bool BEACH = BEACHNESS > beachCutoff;
             
-            if (beach) targetsToFill[addedTargets++] = "beach";
+            if (BEACH) targetsToFill[addedTargets++] = "beach";
             else
             {
-                const bool awayFromCoast = getContinentness(i, j) > continental_cutoff + 0.01f 
-                            && peninsuler.get_noise_2d(i, j) > peninsuler_cutoff + 0.27f;
+                const bool AWAY_FROM_COAST = getContinentness(i, j) > continental_cutoff + 0.01f && peninsuler.get_noise_2d(i, j) > peninsuler_cutoff + 0.27f;
                 
-                const bool lake = isLake(i, j) && awayFromCoast;
+                const bool LAKE = isLake(i, j) && AWAY_FROM_COAST;
 
-                if (lake) targetsToFill[addedTargets++] = "lake";
+                if (LAKE) targetsToFill[addedTargets++] = "lake";
                 else {
                     targetsToFill[addedTargets++] = "cont";
-                    if(!beachness < beachCutoff - 0.05f ) 
+                    if(!BEACHNESS < beachCutoff - 0.05f ) 
                     {
-                        bool tree = false;
-
                         // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
                         const bool GOOD_DICE_ROLL = rng.randf_range(0, 4) + forest.get_noise_2d(i, j) * 1.4f > treeCutoff;
                         const bool LUCKY_TREE = rng.randi_range(0, 1000) == 0;
 
-                        tree = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOfObjects(i, j, 3);
-                        if (tree)
+                        const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOfObjects(i, j, 3);
+                        if (TREE)
                         {
                             blockingObjectsCoords.insert(MatrixCoords(i, j));
                             targetsToFill[addedTargets++] = "tree";
@@ -141,9 +138,9 @@ float FracturedContinentGenerator::getContinentness(uint16_t i, uint16_t j) cons
             (float)continenter.get_noise_2d(i, j), 
             bcf / 4.2f);}
     */
-    float bcf = FormationGenerator::getBorderClosenessFactor(i, j, size);
+    const float BCF = FormationGenerator::getBorderClosenessFactor(i, j, size);
 
-    return continenter.get_noise_2d(i, j) - bcf/4.2f - powf(bcf, 43.f);
+    return continenter.get_noise_2d(i, j) * (1-BCF);
 }
 float FracturedContinentGenerator::getBeachness(uint16_t i, uint16_t j) const
 {

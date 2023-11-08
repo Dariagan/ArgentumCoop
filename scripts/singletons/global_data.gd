@@ -64,7 +64,7 @@ func _init() -> void:
 	
 	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
-func _index_all_found_resources(directories: Array[String], recursive: bool = true) -> Dictionary:
+func _index_all_found_resources(directories: Array[String], check_subfolders: bool = true) -> Dictionary:
 	var dir_access: DirAccess
 	var table: Dictionary = {}
 	
@@ -85,7 +85,7 @@ func _index_all_found_resources(directories: Array[String], recursive: bool = tr
 						print("Resource %s%s loaded" % [directory, file_name])
 					else:
 						printerr("File %s%s couldn't be loaded as a resource" % [directory, file_name])
-				elif recursive:
+				elif check_subfolders:
 					table.merge(_index_all_found_resources([directory+file_name+"/"]), true)
 					
 				file_name = dir_access.get_next()

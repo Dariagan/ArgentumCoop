@@ -30,7 +30,7 @@ namespace godot {
             //TODO algún método para escribir en un archivo el estado del mapa actual
             //TODO algún método para cargar el worldMatrix a partir de un archivo
             
-            signed int seed = 0; int get_seed(); void set_seed(signed int seed);
+            signed int seed = 0; int get_seed(); void set_seed(signed int seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
 
             Dictionary tiles_data; Dictionary get_tiles_data(); void set_tiles_data(Dictionary data);
 

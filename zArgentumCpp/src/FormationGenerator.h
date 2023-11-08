@@ -3,23 +3,21 @@
 #include "TileSelector.cpp"
 #include "MatrixCoords.cpp"
 
-
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <unordered_set>
 #include <unordered_map>
-
-
 #include <memory>
 
-namespace godot {
-
+namespace godot 
+{
     class FormationGenerator : public RefCounted{
         GDCLASS(FormationGenerator, RefCounted)
 
         protected:
             static void _bind_methods();
-            void placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
-                const MatrixCoords& origin, const MatrixCoords& tileCoordsRelativeToFormationOrigin, const std::string& tileId, bool deleteOthers = false);
+            static void placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
+                const MatrixCoords& origin, const MatrixCoords& tileCoordsRelativeToFormationOrigin, 
+                const std::string& tileId, bool deleteOthers = false);
             
             std::unique_ptr<TileSelector> tileSelector;
 
@@ -27,11 +25,11 @@ namespace godot {
             FormationGenerator();
             virtual ~FormationGenerator();
             
-            static float getBorderClosenessFactor(int i, int j, const MatrixCoords& size);
+            static float getBorderClosenessFactor(u_int16_t i, u_int16_t j, const MatrixCoords& SIZE);
             
             virtual void generate(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
                 const MatrixCoords& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
-                const signed int seed = 0, const Dictionary& data = Dictionary());
+                const unsigned int seed = 0, const Dictionary& data = Dictionary());
     };
 }
 

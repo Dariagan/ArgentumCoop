@@ -18,15 +18,18 @@ class TileSelector
     private:
         std::default_random_engine randomEngine;
 
-        std::vector<std::string> targetsToFill; 
-        unsigned char targetsCount;
-        std::vector<std::string> tileIdOrDesignationAsGroup;
-        std::vector<std::pair<std::vector<std::string>, std::discrete_distribution<int>>> idsDistributionOfGroups;
+        static constexpr unsigned char MAX_TARGETS_COUNT = 64;
+        static constexpr unsigned char MAX_GROUPED_TILES_COUNT = 64;
+        const unsigned char TARGETS_COUNT = 0;
+
+        std::array<std::string, MAX_TARGETS_COUNT> targetsToFill; //OJO NO PASARSE
+        std::array<std::string, MAX_TARGETS_COUNT> tileIdOrDesignationAsGroup;
+        std::array<std::pair<std::array<std::string, MAX_GROUPED_TILES_COUNT>, std::discrete_distribution<int>>, MAX_TARGETS_COUNT> idsDistributionOfGroups;
 
     public:
         std::string getTileId(const std::string& TARGET_TO_FILL)
         {
-            for (short unsigned int i = 0; i < targetsToFill.size(); i++)
+            for (short unsigned int i = 0; i < TARGETS_COUNT; i++)
             {
                 if (targetsToFill[i] == TARGET_TO_FILL)
                 {
@@ -49,24 +52,29 @@ class TileSelector
 
         void reseed(unsigned int seed){randomEngine.seed(seed);};
 
-        TileSelector(const Ref<Resource>& gdTileSelection, int seed)
+        TileSelector(const Ref<Resource>& gdTileSelection, int seed) try : TARGETS_COUNT(
+            ((TypedArray<String>)gdTileSelection->get("targets")).size())
         {
             randomEngine.seed(seed);
             TypedArray<String> gd_targets = gdTileSelection->get("targets");
             TypedArray<String> gd_tile_to_place = gdTileSelection->get("tile_to_place");
             TypedArray<Dictionary> gd_grouped_prob_weighted_tiles = gdTileSelection->get("grouped_prob_weighted_tiles");
 
-            const short unsigned int TARGETS_COUNT = gd_targets.size();
+
+            if (TARGETS_COUNT > MAX_TARGETS_COUNT)
+            {
+                UtilityFunctions::printerr("Passed 64 targets limit for tileselector");
+                return;
+            }
+
             if (gd_tile_to_place.size() < TARGETS_COUNT)
             {
                 UtilityFunctions::printerr("TileSelection.tres error");
                 return;
             }
-            
+                        
             for (short unsigned int i = 0; i < TARGETS_COUNT; i++)
             {
-                targetsToFill.resize(TARGETS_COUNT); tileIdOrDesignationAsGroup.resize(TARGETS_COUNT); idsDistributionOfGroups.resize(TARGETS_COUNT);
-
                 std::string targetKeyAsCppString = ((String)(gd_targets[i])).utf8().get_data();
                 targetsToFill[i] = targetKeyAsCppString;
 
@@ -77,7 +85,14 @@ class TileSelector
                 {
                     Dictionary dict = gd_grouped_prob_weighted_tiles[i];
                     const short unsigned int DICT_SIZE = dict.keys().size();
-                    std::vector<std::string> groupTileIds(DICT_SIZE);
+
+                    if (DICT_SIZE > MAX_GROUPED_TILES_COUNT)
+                    {
+                        UtilityFunctions::printerr("error TODO TileSelector.cpp (constructor)");
+                        return;
+                    }
+
+                    std::array<std::string, MAX_GROUPED_TILES_COUNT> groupTileIds;
                     std::vector<int> groupTileIdsProbabilities(DICT_SIZE);
                     for (short unsigned int j = 0; j < DICT_SIZE; j++)
                     {
@@ -87,11 +102,13 @@ class TileSelector
                         groupTileIdsProbabilities[j] = (int)dict.values()[j];
                     }
                     
-                    auto groupDistribution = std::discrete_distribution<int>(groupTileIdsProbabilities.begin(), groupTileIdsProbabilities.end());
+                    const auto GROUP_P_DISTRIBUTION = std::discrete_distribution<int>(groupTileIdsProbabilities.begin(), groupTileIdsProbabilities.end());
 
-                    idsDistributionOfGroups[i] = std::make_pair(groupTileIds, groupDistribution);
+                    idsDistributionOfGroups[i] = std::make_pair(groupTileIds, GROUP_P_DISTRIBUTION);
                 }
             }  
+        } catch (const std::exception& e) {
+            UtilityFunctions::printerr("An exception occurred (TileSelector): ", e.what());
         }
         ~TileSelector(){};
     };
