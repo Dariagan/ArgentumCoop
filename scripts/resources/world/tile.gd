@@ -8,7 +8,7 @@ class_name Tile
 @export var origin_position:Vector2i = Vector2i.ZERO
 #borrar la linea de arriba desp
 
-@export var modulo_tile_picking_area: Vector2i = Vector2i(1, 1)# 4,4 for grass tiles
+@export var modulo_tiling_area: Vector2i = Vector2i(1, 1)
 @export var alt_id: int
 
 
@@ -19,7 +19,7 @@ func get_data() -> Dictionary:
 		"layer" = layer, 
 		"source_id" = source_id,
 		"op" = origin_position,
-		"ma" = modulo_tile_picking_area,
+		"ma" = modulo_tiling_area,
 		"alt_id" = alt_id
 		}
 

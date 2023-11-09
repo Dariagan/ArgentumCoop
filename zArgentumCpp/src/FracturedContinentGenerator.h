@@ -14,9 +14,10 @@ class FracturedContinentGenerator : public FormationGenerator
     GDCLASS(FracturedContinentGenerator, FormationGenerator)
 
     private:
-        MatrixCoords origin, size;
+        Vector2i origin;
+        MatrixCoords size;
 
-        short int DEBUG_RANGE_MIN, DEBUG_RANGE_MAX; 
+        static constexpr short int DEBUG_RANGE_MAX = 50, DEBUG_RANGE_MIN = -DEBUG_RANGE_MAX; 
 
         RandomNumberGenerator rng;    
         std::unordered_set<MatrixCoords, MatrixCoords::hash> blockingObjectsCoords;
@@ -42,7 +43,7 @@ class FracturedContinentGenerator : public FormationGenerator
 
 //en vez de poner optional parameters así, declarar varios métodos overloaded, hacer q el de menos llame al de más, y bindear los dos
         void generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
-            const MatrixCoords& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet,
+            const Vector2i& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet,
             const unsigned int seed = 0, const Dictionary& data = Dictionary()) override;
 };
 }

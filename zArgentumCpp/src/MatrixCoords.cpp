@@ -6,7 +6,9 @@
 #include <cstdio>
 #include <algorithm>
 #include <climits>
+#include "SafeVector.cpp"
 
+namespace godot{
 // Small Unsigned Vector (cannot be negative)
 //TODO EXPORTAR A GODOT
 struct MatrixCoords
@@ -19,11 +21,8 @@ struct MatrixCoords
 
     MatrixCoords(const godot::Vector2i& vector2i) 
     {
-        if (vector2i.x < 0 || vector2i.y < 0)
-        {
-            godot::UtilityFunctions::printerr("negative Vector2i(",vector2i.x,",",vector2i.y,") passed to MatrixCoords constructor");
-        }
-        i = vector2i.x; j = vector2i.y;
+        i = std::min(std::max(vector2i.x, 0), USHRT_MAX); 
+        j = std::min(std::max(vector2i.y, 0), USHRT_MAX);
     }
 
     bool operator==(const MatrixCoords &oMatrixCoords) const
@@ -44,12 +43,13 @@ struct MatrixCoords
 
     operator godot::Vector2i() const {return godot::Vector2i(i, j);}
     operator godot::Vector2() const {return godot::Vector2(i, j);}
+    operator godot::SafeVec() const {return godot::SafeVec(i, j);}
 
     MatrixCoords operator+(const MatrixCoords &oMatrixCoords) const
     {return MatrixCoords(i + oMatrixCoords.i, j + oMatrixCoords.j);}
     //DANGEROUS
     //MatrixCoords operator-(const MatrixCoords &oMatrixCoords) const 
-    //{return MatrixCoords(x - oMatrixCoords.x, y - oMatrixCoords.y);}
+    //{return MatrixCoords(x - oMatrixCoords.x, j - oMatrixCoords.j);}
     MatrixCoords operator*(const MatrixCoords &oMatrixCoords) const
     {return MatrixCoords(i * oMatrixCoords.i, j * oMatrixCoords.j);}
     MatrixCoords operator/(const MatrixCoords &oMatrixCoords) const
@@ -84,5 +84,5 @@ struct MatrixCoords
         {return vec.i*31 + vec.j ;}
     };
 };
-
+}
 #endif

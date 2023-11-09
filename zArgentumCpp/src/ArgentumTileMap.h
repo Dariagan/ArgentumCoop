@@ -17,9 +17,12 @@ namespace godot {
         private:
             std::vector<std::vector<std::vector<std::string>>> worldMatrix;//hacer esto un array bidimensional de C predimensionado y usar el Vec2i worldsize como bound?
             Vector2i worldSize;
-            std::unordered_set<MatrixCoords, MatrixCoords::hash> loadedTiles;//FIXME
+            std::unordered_set<Vector2i, MatrixCoords::hash> loadedTiles;//compartido por todos los beings del world activos en esta pc
             std::unordered_map<std::string, std::unordered_map<StringName, Variant>> cppTilesData;
-            
+            static bool withinChunkBounds(const Vector2i &LOADED_COORD_TO_CHECK, const Vector2i &TL_CORNER, const MatrixCoords &CHUNK_SIZE);
+
+            bool setCell(const std::string& TILE_ID, const Vector2i& coords);
+
         protected:
             static void _bind_methods();
 
@@ -39,7 +42,7 @@ namespace godot {
                  const Ref<Resource>& tileSelectionSet, signed int seed, const Dictionary& data);
             
             void load_tiles_around(const Vector2& coords, const Vector2i& chunk_size);
-            void unloadExcessTiles(const Vector2i& coords);
+            void unloadExcessTiles(const Vector2i& topLeftCornerCoords, const MatrixCoords& CHUNK_SIZE);
     };
 }
 

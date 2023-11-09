@@ -8,5 +8,5 @@ id = &"tree_temp_0"
 layer = 2
 source_id = 4
 origin_position = Vector2i(0, 3)
-modulo_tile_picking_area = Vector2i(1, 1)
+modulo_tiling_area = Vector2i(1, 1)
 alt_id = 0

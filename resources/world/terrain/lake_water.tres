@@ -8,5 +8,5 @@ id = &"lake_water"
 layer = 0
 source_id = 2
 origin_position = Vector2i(8, 0)
-modulo_tile_picking_area = Vector2i(4, 4)
+modulo_tiling_area = Vector2i(4, 4)
 alt_id = 0

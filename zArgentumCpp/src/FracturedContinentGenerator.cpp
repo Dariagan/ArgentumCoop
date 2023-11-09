@@ -10,7 +10,6 @@ using namespace godot;
 
 FracturedContinentGenerator::FracturedContinentGenerator()
 {
-    DEBUG_RANGE_MIN = -50; DEBUG_RANGE_MAX = DEBUG_RANGE_MIN + 100;
     continenter.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
 
     peninsuler.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
@@ -34,7 +33,7 @@ FracturedContinentGenerator::FracturedContinentGenerator()
 
 void FracturedContinentGenerator::generate(
     std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
-    const MatrixCoords& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
+    const Vector2i& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
     const unsigned int SEED, const Dictionary& data)
 {
     this->origin = origin; this->size = size;
@@ -70,7 +69,7 @@ void FracturedContinentGenerator::generate(
         const bool PENINSULER_CAVED = isPeninsulerCaved(i, j);
 
         std::array<std::string, 3> targetsToFill;
-        unsigned char addedTargets = 0;
+        unsigned char addedTargetsCount = 0;
 
         if (CONTINENTAL && !PENINSULER_CAVED)
         {
@@ -81,16 +80,16 @@ void FracturedContinentGenerator::generate(
             const float BEACHNESS = getBeachness(i, j);
             const bool BEACH = BEACHNESS > beachCutoff;
             
-            if (BEACH) targetsToFill[addedTargets++] = "beach";
+            if (BEACH) targetsToFill[addedTargetsCount++] = "beach";
             else
             {
                 const bool AWAY_FROM_COAST = getContinentness(i, j) > continental_cutoff + 0.01f && peninsuler.get_noise_2d(i, j) > peninsuler_cutoff + 0.27f;
                 
                 const bool LAKE = isLake(i, j) && AWAY_FROM_COAST;
 
-                if (LAKE) targetsToFill[addedTargets++] = "lake";
+                if (LAKE) targetsToFill[addedTargetsCount++] = "lake";
                 else {
-                    targetsToFill[addedTargets++] = "cont";
+                    targetsToFill[addedTargetsCount++] = "cont";
                     if(!BEACHNESS < beachCutoff - 0.05f ) 
                     {
                         // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
@@ -101,30 +100,24 @@ void FracturedContinentGenerator::generate(
                         if (TREE)
                         {
                             blockingObjectsCoords.insert(MatrixCoords(i, j));
-                            targetsToFill[addedTargets++] = "tree";
+                            targetsToFill[addedTargetsCount++] = "tree";
                         }
                     }
                 }
             }
-        } else targetsToFill[addedTargets++] = "ocean";
+        } else targetsToFill[addedTargetsCount++] = "ocean";
 
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
-
-        std::array<std::string, 3> collectedTileIds;
-        for(unsigned char l = 0; l < addedTargets; l++)
+        for(unsigned char k = 0; k < addedTargetsCount; k++)
         {
-            collectedTileIds[l] = (this->tileSelector->getTileId(targetsToFill[l]));
+            const std::string tileId = this->tileSelector->getTileId(targetsToFill[k]);
+            FormationGenerator::placeTile(worldMatrix, origin, MatrixCoords(i, j), tileId);
         }
         
-        for(unsigned char l = 0; l < addedTargets; l++){
-            FormationGenerator::placeTile(worldMatrix, origin, MatrixCoords(i, j), collectedTileIds[l]);
-        }
     }}
     placeDungeonEntrances(worldMatrix, 3);
     blockingObjectsCoords.clear();
 }
-
-
 
 bool FracturedContinentGenerator::isContinental(uint16_t i, uint16_t j) const
 {return getContinentness(i, j) > continental_cutoff;}
@@ -133,10 +126,10 @@ bool FracturedContinentGenerator::isContinental(uint16_t i, uint16_t j) const
 float FracturedContinentGenerator::getContinentness(uint16_t i, uint16_t j) const
 {   /*
     if (i > DEBUG_RANGE_MIN && i < DEBUG_RANGE_MAX && j > DEBUG_RANGE_MIN && j < DEBUG_RANGE_MAX){
-        printf(", cntness %.3f = %.3f - %.3f, ", 
-            continenter.get_noise_2d(i, j) - bcf / 4.2f, 
+        printf(", cntness %.3f = %.3f * %.3f, ", 
+            continenter.get_noise_2d(i, j) * (1 - BCF), 
             (float)continenter.get_noise_2d(i, j), 
-            bcf / 4.2f);}
+            (1 - BCF));}
     */
     const float BCF = FormationGenerator::getBorderClosenessFactor(i, j, size);
 
@@ -171,8 +164,6 @@ bool FracturedContinentGenerator::isLake(uint16_t i, uint16_t j) const
 void FracturedContinentGenerator::placeDungeonEntrances(
     std::vector<std::vector<std::vector<std::string>>> & worldMatrix, const int DUNGEONS_COUNT)
 {
-   //"cave_i"
-
     uint16_t ri, rj;
     
     float tries = 0;

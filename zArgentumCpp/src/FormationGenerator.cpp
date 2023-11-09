@@ -14,19 +14,17 @@ void FormationGenerator::_bind_methods()
 
 
 void FormationGenerator::placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
-    const MatrixCoords& origin, const MatrixCoords& coordsRelativeToFormationOrigin, 
+    const Vector2i& origin, const MatrixCoords& coordsRelativeToFormationOrigin, 
     const std::string& tileId, bool deleteOthers)
+{try
 {
-    const MatrixCoords ABSOLUTE_COORDS = origin + coordsRelativeToFormationOrigin;
-    
-    auto& tilesAtPos = worldMatrix[ABSOLUTE_COORDS.i][ABSOLUTE_COORDS.j];
-
+    const Vector2i ABSOLUTE_COORDS = origin + coordsRelativeToFormationOrigin;
+    auto& tilesAtPos = worldMatrix.at(ABSOLUTE_COORDS.x).at(ABSOLUTE_COORDS.y);
     if (deleteOthers) tilesAtPos.clear();
-    
     tilesAtPos.push_back(tileId);
 }
-
-
+catch(const std::exception& e){UtilityFunctions::printerr("FormationGenerator::placeTile() exception: ", e.what());}  
+}
 
 // el problema de esta función lineal es que te sesga las montañas según la continentness hacia el centro de la formación
 // tal vez es mejor ajustar esta: (nota sin usar un array, y sumarle la mitad del size a la i y a la j) 
@@ -41,10 +39,8 @@ float FormationGenerator::getBorderClosenessFactor(u_int16_t i, u_int16_t j, con
     return std::max(powf(I_BORDER_CLOSENESS, POW), powf(J_BORDER_CLOSENESS, POW));
 }
 
-
-
 void FormationGenerator::generate(std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
-    const MatrixCoords& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionMapping, const unsigned int seed,
+    const Vector2i& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionMapping, const unsigned int seed,
     const Dictionary& data)
 {UtilityFunctions::printerr("Inside FormationGenerator abstract method");}
 

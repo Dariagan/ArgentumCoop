@@ -3,10 +3,10 @@ extends Node
 #region Debugging configuration
 var ignore_joiners_readiness_on_start: bool = true
 var insta_start: bool = true
-var debug: bool = false
-var debug_walk_mult:float = 3
-var noclip: bool = true
-var noclip_speed_mult:float = 600
+@export var debug: bool = true
+@export var debug_walk_mult:float = 3
+@export var noclip: bool = true
+@export var noclip_speed_mult:float = 600
 var default_ip_to_join: String = "localhost"
 #endregion Debugging configuration
 
