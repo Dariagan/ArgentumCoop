@@ -5,25 +5,53 @@
 
 using namespace godot;
 
-void FormationGenerator::_bind_methods()
-{
-
-
-    //TODO BINDEAR generate_pre_check
-}
-
-
-void FormationGenerator::placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
-    const Vector2i& origin, const MatrixCoords& coordsRelativeToFormationOrigin, 
-    const std::string& tileId, bool deleteOthers)
+//esta spawnweightsmatrix debería ser 1/16 del size de la world matrix. para el chunk en una cierta pos, se elije alguno de estos puntos y se elige un punto al azar entre (px<->16, py<->16) de alguna tile q sea del mismo tipo
+void FormationGenerator::placeSpawnWeight(std::vector<std::vector<std::vector<std::string>>>& spawnWeightsMatrix, 
+    const SafeVec& origin, const MatrixCoords& coordsRelativeToFormationOrigin, 
+    const std::string& pawnDefId, const bool deleteOtherWeights)
 {try
 {
-    const Vector2i ABSOLUTE_COORDS = origin + coordsRelativeToFormationOrigin;
-    auto& tilesAtPos = worldMatrix.at(ABSOLUTE_COORDS.x).at(ABSOLUTE_COORDS.y);
-    if (deleteOthers) tilesAtPos.clear();
-    tilesAtPos.push_back(tileId);
+    const SafeVec ABSOLUTE_COORDS = origin + coordsRelativeToFormationOrigin;
+    auto& spawnWeightsAtPos = spawnWeightsMatrix.at(ABSOLUTE_COORDS.lef).at(ABSOLUTE_COORDS.RIGHT);
+    if (deleteOtherWeights) 
+        spawnWeightsAtPos.clear();
+    spawnWeightsAtPos.push_back(pawnDefId);
+}catch(const std::exception& e){UtilityFunctions::printerr("FormationGenerator.cpp::placeSpawnWeight() exception: ", e.what());}  
 }
-catch(const std::exception& e){UtilityFunctions::printerr("FormationGenerator::placeTile() exception: ", e.what());}  
+
+void FormationGenerator::placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
+    const SafeVec& origin, const MatrixCoords& coordsRelativeToFormationOrigin, 
+    const std::string& tileId, const bool deleteBeingsAndTiles)
+{try
+{
+    const SafeVec ABSOLUTE_COORDS = origin + coordsRelativeToFormationOrigin;
+    auto& thingsAtPos = worldMatrix.at(ABSOLUTE_COORDS.lef).at(ABSOLUTE_COORDS.RIGHT);
+    if (deleteBeingsAndTiles) 
+        thingsAtPos.clear();
+    thingsAtPos.push_back(tileId);
+}catch(const std::exception& e){UtilityFunctions::printerr("FormationGenerator.cpp::placeTile() exception: ", e.what());}  
+}
+
+void FormationGenerator::placeBeing(
+    const SafeVec &origin, std::vector<std::vector<std::vector<std::string>>> &worldMatrix,
+    const MatrixCoords &coordsRelativeToFormationOrigin, const std::string &beingId)
+{try
+{
+    const SafeVec ABSOLUTE_COORDS = origin + coordsRelativeToFormationOrigin;
+    
+    auto& thingsAtPos = worldMatrix.at(ABSOLUTE_COORDS.lef).at(ABSOLUTE_COORDS.RIGHT);
+    
+    for (char i = 0; i < thingsAtPos.size(); i++)
+    {
+        if (thingsAtPos.at(i).at(0) == '%')
+        {
+            thingsAtPos.erase(thingsAtPos.begin()+i);
+            break;
+        }
+    }
+    thingsAtPos.push_back("%" + beingId);
+
+}catch(const std::exception& e){UtilityFunctions::printerr("FormationGenerator.cpp::placeBeing() exception: ", e.what());}  
 }
 
 // el problema de esta función lineal es que te sesga las montañas según la continentness hacia el centro de la formación
@@ -53,3 +81,8 @@ FormationGenerator::~FormationGenerator(){
 
 
 
+void FormationGenerator::_bind_methods()
+{
+
+
+}

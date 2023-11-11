@@ -58,8 +58,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
                         {
                             setCell(ID, sTileMapCoords);
                         }
-                        
-                        
+                                           
                     }
                 else
                     {setCell("ocean_water", sTileMapCoords);}   
@@ -69,13 +68,13 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
             catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap::load_tiles_around() exception:", e.what());}
         }
     }}
-    const Vector2i topLeftCornerCoords = beingCoords - MatrixCoords(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
+    const SafeVec topLeftCornerCoords = beingCoords - MatrixCoords(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
 
     unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE);
 }
 
 //todo hacer en vez de por distancia q se borren las tiles de loadedtiles cuyas coords no esten dentro del cuadrado actual
-void ArgentumTileMap::unloadExcessTiles(const Vector2i& topLeftCornerCoords, const MatrixCoords& CHUNK_SIZE)//coords PUEDE SER NEGATIVO, ARREGLAR
+void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const MatrixCoords& CHUNK_SIZE)//coords PUEDE SER NEGATIVO, ARREGLAR
 {
     std::vector<Vector2i> tilesToErase;//HACER ARRAY?
     for (const Vector2i& tileCoord : loadedTiles)

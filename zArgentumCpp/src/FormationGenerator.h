@@ -16,12 +16,11 @@ namespace godot
         protected:
             static void _bind_methods();
             static void placeTile(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
-                const Vector2i& origin, const MatrixCoords& tileCoordsRelativeToFormationOrigin, 
+                const SafeVec& origin, const MatrixCoords& tileCoordsRelativeToFormationOrigin, 
                 const std::string& tileId, bool deleteOthers = false);
 
-            static void placeBeing(std::vector<std::vector<std::vector<std::string>>>& worldMatrix, 
-                const Vector2i& origin, const MatrixCoords& tileCoordsRelativeToFormationOrigin, 
-                const std::string& beingId);
+            static void placeBeing(const SafeVec &origin, std::vector<std::vector<std::vector<std::string>>> &worldMatrix,
+                const MatrixCoords &coordsRelativeToFormationOrigin, const std::string &beingId);
             
             std::unique_ptr<TileSelector> tileSelector;
 

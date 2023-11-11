@@ -31,6 +31,8 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     forest.set_fractal_lacunarity(3); forest.set_fractal_gain(0.77);
 }
 
+//definir spawn points para bosses?
+//es alpedo definir spawn points para mobs basados en condiciones específicas porq se mueven solos
 void FracturedContinentGenerator::generate(
     std::vector<std::vector<std::vector<std::string>>> & worldMatrix, 
     const Vector2i& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
@@ -164,20 +166,16 @@ bool FracturedContinentGenerator::isLake(uint16_t i, uint16_t j) const
 void FracturedContinentGenerator::placeDungeonEntrances(
     std::vector<std::vector<std::vector<std::string>>> & worldMatrix, const int DUNGEONS_COUNT)
 {
-    uint16_t ri, rj;
-    
-    float tries = 0;
-
     std::array<MatrixCoords, 3> dungeonsCoords;
     unsigned char dungeonsI = 0;
 
     float minDistanceMult = 1;
-
+    float tries = 0;
     while (dungeonsI < DUNGEONS_COUNT)
     {
         tries++;
-        ri = rng.randi_range(0, size.i);
-        rj = rng.randi_range(0, size.j);
+        const uint16_t ri = rng.randi_range(0, size.i);
+        const uint16_t rj = rng.randi_range(0, size.j);
         const MatrixCoords newDungeonCoords(ri,rj);
 
         if (getContinentness(ri,rj) > continental_cutoff + 0.005 

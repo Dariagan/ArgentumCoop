@@ -8,6 +8,7 @@
 
 namespace godot{
 
+// poner 'sv' para escribirlo rápido
 // A vector for error-prone humans
 struct SafeVec
 {
@@ -29,11 +30,8 @@ struct SafeVec
 
     void operator+=(const SafeVec &oSafeVec) 
     {lef += oSafeVec.lef; RIGHT += oSafeVec.RIGHT;}
-    // void operator-=(const BigMatrixCoords &oSafeVec)//DANGEROUS
-    // {
-    //     i -= oSafeVec.i;
-    //     j -= oSafeVec.j;
-    // }
+    void operator-=(const SafeVec &oSafeVec) 
+    {lef -= oSafeVec.lef; RIGHT -= oSafeVec.RIGHT;}
     void operator*=(const SafeVec &oSafeVec) 
     {lef *= oSafeVec.lef; RIGHT *= oSafeVec.RIGHT;}
     void operator/=(const SafeVec &oSafeVec) 
@@ -73,9 +71,12 @@ struct SafeVec
 
     SafeVec operator+(const SafeVec &oSafeVec) const
     {return SafeVec(lef + oSafeVec.lef, RIGHT + oSafeVec.RIGHT);}
-    //DANGEROUS
-    //BigMatrixCoords operator-(const BigMatrixCoords &oSafeVec) const 
-    //{return BigMatrixCoords(x - oSafeVec.x, j - oSafeVec.j);}
+    SafeVec operator-(const SafeVec &oSafeVec) const
+    {return SafeVec(lef - oSafeVec.lef, RIGHT - oSafeVec.RIGHT);}
+
+    SafeVec operator-()const
+    {return SafeVec(-lef, -RIGHT);}
+
     SafeVec operator*(const SafeVec &oSafeVec) const
     {return SafeVec(lef * oSafeVec.lef, RIGHT * oSafeVec.RIGHT);}
     SafeVec operator/(const SafeVec &oSafeVec) const
