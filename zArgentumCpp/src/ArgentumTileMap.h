@@ -10,20 +10,36 @@
 
 
 namespace godot {
+    
+
+    struct hash
+    {
+        size_t operator()(const char* s)
+        {
+            constexpr int A = 54059;constexpr int B = 76963;constexpr int C = 86969;constexpr int FIRSTH = 37;
+            unsigned h = FIRSTH;
+            while (*s) {
+                h = (h * A) ^ (s[0] * B);
+                s++;
+            }
+            return h; // or return h % C;
+        };
+    };
+
 
     class ArgentumTileMap : public TileMap{
         GDCLASS(ArgentumTileMap, TileMap)
 
         private:
-            std::vector<std::vector<std::vector<std::string>>> worldMatrix;//hacer esto un array bidimensional de C predimensionado y usar el Vec2i worldsize como bound?
-            std::vector<std::vector<std::vector<std::string>>> spawnWeightsMatrix;
+            std::vector<std::vector<std::vector<std::array<char, 32>>>> worldMatrix;//hacer esto un array bidimensional de C predimensionado y usar el Vec2i worldsize como bound?
+            std::vector<std::vector<std::vector<std::array<char, 32>>>> spawnWeightsMatrix;
             
-            Vector2i worldSize;
-            std::unordered_set<Vector2i, MatrixCoords::hash> loadedTiles;//compartido por todos los beings del world activos en esta pc
+            SafeVec worldSize;
+            std::unordered_set<SafeVec, SafeVec::hash> loadedTiles;//compartido por todos los beings del world activos en esta pc
             std::unordered_map<std::string, std::unordered_map<StringName, Variant>> cppTilesData;
-            static bool withinChunkBounds(const Vector2i &LOADED_COORD_TO_CHECK, const Vector2i &TL_CORNER, const MatrixCoords &CHUNK_SIZE);
+            static bool withinChunkBounds(const SafeVec &LOADED_COORD_TO_CHECK, const SafeVec &TL_CORNER, const MatrixCoords &CHUNK_SIZE);
 
-            bool setCell(const std::string& TILE_ID, const Vector2i& coords);
+            bool setCell(const std::string& TILE_ID, const SafeVec& coords);
 
         protected:
             static void _bind_methods();

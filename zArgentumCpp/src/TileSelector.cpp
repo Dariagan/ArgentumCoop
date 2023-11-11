@@ -22,16 +22,16 @@ class TileSelector
         static constexpr unsigned char MAX_GROUPED_TILES_COUNT = 64;
         const unsigned char TARGETS_COUNT = 0;
 
-        std::array<std::string, MAX_TARGETS_COUNT> targetsToFill; //OJO NO PASARSE
-        std::array<std::string, MAX_TARGETS_COUNT> tileIdOrDesignationAsGroup;
-        std::array<std::pair<std::array<std::string, MAX_GROUPED_TILES_COUNT>, std::discrete_distribution<int>>, MAX_TARGETS_COUNT> idsDistributionOfGroups;
+        std::array<std::array<char, 32>, MAX_TARGETS_COUNT> targetsToFill; //OJO NO PASARSE
+        std::array<std::array<char, 32>, MAX_TARGETS_COUNT> tileIdOrDesignationAsGroup;
+        std::array<std::pair<std::array<std::array<char, 32>, MAX_GROUPED_TILES_COUNT>, std::discrete_distribution<int>>, MAX_TARGETS_COUNT> idsDistributionOfGroups;
 
     public:
-        std::string getTileId(const std::string& TARGET_TO_FILL)
+        std::array<char, 32> getTileId(const std::array<char, 32>& TARGET_TO_FILL)
         {
             for (short unsigned int i = 0; i < TARGETS_COUNT; i++)
             {
-                if (targetsToFill[i] == TARGET_TO_FILL)
+                if (strcmp(&targetsToFill[i][0], &TARGET_TO_FILL[0]) == 0)
                 {
                     if (tileIdOrDesignationAsGroup[i].at(0) != '_')
                     {
@@ -46,7 +46,7 @@ class TileSelector
                     break;
                 }    
             }
-            UtilityFunctions::printerr("couldn't find filler for target: ", TARGET_TO_FILL.c_str());
+            UtilityFunctions::printerr("couldn't find filler for target: ", &TARGET_TO_FILL[0]);
             return {};
         }
 
@@ -75,10 +75,14 @@ class TileSelector
                         
             for (short unsigned int i = 0; i < TARGETS_COUNT; i++)
             {
-                std::string targetKeyAsCppString = ((String)(gd_targets[i])).utf8().get_data();
+                std::array<char, 32> targetKeyAsCppString;
+                strncpy(&targetKeyAsCppString[0], ((String)(gd_targets[i])).utf8().get_data(), sizeof(targetKeyAsCppString));
+                 
                 targetsToFill[i] = targetKeyAsCppString;
 
-                std::string fillingTileOrGroupAsCppString = ((String)(gd_tile_to_place[i])).utf8().get_data();
+                std::array<char, 32> fillingTileOrGroupAsCppString;
+                strncpy(&fillingTileOrGroupAsCppString[0], ((String)(gd_tile_to_place[i])).utf8().get_data(), sizeof(fillingTileOrGroupAsCppString));
+
                 tileIdOrDesignationAsGroup[i] = fillingTileOrGroupAsCppString;
 
                 if (tileIdOrDesignationAsGroup[i].at(0) == '_')
@@ -92,11 +96,13 @@ class TileSelector
                         return;
                     }
 
-                    std::array<std::string, MAX_GROUPED_TILES_COUNT> groupTileIds;
+                    std::array<std::array<char, 32>, MAX_GROUPED_TILES_COUNT> groupTileIds;
                     std::vector<int> groupTileIdsProbabilities(DICT_SIZE);
                     for (short unsigned int j = 0; j < DICT_SIZE; j++)
                     {
-                        std::string tileIdAsCppString = ((String)(dict.keys()[j])).utf8().get_data();
+                        std::array<char, 32> tileIdAsCppString;
+                        strncpy(&tileIdAsCppString[0], ((String)(dict.keys()[j])).utf8().get_data(), sizeof(tileIdAsCppString));
+
                         groupTileIds[j] = tileIdAsCppString;
                     
                         groupTileIdsProbabilities[j] = (int)dict.values()[j];

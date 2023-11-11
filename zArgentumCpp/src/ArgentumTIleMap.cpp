@@ -18,8 +18,9 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         UtilityFunctions::printerr("Negatively sized formation not allowed");
         return;
     }
-    bool outOfBoundsEast = origin.x + size.x > worldSize.x;
-    bool outOfBoundsSouth = origin.y + size.y > worldSize.y;
+
+    bool outOfBoundsEast = origin.x + size.x > worldSize.lef;
+    bool outOfBoundsSouth = origin.y + size.y > worldSize.RIGHT;
     bool negativeOrigin = origin.x < 0 || origin.y < 0;
     bool outOfBounds = outOfBoundsEast || outOfBoundsSouth || negativeOrigin;
 
@@ -34,7 +35,7 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
     }
     else
     {
-        formation_generator->generate(worldMatrix, Vector2i(origin), MatrixCoords(size), tileSelectionSet, seed, data);
+        formation_generator->generate(worldMatrix, origin, MatrixCoords(size), tileSelectionSet, seed, data);
         emit_signal("formation_formed");
     }
 }
@@ -47,21 +48,23 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
     for (int j = -CHUNK_SIZE.y/2; j <= CHUNK_SIZE.y/2; j++) 
     {
         const Vector2i sTileMapCoords(beingCoords.x + i, beingCoords.y + j);
-        if (sTileMapCoords.x >= 0 && sTileMapCoords.y >= 0 && sTileMapCoords.x < worldSize.x && sTileMapCoords.y < worldSize.y)
+        if (sTileMapCoords.x >= 0 && sTileMapCoords.y >= 0 && sTileMapCoords.x < worldSize.lef && sTileMapCoords.y < worldSize.RIGHT)
         {
             if (loadedTiles.count(sTileMapCoords) == 0) try
             {
                 if (worldMatrix.at(sTileMapCoords.x).at(sTileMapCoords.y).size() > 0)
-                    for (const std::string& ID : worldMatrix.at(sTileMapCoords.x).at(sTileMapCoords.y))
+                    for (const std::array<char, 32>& ID : worldMatrix.at(sTileMapCoords.x).at(sTileMapCoords.y))
                     {
                         if (ID.at(0) != '%')
                         {
-                            setCell(ID, sTileMapCoords);
+                            setCell(&ID[0], sTileMapCoords);
                         }
                                            
                     }
                 else
-                    {setCell("ocean_water", sTileMapCoords);}   
+                {
+                    setCell("ocean_water", sTileMapCoords);
+                }
                 
                 loadedTiles.insert(sTileMapCoords);
             }
@@ -92,13 +95,12 @@ void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, cons
         {loadedTiles.erase(tileCoord);}
 }
 
-bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const Vector2i &coords)
+bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &coords)
 {
     std::unordered_map<StringName, Variant> tileData;
     try{tileData = cppTilesData.at(TILE_ID);}
     catch(const std::out_of_range& e)
-    {UtilityFunctions::printerr(TILE_ID.c_str(), 
-    " not found in cppTilesData (at ArgentumTileMap.cpp::load_tiles_around())");}
+    {UtilityFunctions::printerr(&TILE_ID[0], " not found in cppTilesData (at ArgentumTileMap.cpp::load_tiles_around())");}
 
     //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
     //PONER EL AGUA EN UNA LAYER INFERIOR? 
@@ -113,10 +115,10 @@ bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const Vector2i 
 
     try{
         const MatrixCoords MODULO_TILING_AREA = (Vector2i)tileData.at("ma");
-        if(MODULO_TILING_AREA.i >= 1 && MODULO_TILING_AREA.j >= 1)
+        if(MODULO_TILING_AREA.lef >= 1 && MODULO_TILING_AREA.RIGHT >= 1)
         {
-            atlasPositionOffset.i = coords.x % MODULO_TILING_AREA.i;
-            atlasPositionOffset.j = coords.y % MODULO_TILING_AREA.j;
+            atlasPositionOffset.lef = coords.lef % MODULO_TILING_AREA.lef;
+            atlasPositionOffset.RIGHT = coords.RIGHT % MODULO_TILING_AREA.RIGHT;
         }
         else UtilityFunctions::printerr("non-positive MODULO_TILING_AREA ",MODULO_TILING_AREA.c_str(),"is not admitted. tile_id:",TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");
     }
@@ -136,7 +138,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
     }
     if(worldMatrix.size() == 0)
     {
-        worldMatrix.resize(size.x, std::vector<std::vector<std::string>>(size.y, std::vector<std::string>()));
+        worldMatrix.resize(size.x, std::vector<std::vector<std::array<char, 32>>>(size.y, std::vector<std::array<char, 32>>()));
         this->worldSize = size;
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
@@ -156,28 +158,29 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
     
     for(int i = 0; i < tiles_data.values().size(); i++)
     {
-        Ref<Resource> tile = Object::cast_to<Resource>(tiles_data.values()[i]);
+        const Ref<Resource>& tile = Object::cast_to<Resource>(tiles_data.values()[i]);
 
-        Dictionary tile_data = tile->call("get_data");
+        const Dictionary& TILE_DATA = tile->call("get_data");
 
         std::unordered_map<StringName, Variant> tileData;
 
-        for(int j = 0; j < tile_data.values().size(); j++)
+        for(int j = 0; j < TILE_DATA.values().size(); j++)
         {
-            tileData.insert({tile_data.keys()[j], tile_data.values()[j]});
+            tileData.insert({TILE_DATA.keys()[j], TILE_DATA.values()[j]});
         }
-        std::string keyAsCppString = ((String)tiles_data.keys()[i]).utf8().get_data();
+        const std::string keyAsCppString = ((String)tiles_data.keys()[i]).utf8().get_data();
+
         cppTilesData.insert({keyAsCppString, tileData});                
     }
 };
 
 bool ArgentumTileMap::withinChunkBounds(
-    const Vector2i &loadedCoordToCheck, const Vector2i &chunkTopLeftCorner, const MatrixCoords &CHUNK_SIZE)
+    const SafeVec &loadedCoordToCheck, const SafeVec &chunkTopLeftCorner, const MatrixCoords &CHUNK_SIZE)
 {
-    return loadedCoordToCheck.x >= chunkTopLeftCorner.x 
-        && loadedCoordToCheck.y >= chunkTopLeftCorner.y 
-        && loadedCoordToCheck.x <= chunkTopLeftCorner.x + CHUNK_SIZE.i
-        && loadedCoordToCheck.y <= chunkTopLeftCorner.y + CHUNK_SIZE.j;
+    return loadedCoordToCheck.lef >= chunkTopLeftCorner.lef 
+        && loadedCoordToCheck.RIGHT >= chunkTopLeftCorner.RIGHT 
+        && loadedCoordToCheck.lef <= chunkTopLeftCorner.lef + CHUNK_SIZE.lef
+        && loadedCoordToCheck.RIGHT <= chunkTopLeftCorner.RIGHT + CHUNK_SIZE.RIGHT;
 }
 
 ArgentumTileMap::ArgentumTileMap(){}

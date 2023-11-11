@@ -13,75 +13,78 @@ namespace godot{
 //TODO EXPORTAR A GODOT
 struct MatrixCoords
 {
-    short unsigned int i;
-    short unsigned int j;
+    short unsigned int lef;
+    short unsigned int RIGHT;
 
     MatrixCoords() {}
-	MatrixCoords(const short int i, const short int j) {this->i = i; this->j = j;}
+	MatrixCoords(const short int i, const short int j) {this->lef = i; this->RIGHT = j;}
 
     MatrixCoords(const godot::Vector2i& vector2i) 
     {
-        i = std::min(std::max(vector2i.x, 0), USHRT_MAX); 
-        j = std::min(std::max(vector2i.y, 0), USHRT_MAX);
+        lef = std::min(std::max(vector2i.x, 0), USHRT_MAX); 
+        RIGHT = std::min(std::max(vector2i.y, 0), USHRT_MAX);
     }
 
     bool operator==(const MatrixCoords &oMatrixCoords) const
-    {return i == oMatrixCoords.i && j == oMatrixCoords.j;}
+    {return lef == oMatrixCoords.lef && RIGHT == oMatrixCoords.RIGHT;}
     bool operator!=(const MatrixCoords &oMatrixCoords) const {return !operator==(oMatrixCoords);}
 
     void operator+=(const MatrixCoords &oMatrixCoords) 
-    {i += oMatrixCoords.i; j += oMatrixCoords.j;}
+    {lef += oMatrixCoords.lef; RIGHT += oMatrixCoords.RIGHT;}
     // void operator-=(const MatrixCoords &oMatrixCoords)//DANGEROUS
     // {
     //     i -= oMatrixCoords.i;
     //     j -= oMatrixCoords.j;
     // }
     void operator*=(const MatrixCoords &oMatrixCoords) 
-    {i *= oMatrixCoords.i; j *= oMatrixCoords.j;}
+    {lef *= oMatrixCoords.lef; RIGHT *= oMatrixCoords.RIGHT;}
     void operator/=(const MatrixCoords &oMatrixCoords) 
-    {i /= oMatrixCoords.i; j /= oMatrixCoords.j;}
+    {lef /= oMatrixCoords.lef; RIGHT /= oMatrixCoords.RIGHT;}
 
-    operator godot::Vector2i() const {return godot::Vector2i(i, j);}
-    operator godot::Vector2() const {return godot::Vector2(i, j);}
-    operator godot::SafeVec() const {return godot::SafeVec(i, j);}
+    MatrixCoords add_lef(const int lef){return MatrixCoords(this->lef + lef, RIGHT);}
+    MatrixCoords addRight(const int RIGHT){return MatrixCoords(lef, this->RIGHT + RIGHT);}
+
+    operator godot::Vector2i() const {return godot::Vector2i(lef, RIGHT);}
+    operator godot::Vector2() const {return godot::Vector2(lef, RIGHT);}
+    operator godot::SafeVec() const {return godot::SafeVec(lef, RIGHT);}
 
     MatrixCoords operator+(const MatrixCoords &oMatrixCoords) const
-    {return MatrixCoords(i + oMatrixCoords.i, j + oMatrixCoords.j);}
+    {return MatrixCoords(lef + oMatrixCoords.lef, RIGHT + oMatrixCoords.RIGHT);}
     //DANGEROUS
     //MatrixCoords operator-(const MatrixCoords &oMatrixCoords) const 
     //{return MatrixCoords(x - oMatrixCoords.x, j - oMatrixCoords.j);}
     MatrixCoords operator*(const MatrixCoords &oMatrixCoords) const
-    {return MatrixCoords(i * oMatrixCoords.i, j * oMatrixCoords.j);}
+    {return MatrixCoords(lef * oMatrixCoords.lef, RIGHT * oMatrixCoords.RIGHT);}
     MatrixCoords operator/(const MatrixCoords &oMatrixCoords) const
-    {return MatrixCoords(i / oMatrixCoords.i, j / oMatrixCoords.j);}
+    {return MatrixCoords(lef / oMatrixCoords.lef, RIGHT / oMatrixCoords.RIGHT);}
 
     MatrixCoords operator*(float number) const
-    {return MatrixCoords(i * number, j * number);}
+    {return MatrixCoords(lef * number, RIGHT * number);}
     MatrixCoords operator/(float number) const
-    {return MatrixCoords(i / number, j / number);}
+    {return MatrixCoords(lef / number, RIGHT / number);}
 
     const char* c_str() const
     {
         static char buffer[15]; 
-        snprintf(buffer, sizeof(buffer), "(%hu, %hu)", i, j);
+        snprintf(buffer, sizeof(buffer), "(%hu, %hu)", lef, RIGHT);
         return buffer;
     }
 
     float length() const{return distanceTo(MatrixCoords(0,0));}
 
     float distanceTo(const MatrixCoords &oMatrixCoords) const 
-    {return std::sqrt((i-oMatrixCoords.i)*(i-oMatrixCoords.i) + (j-oMatrixCoords.j)*(j-oMatrixCoords.j));}
+    {return std::sqrt((lef-oMatrixCoords.lef)*(lef-oMatrixCoords.lef) + (RIGHT-oMatrixCoords.RIGHT)*(RIGHT-oMatrixCoords.RIGHT));}
 
     float distanceSquaredTo(const MatrixCoords &oMatrixCoords) const 
-    {return (i - oMatrixCoords.i)*(i - oMatrixCoords.i) + (j - oMatrixCoords.j)*(j - oMatrixCoords.j);}
+    {return (lef - oMatrixCoords.lef)*(lef - oMatrixCoords.lef) + (RIGHT - oMatrixCoords.RIGHT)*(RIGHT - oMatrixCoords.RIGHT);}
 
     float distanceSquaredTo(const godot::Vector2i &oVector2i) const 
-    {return (i - oVector2i.x)*(i - oVector2i.x) + (j - oVector2i.y)*(j - oVector2i.y);}
+    {return (lef - oVector2i.x)*(lef - oVector2i.x) + (RIGHT - oVector2i.y)*(RIGHT - oVector2i.y);}
 
     struct hash
     {
         size_t operator()( const MatrixCoords &vec ) const
-        {return vec.i*31 + vec.j ;}
+        {return vec.lef*31 + vec.RIGHT ;}
     };
 };
 }
