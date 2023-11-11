@@ -22,7 +22,7 @@ func generate_world():
 	generate_world_matrix(WORLD_SIZE)
 	
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), GlobalData.tile_selections["temperate"], 0, {})
+	generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), GlobalData.tile_selections["temperate"], 4, {})
 		
 	
 	_players_start_position = WORLD_SIZE/2

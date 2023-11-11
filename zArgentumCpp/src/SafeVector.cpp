@@ -88,6 +88,11 @@ struct SafeVec
 	bool operator<=(const SafeVec &oSafeVec) const { return lef == oSafeVec.lef ? (RIGHT <= oSafeVec.RIGHT) : (lef < oSafeVec.lef); }
 	bool operator>=(const SafeVec &oSafeVec) const { return lef == oSafeVec.lef ? (RIGHT >= oSafeVec.RIGHT) : (lef > oSafeVec.lef); }
 
+    bool isAnyCompNegative() const {return lef < 0 || RIGHT < 0;}
+
+    bool isNonNegative() const{return lef >= 0 && RIGHT >= 0;}
+    bool isStrictlyPositive() const{return lef > 0 && RIGHT > 0;}
+
     SafeVec operator*(float number) const
     {return SafeVec(lef * number, RIGHT * number);}
     SafeVec operator/(float number) const

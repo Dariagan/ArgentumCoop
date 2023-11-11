@@ -42,24 +42,23 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
 
 void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vector2i& CHUNK_SIZE)//hacer q el chunk size cambie según el zoom ingame??
 {    
-    const Vector2i beingCoords = local_to_map(global_coords);
+    const SafeVec beingCoords = local_to_map(global_coords);
     
     for (int i = -CHUNK_SIZE.x/2; i <= CHUNK_SIZE.x/2; i++) {
     for (int j = -CHUNK_SIZE.y/2; j <= CHUNK_SIZE.y/2; j++) 
     {
-        const Vector2i sTileMapCoords(beingCoords.x + i, beingCoords.y + j);
-        if (sTileMapCoords.x >= 0 && sTileMapCoords.y >= 0 && sTileMapCoords.x < worldSize.lef && sTileMapCoords.y < worldSize.RIGHT)
+        const SafeVec sTileMapCoords(beingCoords.lef + i, beingCoords.RIGHT + j);
+        if (sTileMapCoords.isNonNegative() && sTileMapCoords.lef < worldSize.lef && sTileMapCoords.RIGHT < worldSize.RIGHT)
         {
             if (loadedTiles.count(sTileMapCoords) == 0) try
             {
-                if (worldMatrix.at(sTileMapCoords.x).at(sTileMapCoords.y).size() > 0)
-                    for (const std::array<char, 32>& ID : worldMatrix.at(sTileMapCoords.x).at(sTileMapCoords.y))
+                if (worldMatrix.at(sTileMapCoords.lef).at(sTileMapCoords.RIGHT).size() > 0)
+                    for (const std::array<char, 32>& ID : worldMatrix.at(sTileMapCoords.lef).at(sTileMapCoords.RIGHT))
                     {
                         if (ID.at(0) != '%')
                         {
                             setCell(&ID[0], sTileMapCoords);
-                        }
-                                           
+                        }       
                     }
                 else
                 {
@@ -79,8 +78,8 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
 //todo hacer en vez de por distancia q se borren las tiles de loadedtiles cuyas coords no esten dentro del cuadrado actual
 void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const MatrixCoords& CHUNK_SIZE)//coords PUEDE SER NEGATIVO, ARREGLAR
 {
-    std::vector<Vector2i> tilesToErase;//HACER ARRAY?
-    for (const Vector2i& tileCoord : loadedTiles)
+    std::vector<SafeVec> tilesToErase;//HACER ARRAY?
+    for (const SafeVec& tileCoord : loadedTiles)
     {
         //este if en realidad tiene que chequear q pase esto para cada being existente (AND) antes de decidir borrar
         if (!withinChunkBounds(tileCoord, topLeftCornerCoords, CHUNK_SIZE)) //el problema es q esto borra las tiles de otros being en el set
@@ -91,7 +90,7 @@ void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, cons
             tilesToErase.push_back(tileCoord);
         }
     }
-    for (const Vector2i& tileCoord : tilesToErase)
+    for (const SafeVec& tileCoord : tilesToErase)
         {loadedTiles.erase(tileCoord);}
 }
 
@@ -105,17 +104,24 @@ bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &
     //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
     //PONER EL AGUA EN UNA LAYER INFERIOR? 
 
-    MatrixCoords atlasOriginPosition; 
+    SafeVec atlasOriginPosition; 
         
-    try{atlasOriginPosition = ((Vector2i)tileData.at("op"));}
+    try{
+        atlasOriginPosition = (Vector2i)tileData.at("op");
+        if (atlasOriginPosition.isAnyCompNegative())
+        {
+            UtilityFunctions::printerr("Atlas origin position is negative for tile_id \"",TILE_ID.c_str(),"\" (at ArgentumTileMap.cpp::load_tiles_around())");
+            return false;
+        }
+    }
     catch(...){UtilityFunctions::printerr("couldn't get atlas origin position for tile_id \"",TILE_ID.c_str(),"\" (at ArgentumTileMap.cpp::load_tiles_around())");
     return false;}
 
     MatrixCoords atlasPositionOffset(0, 0);
 
     try{
-        const MatrixCoords MODULO_TILING_AREA = (Vector2i)tileData.at("ma");
-        if(MODULO_TILING_AREA.lef >= 1 && MODULO_TILING_AREA.RIGHT >= 1)
+        const SafeVec MODULO_TILING_AREA = (SafeVec)tileData.at("ma");
+        if(MODULO_TILING_AREA.isStrictlyPositive())
         {
             atlasPositionOffset.lef = coords.lef % MODULO_TILING_AREA.lef;
             atlasPositionOffset.RIGHT = coords.RIGHT % MODULO_TILING_AREA.RIGHT;
@@ -131,6 +137,7 @@ bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &
 
 void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
 {
+    
     if (size.x < 0 || size.y < 0)
     {
         UtilityFunctions::printerr("Negatively sized world matrix not allowed");
