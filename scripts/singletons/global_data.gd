@@ -14,6 +14,7 @@ var default_ip_to_join: String = "localhost"
 
 var username: String
 
+const CPP_BUFFER_LENGTH_MINUS_ONE = 32 - 1
 const item_data_directories: Array[String] = []#["res://resources/things/items/", "res://resources/things/items/wear/body/"]
 const sprites_datas_directories: Array[String] = ["res://resources/beings/sprites/spritesdatas/"]
 const recipes_directories: Array[String] = []

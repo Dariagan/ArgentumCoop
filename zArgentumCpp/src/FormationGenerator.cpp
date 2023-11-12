@@ -42,11 +42,11 @@ void FormationGenerator::placeBeing(
     
     auto& thingsAtPos = worldMatrix.at(ABSOLUTE_COORDS.lef).at(ABSOLUTE_COORDS.RIGHT);
     
-    for (char lef = 0; lef < thingsAtPos.size(); lef++)
+    for (char i = 0; i < thingsAtPos.size(); i++)
     {
-        if (thingsAtPos.at(lef).at(0) == '%')
+        if (thingsAtPos.at(i).at(0) == '%')
         {
-            thingsAtPos.erase(thingsAtPos.begin()+lef);
+            thingsAtPos.erase(thingsAtPos.begin()+i);
             break;
         }
     }
@@ -76,15 +76,14 @@ void FormationGenerator::generate(std::vector<std::vector<std::vector<std::array
     const Dictionary& data)
 {UtilityFunctions::printerr("Inside FormationGenerator abstract method");}
 
+
+
 FormationGenerator::FormationGenerator(){
 
 }
 FormationGenerator::~FormationGenerator(){
    
 }
-
-
-
 void FormationGenerator::_bind_methods()
 {
 

@@ -99,11 +99,15 @@ void FracturedContinentGenerator::generate(
                         const bool GOOD_DICE_ROLL = rng.randf_range(0, 4) + forest.get_noise_2dv(coords) * 1.4f > treeCutoff;
                         const bool LUCKY_TREE = rng.randi_range(0, 1000) == 0;
 
-                        const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOfObjects(coords, 3);
+                        const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOf(trees, coords, 3);
                         if (TREE)
                         {
-                            blockingObjectsCoords.insert(coords);
+                            trees.insert(coords);
                             strncpy(&targetsToFill[addedTargetsCount++][0], "tree", sizeof(targetsToFill[0]));
+                        }
+                        else if(rng.randi_range(0, 400) == 0 && clearOf(bushes, coords, 1)) {
+                            bushes.insert(coords);
+                            strncpy(&targetsToFill[addedTargetsCount++][0], "bush", sizeof(targetsToFill[0]));
                         }
                     }
                 }
@@ -120,7 +124,7 @@ void FracturedContinentGenerator::generate(
         
     }}
     placeDungeonEntrances(worldMatrix, 3);
-    blockingObjectsCoords.clear();
+    trees.clear();
 }
 
 bool FracturedContinentGenerator::isContinental(MatrixCoords coords) const
@@ -146,11 +150,12 @@ float FracturedContinentGenerator::getBeachness(MatrixCoords coords) const
     0.8f + smallBeacher.get_noise_2dv(coords) / 2.3f - powf(peninsuler.get_noise_2dv(coords) - peninsuler_cutoff, 0.45f));
 }
 
-bool FracturedContinentGenerator::clearOfObjects(MatrixCoords coords, uint16_t radius, bool checkForwards) const
-{
+bool FracturedContinentGenerator::clearOf(
+    const std::unordered_set<MatrixCoords, MatrixCoords::hash>& setToCheck, MatrixCoords coords, uint16_t radius, bool checkForwards) const
+{ 
     for (int x = -radius; x <= checkForwards * radius; x++)
         for (int y = -radius; y <= radius; y++){
-            if (blockingObjectsCoords.count(MatrixCoords(coords.lef+x, coords.RIGHT+y)))
+            if (setToCheck.count(MatrixCoords(coords.lef+x, coords.RIGHT+y)))
                 return false;
         }
     return true;
@@ -181,7 +186,7 @@ void FracturedContinentGenerator::placeDungeonEntrances(
 
         if (getContinentness(rCoords) > continental_cutoff + 0.005 
         && peninsuler.get_noise_2dv(rCoords) > peninsuler_cutoff + 0.1f 
-        && !isLake(rCoords) && clearOfObjects(rCoords, 3, true))//TODO PONER BIEN
+        && !isLake(rCoords) && clearOf(trees, rCoords, 3, true))//TODO PONER BIEN
         {
             bool farFromDungeons = true;
 

@@ -20,8 +20,8 @@ class FracturedContinentGenerator : public FormationGenerator
         static constexpr short int DEBUG_RANGE_MAX = 50, DEBUG_RANGE_MIN = -DEBUG_RANGE_MAX; 
 
         RandomNumberGenerator rng;    
-        std::unordered_set<MatrixCoords, MatrixCoords::hash> blockingObjectsCoords;
-        bool clearOfObjects(MatrixCoords coords, uint16_t radius = 3, bool checkForward = false) const;
+        std::unordered_set<MatrixCoords, MatrixCoords::hash> trees, bushes;
+        bool clearOf(const std::unordered_set<MatrixCoords, MatrixCoords::hash>& setToCheck, MatrixCoords coords, uint16_t radius, bool checkForwards = false) const;
         bool isPeninsulerCaved(MatrixCoords coords) const;
         bool isLake(MatrixCoords coords) const;
         bool isContinental(MatrixCoords coords) const;

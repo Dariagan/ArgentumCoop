@@ -8,9 +8,9 @@
 #include <godot_cpp/godot.hpp>
 #include <unordered_map>
 #include <vector>
-#include <string>
 #include <random>
 #include <utility> 
+#include "GdStringExtractor.cpp"
 namespace godot
 {
 class TileSelector
@@ -23,7 +23,7 @@ class TileSelector
         const unsigned char TARGETS_COUNT = 0;
 
         std::array<std::array<char, 32>, MAX_TARGETS_COUNT> targetsToFill; //OJO NO PASARSE
-        std::array<std::array<char, 32>, MAX_TARGETS_COUNT> tileIdOrDesignationAsGroup;
+        std::array<std::array<char, 32>, MAX_TARGETS_COUNT> tileIdOrDesignatedGroupId;
         std::array<std::pair<std::array<std::array<char, 32>, MAX_GROUPED_TILES_COUNT>, std::discrete_distribution<int>>, MAX_TARGETS_COUNT> idsDistributionOfGroups;
 
     public:
@@ -33,9 +33,9 @@ class TileSelector
             {
                 if (strcmp(&targetsToFill[i][0], &TARGET_TO_FILL[0]) == 0)
                 {
-                    if (tileIdOrDesignationAsGroup[i].at(0) != '_')
+                    if (tileIdOrDesignatedGroupId[i].at(0) != '_')
                     {
-                        return tileIdOrDesignationAsGroup[i];
+                        return tileIdOrDesignatedGroupId[i];
                     }
                     else
                     {
@@ -51,6 +51,8 @@ class TileSelector
         }
 
         void reseed(unsigned int seed){randomEngine.seed(seed);};
+
+        
 
         TileSelector(const Ref<Resource>& gdTileSelection, int seed) try : TARGETS_COUNT(
             ((TypedArray<String>)gdTileSelection->get("targets")).size())
@@ -75,17 +77,20 @@ class TileSelector
                         
             for (short unsigned int i = 0; i < TARGETS_COUNT; i++)
             {
-                std::array<char, 32> targetKeyAsCppString;
-                strncpy(&targetKeyAsCppString[0], ((String)(gd_targets[i])).utf8().get_data(), sizeof(targetKeyAsCppString));
+                targetsToFill[i] = extractGdString((String)(gd_targets[i]));
+                tileIdOrDesignatedGroupId[i] = extractGdString((String)(gd_tile_to_place[i]));
+
+                // std::array<char, 32> targetKeyAsCppString;
+                // strncpy(&targetKeyAsCppString[0], &((String)(gd_targets[i])).utf8().get_data()[0], sizeof(targetKeyAsCppString));
                  
-                targetsToFill[i] = targetKeyAsCppString;
+                // targetsToFill[i] = targetKeyAsCppString;
 
-                std::array<char, 32> fillingTileOrGroupAsCppString;
-                strncpy(&fillingTileOrGroupAsCppString[0], ((String)(gd_tile_to_place[i])).utf8().get_data(), sizeof(fillingTileOrGroupAsCppString));
+                // std::array<char, 32> fillingTileOrGroupAsCppString;
+                // strncpy(&fillingTileOrGroupAsCppString[0], &((String)(gd_tile_to_place[i])).utf8().get_data()[0], sizeof(fillingTileOrGroupAsCppString));
 
-                tileIdOrDesignationAsGroup[i] = fillingTileOrGroupAsCppString;
+                // tileIdOrDesignatedGroupId[i] = fillingTileOrGroupAsCppString;
 
-                if (tileIdOrDesignationAsGroup[i].at(0) == '_')
+                if (tileIdOrDesignatedGroupId[i].at(0) == '_')
                 {
                     Dictionary dict = gd_grouped_prob_weighted_tiles[i];
                     const short unsigned int DICT_SIZE = dict.keys().size();
@@ -100,10 +105,7 @@ class TileSelector
                     std::vector<int> groupTileIdsProbabilities(DICT_SIZE);
                     for (short unsigned int j = 0; j < DICT_SIZE; j++)
                     {
-                        std::array<char, 32> tileIdAsCppString;
-                        strncpy(&tileIdAsCppString[0], ((String)(dict.keys()[j])).utf8().get_data(), sizeof(tileIdAsCppString));
-
-                        groupTileIds[j] = tileIdAsCppString;
+                        groupTileIds[j] = extractGdString((String)(dict.keys()[j]));
                     
                         groupTileIdsProbabilities[j] = (int)dict.values()[j];
                     }

@@ -9,30 +9,15 @@
 #include <unordered_map>
 
 
-namespace godot {
-    
-
-    struct hash
-    {
-        size_t operator()(const char* s)
-        {
-            constexpr int A = 54059;constexpr int B = 76963;constexpr int C = 86969;constexpr int FIRSTH = 37;
-            unsigned h = FIRSTH;
-            while (*s) {
-                h = (h * A) ^ (s[0] * B);
-                s++;
-            }
-            return h; // or return h % C;
-        };
-    };
-
-
+namespace godot 
+{    
     class ArgentumTileMap : public TileMap{
         GDCLASS(ArgentumTileMap, TileMap)
 
         private:
-            std::vector<std::vector<std::vector<std::array<char, 32>>>> worldMatrix;//hacer esto un array bidimensional de C predimensionado y usar el Vec2i worldsize como bound?
+            std::vector<std::vector<std::vector<std::array<char, 32>>>> worldMatrix;
             std::vector<std::vector<std::vector<std::array<char, 32>>>> spawnWeightsMatrix;
+            std::unordered_map<SafeVec, int, SafeVec::hash> beings;
             
             SafeVec worldSize;
             std::unordered_set<SafeVec, SafeVec::hash> loadedTiles;//compartido por todos los beings del world activos en esta pc

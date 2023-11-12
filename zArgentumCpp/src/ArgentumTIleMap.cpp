@@ -7,6 +7,7 @@
 #include <regex>
 #include <string>
 #include <typeinfo>
+#include "GdStringExtractor.cpp"
 
 using namespace godot;
 
@@ -19,10 +20,10 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         return;
     }
 
-    bool outOfBoundsEast = origin.x + size.x > worldSize.lef;
-    bool outOfBoundsSouth = origin.y + size.y > worldSize.RIGHT;
-    bool negativeOrigin = origin.x < 0 || origin.y < 0;
-    bool outOfBounds = outOfBoundsEast || outOfBoundsSouth || negativeOrigin;
+    const bool outOfBoundsEast = origin.x + size.x > worldSize.lef;
+    const bool outOfBoundsSouth = origin.y + size.y > worldSize.RIGHT;
+    const bool negativeOrigin = origin.x < 0 || origin.y < 0;
+    const bool outOfBounds = outOfBoundsEast || outOfBoundsSouth || negativeOrigin;
 
     if (outOfBounds){
         UtilityFunctions::printerr("CANCELLED FORMATION: out of bounds in the world matrix. make the world matrix bigger, move the origin, or resize the formation. Reasons:");
@@ -74,6 +75,8 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
 
     unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE);
 }
+
+//getRandomTileWithinArea(tlcorner, bottomrightcorner, tileid)//pa spawnear
 
 //todo hacer en vez de por distancia q se borren las tiles de loadedtiles cuyas coords no esten dentro del cuadrado actual
 void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const MatrixCoords& CHUNK_SIZE)//coords PUEDE SER NEGATIVO, ARREGLAR
@@ -132,12 +135,13 @@ bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &
 
     //hacer q la atlas positionV se mueva según el mod de la global position, dentro de la tile 4x4
     set_cell(tileData.at("layer"), coords, tileData.at("source_id"), atlasOriginPosition + atlasPositionOffset, tileData.at("alt_id"));
+
+    
     return true;
 }
 
 void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
 {
-    
     if (size.x < 0 || size.y < 0)
     {
         UtilityFunctions::printerr("Negatively sized world matrix not allowed");
@@ -165,6 +169,8 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
     
     for(int i = 0; i < tiles_data.values().size(); i++)
     {
+        const std::string keyAsCppString = &extractGdString((String)tiles_data.keys()[i])[0];//FIXME ERROR, HAY QUE CONSEGUIR EL SUBSTRING
+        
         const Ref<Resource>& tile = Object::cast_to<Resource>(tiles_data.values()[i]);
 
         const Dictionary& TILE_DATA = tile->call("get_data");
@@ -175,7 +181,6 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
         {
             tileData.insert({TILE_DATA.keys()[j], TILE_DATA.values()[j]});
         }
-        const std::string keyAsCppString = ((String)tiles_data.keys()[i]).utf8().get_data();
 
         cppTilesData.insert({keyAsCppString, tileData});                
     }
