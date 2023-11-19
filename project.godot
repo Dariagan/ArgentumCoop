@@ -8,6 +8,16 @@
 
 config_version=5
 
+[addons]
+
+resources_spreadsheet_view/color_rows=true
+resources_spreadsheet_view/color_arrays=true
+resources_spreadsheet_view/array_min_width=128.0
+resources_spreadsheet_view/resource_preview_size=32.0
+resources_spreadsheet_view/clip_headers=false
+resources_spreadsheet_view/dupe_arrays=true
+resources_spreadsheet_view/context_menu_on_leftclick=false
+
 [application]
 
 config/name="ArgentumApocalypsis"
@@ -18,6 +28,7 @@ config/features=PackedStringArray("4.2", "Forward Plus")
 
 GlobalData="*res://scripts/singletons/global_data.gd"
 GameData="*res://scripts/singletons/game_data.gd"
+BetterTerrain="*res://addons/better-terrain/BetterTerrain.gd"
 
 [display]
 
@@ -34,6 +45,10 @@ project/assembly_name="ArgentumSurvival"
 movie_writer/mjpeg_quality=1.0
 movie_writer/movie_file="/home/stefan/Videos/asd.avi"
 movie_writer/fps=8
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/better-terrain/plugin.cfg", "res://addons/dictionary_inspector/plugin.cfg", "res://addons/imrp/plugin.cfg", "res://addons/optional/plugin.cfg", "res://addons/safe_resource_loader/plugin.cfg", "res://addons/script-ide/plugin.cfg")
 
 [importer_defaults]
 

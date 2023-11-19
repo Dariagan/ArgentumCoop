@@ -71,6 +71,7 @@ struct MatrixCoords
     }
 
     float length() const{return distanceTo(MatrixCoords(0,0));}
+    float lengthSquared() const{return distanceSquaredTo(MatrixCoords(0,0));}
 
     float distanceTo(const MatrixCoords &oMatrixCoords) const 
     {return std::sqrt((lef-oMatrixCoords.lef)*(lef-oMatrixCoords.lef) + (RIGHT-oMatrixCoords.RIGHT)*(RIGHT-oMatrixCoords.RIGHT));}

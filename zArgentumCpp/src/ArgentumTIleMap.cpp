@@ -133,10 +133,24 @@ bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &
     }
     catch(...){UtilityFunctions::printerr("couldn't access \"ma\" key for ", TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");}
 
-    //hacer q la atlas positionV se mueva según el mod de la global position, dentro de la tile 4x4
-    set_cell(tileData.at("layer"), coords, tileData.at("source_id"), atlasOriginPosition + atlasPositionOffset, tileData.at("alt_id"));
+    int alt_id = 0;
+    bool flipped= false;
+    try
+    {//temp code, replace trees by scenes to make scale and color randomizeable
+        alt_id = (int)tileData.at("alt_id");
+        const bool flippedAtRandom = tileData.at("fr");
+ 
+        flipped = flippedAtRandom && rand() % 2;
+    }
+    catch(const std::exception& e)
+    {
+        UtilityFunctions::printerr(e.what());
+    }
+    //aviso que existe get sorrounding cells, set_cells_terrain_connect(layer, get_used_cells_by_id(watar)) si usas terrain
 
-    
+    //hacer q la atlas positionV se mueva según el mod de la global position, dentro de la tile 4x4
+    set_cell(tileData.at("layer"), coords, tileData.at("source_id"), atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
+
     return true;
 }
 
@@ -195,7 +209,7 @@ bool ArgentumTileMap::withinChunkBounds(
         && loadedCoordToCheck.RIGHT <= chunkTopLeftCorner.RIGHT + CHUNK_SIZE.RIGHT;
 }
 
-ArgentumTileMap::ArgentumTileMap(){}
+ArgentumTileMap::ArgentumTileMap(){srand(time(NULL));}
 ArgentumTileMap::~ArgentumTileMap(){}
 
 void ArgentumTileMap::_bind_methods()

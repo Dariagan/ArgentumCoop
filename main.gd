@@ -1,11 +1,6 @@
 extends Node
 
 @export var asd: FastNoiseLite
-@onready var menu_control: Container = $Canvas/MenuControl
-@onready var lobby: Node = $Lobby
-
-@onready var game: Node = $Lobby/Game
-
 
 func _enter_tree() -> void:
 	GlobalData.username = "nameless_%s" % _generate_random_string(4)

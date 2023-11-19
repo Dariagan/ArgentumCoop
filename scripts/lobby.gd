@@ -1,8 +1,6 @@
 extends Node
 # local peer
 var peer = ENetMultiplayerPeer.new()
-# local username
-
 
 @export var character_creation_scene: PackedScene
 
@@ -144,7 +142,7 @@ func _connect_signals(lobby_interface: LobbyInterface):
 	lobby_interface.body_scale_changed.connect(_on_body_scale_changed)
 	
 # EN VEZ DE TODO ESTO HACER Q APENAS SE UNA EL PLAYER ESTE EJECUTE UN .RPC_ID(1, _username) Y EL SERVER SE LO QUEDA AHÍ
-# for requesting a peer's username
+#region for requesting a peer's username
 signal player_username_received(username: String)
 var requested_peer: int = -1
 func _request_player_username(peer_id: int) -> void:
@@ -158,7 +156,7 @@ func _receive_player_username(username: String) -> void:
 	if  multiplayer.get_remote_sender_id() == requested_peer:
 		player_username_received.emit(username)
 	requested_peer = -1
-# for requesting a peer's username
+#endregion for requesting a peer's username
 
 
 #region Character creation synchronization

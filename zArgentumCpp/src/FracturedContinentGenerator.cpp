@@ -32,7 +32,7 @@ FracturedContinentGenerator::FracturedContinentGenerator()
 }
 
 //definir spawn points para bosses?
-//es alpedo definir spawn points para mobs basados en condiciones específicas porq se mueven solos
+//es alpedo definir spawn points para mobs comúnes basados en condiciones super específicas porq merondean igualmente
 void FracturedContinentGenerator::generate(
     std::vector<std::vector<std::vector<std::array<char, 32>>>> & worldMatrix, 
     const SafeVec& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
@@ -50,7 +50,7 @@ void FracturedContinentGenerator::generate(
     bigBeacher.set_frequency(4.3f/powf(size.length(), 0.995f)); smallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
     bigLaker.set_frequency(40.f/powf(size.length(), 0.995f)); smallLaker.set_frequency(80.f/powf(size.length(), 0.995f));
     forest.set_frequency(1.8f/powf(size.length(), 0.995f));
-    //TODO hacer cada frequency ajustable desde gdscript,
+    //TODO hacer cada frequency ajustable desde gdscript
 
     continental_cutoff = 0.61f * powf(size.length() / 1600.f, 0.05f);;
     }
@@ -61,7 +61,7 @@ void FracturedContinentGenerator::generate(
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
-    // COMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
+//CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     for (uint16_t x = 0; x < size.lef; x++){
     for (uint16_t y = 0; y < size.RIGHT; y++)
     {
@@ -75,11 +75,7 @@ void FracturedContinentGenerator::generate(
         unsigned char addedTargetsCount = 0;
 
         if (CONTINENTAL && !PENINSULER_CAVED)
-        {
-            /*
-            if(lef > DEBUG_RANGE_MIN && lef < DEBUG_RANGE_MAX && RIGHT > DEBUG_RANGE_MIN && RIGHT < DEBUG_RANGE_MAX){
-                printf("pc=%d", peninsulerCaved);if (RIGHT % 2 == 0) std::cout << "\n"; else std::cout << "||| ";} 
-            */
+        {            
             const float BEACHNESS = getBeachness(coords);
             const bool BEACH = BEACHNESS > beachCutoff;
             
@@ -132,13 +128,7 @@ bool FracturedContinentGenerator::isContinental(MatrixCoords coords) const
 
 
 float FracturedContinentGenerator::getContinentness(MatrixCoords coords) const
-{   /*
-    if (lef > DEBUG_RANGE_MIN && lef < DEBUG_RANGE_MAX && RIGHT > DEBUG_RANGE_MIN && RIGHT < DEBUG_RANGE_MAX){
-        printf(", cntness %.3f = %.3f * %.3f, ", 
-            continenter.get_noise_2d(lef, RIGHT) * (1 - BCF), 
-            (float)continenter.get_noise_2d(lef, RIGHT), 
-            (1 - BCF));}
-    */
+{
     const float BCF = FormationGenerator::getBorderClosenessFactor(coords, size);
 
     return continenter.get_noise_2dv(coords) * (1-BCF);
@@ -170,46 +160,49 @@ bool FracturedContinentGenerator::isLake(MatrixCoords coords) const
         || (((bigLaker.get_noise_2dv(coords) + 1)*0.65f) - getBeachness(coords) > bigLakeCutoff);
 }
 
-// MUST GO AFTER TREES/ROCKS/WHATEVER BLOCKING OBJECTS ARE INSERTED
+//MUST BE CALLED AFTER TREES/ROCKS/WHATEVER BLOCKING OBJECTS ARE INSERTED
 void FracturedContinentGenerator::placeDungeonEntrances(
-    std::vector<std::vector<std::vector<std::array<char, 32>>>> & worldMatrix, const int DUNGEONS_COUNT)
+    std::vector<std::vector<std::vector<std::array<char, 32>>>> & worldMatrix, const unsigned char DUNGEONS_TO_PLACE)
 {
+    constexpr int MAX_TRIES = 1000000;
+
     std::array<MatrixCoords, 3> dungeonsCoords;
     unsigned char dungeonsI = 0;
 
-    float minDistanceMult = 1;
-    float tries = 0;
-    while (dungeonsI < DUNGEONS_COUNT)
+    float minDistanceMultiplier = 1;
+    float triesCount = 0;
+    while (dungeonsI < DUNGEONS_TO_PLACE)
     {
-        tries++;
-        const MatrixCoords rCoords(rng.randi_range(0, size.lef), rng.randi_range(0, size.RIGHT));
+        triesCount++;
+        const MatrixCoords dungeonCoords(rng.randi_range(0, size.lef), rng.randi_range(0, size.RIGHT));
 
-        if (getContinentness(rCoords) > continental_cutoff + 0.005 
-        && peninsuler.get_noise_2dv(rCoords) > peninsuler_cutoff + 0.1f 
-        && !isLake(rCoords) && clearOf(trees, rCoords, 3, true))//TODO PONER BIEN
+        if (getContinentness(dungeonCoords) > continental_cutoff + 0.005 
+        && peninsuler.get_noise_2dv(dungeonCoords) > peninsuler_cutoff + 0.1f 
+        && !isLake(dungeonCoords) && clearOf(trees, dungeonCoords, 3, true))//TODO PONER BIEN
         {
-            bool farFromDungeons = true;
+            bool farEnoughFromOtherDungeons = true;
 
             for (const MatrixCoords& coord : dungeonsCoords)
             {
-                if (rCoords.distanceTo(coord) <  size.length() * 0.25f * minDistanceMult)
+                const float MINIMUM_DISTANCE_BETWEEN_DUNGEONS = size.length() * 0.25f * minDistanceMultiplier;
+                if (dungeonCoords.distanceTo(coord) <  MINIMUM_DISTANCE_BETWEEN_DUNGEONS)
                 {
-                    farFromDungeons = false;
+                    farEnoughFromOtherDungeons = false;
                     break;
                 }
             }
-            if (farFromDungeons)
+            if (farEnoughFromOtherDungeons)
             {
                 std::array<char, 32> buffer;
                 sprintf(&buffer[0], "cave_%d", dungeonsI);
                 const std::array<char, 32> TILE_ID = this->tileSelector->getTileId(buffer);
-                FormationGenerator::placeTile(worldMatrix, origin, rCoords, TILE_ID);
-                dungeonsCoords[dungeonsI++] = rCoords;
+                FormationGenerator::placeTile(worldMatrix, origin, dungeonCoords, TILE_ID);
+                dungeonsCoords[dungeonsI++] = dungeonCoords;
                 //UtilityFunctions::print(newDungeonCoords);
             }
-            else{minDistanceMult = std::clamp(1500.f / tries, 0.f, 1.f);}
+            else{minDistanceMultiplier = std::clamp(1500.f / triesCount, 0.f, 1.f);}
         }
-        if (tries > 1000000){
+        if (triesCount > MAX_TRIES){
             UtilityFunctions::printerr("Dungeon placement condition unmeetable! (FracturedContinentGenerator::placeDungeonEntrances())");
             break;
         }
