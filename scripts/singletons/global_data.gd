@@ -52,16 +52,20 @@ func _init() -> void:
 	
 	item_data = _index_all_found_resources(item_data_directories)
 	sprites_datas = _index_all_found_resources(sprites_datas_directories)
+	sprites_datas.make_read_only()
 	recipe_data = _index_all_found_resources(recipes_directories)
 	building_data = _index_all_found_resources(building_data_directories)
 	controllable_races = _index_all_found_resources(controllable_races_directories)
 	uncontrollable_races = _index_all_found_resources(uncontrollable_races_directories)
 	races.merge(uncontrollable_races, true); races.merge(controllable_races, true)
+	races.make_read_only()
 	
 	tile_selections = _index_all_found_resources(tile_selections_directories)
-	
+	tile_selections.make_read_only()
 	classes = _index_all_found_resources(classes_directories)
+	classes.make_read_only()
 	tiles = _index_all_found_resources(tiles_directories)
+	tiles.make_read_only()
 	
 	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
@@ -92,7 +96,7 @@ func _index_all_found_resources(directories: Array[String], check_subfolders: bo
 				file_name = dir_access.get_next()
 		else:
 			printerr("Couldn't open directory %s" % [directory])
-	
+	#table.make_read_only()
 	return table
 
 func _list_all_spawnable_scenes(directories: Array[String]) -> Array[String]:

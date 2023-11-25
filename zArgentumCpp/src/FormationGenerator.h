@@ -2,6 +2,7 @@
 #define __FORMATION_GENERATOR_H__
 #include "TileSelector.cpp"
 #include "MatrixCoords.cpp"
+#include "ArgentumTileMap.h"
 
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <unordered_set>
@@ -9,20 +10,19 @@
 #include <memory>
 
 namespace godot 
-{
+{//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR
+    class ArgentumTileMap;
     class FormationGenerator : public RefCounted{
         GDCLASS(FormationGenerator, RefCounted)
 
         protected:
             static void _bind_methods();
-            static void placeTile(std::vector<std::vector<std::vector<std::array<char, 32>>>>& worldMatrix, 
-                const SafeVec& origin, const MatrixCoords& tileCoordsRelativeToFormationOrigin, 
-                const std::array<char, 32>& tileId, bool deleteOthers = false);
+             
 
             static void placeBeing(const SafeVec &origin, std::vector<std::vector<std::vector<std::array<char, 32>>>> &worldMatrix,
                 const MatrixCoords &coordsRelativeToFormationOrigin, const std::array<char, 32> &beingId);
             
-            std::unique_ptr<TileSelector> tileSelector;
+            std::unique_ptr<TileSelector> m_tileSelector;
 
         public:
             FormationGenerator();
@@ -30,7 +30,7 @@ namespace godot
             
             static float getBorderClosenessFactor(MatrixCoords coords, const MatrixCoords& SIZE);
             
-            virtual void generate(std::vector<std::vector<std::vector<std::array<char, 32>>>>& worldMatrix, 
+            virtual void generate(ArgentumTileMap& argentumTileMap, 
                 const SafeVec& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
                 const unsigned int seed = 0, const Dictionary& data = Dictionary());
     };

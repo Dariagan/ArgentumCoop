@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bxcw3yocig3he" path="res://scenes/being.tscn" id="5_nor5b"]
 [ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resources/world/tile_set.tres" id="6_67353"]
 [ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
-[ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
+[ext_resource type="Script" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
 [ext_resource type="Script" path="res://scenes/ArgentumTileMap.gd" id="7_itdl2"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]

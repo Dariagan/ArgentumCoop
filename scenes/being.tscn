@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bxcw3yocig3he"]
+[gd_scene load_steps=6 format=3 uid="uid://bxcw3yocig3he"]
 
 [ext_resource type="Script" path="res://scripts/beings/being.gd" id="1_qp2au"]
 [ext_resource type="PackedScene" uid="uid://dh6xc1ceawroh" path="res://scenes/animated_body_portion.tscn" id="2_7wa3q"]
+[ext_resource type="Script" path="res://scripts/resources/beings/being_internal_state.gd" id="3_ptxgd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c0jbg"]
 size = Vector2(11.7222, 5.52427)
@@ -53,3 +54,6 @@ horizontal_alignment = 1
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 debug_enabled = true
+
+[node name="InternalState" type="Node" parent="."]
+script = ExtResource("3_ptxgd")

@@ -1,6 +1,6 @@
 class_name Enums
 
-enum Sex { ANY, MALE, FEMALE}
+enum Sex { ANY = 0, MALE = 1, FEMALE = 2}
 
 enum Layer { BOTTOM, MIDDLE, TOP}
 

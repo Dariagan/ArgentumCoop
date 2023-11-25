@@ -1,12 +1,16 @@
 
 # IMPORTANTE: usar .duplicate(true) desp de arrastrar un .tres de este recurso a algun @export de una var
 
-extends Resource
+extends Node
 class_name HarmableBody
 
 @export var _body_tree: BodyTree
 
 @export var body_groups: Array[BodyGroup] = []
+
+func _init(data: Dictionary = {}):
+	# TODO
+	pass
 
 func rec(body_tree: BodyTree):
 	
@@ -18,3 +22,6 @@ func rec(body_tree: BodyTree):
 	for child in _body_tree.children:
 		rec(child)
 
+# TODO
+func serialize() -> Dictionary:
+	return {}

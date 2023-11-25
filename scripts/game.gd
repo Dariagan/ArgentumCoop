@@ -5,9 +5,7 @@ extends Node
 @onready var tile_map: GdTileMap = $ArgentumTileMap
 
 @export var being_scene: PackedScene:
-	set(value):
-		being_scene = value
-		update_configuration_warnings()
+	set(value): being_scene = value; update_configuration_warnings()
 
 func _ready() -> void:
 	if GlobalData.insta_start:
@@ -17,8 +15,7 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 	generate_world.rpc()
 	
 	var i: int = 0
-	for player_start_data in players_start_data:
-		player_start_data = player_start_data as Dictionary
+	for player_start_data: Dictionary in players_start_data:
 		
 		if not player_start_data.has("race"):
 			player_start_data["race"] = "controllable_random"
@@ -31,15 +28,16 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		if not player_start_data.has("body"):
 			player_start_data["body"] = "random"
 		
-		player_start_data["faction"] = "player"	
-
-		var being_spawn_data = BeingSpawnData.new(player_start_data)
+		player_start_data["fac"] = "player"	
+		
+		var player_being_init_data = BeingReqInitData.new()
+		player_being_init_data.construct(player_start_data)
 		
 		var being: Being = being_scene.instantiate()
 		being.name = str(peers[i])
 		tile_map.spawn_starting_player(being)
 		
-		being.construct(being_spawn_data)
+		being.construct(player_being_init_data)
 		await get_tree().create_timer(0.0001).timeout
 		being.give_control.rpc(peers[i])
 		
@@ -50,8 +48,6 @@ func generate_world() -> void:
 	tile_map.generate_world()
 
 func _get_configuration_warnings():
-	if being_scene == null:
-		return ["being_scene must not be empty!"]
-	else:
-		return []
+	if being_scene == null: return ["being_scene must not be empty!"]
+	else: return []
 

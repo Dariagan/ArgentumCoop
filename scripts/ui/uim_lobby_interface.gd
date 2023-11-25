@@ -40,7 +40,7 @@ func update_player_list(new_player_list: Array) -> void:
 			players_label.text += "%s (host)\n" % new_player_list[i]
 		else:
 			players_label.text += new_player_list[i] + "\n"
-
+			
 func set_up_host_lobby(host_name: String) -> void:
 	_add_start_button(true)
 	_add_lobby_title_line_edit(host_name)

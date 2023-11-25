@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://c1rsrsvwmbh6l"]
 
-[ext_resource type="Script" path="res://scripts/ui/main_menu_interface.gd" id="1_acy1w"]
+[ext_resource type="Script" path="res://scripts/ui/uim_main_menu_interface.gd" id="1_acy1w"]
 
 [node name="no deberia ser control" type="Container"]
 anchors_preset = 15

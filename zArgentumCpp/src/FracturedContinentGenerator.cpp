@@ -34,17 +34,18 @@ FracturedContinentGenerator::FracturedContinentGenerator()
 //definir spawn points para bosses?
 //es alpedo definir spawn points para mobs comúnes basados en condiciones super específicas porq merondean igualmente
 void FracturedContinentGenerator::generate(
-    std::vector<std::vector<std::vector<std::array<char, 32>>>> & worldMatrix, 
+    godot::ArgentumTileMap& argentumTileMap, //HACER Q SEA DE UN SOLO USE ONLY? (PARA PREVENIR BUGS)
     const SafeVec& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
     const unsigned int SEED, const Dictionary& data)
 {
-    this->origin = origin; this->size = size;
+    this->m_origin = origin; this->m_size = size;
 
-    this->tileSelector = std::make_unique<TileSelector>(tileSelectionSet, SEED);
+    this->m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, SEED);
+    m_trees.clear(); m_bushes.clear();
 
     {
     continenter.set_seed(SEED); peninsuler.set_seed(SEED+1); bigLaker.set_seed(SEED+2); smallLaker.set_seed(SEED+3);
-    bigBeacher.set_seed(SEED+4); smallBeacher.set_seed(SEED+5); rng.set_seed(SEED); forest.set_seed(SEED + 9);
+    bigBeacher.set_seed(SEED+4); smallBeacher.set_seed(SEED+5); m_rng.set_seed(SEED); forest.set_seed(SEED + 9);
     
     continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.f/powf(size.length(), 0.995f));
     bigBeacher.set_frequency(4.3f/powf(size.length(), 0.995f)); smallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
@@ -92,17 +93,17 @@ void FracturedContinentGenerator::generate(
                     if(!BEACHNESS < beachCutoff - 0.05f ) 
                     {
                         // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
-                        const bool GOOD_DICE_ROLL = rng.randf_range(0, 4) + forest.get_noise_2dv(coords) * 1.4f > treeCutoff;
-                        const bool LUCKY_TREE = rng.randi_range(0, 1000) == 0;
+                        const bool GOOD_DICE_ROLL = m_rng.randf_range(0, 4) + forest.get_noise_2dv(coords) * 1.4f > treeCutoff;
+                        const bool LUCKY_TREE = m_rng.randi_range(0, 1000) == 0;
 
-                        const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOf(trees, coords, 3);
+                        const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOf(m_trees, coords, 3);
                         if (TREE)
                         {
-                            trees.insert(coords);
+                            m_trees.insert(coords);
                             strncpy(&targetsToFill[addedTargetsCount++][0], "tree", sizeof(targetsToFill[0]));
                         }
-                        else if(rng.randi_range(0, 400) == 0 && clearOf(bushes, coords, 1)) {
-                            bushes.insert(coords);
+                        else if(m_rng.randi_range(0, 400) == 0 && clearOf(m_bushes, coords, 1)) {
+                            m_bushes.insert(coords);
                             strncpy(&targetsToFill[addedTargetsCount++][0], "bush", sizeof(targetsToFill[0]));
                         }
                     }
@@ -114,13 +115,13 @@ void FracturedContinentGenerator::generate(
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
         for(unsigned char k = 0; k < addedTargetsCount; k++)
         {
-            const std::array<char, 32> tileId = this->tileSelector->getTileId(targetsToFill[k]);
-            FormationGenerator::placeTile(worldMatrix, origin, coords, tileId);
+            const std::array<char, 32> tileId = this->m_tileSelector->getTileId(targetsToFill[k]);
+            argentumTileMap.placeFormationTile(origin, coords, tileId);
         }
         
     }}
-    placeDungeonEntrances(worldMatrix, 3);
-    trees.clear();
+    placeDungeonEntrances(argentumTileMap, 3);
+    m_trees.clear();
 }
 
 bool FracturedContinentGenerator::isContinental(MatrixCoords coords) const
@@ -129,7 +130,7 @@ bool FracturedContinentGenerator::isContinental(MatrixCoords coords) const
 
 float FracturedContinentGenerator::getContinentness(MatrixCoords coords) const
 {
-    const float BCF = FormationGenerator::getBorderClosenessFactor(coords, size);
+    const float BCF = FormationGenerator::getBorderClosenessFactor(coords, m_size);
 
     return continenter.get_noise_2dv(coords) * (1-BCF);
 }
@@ -162,7 +163,7 @@ bool FracturedContinentGenerator::isLake(MatrixCoords coords) const
 
 //MUST BE CALLED AFTER TREES/ROCKS/WHATEVER BLOCKING OBJECTS ARE INSERTED
 void FracturedContinentGenerator::placeDungeonEntrances(
-    std::vector<std::vector<std::vector<std::array<char, 32>>>> & worldMatrix, const unsigned char DUNGEONS_TO_PLACE)
+    godot::ArgentumTileMap& argentumTileMap, const unsigned char DUNGEONS_TO_PLACE)
 {
     constexpr int MAX_TRIES = 1000000;
 
@@ -174,18 +175,18 @@ void FracturedContinentGenerator::placeDungeonEntrances(
     while (dungeonsI < DUNGEONS_TO_PLACE)
     {
         triesCount++;
-        const MatrixCoords rCoords(rng.randi_range(0, size.lef), rng.randi_range(0, size.RIGHT));
+        const MatrixCoords rCoords(m_rng.randi_range(0, m_size.lef), m_rng.randi_range(0, m_size.RIGHT));
 
         if (getContinentness(rCoords) > continental_cutoff + 0.005 
         && peninsuler.get_noise_2dv(rCoords) > peninsuler_cutoff + 0.1f 
-        && !isLake(rCoords) && clearOf(trees, rCoords, 3, true))//TODO PONER BIEN
+        && !isLake(rCoords) && clearOf(m_trees, rCoords, 3, true))//TODO PONER BIEN
         {
             bool farEnoughFromOtherDungeons = true;
-            const float MINIMUM_DISTANCE_BETWEEN_DUNGEONS = size.length() * 0.25f * minDistanceMultiplier;
+            const float minDistanceBetweenDungeons = m_size.length() * 0.25f * minDistanceMultiplier;
 
             for (const MatrixCoords& coord : placedDungeonsCoords)
             {
-                if (rCoords.distanceTo(coord) <  MINIMUM_DISTANCE_BETWEEN_DUNGEONS)
+                if (rCoords.distanceTo(coord) <  minDistanceBetweenDungeons)
                 {
                     farEnoughFromOtherDungeons = false;
                     break;
@@ -195,8 +196,8 @@ void FracturedContinentGenerator::placeDungeonEntrances(
             {
                 std::array<char, 32> buffer;
                 sprintf(&buffer[0], "cave_%d", dungeonsI);
-                const std::array<char, 32> TILE_ID = this->tileSelector->getTileId(buffer);
-                FormationGenerator::placeTile(worldMatrix, origin, rCoords, TILE_ID);
+                const std::array<char, 32> TILE_ID = this->m_tileSelector->getTileId(buffer);
+                argentumTileMap.placeFormationTile(m_origin, rCoords, TILE_ID);
                 placedDungeonsCoords[dungeonsI++] = rCoords;
                 //UtilityFunctions::print(newDungeonCoords);
             }

@@ -1,6 +1,8 @@
 extends ArgentumTileMap
 class_name GdTileMap
 
+var _beings: Dictionary # key(str): individual unique id. value: BeingReqInitData.serialized()
+
 func _setup_config():
 	self.tiles_data = GlobalData.tiles
 	self.tile_set = preload("res://resources/world/tile_set.tres")
@@ -14,7 +16,6 @@ func _ready():
 
 func _process(_delta):
 	pass
-	
 
 func generate_world():
 	
@@ -24,19 +25,18 @@ func generate_world():
 	
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
 	generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), GlobalData.tile_selections["temperate"], 4, {})
-		
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
-	# OJO SI APARECE TODO VACÍO PUEDE SER PORQUE EL SPAWN POINT ESTÁ DESPLAZADO
+	# ALERT SI APARECE TODO VACÍO PUEDE SER PORQUE EL SPAWN POINT ESTÁ PUESTO EN UN LUGAR VACÍO
 
 #region SPAWNING 
 var _players_start_position: Vector2i
 
-var player_i: int = 0
+var _player_i: int = 0
 func spawn_starting_player(being: Being):
-	spawn_being_at(being, _players_start_position + Vector2i(player_i, 0))
-	player_i += 1
+	spawn_being_at(being, _players_start_position + Vector2i(_player_i, 0))
+	_player_i += 1
 
 func spawn_being_at(being: Being, pos: Vector2i):
 	add_child(being);
@@ -44,3 +44,6 @@ func spawn_being_at(being: Being, pos: Vector2i):
 	being.z_index = 10
 
 #endregion SPAWNING
+
+func _store_frozen_being():
+	pass

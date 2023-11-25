@@ -1,5 +1,6 @@
 #ifndef __ARGENTUMTILEMAP_H__
 #define __ARGENTUMTILEMAP_H__
+
 #include "FormationGenerator.h"
 
 #include <godot_cpp/classes/tile_map.hpp>
@@ -8,30 +9,29 @@
 #include <unordered_set>  
 #include <unordered_map>
 
-
 namespace godot 
-{    
+{//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
     static const Vector2i ERROR_VECTOR = {-999999, -999999};
-
+    class FormationGenerator;
     class ArgentumTileMap : public TileMap{
         GDCLASS(ArgentumTileMap, TileMap)
 
         private:
-            std::vector<SafeVec> trackedBeingsCoords;
+            std::unordered_map<std::string, SafeVec> m_trackedBeingsCoords;//updateado cada
 
-            std::vector<std::vector<std::vector<std::array<char, 32>>>> worldMatrix;
-            std::vector<std::vector<std::vector<std::array<char, 32>>>> spawnWeightsMatrix;
-            std::unordered_map<SafeVec, std::vector<std::pair<Vector2, String>>, SafeVec::hash> frozenBeings;
+            std::vector<std::vector<std::vector<std::array<char, 32>>>> m_worldMatrix;
+            std::vector<std::vector<std::vector<std::array<char, 32>>>> m_spawnWeightsMatrix;
+            std::unordered_map<SafeVec, std::vector<std::pair<Vector2, String>>, SafeVec::hash> m_frozenBeings;
 
             //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
             //en donde según la id extrae el being de un dictionary q tiene guardado
             
-            SafeVec worldSize;
-            std::unordered_set<SafeVec, SafeVec::hash> loadedTiles;//compartido por todos los beings del world activos en esta pc
-            std::unordered_map<std::string, std::unordered_map<StringName, Variant>> cppTilesData;
-            static bool withinChunkBounds(const SafeVec &LOADED_COORD_TO_CHECK, const SafeVec &TL_CORNER, const MatrixCoords &CHUNK_SIZE);
+            SafeVec m_worldSize;
+            std::unordered_set<SafeVec, SafeVec::hash> m_loadedTiles;//compartido por todos los beings del world activos en esta pc
+            std::unordered_map<std::string, std::unordered_map<StringName, Variant>> m_cppTilesData;
+            static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const MatrixCoords &chunkSize);
 
-            bool setCell(const std::string& TILE_ID, const SafeVec& coords);
+            bool setCell(const std::string& tileId, const SafeVec& coords);
 
         protected:
             static void _bind_methods();
@@ -39,10 +39,16 @@ namespace godot
         public:
             ArgentumTileMap();
             ~ArgentumTileMap();
-            std::vector<std::vector<std::vector<std::array<char, 32>>>>& getWorldMatrix(){return worldMatrix;};
-            std::vector<std::vector<std::vector<std::array<char, 32>>>>& getSpawnWeightsMatrix(){return spawnWeightsMatrix;};
+            //std::vector<std::vector<std::vector<std::array<char, 32>>>>& getWorldMatrix();
+            //std::vector<std::vector<std::vector<std::array<char, 32>>>>& getSpawnWeightsMatrix();
+
+            //SOLO USAR PARA FORMATIONS
+            void placeFormationTile(//TODO hacerlo friend method
+                const SafeVec& formationOrigin, const MatrixCoords& tileCoordsRelativeToFormationOrigin, 
+                const std::array<char, 32>& tileId, bool deleteOthers = false);
+                
             
-            //TODO algún método para escribir en un archivo el estado del mapa actual
+            //TODO algún método para escribir en un archivo el estado del mapa actual (intentar escribir en el .tres?)
             //TODO algún método para cargar el worldMatrix a partir de un archivo
             
             int seed = 0;int get_seed(); void set_seed(int seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
@@ -51,16 +57,8 @@ namespace godot
 
             Vector2i get_random_coord_with_tile_id(const Vector2i& top_left_corner, const Vector2i& bottom_right_corner, const String& tile_id) const;
 
-            void initializePawnKindinGdScript(const Ref<Dictionary>& data){emit_signal("initialize_pawnkind", data);};
-            void store_frozen_being(const Vector2& glb_coords, const String& individual_unique_id){
-                const SafeVec key(local_to_map(glb_coords));
-                auto it = frozenBeings.find(key);
-                if (it != frozenBeings.end()) {
-                    it->second.push_back(std::make_pair(glb_coords, individual_unique_id));
-                } else {
-                    frozenBeings[key] = {std::make_pair(glb_coords, individual_unique_id)};
-                }
-            }
+            void initializePawnKindinGdScript(const Ref<Dictionary>& data);
+            void store_frozen_being(const Vector2& glb_coords, const String& individual_unique_id);
 
             void generate_world_matrix(const Vector2i& size);
             void generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, const Vector2i& size, 
