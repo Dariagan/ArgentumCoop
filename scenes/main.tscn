@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=14 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -14,19 +14,8 @@
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_o47dn"]
-frequency = 0.003
-offset = Vector3(0, 1, 0)
-fractal_lacunarity = 2.8
-fractal_gain = 0.51
-fractal_weighted_strength = 0.3
-domain_warp_amplitude = 25.725
-domain_warp_frequency = -0.115
-domain_warp_fractal_type = 0
-
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
-asd = SubResource("FastNoiseLite_o47dn")
 
 [node name="Lobby" type="Node" parent="."]
 script = ExtResource("4_vtap0")

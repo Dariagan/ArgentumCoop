@@ -2,12 +2,14 @@
 
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/classes/random_number_generator.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <regex>
 #include <string>
 #include <typeinfo>
 #include "GdStringExtractor.cpp"
+#include <algorithm>
 
 using namespace godot;
 
@@ -41,6 +43,8 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
     }
 }
 
+
+
 void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vector2i& CHUNK_SIZE)//hacer q el chunk size cambie según el zoom ingame??
 {    
     const SafeVec beingCoords = local_to_map(global_coords);
@@ -53,20 +57,32 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
         {
             if (loadedTiles.count(sTileMapCoords) == 0) try
             {
-                if (worldMatrix.at(sTileMapCoords.lef).at(sTileMapCoords.RIGHT).size() > 0)
-                    for (const std::array<char, 32>& ID : worldMatrix.at(sTileMapCoords.lef).at(sTileMapCoords.RIGHT))
+                loadedTiles.insert(sTileMapCoords);
+
+                if (frozenBeings.count(sTileMapCoords))
+                {
+                    auto& tileFrozenBeings = frozenBeings[sTileMapCoords];
+                    auto it = tileFrozenBeings.begin();
+
+                    while (it != tileFrozenBeings.end())
                     {
-                        if (ID.at(0) != '%')
-                        {
-                            setCell(&ID[0], sTileMapCoords);
-                        }       
+                        const Vector2& global_coords = it->first;
+                        const String& individual_unique_id = it->second;
+                        emit_signal("being_unfrozen", global_coords, individual_unique_id);
+                        it = tileFrozenBeings.erase(it);
+                    }
+                }
+
+                if (worldMatrix.at(sTileMapCoords.lef).at(sTileMapCoords.RIGHT).size() > 0)
+                    for (const std::array<char, 32>& ID : worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT])
+                    {
+                        setCell(&ID[0], sTileMapCoords);
                     }
                 else
                 {
                     setCell("ocean_water", sTileMapCoords);
                 }
                 
-                loadedTiles.insert(sTileMapCoords);
             }
             catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap::load_tiles_around() exception:", e.what());}
         }
@@ -76,25 +92,25 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
     unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE);
 }
 
-//getRandomTileWithinArea(tlcorner, bottomrightcorner, tileid)//pa spawnear
-
 //todo hacer en vez de por distancia q se borren las tiles de loadedtiles cuyas coords no esten dentro del cuadrado actual
 void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const MatrixCoords& CHUNK_SIZE)//coords PUEDE SER NEGATIVO, ARREGLAR
 {
-    std::vector<SafeVec> tilesToErase;//HACER ARRAY?
-    for (const SafeVec& tileCoord : loadedTiles)
+    auto it = loadedTiles.begin();
+
+    while (it != loadedTiles.end())
     {
-        //este if en realidad tiene que chequear q pase esto para cada being existente (AND) antes de decidir borrar
-        if (!withinChunkBounds(tileCoord, topLeftCornerCoords, CHUNK_SIZE)) //el problema es q esto borra las tiles de otros being en el set
-         //hay q mantener un vector q guarda las positions de todos los beings y fijarse si la tile le pertenece antes de intentar borrar
-        {
+        const SafeVec& tileCoord = *it;
+         //este if en realidad tiene que chequear q pase esto para cada being existente (AND) antes de decidir borrar
+        if (!withinChunkBounds(tileCoord, topLeftCornerCoords, CHUNK_SIZE))//el problema es q esto borra las tiles de otros being en el set
+        {//hay q mantener un vector q guarda las positions de todos los beings y fijarse si la tile le pertenece antes de intentar borrar
             for (int layer_i = 0; layer_i < get_layers_count(); layer_i++)
-                {erase_cell(layer_i, tileCoord);}
-            tilesToErase.push_back(tileCoord);
+            {
+                erase_cell(layer_i, tileCoord);
+            }
+            it = loadedTiles.erase(it);
         }
+        else{++it;}
     }
-    for (const SafeVec& tileCoord : tilesToErase)
-        {loadedTiles.erase(tileCoord);}
 }
 
 bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &coords)
@@ -164,6 +180,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
     if(worldMatrix.size() == 0)
     {
         worldMatrix.resize(size.x, std::vector<std::vector<std::array<char, 32>>>(size.y, std::vector<std::array<char, 32>>()));
+        spawnWeightsMatrix.resize(size.x/10, std::vector<std::vector<std::array<char, 32>>>(size.y/10, std::vector<std::array<char, 32>>()));
         this->worldSize = size;
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
@@ -171,7 +188,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
 }
 
 int ArgentumTileMap::get_seed(){return seed;}; 
-void ArgentumTileMap::set_seed(signed int seed){this->seed = seed;};
+void ArgentumTileMap::set_seed(int seed){this->seed = seed;};
 
 Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
 void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
@@ -183,7 +200,7 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
     
     for(int i = 0; i < tiles_data.values().size(); i++)
     {
-        const std::string keyAsCppString = &extractGdString((String)tiles_data.keys()[i])[0];//FIXME ERROR, HAY QUE CONSEGUIR EL SUBSTRING
+        const std::string keyAsCppString = &extractGdString((String)tiles_data.keys()[i])[0];
         
         const Ref<Resource>& tile = Object::cast_to<Resource>(tiles_data.values()[i]);
 
@@ -198,7 +215,40 @@ void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
 
         cppTilesData.insert({keyAsCppString, tileData});                
     }
-};
+}
+Vector2i godot::ArgentumTileMap::get_random_coord_with_tile_id(const Vector2i &top_left_corner, const Vector2i &bottom_right_corner, const String &tile_id) const
+{
+    //TODO CHEQUEAR QUE LA BOTTOM RIGHT CORNER SEA MAYOR QUE LA TOP LEFT CORNER NUMÉRICAMENTE
+    const SafeVec topLeftCorner(top_left_corner), bottomRightCorner(bottom_right_corner);
+
+    if (topLeftCorner.isAnyCompNegative() || bottomRightCorner.isAnyCompNegative())
+    {
+        UtilityFunctions::printerr("ArgentumTileMap::get_random_coord_with_tile_id: one given corner is negative");
+        return ERROR_VECTOR;
+    }
+    const auto SEARCHED_TILE_ID = extractGdString(tile_id);
+
+    constexpr int MAX_TRIES = 100000;
+
+    RandomNumberGenerator rng;
+
+    for(float triesCount = 0; triesCount < MAX_TRIES; triesCount++)
+    {
+        const MatrixCoords rCoords(rng.randi_range(topLeftCorner.lef, bottomRightCorner.lef), rng.randi_range(topLeftCorner.RIGHT, bottomRightCorner.RIGHT));
+        try
+        {
+            const auto& TILES_AT_POS = worldMatrix.at(rCoords.lef).at(rCoords.RIGHT);
+            
+            if(std::find(TILES_AT_POS.begin(), TILES_AT_POS.end(), SEARCHED_TILE_ID) != TILES_AT_POS.end())
+            {
+                return rCoords;
+            }
+        }
+        catch(const std::exception& e) {UtilityFunctions::printerr(e.what()); return ERROR_VECTOR;} 
+    }
+    UtilityFunctions::printerr("ArgentumTileMap::get_random_coord_with_tile_id: couldn't get random coord");
+    return ERROR_VECTOR;
+}
 
 bool ArgentumTileMap::withinChunkBounds(
     const SafeVec &loadedCoordToCheck, const SafeVec &chunkTopLeftCorner, const MatrixCoords &CHUNK_SIZE)
@@ -228,5 +278,10 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
 
+    
+    ClassDB::bind_method(D_METHOD("store_frozen_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::store_frozen_being);
+
     ADD_SIGNAL(MethodInfo("formation_formed"));
+    ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "glb_coords"), PropertyInfo(Variant::STRING, "uid")));
+    ADD_SIGNAL(MethodInfo("initialize_pawnkind", PropertyInfo(Variant::DICTIONARY, "data")));
 }

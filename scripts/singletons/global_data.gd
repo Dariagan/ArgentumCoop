@@ -1,8 +1,8 @@
 extends Node
 
 #region Debugging configuration
-var ignore_joiners_readiness_on_start: bool = true
-var insta_start: bool = true
+@export var ignore_joiners_readiness_on_start: bool = true
+@export var insta_start: bool = true
 @export var debug: bool = true
 @export var debug_walk_mult:float = 3
 @export var noclip: bool = true
@@ -107,7 +107,6 @@ func _list_all_spawnable_scenes(directories: Array[String]) -> Array[String]:
 			var file_name = dir_access.get_next()
 			
 			while file_name != "":
-				
 				if !dir_access.current_is_dir() and file_name.ends_with(".tscn"):
 					found_scenes.append(directory + file_name)
 					

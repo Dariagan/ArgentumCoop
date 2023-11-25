@@ -1,10 +1,13 @@
+@tool
 extends Node
 # PONER EN LA GUI ARRIBA A LA DERECHA DAYS SURVIVED: X, EN FUENTE DIABLESCA
 
 @onready var tile_map: GdTileMap = $ArgentumTileMap
 
-@export var being_scene: PackedScene
-@onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
+@export var being_scene: PackedScene:
+	set(value):
+		being_scene = value
+		update_configuration_warnings()
 
 func _ready() -> void:
 	if GlobalData.insta_start:
@@ -36,7 +39,6 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		being.name = str(peers[i])
 		tile_map.spawn_starting_player(being)
 		
-		
 		being.construct(being_spawn_data)
 		await get_tree().create_timer(0.0001).timeout
 		being.give_control.rpc(peers[i])
@@ -47,5 +49,9 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 func generate_world() -> void:
 	tile_map.generate_world()
 
-
+func _get_configuration_warnings():
+	if being_scene == null:
+		return ["being_scene must not be empty!"]
+	else:
+		return []
 

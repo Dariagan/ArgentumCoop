@@ -14,6 +14,7 @@ func _ready():
 
 func _process(_delta):
 	pass
+	
 
 func generate_world():
 	

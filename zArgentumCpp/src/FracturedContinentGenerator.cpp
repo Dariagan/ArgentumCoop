@@ -166,7 +166,7 @@ void FracturedContinentGenerator::placeDungeonEntrances(
 {
     constexpr int MAX_TRIES = 1000000;
 
-    std::array<MatrixCoords, 3> dungeonsCoords;
+    std::array<MatrixCoords, 3> placedDungeonsCoords;
     unsigned char dungeonsI = 0;
 
     float minDistanceMultiplier = 1;
@@ -174,18 +174,18 @@ void FracturedContinentGenerator::placeDungeonEntrances(
     while (dungeonsI < DUNGEONS_TO_PLACE)
     {
         triesCount++;
-        const MatrixCoords dungeonCoords(rng.randi_range(0, size.lef), rng.randi_range(0, size.RIGHT));
+        const MatrixCoords rCoords(rng.randi_range(0, size.lef), rng.randi_range(0, size.RIGHT));
 
-        if (getContinentness(dungeonCoords) > continental_cutoff + 0.005 
-        && peninsuler.get_noise_2dv(dungeonCoords) > peninsuler_cutoff + 0.1f 
-        && !isLake(dungeonCoords) && clearOf(trees, dungeonCoords, 3, true))//TODO PONER BIEN
+        if (getContinentness(rCoords) > continental_cutoff + 0.005 
+        && peninsuler.get_noise_2dv(rCoords) > peninsuler_cutoff + 0.1f 
+        && !isLake(rCoords) && clearOf(trees, rCoords, 3, true))//TODO PONER BIEN
         {
             bool farEnoughFromOtherDungeons = true;
+            const float MINIMUM_DISTANCE_BETWEEN_DUNGEONS = size.length() * 0.25f * minDistanceMultiplier;
 
-            for (const MatrixCoords& coord : dungeonsCoords)
+            for (const MatrixCoords& coord : placedDungeonsCoords)
             {
-                const float MINIMUM_DISTANCE_BETWEEN_DUNGEONS = size.length() * 0.25f * minDistanceMultiplier;
-                if (dungeonCoords.distanceTo(coord) <  MINIMUM_DISTANCE_BETWEEN_DUNGEONS)
+                if (rCoords.distanceTo(coord) <  MINIMUM_DISTANCE_BETWEEN_DUNGEONS)
                 {
                     farEnoughFromOtherDungeons = false;
                     break;
@@ -196,8 +196,8 @@ void FracturedContinentGenerator::placeDungeonEntrances(
                 std::array<char, 32> buffer;
                 sprintf(&buffer[0], "cave_%d", dungeonsI);
                 const std::array<char, 32> TILE_ID = this->tileSelector->getTileId(buffer);
-                FormationGenerator::placeTile(worldMatrix, origin, dungeonCoords, TILE_ID);
-                dungeonsCoords[dungeonsI++] = dungeonCoords;
+                FormationGenerator::placeTile(worldMatrix, origin, rCoords, TILE_ID);
+                placedDungeonsCoords[dungeonsI++] = rCoords;
                 //UtilityFunctions::print(newDungeonCoords);
             }
             else{minDistanceMultiplier = std::clamp(1500.f / triesCount, 0.f, 1.f);}

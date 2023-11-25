@@ -1,7 +1,5 @@
 extends Node
 
-@export var asd: FastNoiseLite
-
 func _enter_tree() -> void:
 	GlobalData.username = "nameless_%s" % _generate_random_string(4)
 	

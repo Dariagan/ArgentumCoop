@@ -6,7 +6,7 @@
 
 using namespace godot;
 
-//esta spawnweightsmatrix debería ser 1/16 del size de la world matrix. para el chunk en una cierta pos, se elije alguno de estos puntos y se elige un punto al azar entre (px<->16, py<->16) de alguna tile q sea del mismo tipo
+//esta spawnweightsmatrix debería ser 1/16 del size de la world matrix. para el chunk en una cierta pos, se elije el punto más cercano y para spawnear se elige un punto al azar entre (px<->16, py<->16) de alguna tile q sea del mismo tipo
 // void FormationGenerator::placeSpawnWeight(std::vector<std::vector<std::vector<std::array<char, 32>>>>& spawnWeightsMatrix, 
 //     const SafeVec& origin, const MatrixCoords& coordsRelativeToFormationOrigin, 
 //     const std::array<char, 32>& pawnDefId, const bool deleteOtherWeights)

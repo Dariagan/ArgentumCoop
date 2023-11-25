@@ -10,10 +10,8 @@ var _peers: Array = []
 var _ready_peers: Array = []
 var _characters_spawn_data: Array = [] 
 
-
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
-	
 	_connect_signals(_lobby_interface)
 	
 	#_lobby_interface.follower_body_i_selected.connect(_on_follower_body_selected)
