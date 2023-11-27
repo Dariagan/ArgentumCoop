@@ -23,10 +23,7 @@ using namespace godot;
 // }
 
 
-// el problema de esta función lineal es que te sesga las montañas según la continentness hacia el centro de la formación
-// tal vez es mejor ajustar esta: (nota sin usar un array, y sumarle la mitad del size a la lef y a la RIGHT) 
-//https://github.com/SebLague/Procedural-Landmass-Generation/blob/master/Proc%20Gen%20E11/Assets/Scripts/FalloffGenerator.cs
-float FormationGenerator::getBorderClosenessFactor(MatrixCoords coords, const MatrixCoords& SIZE)
+float FormationGenerator::getBorderClosenessFactor(const MatrixCoords& coords, const MatrixCoords& SIZE)
 {
     const float I_BORDER_CLOSENESS = abs(coords.lef-SIZE.lef/2.f)/(SIZE.lef/2.f);
     const float J_BORDER_CLOSENESS = abs(coords.RIGHT-SIZE.RIGHT/2.f)/(SIZE.RIGHT/2.f);

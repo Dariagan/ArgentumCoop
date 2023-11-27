@@ -18,17 +18,13 @@ namespace godot
         protected:
             static void _bind_methods();
              
-
-            static void placeBeing(const SafeVec &origin, std::vector<std::vector<std::vector<std::array<char, 32>>>> &worldMatrix,
-                const MatrixCoords &coordsRelativeToFormationOrigin, const std::array<char, 32> &beingId);
-            
             std::unique_ptr<TileSelector> m_tileSelector;
 
         public:
             FormationGenerator();
             virtual ~FormationGenerator();
             
-            static float getBorderClosenessFactor(MatrixCoords coords, const MatrixCoords& SIZE);
+            static float getBorderClosenessFactor(const MatrixCoords& coords, const MatrixCoords& SIZE);
             
             virtual void generate(ArgentumTileMap& argentumTileMap, 
                 const SafeVec& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 

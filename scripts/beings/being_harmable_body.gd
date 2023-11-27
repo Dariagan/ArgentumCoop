@@ -1,6 +1,5 @@
 
 # IMPORTANTE: usar .duplicate(true) desp de arrastrar un .tres de este recurso a algun @export de una var
-
 extends Node
 class_name HarmableBody
 
@@ -11,6 +10,8 @@ class_name HarmableBody
 func _init(data: Dictionary = {}):
 	# TODO
 	pass
+
+#HACER QUE CADA BODY PART SEA UN NODE?
 
 func rec(body_tree: BodyTree):
 	

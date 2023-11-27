@@ -10,6 +10,7 @@
 #include <string>
 #include <typeinfo>
 #include <algorithm>
+#include <chrono>
 
 using namespace godot;
 
@@ -37,7 +38,11 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
     }
     else
     {
+        auto start = std::chrono::high_resolution_clock::now();
         formation_generator->generate(*this, origin, MatrixCoords(size), tileSelectionSet, seed, data);
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+        UtilityFunctions::print("time taken to generate: ", duration.count());
         emit_signal("formation_formed");
     }
 }

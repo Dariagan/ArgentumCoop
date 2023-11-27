@@ -32,8 +32,9 @@ BetterTerrain="*res://addons/better-terrain/BetterTerrain.gd"
 
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
+window/size/viewport_width=1850
+window/size/viewport_height=980
+window/size/mode=2
 window/size/initial_position_type=2
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"

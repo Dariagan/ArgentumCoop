@@ -28,6 +28,7 @@ class FracturedContinentGenerator : public FormationGenerator
         float getContinentness(MatrixCoords coords) const;
         float getBeachness(MatrixCoords coords) const;
         void placeDungeonEntrances(ArgentumTileMap& argentumTileMap, const unsigned char DUNGEONS_TO_PLACE);
+        void resetState();
             
     protected:
         static void _bind_methods();

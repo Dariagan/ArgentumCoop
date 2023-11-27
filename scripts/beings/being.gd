@@ -8,7 +8,7 @@ class_name Being
 @onready var body_holder: Node2D = $BodyHolder
 @onready var camera_2d: Camera2D = $Camera2D
 
-@onready var being_internal_state: BeingInternalState = $InternalState
+@onready var internal_state: BeingInternalState = $InternalState
 
 signal load_tiles_around_me(cords: Vector2, chunk_size: Vector2i)
 
@@ -28,25 +28,25 @@ func construct(data: BeingReqInitData) -> void:
 		body.construct(data.sprite_body, data.body_scale)
 		if data.sprite_head:
 			head.construct(data.sprite_head, data.head_scale, data.sprite_body.head_v_offset, data.body_scale.z)
-	construct_being_internal_state.rpc(data.serialize())
+	construct_internal_state.rpc(data.serialize())
 	
 @rpc("call_local")
-func construct_being_internal_state(data: Dictionary):
-	being_internal_state.construct(data["state"])
+func construct_internal_state(data: Dictionary):
+	internal_state.construct(data["state"])
 
 var uncontrolled: bool = true
 
 @rpc("call_local")
 func give_control(peer_id: int) -> void:
-	if being_internal_state.faction is PlayerFaction and being_internal_state.race is ControllableRace:
+	if internal_state.faction is PlayerFaction and internal_state.race is ControllableRace:
 		uncontrolled = false
 		set_multiplayer_authority(peer_id)
-		if peer_id == multiplayer.get_unique_id() and being_internal_state.faction is PlayerFaction:
+		if peer_id == multiplayer.get_unique_id() and internal_state.faction is PlayerFaction:
 			camera_2d.make_current()
 
 @rpc("call_local", "any_peer")
 func take_control() -> void:
-	if being_internal_state.faction is PlayerFaction and uncontrolled and being_internal_state.race is ControllableRace:
+	if internal_state.faction is PlayerFaction and uncontrolled and internal_state.race is ControllableRace:
 		uncontrolled = false
 		set_multiplayer_authority(multiplayer.get_remote_sender_id())
 		if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
@@ -74,7 +74,7 @@ func _input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	
-	match [is_multiplayer_authority(), being_internal_state.faction is PlayerFaction, uncontrolled]:
+	match [is_multiplayer_authority(), internal_state.faction is PlayerFaction, uncontrolled]:
 		[false, ..]:
 			return
 		[_, false, _]:
@@ -136,7 +136,7 @@ func _update_direction_axis_by_input(delta: float) -> void:
 	if _direction_axis != Vector2.ZERO:
 		_direction_axis = _direction_axis.normalized()
 		_velocity += _direction_axis * acceleration * delta
-		_velocity = _velocity.limit_length(being_internal_state.get_max_speed())
+		_velocity = _velocity.limit_length(internal_state.get_max_speed())
 		_update_facing_direction()
 	
 	if not GlobalData.noclip:
@@ -172,5 +172,5 @@ func _play_animation(animation_name: String) -> void:
 			
 func serialize() -> Dictionary:
 	return {
-		"state": being_internal_state.serialize()
+		"state": internal_state.serialize()
 	}
