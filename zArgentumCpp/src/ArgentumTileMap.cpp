@@ -39,7 +39,7 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
     else
     {
         auto start = std::chrono::high_resolution_clock::now();
-        formation_generator->generate(*this, origin, MatrixCoords(size), tileSelectionSet, seed, data);
+        formation_generator->generate(*this, origin, SafeVec(size), tileSelectionSet, seed, data);
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
         UtilityFunctions::print("time taken to generate: ", duration.count());
@@ -88,13 +88,13 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
             catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap::load_tiles_around() exception:", e.what());}
         }
     }}
-    const SafeVec topLeftCornerCoords = beingCoords - MatrixCoords(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
+    const SafeVec topLeftCornerCoords = beingCoords - SafeVec(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
 
     unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE);
 }
 
 //todo hacer en vez de por distancia q se borren las tiles de loadedtiles cuyas coords no esten dentro del cuadrado actual
-void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const MatrixCoords& CHUNK_SIZE)//coords PUEDE SER NEGATIVO, ARREGLAR
+void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE)//coords PUEDE SER NEGATIVO, ARREGLAR
 {
     auto it = m_loadedTiles.begin();
 
@@ -137,7 +137,7 @@ bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &
     catch(...){UtilityFunctions::printerr("couldn't get atlas origin position for tile_id \"",TILE_ID.c_str(),"\" (at ArgentumTileMap.cpp::load_tiles_around())");
     return false;}
 
-    MatrixCoords atlasPositionOffset(0, 0);
+    SafeVec atlasPositionOffset(0, 0);
 
     try{
         const SafeVec moduloTilingArea = (SafeVec)tileData.at("ma");
@@ -235,7 +235,7 @@ Vector2i godot::ArgentumTileMap::get_random_coord_with_tile_id(
 
     for(float triesCount = 0; triesCount < MAX_TRIES; triesCount++)
     {
-        const MatrixCoords rCoords(
+        const SafeVec rCoords(
             rng.randi_range(sv_topLeftCorner.lef, sv_bottomRightCorner.lef), 
             rng.randi_range(sv_topLeftCorner.RIGHT, sv_bottomRightCorner.RIGHT));
         try
@@ -254,7 +254,7 @@ Vector2i godot::ArgentumTileMap::get_random_coord_with_tile_id(
 }
 
 bool ArgentumTileMap::withinChunkBounds(
-    const SafeVec &loadedCoordToCheck, const SafeVec &chunkTopLeftCorner, const MatrixCoords &CHUNK_SIZE)
+    const SafeVec &loadedCoordToCheck, const SafeVec &chunkTopLeftCorner, const SafeVec &CHUNK_SIZE)
 {
     return loadedCoordToCheck.lef >= chunkTopLeftCorner.lef 
         && loadedCoordToCheck.RIGHT >= chunkTopLeftCorner.RIGHT 
@@ -263,7 +263,7 @@ bool ArgentumTileMap::withinChunkBounds(
 }
 
 void ArgentumTileMap::placeFormationTile( 
-    const SafeVec& formationOrigin, const MatrixCoords& coordsRelativeToFormationOrigin, 
+    const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
     const std::array<char, 32>& tileId, const bool deleteBeingsAndTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;

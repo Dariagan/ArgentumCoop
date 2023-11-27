@@ -41,7 +41,7 @@ void FracturedContinentGenerator::resetState()
 //es alpedo definir spawn points para mobs comúnes basados en condiciones super específicas porq merondean igualmente
 void FracturedContinentGenerator::generate(
     godot::ArgentumTileMap& argentumTileMap, //HACER Q SEA DE UN SOLO USE ONLY? (PARA PREVENIR BUGS)
-    const SafeVec& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
+    const SafeVec& origin, const SafeVec& size, const Ref<Resource>& tileSelectionSet, 
     const unsigned int SEED, const Dictionary& data)
 {
     this->m_origin = origin; this->m_size = size;
@@ -72,7 +72,7 @@ void FracturedContinentGenerator::generate(
     for (uint16_t x = 0; x < size.lef; x++){
     for (uint16_t y = 0; y < size.RIGHT; y++)
     {
-        const MatrixCoords coords(x, y);
+        const SafeVec coords(x, y);
 
         const bool CONTINENTAL = isContinental(coords);
 
@@ -146,17 +146,17 @@ void FracturedContinentGenerator::generate(
     this->resetState();
 }
 
-bool FracturedContinentGenerator::isContinental(MatrixCoords coords) const
+bool FracturedContinentGenerator::isContinental(SafeVec coords) const
 {return getContinentness(coords) > continental_cutoff;}
 
 
-float FracturedContinentGenerator::getContinentness(MatrixCoords coords) const
+float FracturedContinentGenerator::getContinentness(SafeVec coords) const
 {
     const float BCF = FormationGenerator::getBorderClosenessFactor(coords, m_size);
 
     return continenter.get_noise_2dv(coords) * (1-BCF);
 }
-float FracturedContinentGenerator::getBeachness(MatrixCoords coords) const
+float FracturedContinentGenerator::getBeachness(SafeVec coords) const
 {
     return std::max(
     0.72f + bigBeacher.get_noise_2dv(coords) / 2.3f - powf(getContinentness(coords) - continental_cutoff, 0.6f), 
@@ -164,20 +164,20 @@ float FracturedContinentGenerator::getBeachness(MatrixCoords coords) const
 }
 
 bool FracturedContinentGenerator::clearOf(
-    const std::unordered_set<MatrixCoords, MatrixCoords::hash>& setToCheck, MatrixCoords coords, uint16_t radius, bool checkForwards) const
+    const std::unordered_set<SafeVec, SafeVec::hash>& setToCheck, SafeVec coords, uint16_t radius, bool checkForwards) const
 { 
     for (int x = -radius; x <= checkForwards * radius; x++)
         for (int y = -radius; y <= radius; y++){
-            if (setToCheck.count(MatrixCoords(coords.lef+x, coords.RIGHT+y)))
+            if (setToCheck.count(SafeVec(coords.lef+x, coords.RIGHT+y)))
                 return false;
         }
     return true;
 }
 
-bool FracturedContinentGenerator::isPeninsulerCaved(MatrixCoords coords) const
+bool FracturedContinentGenerator::isPeninsulerCaved(SafeVec coords) const
 {return peninsuler.get_noise_2dv(coords) < peninsuler_cutoff;}
 
-bool FracturedContinentGenerator::isLake(MatrixCoords coords) const
+bool FracturedContinentGenerator::isLake(SafeVec coords) const
 {
     return (((smallLaker.get_noise_2dv(coords) + 1)*0.65f) - getBeachness(coords) > smallLakeCutoff) 
         || (((bigLaker.get_noise_2dv(coords) + 1)*0.65f) - getBeachness(coords) > bigLakeCutoff);
@@ -197,13 +197,13 @@ void FracturedContinentGenerator::placeDungeonEntrances(
         return;
     }
 
-    std::array<MatrixCoords, MAX_DUNGEONS_IN_ARRAY> placedDungeonsCoords;
+    std::array<SafeVec, MAX_DUNGEONS_IN_ARRAY> placedDungeonsCoords;
 
     float minDistanceMultiplier = 1;
     float triesCount = 1;
     for (unsigned char dungeonI = 0; dungeonI < dungeonsToPlace; triesCount++)
     {
-        const MatrixCoords rCoords(m_rng.randi_range(0, m_size.lef), m_rng.randi_range(0, m_size.RIGHT));
+        const SafeVec rCoords(m_rng.randi_range(0, m_size.lef), m_rng.randi_range(0, m_size.RIGHT));
 
         if (getContinentness(rCoords) > continental_cutoff + 0.005 
         && peninsuler.get_noise_2dv(rCoords) > peninsuler_cutoff + 0.1f 
@@ -212,7 +212,7 @@ void FracturedContinentGenerator::placeDungeonEntrances(
             bool farEnoughFromOtherDungeons = true;
             const float minDistanceBetweenDungeons = m_size.length() * 0.25f * minDistanceMultiplier;
 
-            for (const MatrixCoords& coord : placedDungeonsCoords)
+            for (const SafeVec& coord : placedDungeonsCoords)
             {
                 if (rCoords.distanceTo(coord) <  minDistanceBetweenDungeons)
                 {

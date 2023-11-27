@@ -16,7 +16,7 @@ struct SafeVec
     int RIGHT;
 
     SafeVec() {}
-	SafeVec(const short int i, const short int j) {this->lef = i; this->RIGHT = j;}
+	SafeVec(int i, int j) {this->lef = i; this->RIGHT = j;}
 
     SafeVec(const godot::Vector2i& vector2i) 
     {

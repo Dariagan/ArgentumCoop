@@ -1,7 +1,7 @@
 #ifndef __FORMATION_GENERATOR_H__
 #define __FORMATION_GENERATOR_H__
 #include "TileSelector.cpp"
-#include "MatrixCoords.cpp"
+#include "SafeVector.cpp"
 #include "ArgentumTileMap.h"
 
 #include <godot_cpp/classes/ref_counted.hpp>
@@ -24,10 +24,10 @@ namespace godot
             FormationGenerator();
             virtual ~FormationGenerator();
             
-            static float getBorderClosenessFactor(const MatrixCoords& coords, const MatrixCoords& SIZE);
+            static float getBorderClosenessFactor(const SafeVec& coords, const SafeVec& SIZE);
             
             virtual void generate(ArgentumTileMap& argentumTileMap, 
-                const SafeVec& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet, 
+                const SafeVec& origin, const SafeVec& size, const Ref<Resource>& tileSelectionSet, 
                 const unsigned int seed = 0, const Dictionary& data = Dictionary());
     };
 }

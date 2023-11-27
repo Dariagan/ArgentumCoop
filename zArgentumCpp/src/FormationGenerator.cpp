@@ -10,7 +10,7 @@ using namespace godot;
 
 //esta spawnweightsmatrix debería ser 1/16 del size de la world matrix. para el chunk en una cierta pos, se elije el punto más cercano y para spawnear se elige un punto al azar entre (px<->16, py<->16) de alguna tile q sea del mismo tipo
 // void FormationGenerator::placeSpawnWeight(std::vector<std::vector<std::vector<std::array<char, 32>>>>& spawnWeightsMatrix, 
-//     const SafeVec& origin, const MatrixCoords& coordsRelativeToFormationOrigin, 
+//     const SafeVec& origin, const SafeVec& coordsRelativeToFormationOrigin, 
 //     const std::array<char, 32>& pawnDefId, const bool deleteOtherWeights)
 // {try
 // {
@@ -23,7 +23,7 @@ using namespace godot;
 // }
 
 
-float FormationGenerator::getBorderClosenessFactor(const MatrixCoords& coords, const MatrixCoords& SIZE)
+float FormationGenerator::getBorderClosenessFactor(const SafeVec& coords, const SafeVec& SIZE)
 {
     const float I_BORDER_CLOSENESS = abs(coords.lef-SIZE.lef/2.f)/(SIZE.lef/2.f);
     const float J_BORDER_CLOSENESS = abs(coords.RIGHT-SIZE.RIGHT/2.f)/(SIZE.RIGHT/2.f);
@@ -33,7 +33,7 @@ float FormationGenerator::getBorderClosenessFactor(const MatrixCoords& coords, c
     return std::max(powf(I_BORDER_CLOSENESS, POW), powf(J_BORDER_CLOSENESS, POW));
 }
 
-void godot::FormationGenerator::generate(ArgentumTileMap &argentumTileMap, const SafeVec &origin, const MatrixCoords &size, const Ref<Resource> &tileSelectionSet, const unsigned int seed, const Dictionary &data)
+void godot::FormationGenerator::generate(ArgentumTileMap &argentumTileMap, const SafeVec &origin, const SafeVec &size, const Ref<Resource> &tileSelectionSet, const unsigned int seed, const Dictionary &data)
 {
 }
 

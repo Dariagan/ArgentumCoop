@@ -15,18 +15,18 @@ class FracturedContinentGenerator : public FormationGenerator
 
     private:
         SafeVec m_origin;
-        MatrixCoords m_size;
+        SafeVec m_size;
 
         static constexpr short int DEBUG_RANGE_MAX = 50, DEBUG_RANGE_MIN = -DEBUG_RANGE_MAX; 
 
         RandomNumberGenerator m_rng;    
-        std::unordered_set<MatrixCoords, MatrixCoords::hash> m_trees, m_bushes;
-        bool clearOf(const std::unordered_set<MatrixCoords, MatrixCoords::hash>& setToCheck, MatrixCoords coords, uint16_t radius, bool checkForwards = false) const;
-        bool isPeninsulerCaved(MatrixCoords coords) const;
-        bool isLake(MatrixCoords coords) const;
-        bool isContinental(MatrixCoords coords) const;
-        float getContinentness(MatrixCoords coords) const;
-        float getBeachness(MatrixCoords coords) const;
+        std::unordered_set<SafeVec, SafeVec::hash> m_trees, m_bushes;
+        bool clearOf(const std::unordered_set<SafeVec, SafeVec::hash>& setToCheck, SafeVec coords, uint16_t radius, bool checkForwards = false) const;
+        bool isPeninsulerCaved(SafeVec coords) const;
+        bool isLake(SafeVec coords) const;
+        bool isContinental(SafeVec coords) const;
+        float getContinentness(SafeVec coords) const;
+        float getBeachness(SafeVec coords) const;
         void placeDungeonEntrances(ArgentumTileMap& argentumTileMap, const unsigned char DUNGEONS_TO_PLACE);
         void resetState();
             
@@ -44,7 +44,7 @@ class FracturedContinentGenerator : public FormationGenerator
 
 //en vez de poner optional parameters así, declarar varios métodos overloaded, hacer q el de menos llame al de más, y bindear los dos
         void generate(ArgentumTileMap& argentumTileMap, 
-            const SafeVec& origin, const MatrixCoords& size, const Ref<Resource>& tileSelectionSet,
+            const SafeVec& origin, const SafeVec& size, const Ref<Resource>& tileSelectionSet,
             const unsigned int seed = 0, const Dictionary& data = Dictionary()) override;
 };
 }

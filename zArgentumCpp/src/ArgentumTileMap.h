@@ -29,7 +29,7 @@ namespace godot
             SafeVec m_worldSize;
             std::unordered_set<SafeVec, SafeVec::hash> m_loadedTiles;//compartido por todos los beings del world activos en esta pc
             std::unordered_map<std::string, std::unordered_map<StringName, Variant>> m_cppTilesData;
-            static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const MatrixCoords &chunkSize);
+            static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const SafeVec &chunkSize);
 
             bool setCell(const std::string& tileId, const SafeVec& coords);
 
@@ -44,7 +44,7 @@ namespace godot
 
             //SOLO USAR PARA FORMATIONS
             void placeFormationTile(//TODO hacerlo friend method
-                const SafeVec& formationOrigin, const MatrixCoords& tileCoordsRelativeToFormationOrigin, 
+                const SafeVec& formationOrigin, const SafeVec& tileCoordsRelativeToFormationOrigin, 
                 const std::array<char, 32>& tileId, bool deleteOthers = false);
                 
             
@@ -65,7 +65,7 @@ namespace godot
                  const Ref<Resource>& tileSelectionSet, signed int seed, const Dictionary& data);
             
             void load_tiles_around(const Vector2& coords, const Vector2i& chunk_size);
-            void unloadExcessTiles(const SafeVec& topLeftCornerCoords, const MatrixCoords& CHUNK_SIZE);
+            void unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE);
     };
 }
 
