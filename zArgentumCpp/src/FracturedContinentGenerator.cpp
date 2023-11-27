@@ -193,7 +193,7 @@ void FracturedContinentGenerator::placeDungeonEntrances(
 
     if (dungeonsToPlace > MAX_DUNGEONS_IN_ARRAY)
     {
-        UtilityFunctions::printerr("can't place more dungeons than ", MAX_DUNGEONS_IN_ARRAY);
+        UtilityFunctions::printerr("can't place more than ",MAX_DUNGEONS_IN_ARRAY," dungeons (array capacity)\nDungeon placement cancelled");
         return;
     }
 
