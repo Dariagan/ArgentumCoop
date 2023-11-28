@@ -11,12 +11,13 @@
 #include <typeinfo>
 #include <algorithm>
 #include <chrono>
+#include <thread>
 
 using namespace godot;
 
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
     const Vector2i& size, const Ref<Resource>& tileSelectionSet, signed int seed, const Dictionary& data)
-{
+{   
     if (size.x < 0 || size.y < 0)
     {
         UtilityFunctions::printerr("Negatively sized formation not allowed");
@@ -42,12 +43,12 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         formation_generator->generate(*this, origin, SafeVec(size), tileSelectionSet, seed, data);
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-        UtilityFunctions::print("time taken to generate: ", duration.count());
+        UtilityFunctions::print("time taken to generate formation: ", duration.count(),"ms");
         emit_signal("formation_formed");
     }
 }
 
-void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vector2i& CHUNK_SIZE)//hacer q el chunk size cambie según el zoom ingame??
+void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vector2i& CHUNK_SIZE, const int being_uid)//hacer q el chunk size cambie según el zoom ingame??
 {    
     const SafeVec beingCoords = local_to_map(global_coords);
     
@@ -55,11 +56,11 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
     for (int j = -CHUNK_SIZE.y/2; j <= CHUNK_SIZE.y/2; j++) 
     {
         const SafeVec sTileMapCoords(beingCoords.lef + i, beingCoords.RIGHT + j);
-        if (sTileMapCoords.isNonNegative() && sTileMapCoords.lef < m_worldSize.lef && sTileMapCoords.RIGHT < m_worldSize.RIGHT)
+        if (sTileMapCoords.isNonNegative() && sTileMapCoords.lef < m_worldMatrix.size() && sTileMapCoords.RIGHT < m_worldMatrix[0].size())
         {
-            if (m_loadedTiles.count(sTileMapCoords) == 0) try
+            if (m_tileSharedLoadsCount.count(sTileMapCoords) == 0)
             {
-                m_loadedTiles.insert(sTileMapCoords);
+                m_tileSharedLoadsCount.insert({sTileMapCoords, 1});
 
                 if (m_frozenBeings.count(sTileMapCoords))
                 {
@@ -69,12 +70,12 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
                     while (it != tileFrozenBeings.end())
                     {
                         const Vector2& global_coords = it->first;
-                        const String& individual_unique_id = it->second;
+                        const int individual_unique_id = it->second;
                         emit_signal("being_unfrozen", global_coords, individual_unique_id);
                         it = tileFrozenBeings.erase(it);
                     }
                 }
-                if (m_worldMatrix.at(sTileMapCoords.lef).at(sTileMapCoords.RIGHT).size() > 0)
+                if (m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT].size() > 0)//if more than 0 tileIds:
                     for (const std::array<char, 32>& id : m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT])
                     {
                         setCell(&id[0], sTileMapCoords);
@@ -83,73 +84,68 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
                 {
                     setCell("ocean_water", sTileMapCoords);
                 }
-                
             }
-            catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap::load_tiles_around() exception:", e.what());}
+            else if (m_beingLoadedTiles[being_uid].count(sTileMapCoords) == 0)
+            {
+               m_tileSharedLoadsCount[sTileMapCoords] += 1;
+            }
+            m_beingLoadedTiles[being_uid].insert(sTileMapCoords);
         }
     }}
     const SafeVec topLeftCornerCoords = beingCoords - SafeVec(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
 
-    unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE);
+    unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE, being_uid);
 }
 
-//todo hacer en vez de por distancia q se borren las tiles de loadedtiles cuyas coords no esten dentro del cuadrado actual
-void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE)//coords PUEDE SER NEGATIVO, ARREGLAR
+void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE, const int being_uid)
 {
-    auto it = m_loadedTiles.begin();
+    auto loadedTilesIter = m_beingLoadedTiles[being_uid].begin();
 
-    while (it != m_loadedTiles.end())
+    while (loadedTilesIter != m_beingLoadedTiles[being_uid].end())
     {
-        const SafeVec& tileCoord = *it;
-         //este if en realidad tiene que chequear q pase esto para cada being existente (AND) antes de decidir borrar
-        if (!withinChunkBounds(tileCoord, topLeftCornerCoords, CHUNK_SIZE))//el problema es q esto borra las tiles de otros being en el set
-        {//hay q mantener un vector q guarda las positions de todos los beings y fijarse si la tile le pertenece antes de intentar borrar
-            for (int layer_i = 0; layer_i < get_layers_count(); layer_i++)
-            {
-                erase_cell(layer_i, tileCoord);
-            }
-            it = m_loadedTiles.erase(it);
+        const SafeVec& tileCoord = *loadedTilesIter;
+        
+        if (!withinChunkBounds(tileCoord, topLeftCornerCoords, CHUNK_SIZE))
+        {
+            decrementSharedCount(tileCoord);
+
+            loadedTilesIter = m_beingLoadedTiles[being_uid].erase(loadedTilesIter);
         }
-        else{++it;}
+        else{++loadedTilesIter;}
+    }
+}
+void ArgentumTileMap::decrementSharedCount(const SafeVec& tileCoord)
+{
+    m_tileSharedLoadsCount[tileCoord] -= 1;
+    if (m_tileSharedLoadsCount[tileCoord] <= 0)
+    {
+        for (int layer_i = 0; layer_i < get_layers_count(); layer_i++)
+            {erase_cell(layer_i, tileCoord);}
+
+        //TODO freezear a aquellos beings q se encuentren dentro de esta tile borrada
+
+        m_tileSharedLoadsCount.erase(tileCoord);
     }
 }
 
-bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &coords)
+bool ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &coords)
 {
     std::unordered_map<StringName, Variant> tileData;
     try{tileData = m_cppTilesData.at(TILE_ID);}
     catch(const std::out_of_range& e)
-    {UtilityFunctions::printerr(&TILE_ID[0], " not found in cppTilesData (at ArgentumTileMap.cpp::load_tiles_around())");}
+    {UtilityFunctions::printerr(&TILE_ID[0], " not found in cppTilesData (at ArgentumTileMap.cpp::load_tiles_around())");
+     return false;
+    }
 
     //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
     //PONER EL AGUA EN UNA LAYER INFERIOR? 
 
-    SafeVec atlasOriginPosition; 
-        
-    try{
-        atlasOriginPosition = (Vector2i)tileData.at("op");
-        if (atlasOriginPosition.isAnyCompNegative())
-        {
-            UtilityFunctions::printerr("Atlas origin position is negative for tile_id \"",TILE_ID.c_str(),"\" (at ArgentumTileMap.cpp::load_tiles_around())");
-            return false;
-        }
-    }
-    catch(...){UtilityFunctions::printerr("couldn't get atlas origin position for tile_id \"",TILE_ID.c_str(),"\" (at ArgentumTileMap.cpp::load_tiles_around())");
-    return false;}
+    const SafeVec& atlasOriginPosition = (SafeVec)tileData["op"];; 
 
-    SafeVec atlasPositionOffset(0, 0);
+    const SafeVec& moduloTilingArea = (SafeVec)tileData["ma"];
 
-    try{
-        const SafeVec moduloTilingArea = (SafeVec)tileData.at("ma");
-        if(moduloTilingArea.isStrictlyPositive())
-        {
-            atlasPositionOffset.lef = coords.lef % moduloTilingArea.lef;
-            atlasPositionOffset.RIGHT = coords.RIGHT % moduloTilingArea.RIGHT;
-        }
-        else UtilityFunctions::printerr("non-positive MODULO_TILING_AREA ",moduloTilingArea.c_str(),"is not admitted. tile_id:",TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");
-    }
-    catch(...){UtilityFunctions::printerr("couldn't access \"ma\" key for ", TILE_ID.c_str()," (at ArgentumTileMap.cpp::load_tiles_around())");}
-
+    const SafeVec atlasPositionOffset(coords.lef % moduloTilingArea.lef, coords.RIGHT % moduloTilingArea.RIGHT);
+    
     int alt_id = 0;
     bool flipped = false;
     try
@@ -165,7 +161,6 @@ bool godot::ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &
     }
     //aviso que existe get sorrounding cells, set_cells_terrain_connect(layer, get_used_cells_by_id(watar)) si usas terrain
 
-    //hacer q la atlas positionV se mueva según el mod de la global position, dentro de la tile 4x4
     set_cell(tileData.at("layer"), coords, tileData.at("source_id"), atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
 
     return true;
@@ -192,27 +187,59 @@ int ArgentumTileMap::get_seed(){return seed;};
 void ArgentumTileMap::set_seed(int seed){this->seed = seed;};
 
 Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
-void ArgentumTileMap::set_tiles_data(Dictionary tiles_data)
+void ArgentumTileMap::set_tiles_data(Dictionary all_tiles_data)
 {
-    this->tiles_data = tiles_data;
+    this->tiles_data = all_tiles_data;
     for(auto &tileData : m_cppTilesData)
         tileData.second.clear();
     m_cppTilesData.clear();
     
-    for(int i = 0; i < tiles_data.values().size(); i++)
+    for(int i = 0; i < all_tiles_data.values().size(); i++)
     {
-        const std::string keyAsCppString = &extractGdString((String)tiles_data.keys()[i])[0];
+        const String& gd_current_tile_key = (String)all_tiles_data.keys()[i];
+        const std::string keyAsCppString = &extractGdString(gd_current_tile_key)[0];
         
-        const Ref<Resource>& tile = Object::cast_to<Resource>(tiles_data.values()[i]);
+        const Ref<Resource>& tile = Object::cast_to<Resource>(all_tiles_data.values()[i]);
 
-        const Dictionary& TILE_DATA = tile->call("get_data");
+        const Dictionary& gd_tile_data = tile->call("get_data");
 
         std::unordered_map<StringName, Variant> tileData;
 
-        for(int j = 0; j < TILE_DATA.values().size(); j++)
+        for(int j = 0; j < gd_tile_data.values().size(); j++)
         {
-            tileData.insert({TILE_DATA.keys()[j], TILE_DATA.values()[j]});
+            const String& tile_field_key = gd_tile_data.keys()[j];
+            if (tile_field_key == "op")
+            {
+                if (((SafeVec)gd_tile_data.values()[j]).isAnyCompNegative())//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
+                {
+                    UtilityFunctions::printerr("Atlas origin position is negative for tile_id \"",gd_current_tile_key,"\" (at ArgentumTileMap.cpp::set_tiles_data()), using (0,0)");
+                    tileData.insert({gd_tile_data.keys()[j], Vector2i(0, 0)});
+                    continue;
+                }
+            }
+            else if (tile_field_key == "ma")
+            {
+                const Vector2i& vec = gd_tile_data.values()[j];
+                if (((SafeVec)vec).isStrictlyPositive() == false)//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
+                {
+                    UtilityFunctions::printerr("non-positive MODULO_TILING_AREA ",vec," is not admitted. tile_id:",gd_current_tile_key," (at ArgentumTileMap.cpp::set_tiles_data())");
+                    tileData.insert({gd_tile_data.keys()[j], Vector2i(1, 1)});
+                    continue;
+                }
+            }
+            tileData.insert({gd_tile_data.keys()[j], gd_tile_data.values()[j]});
         }
+        if (tileData.count("op") == 0)
+        {
+            UtilityFunctions::printerr("op not found, using (0,0) (at ArgentumTileMap.cpp::set_tiles_data())");
+            tileData.insert({"op", Vector2i(0, 0)});
+        }
+        if (tileData.count("ma") == 0)
+        {
+            UtilityFunctions::printerr("ma not found, using (1,1) (at ArgentumTileMap.cpp::set_tiles_data())");
+            tileData.insert({"op", Vector2i(1, 1)});
+        }
+
         m_cppTilesData.insert({keyAsCppString, tileData});                
     }
 }
@@ -275,8 +302,16 @@ void ArgentumTileMap::placeFormationTile(
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
 void ArgentumTileMap::initializePawnKindinGdScript(const Ref<Dictionary>& data){emit_signal("initialize_pawnkind", data);}
-void ArgentumTileMap::store_frozen_being(const Vector2& glb_coords, const String& individual_unique_id)
-    {m_frozenBeings[local_to_map(glb_coords)].push_back({glb_coords, individual_unique_id});}
+void ArgentumTileMap::freeze_and_store_being(const Vector2& glb_coords, const int individual_unique_id)
+{
+    SafeVec localCoords = local_to_map(glb_coords);
+    m_frozenBeings[localCoords].push_back({glb_coords, individual_unique_id});
+    for (const auto& loadedTile: m_beingLoadedTiles[individual_unique_id])
+    {
+        decrementSharedCount(loadedTile);
+    }
+    m_beingLoadedTiles.erase(individual_unique_id);
+}
 
 
 ArgentumTileMap::ArgentumTileMap(){srand(time(NULL));}
@@ -288,7 +323,7 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("generate_formation", "formation_generator", "origin", "size", "tile_selection_set", "seed", "data"), &ArgentumTileMap::generate_formation);
     ClassDB::bind_method(D_METHOD("generate_world_matrix", "size"), &ArgentumTileMap::generate_world_matrix);
     
-    ClassDB::bind_method(D_METHOD("load_tiles_around", "coords", "chunk_size"), &ArgentumTileMap::load_tiles_around);
+    ClassDB::bind_method(D_METHOD("load_tiles_around", "coords", "chunk_size", "uid"), &ArgentumTileMap::load_tiles_around);
 
     ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ArgentumTileMap::set_seed);
     ClassDB::bind_method(D_METHOD("get_seed"), &ArgentumTileMap::get_seed);
@@ -298,9 +333,9 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
     
-    ClassDB::bind_method(D_METHOD("store_frozen_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::store_frozen_being);
+    ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
 
     ADD_SIGNAL(MethodInfo("formation_formed"));
-    ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "glb_coords"), PropertyInfo(Variant::STRING, "uid")));
+    ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "glb_coords"), PropertyInfo(Variant::INT, "being_uid")));
     ADD_SIGNAL(MethodInfo("initialize_pawnkind", PropertyInfo(Variant::DICTIONARY, "data")));
 }

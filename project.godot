@@ -26,8 +26,8 @@ config/features=PackedStringArray("4.2", "Forward Plus")
 
 [autoload]
 
-GlobalData="*res://scripts/singletons/global_data.gd"
-GameData="*res://scripts/singletons/game_data.gd"
+GlobalData="*res://scripts/singletons/singleton_global_data.gd"
+GameData="*res://scripts/singletons/singleton_game_data.gd"
 BetterTerrain="*res://addons/better-terrain/BetterTerrain.gd"
 
 [display]

@@ -21,13 +21,18 @@ namespace godot
 
             std::vector<std::vector<std::vector<std::array<char, 32>>>> m_worldMatrix;
             std::vector<std::vector<std::vector<std::array<char, 32>>>> m_spawnWeightsMatrix;
-            std::unordered_map<SafeVec, std::vector<std::pair<Vector2, String>>, SafeVec::hash> m_frozenBeings;
+            std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> m_frozenBeings;
 
             //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
             //en donde según la id extrae el being de un dictionary q tiene guardado
+
+            void decrementSharedCount(const SafeVec& tileCoord);
             
             SafeVec m_worldSize;
-            std::unordered_set<SafeVec, SafeVec::hash> m_loadedTiles;//compartido por todos los beings del world activos en esta pc
+            std::unordered_map<int, std::unordered_set<SafeVec, SafeVec::hash>> m_beingLoadedTiles;
+
+            std::unordered_map<SafeVec, int, SafeVec::hash> m_tileSharedLoadsCount;
+
             std::unordered_map<std::string, std::unordered_map<StringName, Variant>> m_cppTilesData;
             static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const SafeVec &chunkSize);
 
@@ -58,14 +63,14 @@ namespace godot
             Vector2i get_random_coord_with_tile_id(const Vector2i& top_left_corner, const Vector2i& bottom_right_corner, const String& tile_id) const;
 
             void initializePawnKindinGdScript(const Ref<Dictionary>& data);
-            void store_frozen_being(const Vector2& glb_coords, const String& individual_unique_id);
+            void freeze_and_store_being(const Vector2& glb_coords, const int individual_unique_id);
 
             void generate_world_matrix(const Vector2i& size);
             void generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, const Vector2i& size, 
                  const Ref<Resource>& tileSelectionSet, signed int seed, const Dictionary& data);
             
-            void load_tiles_around(const Vector2& coords, const Vector2i& chunk_size);
-            void unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE);
+            void load_tiles_around(const Vector2& coords, const Vector2i& chunk_size, const int uid);
+            void unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE, const int uid);
     };
 }
 

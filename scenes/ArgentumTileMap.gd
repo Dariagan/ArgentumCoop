@@ -35,15 +35,19 @@ var _players_start_position: Vector2i
 
 var _player_i: int = 0
 func spawn_starting_player(being: Being):
-	spawn_being_at(being, _players_start_position + Vector2i(_player_i, 0))
+	birth_being_at(being, _players_start_position + Vector2i(_player_i, 0))
 	_player_i += 1
 
-func spawn_being_at(being: Being, pos: Vector2i):
-	add_child(being);
+var _birthed_beings_i: int = 0
+func birth_being_at(being: Being, pos: Vector2i):
+	being.uid = _birthed_beings_i
+	add_child(being)
+	_birthed_beings_i += 1
 	being.position = map_to_local(pos)
 	being.z_index = 10
 
 #endregion SPAWNING
 
-func _store_frozen_being():
+func _free_and_store_being():
 	pass
+	
