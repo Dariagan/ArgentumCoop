@@ -16,7 +16,7 @@
 
 /* RENAME THE CLASS USING: CTRL + F2 */
 // class zExampleHeader: public RefCounted
-// {
+// {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 //     GDCLASS(zExampleHeader, RefCounted)
 //     private:
 

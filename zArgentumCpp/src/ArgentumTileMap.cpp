@@ -198,6 +198,12 @@ void ArgentumTileMap::set_tiles_data(Dictionary all_tiles_data)
 
         const Dictionary& gd_tile_data = tile->call("get_data");
 
+        if(gd_tile_data.is_empty() || gd_tile_data["id"] == "" || (int)gd_tile_data["source_id"] == -1)
+        {
+            UtilityFunctions::printerr("read gd_tile_data is not valid (ArgentumTileMap.cpp::set_tiles_data())");
+            continue;
+        }
+
         std::unordered_map<StringName, Variant> cppTileData;
 
         for(int j = 0; j < gd_tile_data.values().size(); j++)

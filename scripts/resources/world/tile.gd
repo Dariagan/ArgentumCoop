@@ -5,7 +5,7 @@ class_name Tile
 @export var id: String
 	
 @export var layer: int = 0
-@export var source_id: int
+@export var source_id: int = -1
 @export var origin_position:Vector2i = Vector2i.ZERO
 @export var flipped_at_random: bool = false
 
@@ -21,7 +21,7 @@ func get_data() -> Dictionary:
 		printerr("id is empty for tile")
 		return {}
 	if source_id == 0:
-		printerr("source id is empty for tile")
+		printerr("source id is empty for tile with id %d", id)
 		return {}
 	
 	var ID_LENGTH: int = id.length()

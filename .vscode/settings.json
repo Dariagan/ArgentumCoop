@@ -66,6 +66,7 @@
         "format": "cpp",
         "variant": "cpp",
         "iomanip": "cpp",
-        "templateheader": "cpp"
+        "templateheader": "cpp",
+        "fstream": "cpp"
     }
 }
