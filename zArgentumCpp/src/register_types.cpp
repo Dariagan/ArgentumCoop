@@ -11,6 +11,9 @@
 
 using namespace godot;
 
+// IMPORTANTE: AL CREAR UNA CLASE QUE HEREDE DE UNA CLASE DE GODOT:
+// HAY QUE ANTEPONERLE "public" A LA CLASE DE GODOT 
+
 void initialize_argentum_cpp(ModuleInitializationLevel p_level)
 {
     if(p_level != MODULE_INITIALIZATION_LEVEL_SCENE){

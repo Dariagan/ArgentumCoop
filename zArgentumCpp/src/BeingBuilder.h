@@ -11,30 +11,49 @@
 #include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/godot.hpp>
 #include <optional>
-#include <memory>
 
 namespace godot{
 
-//TODO AGREGAR ESTA CLASE AL GODOT-SIDE? PODRÍA SER MUY ÚTIL
 class BeingBuilder: public RefCounted
 {
     GDCLASS(BeingBuilder, RefCounted)
     private:
         std::optional<Dictionary> builtBeing = std::nullopt;
-        String name, factionId, raceId="", klassId="random", bodyId="random", headId="random";
-        bool controllableRace;
+        String name="random", factionId="", raceId="", klassId="random", bodyId="random", headId="random";
+        bool controllableRace = false;
         Vector3 headScale = Vector3(1,1,1), bodyScale = Vector3(1,1,1);
         float extraHealthMultiplier = 1;
-        bool validate() const;
+        bool isValidBeing() const;
+        void print_failed_validation(bool& validationFailedMessageAlreadyPrinted) const;
+
     protected:
         static void _bind_methods();
     public:
-
+        //TODO cargar los dicts del node autoload global_data
         static void load_game_data(Dictionary data); 
 
+        BeingBuilder& setName(const String& name);
+        BeingBuilder& randomizeName();
+        BeingBuilder& setFactionId(const String& factionId);
+        BeingBuilder& setRaceId(const String& raceId, bool controllableRace);
+        BeingBuilder& setKlassId(const String& klassId);
+        BeingBuilder& randomizeKlassId();
+        BeingBuilder& setHeadId(const String& headId);
+        BeingBuilder& randomizeHeadId();
+        BeingBuilder& setBodyId(const String& bodyId);
+        BeingBuilder& randomizeBodyId();
+        BeingBuilder& setHeadScale(const Vector3& headScale);
+        BeingBuilder& setBodyScale(const Vector3& bodyScale);
+        BeingBuilder& setExtraHealthMultiplier(const float extraHealthMultiplier);
+
+        bool build();
+        std::optional<Dictionary> getResult() const;
+
+        // functions to be used exclusively on GDscript-side (not in C++)
         void _gd_set_name(const String& name);
+        void _gd_randomize_name();
         void _gd_set_faction_id(const String& faction_id);
-        void _gd_set_race_id(const String& race_id);
+        void _gd_set_race_id(const String& race_id, const bool controllable_race);
         void _gd_set_klass_id(const String& klass_id);
         void _gd_randomize_klass_id();
         void _gd_set_head_id(const String& head_id);
@@ -44,34 +63,9 @@ class BeingBuilder: public RefCounted
         void _gd_set_head_scale(const Vector3& head_scale);
         void _gd_set_body_scale(const Vector3& body_scale);
         void _gd_set_extra_health_multiplier(const float multiplier);
-
-        BeingBuilder& setName(const String& name);
-        BeingBuilder& setFactionId(const String& factionId);
-        BeingBuilder& setRaceId(const String& raceId, bool controllableRace);
-        BeingBuilder& setKlassId(const String& klassId);
-        BeingBuilder& randomizeKlassId();
-        BeingBuilder& setHeadId(const String& bodyId);
-        BeingBuilder& randomizeHeadId();
-        BeingBuilder& setBodyId(const String& bodyId);
-        BeingBuilder& randomizeBodyId();
-        BeingBuilder& setHeadScale(const Vector3& headScale);
-        BeingBuilder& setBodyScale(const Vector3& bodyScale);
-        BeingBuilder& setExtraHealthMultiplier(const float extraHealthMultiplier);
-        //MIRAR LAS OPERACIONES FUNCIONALES
-        //https://en.cppreference.com/w/cpp/utility/optional
-        
-        //usado por build
-        
-        bool build();
-
         Dictionary _gd_get_result() const;
-
-        std::optional<Dictionary> getResult() const;
-
-        //usar solo del lado de gdscript
         
-        BeingBuilder();
-        ~BeingBuilder();
+        BeingBuilder(); ~BeingBuilder();
 };
 }
 

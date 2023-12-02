@@ -4,6 +4,8 @@ class_name BasicRace
 @export var name: StringName = &" "
 @export var icon: Texture2D
 
+@export var default_being_names: Array[StringName] = []
+
 @export var head_sprites_datas: Array[SpriteData]
 
 @export var body_sprites_datas: Array[BodySpriteData]

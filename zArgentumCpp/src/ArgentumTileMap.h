@@ -32,6 +32,8 @@ namespace godot
             void decrementSharedCount(const SafeVec& tileCoord);
             
             SafeVec m_worldSize;
+
+            //keeps track of tracks of the tiles loaded by the being with the specific uid (int)
             std::unordered_map<int, std::unordered_set<SafeVec, SafeVec::hash>> m_beingLoadedTiles;
 
             std::unordered_map<SafeVec, int, SafeVec::hash> m_tileSharedLoadsCount;
