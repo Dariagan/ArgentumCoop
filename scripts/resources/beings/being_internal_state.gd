@@ -7,11 +7,11 @@ var faction: Faction
 
 var sex: Enums.Sex
 var race: BasicRace #mover estos dos a una clase Characterization guardada en otro lado?
-var klass: Klass #mover estos dos a una clase Characterization guardada en otro lado?
+var klass: Klass = null #mover estos dos a una clase Characterization guardada en otro lado?
 
 var body: HarmableBody #contains health state for each body part
-var inventory_state: InventoryData # TODO USAR EL PLUGIN INVENTORYSYSTEM?
-var skills_data
+var inventory: InventoryData = null# TODO USAR EL PLUGIN INVENTORYSYSTEM?
+var skills_data = null
 
 func construct_locally(sex: Enums.Sex, race:BasicRace, faction: Faction, body: HarmableBody, klass: Klass = null):
 	self.sex = sex; self.race = race; self.faction = faction; self.body = body; self.klass= klass

@@ -1,20 +1,6 @@
 #include "BeingBuilder.h"
 using namespace godot;
 
-void BeingBuilder::_gd_set_name(const String& name){setName(name);}
-void BeingBuilder::_gd_randomize_name(){randomizeName();}
-void BeingBuilder::_gd_set_faction_id(const String& faction_id){setFactionId(faction_id);};
-void BeingBuilder::_gd_set_race_id(const String& race_id, const bool controllable_race){setRaceId(race_id, controllable_race);}
-void BeingBuilder::_gd_set_klass_id(const String& klass_id){setKlassId(klass_id);}
-void BeingBuilder::_gd_randomize_klass_id(){randomizeKlassId();}
-void BeingBuilder::_gd_set_head_id(const String& head_id){setHeadId(headId);}
-void BeingBuilder::_gd_randomize_head_id(){randomizeHeadId();}
-void BeingBuilder::_gd_set_body_id(const String& body_id){setBodyId(body_id);}
-void BeingBuilder::_gd_randomize_body_id(){randomizeBodyId();}
-void BeingBuilder::_gd_set_head_scale(const Vector3& head_scale){setHeadScale(head_scale);}
-void BeingBuilder::_gd_set_body_scale(const Vector3& body_scale){setBodyScale(body_scale);}
-void BeingBuilder::_gd_set_extra_health_multiplier(const float multiplier){setExtraHealthMultiplier(extraHealthMultiplier);}
-
 //TODO CARGAR TODAS LAS RACES, KLASSES AL C++ SIDE PA VER SI EXISTE LA ID PASADA AL CONSTRUIR DENTRO DEL DICT. VAN A HABER MENOS BUGS DE IF MAL-ESCRITAS EN GENERAL
 
 BeingBuilder& BeingBuilder::setName(const String& name)
@@ -52,45 +38,43 @@ BeingBuilder& BeingBuilder::setBodyScale(const Vector3& bodyScale)//agregar rese
 BeingBuilder& BeingBuilder::setExtraHealthMultiplier(const float extraHealthMultiplier)//agregar reset
 {this->extraHealthMultiplier = extraHealthMultiplier; return *this;}
 
-// also sets validationFailed to true
-void BeingBuilder::print_failed_validation(bool& validationFailedWasAlreadyPrinted) const
+// also sets validationSuccessful to false
+void BeingBuilder::failAndPrint(bool& isValidationSuccessful) const{if(isValidationSuccessful)
 {
-    if(validationFailedWasAlreadyPrinted == false){
-        validationFailedWasAlreadyPrinted = true;
-        UtilityFunctions::printerr("Couldn't validate (BeingBuilder.cpp::build()). causes:");
-    }
-}
-
+    isValidationSuccessful = false;
+    UtilityFunctions::printerr("Failed validation of builder (at BeingBuilder.cpp::build()),");
+    UtilityFunctions::printerr("with current state-> name:",name," factionId:",factionId,
+    " raceId:",raceId," klassId:",klassId," headId:",headId," bodyId:",bodyId,
+    " headScale:",headScale," bodyScale:",bodyScale," extraHealthMultiplier:",extraHealthMultiplier);
+    UtilityFunctions::printerr("Causes:");
+}}
 bool BeingBuilder::isValidBeing() const
 {
-    bool validationFailed = false;
+    bool isValidationSuccessful = true;
 
     if(extraHealthMultiplier <= 0)
     {
-        print_failed_validation(validationFailed);
+        failAndPrint(isValidationSuccessful);
         UtilityFunctions::printerr("-specified extraHealthMultiplier less or equal to zero");
     }
 
     if(raceId == "")
     {
-        print_failed_validation(validationFailed);
-        UtilityFunctions::printerr("-race id not set");
+        failAndPrint(isValidationSuccessful);
+        UtilityFunctions::printerr("-race id hasn't been specified");
     }
     else if(!controllableRace && klassId != "random")
     {
-        print_failed_validation(validationFailed);
+        failAndPrint(isValidationSuccessful);
         UtilityFunctions::printerr("-klass was specified, but race is not a controllable one");
     }
 
     if(factionId == "")
     {
-        print_failed_validation(validationFailed);
-        UtilityFunctions::printerr("-faction id not set");
+        failAndPrint(isValidationSuccessful);
+        UtilityFunctions::printerr("-faction id hasn't been specified");
     }
-
-    if (validationFailed == false) {return true;}
-
-    return false;
+    return isValidationSuccessful;
 }
 
 bool BeingBuilder::build()
@@ -102,7 +86,6 @@ bool BeingBuilder::build()
         data["fac"] = factionId;
         data["race"] = raceId;
         if (controllableRace) {data["klass"] = klassId;}
-        
         data["head"] = headId;
         data["body"] = bodyId;
         data["head_scale"] = headScale;
@@ -121,18 +104,31 @@ bool BeingBuilder::build()
 std::optional<Dictionary> BeingBuilder::getResult() const
 {return builtBeing;}
 
-// USE THIS METHOD ONLY in GDscript, not in c++
-Dictionary BeingBuilder::_gd_get_result() const
-{
-    if (builtBeing.has_value())
-    {
-        return builtBeing.value();
-    }
-    Dictionary emptyDict; emptyDict.make_read_only();
-    return emptyDict;
-}
+
 BeingBuilder::BeingBuilder(){}
 BeingBuilder::~BeingBuilder(){}
+
+// USE THESE METHODS ONLY in GDscript, NOT in c++ !
+void BeingBuilder::_gd_set_name(const String& name){setName(name);}
+void BeingBuilder::_gd_randomize_name(){randomizeName();}
+void BeingBuilder::_gd_set_faction_id(const String& faction_id){setFactionId(faction_id);};
+void BeingBuilder::_gd_set_race_id(const String& race_id, const bool controllable_race){setRaceId(race_id, controllable_race);}
+void BeingBuilder::_gd_set_klass_id(const String& klass_id){setKlassId(klass_id);}
+void BeingBuilder::_gd_randomize_klass_id(){randomizeKlassId();}
+void BeingBuilder::_gd_set_head_id(const String& head_id){setHeadId(headId);}
+void BeingBuilder::_gd_randomize_head_id(){randomizeHeadId();}
+void BeingBuilder::_gd_set_body_id(const String& body_id){setBodyId(body_id);}
+void BeingBuilder::_gd_randomize_body_id(){randomizeBodyId();}
+void BeingBuilder::_gd_set_head_scale(const Vector3& head_scale){setHeadScale(head_scale);}
+void BeingBuilder::_gd_set_body_scale(const Vector3& body_scale){setBodyScale(body_scale);}
+void BeingBuilder::_gd_set_extra_health_multiplier(const float multiplier){setExtraHealthMultiplier(extraHealthMultiplier);}
+Dictionary BeingBuilder::_gd_get_result() const
+{
+    Dictionary emptyDict; emptyDict.make_read_only();
+
+    return builtBeing.value_or(emptyDict);
+}
+
 void BeingBuilder::_bind_methods()
 {
     ClassDB::bind_method(D_METHOD("set_name", "name"), &BeingBuilder::_gd_set_name);

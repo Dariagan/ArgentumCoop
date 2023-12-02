@@ -24,7 +24,7 @@ class BeingBuilder: public RefCounted
         Vector3 headScale = Vector3(1,1,1), bodyScale = Vector3(1,1,1);
         float extraHealthMultiplier = 1;
         bool isValidBeing() const;
-        void print_failed_validation(bool& validationFailedMessageAlreadyPrinted) const;
+        void failAndPrint(bool& validationFailedMessageAlreadyPrinted) const;
 
     protected:
         static void _bind_methods();

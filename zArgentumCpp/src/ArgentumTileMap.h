@@ -55,12 +55,14 @@ namespace godot
             //std::vector<std::vector<std::vector<std::array<char, 32>>>>& getWorldMatrix();
             //std::vector<std::vector<std::vector<std::array<char, 32>>>>& getSpawnWeightsMatrix();
 
+            void placeSpawnWeight(SafeVec coord, std::array<char, 32> beingKindId);
+
             //SOLO USAR PARA FORMATIONS
-            void placeFormationTile(//TODO hacerlo friend method
+            void placeFormationTile(
                 const SafeVec& formationOrigin, const SafeVec& tileCoordsRelativeToFormationOrigin, 
-                const std::array<char, 32>& tileId, bool deleteOthers = false);
+                const std::optional<std::array<char, 32>>& optTileId, bool deleteOthers = false);
                 
-            bool birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder);
+            void birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder);
             
             //TODO algún método para escribir en un archivo el estado del mapa actual (intentar escribir en el .tres?)
             //TODO algún método para cargar el worldMatrix a partir de un archivo

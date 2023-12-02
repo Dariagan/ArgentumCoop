@@ -117,8 +117,7 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec& tileCoord)
         for (int layer_i = 0; layer_i < get_layers_count(); layer_i++)
             {erase_cell(layer_i, tileCoord);}
 
-        //TODO freezear a aquellos beings q se encuentren dentro de esta tile borrada
-
+        emit_signal("tile_unloaded", (Vector2i)tileCoord);
         m_tileSharedLoadsCount.erase(tileCoord);
     }
 }
@@ -293,27 +292,26 @@ bool ArgentumTileMap::withinChunkBounds(
 
 void ArgentumTileMap::placeFormationTile( 
     const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
-    const std::array<char, 32>& tileId, const bool deletePreviousTiles){try
+    const std::optional<std::array<char, 32>>& optTileId, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
     auto& otherTilesAtPos = m_worldMatrix.at(absoluteCoords.lef).at(absoluteCoords.RIGHT);
     
     if (deletePreviousTiles){otherTilesAtPos.clear();}
-    otherTilesAtPos.push_back(tileId);
+    
+    std::array<char, 32> temp; strcpy(&temp[0], "NOT_FOUND");
+
+    otherTilesAtPos.push_back(optTileId.value_or(temp));
 }
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
-//con un builder se podrían repetir los settings tmb
-//TODO hacer un builder de BeingData quien sea q chequee el build y printee errores. desp pasarle el objeto a este
 //ojo estas coords son absolutas, no relativas al origin de la formation
-bool godot::ArgentumTileMap::birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder)
-{//shouldn't print anything, that's the builder's task
+void godot::ArgentumTileMap::birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder)
+{
     if(beingBuilder.getResult().has_value())
     {
         emit_signal("birth_being_w_init_data", coords, beingBuilder.getResult().value());
-        return true;
-    }
-    return false;
+    }//shouldn't print anything otherwise, that's the builder's task when building
 }
 
 void ArgentumTileMap::birthBeingOfKind(const String& being_kind_id){emit_signal("birth_of_being_of_kind", being_kind_id);}
@@ -358,8 +356,11 @@ void ArgentumTileMap::_bind_methods()
 
     ADD_SIGNAL(MethodInfo("formation_formed"));
 
-    ADD_SIGNAL(MethodInfo("birth_being", PropertyInfo(Variant::VECTOR2I, "coords"), PropertyInfo(Variant::STRING_NAME, "pawnkind_id")));
-    ADD_SIGNAL(MethodInfo("birth_being_w_init_data", PropertyInfo(Variant::VECTOR2I, "coords"), PropertyInfo(Variant::DICTIONARY, "init_data")));
+    ADD_SIGNAL(MethodInfo("birth_being", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::STRING_NAME, "pawnkind_id")));
+    ADD_SIGNAL(MethodInfo("birth_being_w_init_data", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::DICTIONARY, "init_data")));
+
+    ADD_SIGNAL(MethodInfo("tile_unloaded", PropertyInfo(Variant::VECTOR2I, "local_coords")));
+
     ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "glb_coords"), PropertyInfo(Variant::INT, "being_uid")));
     ADD_SIGNAL(MethodInfo("birth_of_being_of_kind", PropertyInfo(Variant::STRING, "being_kind_id")));
 }

@@ -1,6 +1,5 @@
 #ifndef __TILE_SELECTOR_H__
 #define __TILE_SELECTOR_H__
-
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
@@ -10,6 +9,9 @@
 #include <vector>
 #include <random>
 #include <utility> 
+#include <optional>
+#include <algorithm>
+
 #include "GdStringExtractor.cpp"
 namespace godot
 {
@@ -27,26 +29,27 @@ class TileSelector
         std::array<std::pair<std::array<std::array<char, 32>, MAX_GROUPED_TILES_COUNT>, std::discrete_distribution<int>>, MAX_TARGETS_COUNT> idsDistributionOfGroups;
 
     public:
-        std::array<char, 32> getTileId(const std::array<char, 32>& TARGET_TO_FILL)
+        std::optional<std::array<char, 32>> getTileId(const std::array<char, 32>& TARGET_TO_FILL)
         {
-            for (short unsigned int i = 0; i < TARGETS_COUNT; i++)
-            {
-                if (strcmp(&targetsToFill[i][0], &TARGET_TO_FILL[0]) == 0)
-                {
-                    if (tileIdOrDesignatedGroupId[i].at(0) != '_')
-                    {
-                        return tileIdOrDesignatedGroupId[i];
-                    }
-                    else
-                    {
-                        auto pair = idsDistributionOfGroups[i];
+            auto it = std::find_if(targetsToFill.begin(), targetsToFill.end(), [&](const auto& target) {
+                return std::strcmp(&target[0], &TARGET_TO_FILL[0]) == 0;
+            });
 
-                        return pair.first[pair.second(randomEngine)];
-                    }
-                    break;
-                }    
+            if (it != targetsToFill.end())
+            {
+                auto index = std::distance(targetsToFill.begin(), it);
+
+                if (tileIdOrDesignatedGroupId[index].at(0) != '_')
+                {
+                    return tileIdOrDesignatedGroupId[index];
+                }
+                else
+                {
+                    auto pair = idsDistributionOfGroups[index];
+                    return pair.first[pair.second(randomEngine)];
+                }
             }
-            UtilityFunctions::printerr("couldn't find filler for target: ", &TARGET_TO_FILL[0]);
+            UtilityFunctions::printerr("couldn't find any candidate tile for the target to be filled: \"",&TARGET_TO_FILL[0],"\" (at TileSelector.cpp::getTileId())");
             return {};
         }
 

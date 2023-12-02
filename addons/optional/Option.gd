@@ -31,7 +31,7 @@ var _value: Variant = null
 # TODO signal value_changed
 
 static func Some(v) -> Option:
-	assert(v != null, "Cannot assign null to an Some")
+	assert(v != null and v != "", "Cannot assign null to an Some")
 	return Option.new(v)
 
 static func None() -> Option:

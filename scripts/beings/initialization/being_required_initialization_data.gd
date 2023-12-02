@@ -4,7 +4,7 @@ class_name BeingReqInitData
 #se diferencia de un pawnkinddef en q el pawnkinddef puede incluir rangos de aleatoriedad/sets weighteados configurables para ciertos atributos/variables
 #dentro de ahí, (money, possible loot, health, possible names). y en pawnkinddef no se especifica la faction. en esto sí, para saber en cual meter al being
 #
-#esto contiene solo valores deterministas para el spawning (excepto por la randomización de la cara y cuerpo si se especifica)
+#esto contiene solo valores deterministas para el spawning de un individuo (excepto por la randomización de la cara y cuerpo si no se especifican)
 
 var name: String 
 var head_scale: Vector3 = Vector3.ONE
@@ -20,6 +20,7 @@ var extra_health_multiplier: float = 1
 var internal_state: BeingInternalState
 	
 func construct(being_birth_dict: Dictionary) -> void:
+	assert(being_birth_dict != null && being_birth_dict != {})
 	var sex: Enums.Sex
 	var race: BasicRace
 	var klass: Klass
@@ -61,7 +62,8 @@ func construct(being_birth_dict: Dictionary) -> void:
 	
 	internal_state = BeingInternalState.new()
 	internal_state.construct_locally(sex, race, faction, null, klass)
-	
+
+# TODO
 func construct_from_serialized(serialized_being_spawn_data: Dictionary) -> void:
 	pass
 
@@ -74,6 +76,7 @@ func serialize() -> Dictionary:
 		"body": sprite_body.id,
 		"state": internal_state.serialize(),
 		"eh": extra_health_multiplier
+		#extra_stats_multiplier
 	}
 	#dict["followers"] = get_array_of_ids(followers)
 	

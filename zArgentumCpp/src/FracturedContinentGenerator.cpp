@@ -136,7 +136,7 @@ void FracturedContinentGenerator::generate(
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
         for(unsigned char k = 0; k < addedTargetsCount; k++)
         {
-            const std::array<char, 32> tileId = this->m_tileSelector->getTileId(targetsToFill[k]);
+            const auto tileId = this->m_tileSelector->getTileId(targetsToFill[k]);
             argentumTileMap.placeFormationTile(origin, coords, tileId);
         }
         
@@ -189,19 +189,11 @@ void FracturedContinentGenerator::placeDungeonEntrances(
 {
     constexpr int MAX_TRIES = 1'000'000;
 
-    constexpr int MAX_DUNGEONS_IN_ARRAY = 3;
-
-    if (dungeonsToPlace > MAX_DUNGEONS_IN_ARRAY)
-    {
-        UtilityFunctions::printerr("can't place more than ",MAX_DUNGEONS_IN_ARRAY," dungeons (array capacity)\nDungeon placement cancelled");
-        return;
-    }
-
-    std::array<SafeVec, MAX_DUNGEONS_IN_ARRAY> placedDungeonsCoords;
+    std::vector<SafeVec> placedDungeonsCoords;
 
     float minDistanceMultiplier = 1;
     float triesCount = 1;
-    for (unsigned char dungeonI = 0; dungeonI < dungeonsToPlace; triesCount++)
+    for (; placedDungeonsCoords.size() < dungeonsToPlace; triesCount++)
     {
         const SafeVec rCoords(m_rng.randi_range(0, m_size.lef), m_rng.randi_range(0, m_size.RIGHT));
 
@@ -209,25 +201,20 @@ void FracturedContinentGenerator::placeDungeonEntrances(
         && peninsuler.get_noise_2dv(rCoords) > peninsuler_cutoff + 0.1f 
         && !isLake(rCoords) && clearOf(m_trees, rCoords, 3, true))
         {
-            bool farEnoughFromOtherDungeons = true;
             const float minDistanceBetweenDungeons = m_size.length() * 0.25f * minDistanceMultiplier;
 
-            for (const SafeVec& coord : placedDungeonsCoords)
+            const auto isTooClose = [&](const auto& coord){return rCoords.distanceTo(coord) <  minDistanceBetweenDungeons;};
+
+            if (std::find_if(placedDungeonsCoords.begin(), placedDungeonsCoords.end(), isTooClose) 
+                == placedDungeonsCoords.end())
             {
-                if (rCoords.distanceTo(coord) <  minDistanceBetweenDungeons)
-                {
-                    farEnoughFromOtherDungeons = false;
-                    break;
-                }
-            }
-            if (farEnoughFromOtherDungeons)
-            {
+                placedDungeonsCoords.push_back(rCoords);
                 std::array<char, 32> buffer;
-                sprintf(&buffer[0], "cave_%d", dungeonI);
-                const std::array<char, 32> TILE_ID = this->m_tileSelector->getTileId(buffer);
-                argentumTileMap.placeFormationTile(m_origin, rCoords, TILE_ID);
-                placedDungeonsCoords[dungeonI++] = rCoords;
-                //UtilityFunctions::print(newDungeonCoords);
+                sprintf(&buffer[0], "cave_%lu", placedDungeonsCoords.size()-1);
+
+                const auto tileId = this->m_tileSelector->getTileId(buffer);
+                argentumTileMap.placeFormationTile(m_origin, rCoords, tileId);
+                UtilityFunctions::print((Vector2i)rCoords);
             }
             else{minDistanceMultiplier = std::clamp(1500.f / triesCount, 0.f, 1.f);}
         }
