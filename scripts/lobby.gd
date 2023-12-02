@@ -174,7 +174,7 @@ func _on_head_selected(head : SpriteData):
 	else: 
 		_update_characterization_for_everyone.rpc("head")
 	
-func _on_class_selected(klass: Class):
+func _on_class_selected(klass: Klass):
 	if klass: _update_characterization_for_everyone.rpc("klass", klass.id)
 	else: _update_characterization_for_everyone.rpc("klass")
 func _on_follower_selected(follower: UncontrollableRace):

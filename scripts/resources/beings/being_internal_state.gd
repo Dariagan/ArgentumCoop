@@ -1,18 +1,19 @@
 extends Node# es Node para que sea fácilmente debuggeable desde Remote,y así el state interactúa más fácilmente con el parent Being
 class_name BeingInternalState 
+#para agregar más funcionalidad/estado, addchildear nodos hijos de estado
 
 var carried_weight: int = 0
 var faction: Faction
 
 var sex: Enums.Sex
 var race: BasicRace #mover estos dos a una clase Characterization guardada en otro lado?
-var klass: Class #mover estos dos a una clase Characterization guardada en otro lado?
+var klass: Klass #mover estos dos a una clase Characterization guardada en otro lado?
 
 var body: HarmableBody #contains health state for each body part
 var inventory_state: InventoryData # TODO USAR EL PLUGIN INVENTORYSYSTEM?
 var skills_data
 
-func construct_locally(sex: Enums.Sex, race:BasicRace, faction: Faction, body: HarmableBody, klass: Class = null):
+func construct_locally(sex: Enums.Sex, race:BasicRace, faction: Faction, body: HarmableBody, klass: Klass = null):
 	self.sex = sex; self.race = race; self.faction = faction; self.body = body; self.klass= klass
 
 func construct(data: Dictionary) -> void:
@@ -23,7 +24,7 @@ func construct(data: Dictionary) -> void:
 	
 	race = GlobalData.races[data["race"]]
 	if race is ControllableRace:
-		klass = GlobalData.classes[data["klass"]]
+		klass = GlobalData.klasses[data["klass"]]
 
 func get_max_speed() -> float:
 	var max_speed: float =  7 * race.combat_multipliers.speed 

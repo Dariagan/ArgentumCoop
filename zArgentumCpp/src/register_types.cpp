@@ -2,6 +2,7 @@
 #include "FormationGenerator.h"
 #include "FracturedContinentGenerator.h"
 #include "ArgentumTileMap.h"
+#include "BeingBuilder.h"
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -16,6 +17,7 @@ void initialize_argentum_cpp(ModuleInitializationLevel p_level)
         return;
     }
     ClassDB::register_class<ArgentumTileMap>();
+    ClassDB::register_class<BeingBuilder>();
     ClassDB::register_abstract_class<FormationGenerator>();
     ClassDB::register_class<FracturedContinentGenerator>();
 }

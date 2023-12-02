@@ -17,6 +17,8 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 	var i: int = 0
 	for player_start_data: Dictionary in players_start_data:
 		
+		if not player_start_data.has("name"):
+			player_start_data["name"] = "nameless_player%d"%i
 		if not player_start_data.has("race"):
 			player_start_data["race"] = "controllable_random"
 		if not player_start_data.has("sex"):
@@ -29,6 +31,9 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 			player_start_data["body"] = "random"
 		
 		player_start_data["fac"] = "player"	
+		
+		#extra health para los protagonists
+		player_start_data["eh"] = 2	
 		
 		var player_being_init_data = BeingReqInitData.new()
 		player_being_init_data.construct(player_start_data)

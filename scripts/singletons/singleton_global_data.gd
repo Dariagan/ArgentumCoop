@@ -23,9 +23,10 @@ const controllable_races_directories: Array[String] = ["res://resources/beings/r
 const uncontrollable_races_directories: Array[String] = ["res://resources/beings/races/uncontrollable/"]
 const tile_selections_directories: Array[String] =["res://resources/world/tile_selections/"]
 
-const classes_directories: Array[String] = ["res://resources/beings/classes/"]
+const klasses_directories: Array[String] = ["res://resources/beings/klasses/"]
 const tiles_directories: Array[String] = ["res://resources/world/terrain/", "res://resources/world/buildings/"]
 const spawnable_scenes_directories: Array[String] = ["res://scenes/world/terrain/", "res://scenes/world/buildings/"]
+#TODO USAR MULTIPLE RESOURCE LOADER?
 
 var item_data: Dictionary
 
@@ -37,7 +38,7 @@ var building_data: Dictionary
 var races: Dictionary
 var controllable_races: Dictionary
 var uncontrollable_races: Dictionary
-var classes: Dictionary
+var klasses: Dictionary
 
 var tiles: Dictionary
 
@@ -62,14 +63,14 @@ func _init() -> void:
 	
 	tile_selections = _index_all_found_resources(tile_selections_directories)
 	tile_selections.make_read_only()
-	classes = _index_all_found_resources(classes_directories)
-	classes.make_read_only()
+	klasses = _index_all_found_resources(klasses_directories)
+	klasses.make_read_only()
 	tiles = _index_all_found_resources(tiles_directories)
 	tiles.make_read_only()
 	
 	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
-func _index_all_found_resources(directories: Array[String], check_subfolders: bool = true) -> Dictionary:
+func _index_all_found_resources(directories: Array[String], check_subfolders: bool = true, use_safe_loader: bool = false) -> Dictionary:
 	var dir_access: DirAccess
 	var table: Dictionary = {}
 	
@@ -83,8 +84,13 @@ func _index_all_found_resources(directories: Array[String], check_subfolders: bo
 			while file_name != "":
 				
 				if !dir_access.current_is_dir():
-					var resource = ResourceLoader.load(directory + file_name)
-			
+					var resource
+					
+					if not use_safe_loader:
+						resource = ResourceLoader.load(directory + file_name)
+					else:
+						resource = SafeResourceLoader.load(directory + file_name)
+					
 					if resource && "id" in resource:
 						table[resource.id] = resource
 						print("Resource %s%s loaded" % [directory, file_name])

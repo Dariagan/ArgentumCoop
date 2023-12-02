@@ -1,6 +1,10 @@
 extends RefCounted 
 #BeingRequiredInitializationData
 class_name BeingReqInitData
+#se diferencia de un pawnkinddef en q el pawnkinddef puede incluir rangos de aleatoriedad/sets weighteados configurables para ciertos atributos/variables
+#dentro de ahí, (money, possible loot, health, possible names). y en pawnkinddef no se especifica la faction. en esto sí, para saber en cual meter al being
+#
+#esto contiene solo valores deterministas para el spawning (excepto por la randomización de la cara y cuerpo si se especifica)
 
 var name: String 
 var head_scale: Vector3 = Vector3.ONE
@@ -15,12 +19,10 @@ var extra_health_multiplier: float = 1
 
 var internal_state: BeingInternalState
 	
-# inicializar las variables con .nombre_variable = algo
-	
 func construct(being_birth_dict: Dictionary) -> void:
 	var sex: Enums.Sex
 	var race: BasicRace
-	var klass: Class
+	var klass: Klass
 	var faction: Faction
 	var followers: Array[UncontrollableRace]  
 	var result
@@ -39,13 +41,13 @@ func construct(being_birth_dict: Dictionary) -> void:
 	else:
 		race = handle_key("race", being_birth_dict, GlobalData.uncontrollable_races)
 		
-	klass = handle_key("klass", being_birth_dict, GlobalData.classes)
+	klass = handle_key("klass", being_birth_dict, GlobalData.klasses)
 	
 	faction = handle_key("fac", being_birth_dict, GameData.factions)
 		
 	if being_birth_dict.has("followers"):
-		# BUG, ARREGLAR. DICE CLASSES AHÍ. HAY Q ARREGLAR ETO
-		followers = GlobalData.classes[being_birth_dict["followers"]]
+		# BUG, ARREGLAR. DICE  AHÍ. HAY Q ARREGLAR ETO
+		followers = GlobalData.klasses[being_birth_dict["followers"]]
 			
 	sprite_head = handle_key("head", being_birth_dict, race.head_sprites_datas)
 			

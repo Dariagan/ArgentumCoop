@@ -11,11 +11,11 @@ var _found_races: Array
 var _current_race: ControllableRace
 var _current_sex: Enums.Sex
 var _current_head: SpriteData
-var _current_class: Class
+var _current_class: Klass
 var _current_follower: UncontrollableRace
 
 signal race_selected(race: ControllableRace)
-signal class_selected(klass: Class)
+signal class_selected(klass: Klass)
 signal sex_selected(sex: Enums.Sex)
 signal head_selected(head: SpriteData)
 signal follower_selected(follower: UncontrollableRace)
@@ -39,7 +39,7 @@ func _on_race_selected(id: int):
 	_current_race = _found_races[id]
 	race_selected.emit(_current_race)
 	
-	if _current_class and not _current_class in _current_race.classes:
+	if _current_class and not _current_class in _current_race.klasses:
 		_current_class = null
 		class_selected.emit(null)
 	if not _current_class:
@@ -55,7 +55,7 @@ func _on_race_selected(id: int):
 	if _current_race and _current_sex > 0:
 		_setup_head_menu_popup(_current_sex)
 	
-	_update_popup_menu(class_menu_button.get_popup(), _current_race.classes)
+	_update_popup_menu(class_menu_button.get_popup(), _current_race.klasses)
 	#selected_race.emit(_current_race)
 
 func _on_sex_selected(id: int):
@@ -82,7 +82,7 @@ func _on_head_selected(i: int):
 	head_menu_button.icon = _current_head.frames.get_frame_texture("idle_down", 0)
 
 func _on_class_selected(id: int):
-	_current_class = _current_race.classes[id]
+	_current_class = _current_race.klasses[id]
 	class_selected.emit(_current_class)
 	
 	if _current_follower and not _current_follower in _current_class.available_followers:

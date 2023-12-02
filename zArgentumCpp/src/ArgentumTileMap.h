@@ -2,6 +2,7 @@
 #define __ARGENTUMTILEMAP_H__
 
 #include "FormationGenerator.h"
+#include "BeingBuilder.h"
 
 #include <godot_cpp/classes/tile_map.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
@@ -20,6 +21,8 @@ namespace godot
             std::unordered_map<std::string, SafeVec> m_trackedBeingsCoords;//updateado cada
 
             std::vector<std::vector<std::vector<std::array<char, 32>>>> m_worldMatrix;
+
+            //contiene ids de BeingKinds
             std::vector<std::vector<std::vector<std::array<char, 32>>>> m_spawnWeightsMatrix;
             std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> m_frozenBeings;
 
@@ -44,6 +47,9 @@ namespace godot
         public:
             ArgentumTileMap();
             ~ArgentumTileMap();
+
+            bool persist(String filename);
+
             //std::vector<std::vector<std::vector<std::array<char, 32>>>>& getWorldMatrix();
             //std::vector<std::vector<std::vector<std::array<char, 32>>>>& getSpawnWeightsMatrix();
 
@@ -52,6 +58,7 @@ namespace godot
                 const SafeVec& formationOrigin, const SafeVec& tileCoordsRelativeToFormationOrigin, 
                 const std::array<char, 32>& tileId, bool deleteOthers = false);
                 
+            bool birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder);
             
             //TODO algún método para escribir en un archivo el estado del mapa actual (intentar escribir en el .tres?)
             //TODO algún método para cargar el worldMatrix a partir de un archivo
@@ -62,7 +69,7 @@ namespace godot
 
             Vector2i get_random_coord_with_tile_id(const Vector2i& top_left_corner, const Vector2i& bottom_right_corner, const String& tile_id) const;
 
-            void initializePawnKindinGdScript(const Ref<Dictionary>& data);
+            void birthBeingOfKind(const String& being_kind_id);
             void freeze_and_store_being(const Vector2& glb_coords, const int individual_unique_id);
 
             void generate_world_matrix(const Vector2i& size);

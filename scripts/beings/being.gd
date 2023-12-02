@@ -1,5 +1,6 @@
 extends CharacterBody2D
 class_name Being
+#para persistirlo habrá que usar packedscene para guardar las cosas custom variables q puede ser q tenga, sino habrá q iterar por cada child
 
 var uid: int = randi_range(-9223372036854775808, 9223372036854775807)
 

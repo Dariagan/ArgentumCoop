@@ -6,7 +6,6 @@
 #include <godot_cpp/classes/random_number_generator.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
-#include <regex>
 #include <string>
 #include <typeinfo>
 #include <algorithm>
@@ -75,15 +74,11 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
                         it = tileFrozenBeings.erase(it);
                     }
                 }
-                if (m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT].size() > 0)//if more than 0 tileIds:
+                if (m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT].size() > 0)//if more than 0 tileIds at coords:
                     for (const std::array<char, 32>& id : m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT])
-                    {
-                        setCell(&id[0], sTileMapCoords);
-                    }
+                        {setCell(&id[0], sTileMapCoords);}
                 else
-                {
-                    setCell("ocean_water", sTileMapCoords);
-                }
+                    {setCell("ocean_water", sTileMapCoords);}
             }
             else if (m_beingLoadedTiles[being_uid].count(sTileMapCoords) == 0)
             {
@@ -203,44 +198,45 @@ void ArgentumTileMap::set_tiles_data(Dictionary all_tiles_data)
 
         const Dictionary& gd_tile_data = tile->call("get_data");
 
-        std::unordered_map<StringName, Variant> tileData;
+        std::unordered_map<StringName, Variant> cppTileData;
 
         for(int j = 0; j < gd_tile_data.values().size(); j++)
         {
             const String& tile_field_key = gd_tile_data.keys()[j];
             if (tile_field_key == "op")
             {
-                if (((SafeVec)gd_tile_data.values()[j]).isAnyCompNegative())//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
+                const Vector2i& atlas_origin_position = gd_tile_data.values()[j];
+                if (((SafeVec)atlas_origin_position).isAnyCompNegative())//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
                 {
-                    UtilityFunctions::printerr("Atlas origin position is negative for tile_id \"",gd_current_tile_key,"\" (at ArgentumTileMap.cpp::set_tiles_data()), using (0,0)");
-                    tileData.insert({gd_tile_data.keys()[j], Vector2i(0, 0)});
+                    UtilityFunctions::printerr("Atlas origin position ",atlas_origin_position," is negative for tile_id \"",gd_current_tile_key,"\", using (0,0) (at ArgentumTileMap.cpp::set_tiles_data())");
+                    cppTileData.insert({gd_tile_data.keys()[j], Vector2i(0, 0)});
                     continue;
                 }
             }
             else if (tile_field_key == "ma")
             {
-                const Vector2i& vec = gd_tile_data.values()[j];
-                if (((SafeVec)vec).isStrictlyPositive() == false)//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
+                const Vector2i& modulo_area = gd_tile_data.values()[j];
+                if (((SafeVec)modulo_area).isStrictlyPositive() == false)//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
                 {
-                    UtilityFunctions::printerr("non-positive MODULO_TILING_AREA ",vec," is not admitted. tile_id:",gd_current_tile_key," (at ArgentumTileMap.cpp::set_tiles_data())");
-                    tileData.insert({gd_tile_data.keys()[j], Vector2i(1, 1)});
+                    UtilityFunctions::printerr("non-positive MODULO_TILING_AREA ",modulo_area," is not admitted. tile_id:",gd_current_tile_key," (at ArgentumTileMap.cpp::set_tiles_data())");
+                    cppTileData.insert({gd_tile_data.keys()[j], Vector2i(1, 1)});
                     continue;
                 }
             }
-            tileData.insert({gd_tile_data.keys()[j], gd_tile_data.values()[j]});
+            cppTileData.insert({gd_tile_data.keys()[j], gd_tile_data.values()[j]});
         }
-        if (tileData.count("op") == 0)
+        if (cppTileData.count("op") == 0)
         {
             UtilityFunctions::printerr("op not found, using (0,0) (at ArgentumTileMap.cpp::set_tiles_data())");
-            tileData.insert({"op", Vector2i(0, 0)});
+            cppTileData.insert({"op", Vector2i(0, 0)});
         }
-        if (tileData.count("ma") == 0)
+        if (cppTileData.count("ma") == 0)
         {
             UtilityFunctions::printerr("ma not found, using (1,1) (at ArgentumTileMap.cpp::set_tiles_data())");
-            tileData.insert({"op", Vector2i(1, 1)});
+            cppTileData.insert({"ma", Vector2i(1, 1)});
         }
 
-        m_cppTilesData.insert({keyAsCppString, tileData});                
+        m_cppTilesData.insert({keyAsCppString, cppTileData});                
     }
 }
 Vector2i godot::ArgentumTileMap::get_random_coord_with_tile_id(
@@ -291,17 +287,30 @@ bool ArgentumTileMap::withinChunkBounds(
 
 void ArgentumTileMap::placeFormationTile( 
     const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
-    const std::array<char, 32>& tileId, const bool deleteBeingsAndTiles){try
+    const std::array<char, 32>& tileId, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
-    auto& thingsAtPos = m_worldMatrix.at(absoluteCoords.lef).at(absoluteCoords.RIGHT);
+    auto& otherTilesAtPos = m_worldMatrix.at(absoluteCoords.lef).at(absoluteCoords.RIGHT);
     
-    if (deleteBeingsAndTiles){thingsAtPos.clear();}
-    thingsAtPos.push_back(tileId);
+    if (deletePreviousTiles){otherTilesAtPos.clear();}
+    otherTilesAtPos.push_back(tileId);
 }
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
-void ArgentumTileMap::initializePawnKindinGdScript(const Ref<Dictionary>& data){emit_signal("initialize_pawnkind", data);}
+//con un builder se podrían repetir los settings tmb
+//TODO hacer un builder de BeingData quien sea q chequee el build y printee errores. desp pasarle el objeto a este
+//ojo estas coords son absolutas, no relativas al origin de la formation
+bool godot::ArgentumTileMap::birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder)
+{//shouldn't print anything, that's the builder's task
+    if(beingBuilder.getResult().has_value())
+    {
+        emit_signal("birth_being_w_init_data", coords, beingBuilder.getResult().value());
+        return true;
+    }
+    return false;
+}
+
+void ArgentumTileMap::birthBeingOfKind(const String& being_kind_id){emit_signal("birth_of_being_of_kind", being_kind_id);}
 void ArgentumTileMap::freeze_and_store_being(const Vector2& glb_coords, const int individual_unique_id)
 {
     SafeVec localCoords = local_to_map(glb_coords);
@@ -316,6 +325,12 @@ void ArgentumTileMap::freeze_and_store_being(const Vector2& glb_coords, const in
 
 ArgentumTileMap::ArgentumTileMap(){srand(time(NULL));}
 ArgentumTileMap::~ArgentumTileMap(){}
+
+//se pueden llamar metodos de godot de guardar desde acá
+bool godot::ArgentumTileMap::persist(String file_name)
+{
+    return false;
+}
 
 void ArgentumTileMap::_bind_methods()
 {   
@@ -336,6 +351,9 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
 
     ADD_SIGNAL(MethodInfo("formation_formed"));
+
+    ADD_SIGNAL(MethodInfo("birth_being", PropertyInfo(Variant::VECTOR2I, "coords"), PropertyInfo(Variant::STRING_NAME, "pawnkind_id")));
+    ADD_SIGNAL(MethodInfo("birth_being_w_init_data", PropertyInfo(Variant::VECTOR2I, "coords"), PropertyInfo(Variant::DICTIONARY, "init_data")));
     ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "glb_coords"), PropertyInfo(Variant::INT, "being_uid")));
-    ADD_SIGNAL(MethodInfo("initialize_pawnkind", PropertyInfo(Variant::DICTIONARY, "data")));
+    ADD_SIGNAL(MethodInfo("birth_of_being_of_kind", PropertyInfo(Variant::STRING, "being_kind_id")));
 }

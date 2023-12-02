@@ -1,7 +1,7 @@
 extends Resource
-class_name Class
+class_name Klass
 
-@export var id: String = "class_"
+@export var id: String = "klass_"
 
 @export var name: String
 
@@ -15,5 +15,5 @@ class_name Class
 # class shouldn't change how much you are capable of carrying
 # class shouldn't give any type of damage reduction
 # class should give unique unlockable abilities (like diablo abilities?)
-# races shouddn't give unique unlockable abilities, instead, create a class only available for that race which has the abilities you need
+# RACES shouddn't give unique unlockable abilities, instead, create a class only available for that race which has the abilities you need
 #make it inherit from the common basic class with no abilities if you need the general type (like Warrior)
