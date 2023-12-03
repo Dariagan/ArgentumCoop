@@ -13,5 +13,3 @@ func _generate_random_string(length: int) -> String:
 		var random_index = randi() % chars.length()
 		random_string += chars.substr(random_index, 1)
 	return random_string
-
-		

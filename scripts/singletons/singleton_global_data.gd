@@ -5,7 +5,7 @@ extends Node
 @export var insta_start: bool = true
 @export var debug: bool = true
 @export var debug_walk_mult:float = 3
-@export var noclip: bool = true
+@export var noclip: bool = false
 @export var noclip_speed_mult:float = 600
 var default_ip_to_join: String = "localhost"
 #endregion Debugging configuration

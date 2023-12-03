@@ -1,6 +1,5 @@
 #ifndef __ARGENTUMTILEMAP_H__
 #define __ARGENTUMTILEMAP_H__
-
 #include "FormationGenerator.h"
 #include "BeingBuilder.h"
 
@@ -10,20 +9,37 @@
 #include <unordered_set>  
 #include <unordered_map>
 
+template<class T, size_t N> 
+struct std::hash<std::array<T, N>> {
+    std::hash<T> hasher;
+    auto operator() (const std::array<T, N>& key) const {
+        size_t result = 0;
+        for(size_t i = 0; i < N; ++i) {
+            result = result * 31 + hasher(key[i]); 
+        }
+        return result;
+    }
+};
+
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
     static const Vector2i ERROR_VECTOR = {-999999, -999999};
     class FormationGenerator;
-    class ArgentumTileMap : public TileMap{
-        GDCLASS(ArgentumTileMap, TileMap)
+
+    class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
 
         private:
             std::unordered_map<std::string, SafeVec> m_trackedBeingsCoords;//updateado cada
 
             std::vector<std::vector<std::vector<std::array<char, 32>>>> m_worldMatrix;
 
+            //chunk size: 7x7 puntos de spawnweights
+            //TypedArray<TypedArray<long>>
+            TypedArray<Array> beings_in_chunk_count;
+            
             //contiene ids de BeingKinds
-            std::vector<std::vector<std::vector<std::array<char, 32>>>> m_spawnWeightsMatrix;
+            std::vector<std::vector<std::unordered_map<std::array<char, 32>, unsigned char>>> m_spawnWeightsMatrix;
+
             std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> m_frozenBeings;
 
             //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
@@ -43,6 +59,9 @@ namespace godot
 
             bool setCell(const std::string& tileId, const SafeVec& coords);
 
+            void doGlobalSpawnAttempts();
+
+            Dictionary tiles_data;
         protected:
             static void _bind_methods();
 
@@ -52,10 +71,11 @@ namespace godot
 
             bool persist(String filename);
 
-            //std::vector<std::vector<std::vector<std::array<char, 32>>>>& getWorldMatrix();
-            //std::vector<std::vector<std::vector<std::array<char, 32>>>>& getSpawnWeightsMatrix();
+            //std::vector<std::vector<std::array<std::array<char, 32>>>>& getWorldMatrix();
+            //std::vector<std::vector<std::array<std::array<char, 32>>>>& getSpawnWeightsMatrix();
 
-            void placeSpawnWeight(SafeVec coord, std::array<char, 32> beingKindId);
+            void placeSpawnWeight(const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
+                const std::array<char, 32>& beingKindId, const unsigned char weight, bool deleteOthers = false);
 
             //SOLO USAR PARA FORMATIONS
             void placeFormationTile(
@@ -69,7 +89,7 @@ namespace godot
             
             int seed = 0;int get_seed(); void set_seed(int seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
 
-            Dictionary tiles_data; Dictionary get_tiles_data(); void set_tiles_data(Dictionary data);//tiles_data ITSELF MUST BE PUBLIC
+            Dictionary get_tiles_data(); void set_tiles_data(Dictionary data);//tiles_data ITSELF MUST BE PUBLIC
 
             Vector2i get_random_coord_with_tile_id(const Vector2i& top_left_corner, const Vector2i& bottom_right_corner, const String& tile_id) const;
 
@@ -82,6 +102,12 @@ namespace godot
             
             void load_tiles_around(const Vector2& coords, const Vector2i& chunk_size, const int uid);
             void unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE, const int uid);
+
+            void set_beings_in_chunk_count(const TypedArray<Array> beings_in_chunk_count);
+            TypedArray<Array> get_beings_in_chunk_count();
+            
+
+            static constexpr unsigned char MATRIXES_SIZE_RATIO = 70;
     };
 }
 

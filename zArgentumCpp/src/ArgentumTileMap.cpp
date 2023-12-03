@@ -122,6 +122,19 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec& tileCoord)
     }
 }
 
+//solo se hace sobre tiles no cargadas
+void ArgentumTileMap::doGlobalSpawnAttempts()
+{
+    constexpr unsigned char SPAWNING_MACROSCOPIC_CHUNK_SIZE = 6;
+    for(int i = 0; i < m_spawnWeightsMatrix.size(); i += SPAWNING_MACROSCOPIC_CHUNK_SIZE)
+    for(int j = 0; j < m_spawnWeightsMatrix[0].size(); j += SPAWNING_MACROSCOPIC_CHUNK_SIZE)
+    {
+        const SafeVec coords(i, j);
+        
+
+    }
+}
+
 bool ArgentumTileMap::setCell(const std::string &TILE_ID, const SafeVec &coords)
 {
     std::unordered_map<StringName, Variant> tileData;
@@ -169,8 +182,8 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
     }
     if(m_worldMatrix.size() == 0)
     {
-        m_worldMatrix.resize(size.x, std::vector<std::vector<std::array<char, 32>>>(size.y, std::vector<std::array<char, 32>>()));
-        m_spawnWeightsMatrix.resize(size.x/10, std::vector<std::vector<std::array<char, 32>>>(size.y/10, std::vector<std::array<char, 32>>()));
+        m_worldMatrix.resize(size.x, std::vector<std::vector<std::array<char, 32>>>(size.y));
+        m_spawnWeightsMatrix.resize(size.x/10, std::vector<std::unordered_map<std::array<char, 32>, unsigned char>>(size.y/10));
         this->m_worldSize = size;
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
@@ -305,8 +318,19 @@ void ArgentumTileMap::placeFormationTile(
 }
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
+void ArgentumTileMap::placeSpawnWeight(
+    const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
+    const std::array<char, 32>& beingKindId, const unsigned char weight, bool deleteOthers)
+{
+    const SafeVec absolute_coordinates = (formationOrigin + coordsRelativeToFormationOrigin)/MATRIXES_SIZE_RATIO;
+
+    if(deleteOthers) {m_spawnWeightsMatrix[absolute_coordinates.lef][absolute_coordinates.RIGHT].clear();}
+    
+    m_spawnWeightsMatrix[absolute_coordinates.lef][absolute_coordinates.RIGHT][beingKindId] = weight;
+}
+
 //ojo estas coords son absolutas, no relativas al origin de la formation
-void godot::ArgentumTileMap::birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder)
+void ArgentumTileMap::birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder)
 {
     if(beingBuilder.getResult().has_value())
     {
@@ -336,6 +360,9 @@ bool godot::ArgentumTileMap::persist(String file_name)
     return false;
 }
 
+void ArgentumTileMap::set_beings_in_chunk_count(const TypedArray<Array> beings_in_chunk_count){this->beings_in_chunk_count = beings_in_chunk_count;}
+TypedArray<Array> ArgentumTileMap::get_beings_in_chunk_count(){return beings_in_chunk_count;}
+
 void ArgentumTileMap::_bind_methods()
 {   
     //TODO hacer el tileselector compartible de alguna forma así no hay q hacer las godot calls cada vez q se llame un formation generator?
@@ -351,12 +378,20 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
     ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
+
+
+    ClassDB::bind_method(D_METHOD("set_beings_in_chunk_count", "beings_in_chunk_count"), &ArgentumTileMap::set_beings_in_chunk_count);
+    ClassDB::bind_method(D_METHOD("get_beings_in_chunk_count"), &ArgentumTileMap::get_beings_in_chunk_count);
+    ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "beings_in_chunk_count"), "set_beings_in_chunk_count", "get_beings_in_chunk_count");
     
     ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
 
     ADD_SIGNAL(MethodInfo("formation_formed"));
 
-    ADD_SIGNAL(MethodInfo("birth_being", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::STRING_NAME, "pawnkind_id")));
+    ADD_SIGNAL(MethodInfo("birth_being_kind", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::STRING_NAME, "being_kind_id")));
+
+    ADD_SIGNAL(MethodInfo("birth_being_kind_within_area", PropertyInfo(Variant::VECTOR2I, "top_left"), PropertyInfo(Variant::VECTOR2I, "bottom_right"), PropertyInfo(Variant::STRING_NAME, "being_kind_id")));
+
     ADD_SIGNAL(MethodInfo("birth_being_w_init_data", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::DICTIONARY, "init_data")));
 
     ADD_SIGNAL(MethodInfo("tile_unloaded", PropertyInfo(Variant::VECTOR2I, "local_coords")));

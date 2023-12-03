@@ -15,3 +15,9 @@ class_name BeingKindDef
 @export var equipment_distribution: Dictionary
 @export var loot_distribution: Dictionary
 @export var raid_unit_cost: int
+
+@export var blacklisted_tiles_for_spawning: Array[Tile] = []
+
+#if used, only these can be used
+#TODO hacer sets de tiles whitelisted comúnes para reutilizar
+@export var whitelistedlisted_tiles_for_spawning: Array[Tile] = []

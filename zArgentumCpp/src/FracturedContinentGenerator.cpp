@@ -40,7 +40,7 @@ void FracturedContinentGenerator::resetState()
 //definir spawn points para bosses?
 //es alpedo definir spawn points para mobs comúnes basados en condiciones super específicas porq merondean igualmente
 void FracturedContinentGenerator::generate(
-    godot::ArgentumTileMap& argentumTileMap, //HACER Q SEA DE UN SOLO USE ONLY? (PARA PREVENIR BUGS)
+    ArgentumTileMap& argentumTileMap, //HACER Q SEA DE UN SOLO USE ONLY? (PARA PREVENIR BUGS)
     const SafeVec& origin, const SafeVec& size, const Ref<Resource>& tileSelectionSet, 
     const unsigned int SEED, const Dictionary& data)
 {
@@ -132,6 +132,11 @@ void FracturedContinentGenerator::generate(
             }
         } else 
             {strncpy(&targetsToFill[addedTargetsCount++][0], "ocean", sizeof(targetsToFill[0]));};// addedTargetsCount=0 //TODO HACER ESTO UN MACRO
+
+        //todo poner los spawnweights con targets, como haces con las tiles
+    
+        std::array<char, 32> temp = {'a','s','d',0}; 
+        argentumTileMap.placeSpawnWeight(origin, coords, temp, 10);
 
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
         for(unsigned char k = 0; k < addedTargetsCount; k++)

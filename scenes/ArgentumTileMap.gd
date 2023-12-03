@@ -16,6 +16,7 @@ func _ready():
 
 func _process(_delta):
 	pass
+	
 
 func generate_world():
 	
@@ -37,6 +38,7 @@ var _player_i: int = 0
 func spawn_starting_player(being: Being):
 	birth_being_at(being, _players_start_position + Vector2i(_player_i, 0))
 	_player_i += 1
+	
 
 var _birthed_beings_i: int = 0
 func birth_being_at(being: Being, pos: Vector2i):
