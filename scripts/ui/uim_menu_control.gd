@@ -1,12 +1,12 @@
 extends Control
 
-@onready var main_menu: Container = $MainMenu
+@onready var main_menu: Control = $MainMenu
 
 
 @export var lobby_interface_scene: PackedScene
 var lobby_interface: LobbyInterface
 
-# TODO
+
 signal lobby_started(lobby_interface: LobbyInterface, joined_ip: String)
 
 

@@ -20,4 +20,4 @@ class_name BeingKindDef
 
 #if used, only these can be used
 #TODO hacer sets de tiles whitelisted comúnes para reutilizar
-@export var whitelistedlisted_tiles_for_spawning: Array[Tile] = []
+@export var whitelisted_tiles_for_spawning: Array[Tile] = []

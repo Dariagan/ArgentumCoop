@@ -44,6 +44,7 @@ void FracturedContinentGenerator::generate(
     const SafeVec& origin, const SafeVec& size, const Ref<Resource>& tileSelectionSet, 
     const unsigned int SEED, const Dictionary& data)
 {
+    //TODO posible randomización leve de parámetros
     this->m_origin = origin; this->m_size = size;
 
     this->m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, SEED);
@@ -67,6 +68,8 @@ void FracturedContinentGenerator::generate(
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
+
+//TODO hacer 4 threads?
 
 //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     for (uint16_t x = 0; x < size.lef; x++){
@@ -194,7 +197,7 @@ void FracturedContinentGenerator::placeDungeonEntrances(
 {
     constexpr int MAX_TRIES = 1'000'000;
 
-    std::vector<SafeVec> placedDungeonsCoords;
+    std::vector<SafeVec> placedDungeonsCoords(dungeonsToPlace);
 
     float minDistanceMultiplier = 1;
     float triesCount = 1;
