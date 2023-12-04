@@ -31,14 +31,14 @@ namespace godot
         private:
             std::unordered_map<std::string, SafeVec> m_trackedBeingsCoords;//updateado cada
 
-            std::vector<std::vector<std::vector<std::array<char, 32>>>> m_worldMatrix;
+            std::vector<std::vector<std::vector<uint16_t>>> m_worldMatrix;
 
             //chunk size: 7x7 puntos de spawnweights
             //TypedArray<TypedArray<long>>
             TypedArray<Array> beings_in_chunk_count;
             
             //contiene ids de BeingKinds
-            std::vector<std::vector<std::unordered_map<std::array<char, 32>, unsigned char>>> m_spawnWeightsMatrix;
+            std::vector<std::vector<std::unordered_map<uint16_t, unsigned char>>> m_spawnWeightsMatrix;
 
             std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> m_frozenBeings;
 
@@ -71,8 +71,8 @@ namespace godot
 
             bool persist(String filename);
 
-            //std::vector<std::vector<std::array<std::array<char, 32>>>>& getWorldMatrix();
-            //std::vector<std::vector<std::array<std::array<char, 32>>>>& getSpawnWeightsMatrix();
+            //std::vector<std::vector<std::array<uint16_t>>>& getWorldMatrix();
+            //std::vector<std::vector<std::array<uint16_t>>>& getSpawnWeightsMatrix();
 
             void placeSpawnWeight(const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
                 const std::array<char, 32>& beingKindId, const unsigned char weight, bool deleteOthers = false);
@@ -80,7 +80,7 @@ namespace godot
             //SOLO USAR PARA FORMATIONS
             void placeFormationTile(
                 const SafeVec& formationOrigin, const SafeVec& tileCoordsRelativeToFormationOrigin, 
-                const std::optional<std::array<char, 32>>& optTileId, bool deleteOthers = false);
+                const std::optional<uint16_t>& optTileId, bool deleteOthers = false);
                 
             void birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder);
             

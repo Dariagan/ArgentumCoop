@@ -1,5 +1,4 @@
 #include "ArgentumTileMap.h"
-#include "GdStringExtractor.cpp"
 
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
@@ -75,7 +74,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
                     }
                 }
                 if (m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT].size() > 0)//if more than 0 tileIds at coords:
-                    for (const std::array<char, 32>& id : m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT])
+                    for (const uint16_t& id : m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT])
                         {setCell(&id[0], sTileMapCoords);}
                 else
                     {setCell("ocean_water", sTileMapCoords);}
@@ -182,8 +181,8 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
     }
     if(m_worldMatrix.size() == 0)
     {
-        m_worldMatrix.resize(size.x, std::vector<std::vector<std::array<char, 32>>>(size.y));
-        m_spawnWeightsMatrix.resize(size.x/10, std::vector<std::unordered_map<std::array<char, 32>, unsigned char>>(size.y/10));
+        m_worldMatrix.resize(size.x, std::vector<std::vector<uint16_t>>(size.y));
+        m_spawnWeightsMatrix.resize(size.x/10, std::vector<std::unordered_map<uint16_t, unsigned char>>(size.y/10));
         this->m_worldSize = size;
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
@@ -305,22 +304,20 @@ bool ArgentumTileMap::withinChunkBounds(
 
 void ArgentumTileMap::placeFormationTile( 
     const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
-    const std::optional<std::array<char, 32>>& optTileId, const bool deletePreviousTiles){try
+    const std::optional<uint16_t>& optTileUid, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
     auto& otherTilesAtPos = m_worldMatrix.at(absoluteCoords.lef).at(absoluteCoords.RIGHT);
     
     if (deletePreviousTiles){otherTilesAtPos.clear();}
-    
-    std::array<char, 32> temp; strcpy(&temp[0], "NOT_FOUND");
 
-    otherTilesAtPos.push_back(optTileId.value_or(temp));
+    otherTilesAtPos.push_back(optTileUid.value_or(-1));
 }
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
 void ArgentumTileMap::placeSpawnWeight(
     const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
-    const std::array<char, 32>& beingKindId, const unsigned char weight, bool deleteOthers)
+    const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers)
 {
     const SafeVec absolute_coordinates = (formationOrigin + coordsRelativeToFormationOrigin)/MATRIXES_SIZE_RATIO;
 

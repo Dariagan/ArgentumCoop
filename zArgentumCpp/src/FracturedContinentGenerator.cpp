@@ -68,9 +68,6 @@ void FracturedContinentGenerator::generate(
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
-
-//TODO hacer 4 threads?
-
 //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     for (uint16_t x = 0; x < size.lef; x++){
     for (uint16_t y = 0; y < size.RIGHT; y++)
@@ -137,15 +134,13 @@ void FracturedContinentGenerator::generate(
             {strncpy(&targetsToFill[addedTargetsCount++][0], "ocean", sizeof(targetsToFill[0]));};// addedTargetsCount=0 //TODO HACER ESTO UN MACRO
 
         //todo poner los spawnweights con targets, como haces con las tiles
-    
-        std::array<char, 32> temp = {'a','s','d',0}; 
-        argentumTileMap.placeSpawnWeight(origin, coords, temp, 10);
 
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
         for(unsigned char k = 0; k < addedTargetsCount; k++)
         {
-            const auto tileId = this->m_tileSelector->getTileId(targetsToFill[k]);
-            argentumTileMap.placeFormationTile(origin, coords, tileId);
+            const std::optional<uint16_t> tileUid = this->m_tileSelector->getTileUid(targetsToFill[k]);
+            argentumTileMap.placeFormationTile(origin, coords, tileUid);
+            
         }
         
     }}
@@ -220,7 +215,7 @@ void FracturedContinentGenerator::placeDungeonEntrances(
                 std::array<char, 32> buffer;
                 sprintf(&buffer[0], "cave_%lu", placedDungeonsCoords.size()-1);
 
-                const auto tileId = this->m_tileSelector->getTileId(buffer);
+                const auto tileId = this->m_tileSelector->getTileUid(buffer);
                 argentumTileMap.placeFormationTile(m_origin, rCoords, tileId);
                 UtilityFunctions::print((Vector2i)rCoords);
             }
