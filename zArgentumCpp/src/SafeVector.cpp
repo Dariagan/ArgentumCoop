@@ -106,6 +106,7 @@ struct SafeVec
     }
 
     float length() const{return distanceTo(SafeVec(0,0));}
+    size_t area() const{return lef*RIGHT;}
 
     float distanceTo(const SafeVec &oSafeVec) const 
     {return std::sqrt((lef-oSafeVec.lef)*(lef-oSafeVec.lef) + (RIGHT-oSafeVec.RIGHT)*(RIGHT-oSafeVec.RIGHT));}

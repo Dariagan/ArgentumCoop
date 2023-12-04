@@ -14,21 +14,20 @@
 
 // namespace godot{
 
-/* RENAME THE CLASS USING: CTRL + F2 */
+// /* RENAME THE CLASS USING: CTRL + F2 */
 // class zExampleHeader: public RefCounted
 // {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 //     GDCLASS(zExampleHeader, RefCounted)
-//     private:
-
+//     public:
+//         zExampleHeader(); ~zExampleHeader();
 
 //     protected:
 //         static void _bind_methods();
-//     public:
-
-//         zExampleHeader(); ~zExampleHeader();
+//     private:
+    
 // };
 // }
 
 // #endif //CHANGE_ME_WITH_DOUBLE_CLICK_AND_CTRL_F2
 
-/* CTRL + A, CTRL + K , CTRL + U, TO UNCOMMENT ALL THE LINES */
+// /* CTRL + A, CTRL + K , CTRL + U, TO UNCOMMENT ALL THE LINES */

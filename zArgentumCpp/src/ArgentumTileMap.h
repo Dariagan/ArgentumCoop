@@ -2,12 +2,14 @@
 #define __ARGENTUMTILEMAP_H__
 #include "FormationGenerator.h"
 #include "BeingBuilder.h"
+#include "WorldMatrix.cpp"
 
 #include <godot_cpp/classes/tile_map.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/godot.hpp>
 #include <unordered_set>  
 #include <unordered_map>
+#include <memory>
 
 template<class T, size_t N> 
 struct std::hash<std::array<T, N>> {
@@ -28,54 +30,17 @@ namespace godot
 
     class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
 
-        private:
-            std::unordered_map<std::string, SafeVec> m_trackedBeingsCoords;//updateado cada
-
-            std::vector<std::vector<std::vector<uint16_t>>> m_worldMatrix;
-
-            //chunk size: 7x7 puntos de spawnweights
-            //TypedArray<TypedArray<long>>
-            TypedArray<Array> beings_in_chunk_count;
-            
-            //contiene ids de BeingKinds
-            std::vector<std::vector<std::unordered_map<uint16_t, unsigned char>>> m_spawnWeightsMatrix;
-
-            std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> m_frozenBeings;
-
-            //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
-            //en donde según la id extrae el being de un dictionary q tiene guardado
-
-            void decrementSharedCount(const SafeVec& tileCoord);
-            
-            SafeVec m_worldSize;
-
-            //keeps track of tracks of the tiles loaded by the being with the specific uid (int)
-            std::unordered_map<int, std::unordered_set<SafeVec, SafeVec::hash>> m_beingLoadedTiles;
-
-            std::unordered_map<SafeVec, int, SafeVec::hash> m_tileSharedLoadsCount;
-
-            std::unordered_map<std::string, std::unordered_map<StringName, Variant>> m_cppTilesData;
-            static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const SafeVec &chunkSize);
-
-            bool setCell(const std::string& tileId, const SafeVec& coords);
-
-            void doGlobalSpawnAttempts();
-
-            Dictionary tiles_data;
-        protected:
-            static void _bind_methods();
-
         public:
             ArgentumTileMap();
             ~ArgentumTileMap();
 
             bool persist(String filename);
 
-            //std::vector<std::vector<std::array<uint16_t>>>& getWorldMatrix();
             //std::vector<std::vector<std::array<uint16_t>>>& getSpawnWeightsMatrix();
 
-            void placeSpawnWeight(const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
-                const std::array<char, 32>& beingKindId, const unsigned char weight, bool deleteOthers = false);
+            void placeSpawnWeight(
+                const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
+                const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers);
 
             //SOLO USAR PARA FORMATIONS
             void placeFormationTile(
@@ -108,6 +73,47 @@ namespace godot
             
 
             static constexpr unsigned char MATRIXES_SIZE_RATIO = 70;
+
+        protected:
+            static void _bind_methods();
+
+        private:
+            std::unordered_map<std::string, SafeVec> m_trackedBeingsCoords;//updateado cada
+
+            std::unique_ptr<WorldMatrix> worldMatrixPtr = nullptr;
+
+            //chunk size: 7x7 puntos de spawnweights
+            //TypedArray<TypedArray<long>>
+            TypedArray<Array> beings_in_chunk_count;
+            
+            //contiene ids de BeingKinds
+            std::vector<std::vector<std::unordered_map<uint16_t, unsigned char>>> m_spawnWeightsMatrix;
+
+            std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> m_frozenBeings;
+
+            //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
+            //en donde según la id extrae el being de un dictionary q tiene guardado
+
+            void decrementSharedCount(const SafeVec& tileCoord);
+            
+            SafeVec m_worldSize;
+
+            //keeps track of tracks of the tiles loaded by the being with the specific uid (int)
+            std::unordered_map<int, std::unordered_set<SafeVec, SafeVec::hash>> m_beingLoadedTiles;
+
+            std::unordered_map<SafeVec, int, SafeVec::hash> m_tileSharedLoadsCount;
+
+            std::unordered_map<std::string, std::unordered_map<StringName, Variant>> m_cppTilesData;
+            static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const SafeVec &chunkSize);
+
+            bool setCell(const uint16_t uid, const SafeVec& coords);
+
+            void doGlobalSpawnAttempts();
+
+            Dictionary tiles_data;
+        
+
+        
     };
 }
 

@@ -1,10 +1,10 @@
 extends ArgentumTileMap
 class_name GdTileMap
 
-var _beings: Dictionary # key(str): individual unique id. value: BeingReqInitData.serialized()
+var _beings: Dictionary # key(str): individual unique id. value: Being. el multiplayerspawner se encarga del sync
 
 func _setup_config():
-	self.tiles_data = GlobalData.tiles
+	#self.tiles_data = GlobalData.tiles
 	self.tile_set = preload("res://resources/world/tile_set.tres")
 	add_layer(0);add_layer(1);add_layer(2)
 	set_layer_z_index(2, 10)
@@ -20,12 +20,12 @@ func _process(_delta):
 
 func generate_world():
 	
-	const WORLD_SIZE: Vector2i = Vector2i(5000, 5000)
+	const WORLD_SIZE: Vector2i = Vector2i(30000, 30000)
 	
 	generate_world_matrix(WORLD_SIZE)
 	
-	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), GlobalData.tile_selections["temperate"], 4, {})
+	#var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
+	#generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), GlobalData.tile_selections["temperate"], 4, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT

@@ -175,5 +175,7 @@ func _play_animation(animation_name: String) -> void:
 			
 func serialize() -> Dictionary:
 	return {
+		"direction": _facing_direction,
+		"position": position,
 		"state": internal_state.serialize()
 	}

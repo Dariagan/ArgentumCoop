@@ -29,8 +29,8 @@ class TileSelector
     public:
         std::optional<uint16_t> getTileUid(const std::array<char, 32>& argTargetToFill)
         {
-            auto it = std::find_if(TargetsToFill.begin(), TargetsToFill.end(), [&](const auto& target) {
-                return std::strcmp(target, &argTargetToFill[0]) == 0;
+            auto it = std::find_if(TargetsToFill.begin(), TargetsToFill.end(), [&](const std::string& target) {
+                return std::strcmp(target.c_str(), &argTargetToFill[0]) == 0;
             });
 
             if (it != TargetsToFill.end())
