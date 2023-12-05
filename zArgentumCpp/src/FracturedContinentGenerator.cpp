@@ -79,15 +79,13 @@ void FracturedContinentGenerator::generate(
     for (uint16_t y = 0; y < size.RIGHT; y++)
     {
         const SafeVec coords(x, y);
+//! POTENCIAL BUG: STACK OVERFLOW SI SE ESCRIBE EN UN addedTargetsCount[i] CON i SIENDO MAYOR QUE EL TAMAÑO DEL ARRAY - 1
+        std::array<Target, WorldMatrix::MAX_TILES_PER_POS> targetsToFill;
+        unsigned char placementsCount = 0;
 
         const bool CONTINENTAL = isContinental(coords);
 
         const bool PENINSULER_CAVED = isPeninsulerCaved(coords);
-
-//! POTENCIAL BUG: STACK OVERFLOW SI SE ESCRIBE EN UN addedTargetsCount[i] CON i SIENDO MAYOR QUE EL TAMAÑO DEL ARRAY - 1
-        static std::array<Target, WorldMatrix::MAX_TILES_PER_POS> targetsToFill;
-        
-        unsigned char placementsCount = 0;
 
         if (CONTINENTAL && ! PENINSULER_CAVED)
         {            
@@ -140,11 +138,10 @@ void FracturedContinentGenerator::generate(
         //todo poner los spawnweights con targets, como haces con las tiles
 
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
-        for(unsigned char k = 0; k < placementsCount; k++)
+        for(unsigned char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
         {
-            argentumTileMap.placeFormationTile(origin, coords, targetsUids[(unsigned char)targetsToFill[k]]);
+            argentumTileMap.placeFormationTile(origin, coords, targetsUids[targetsToFill[k]]);
         }
-        
     }}
     placeDungeonEntrances(argentumTileMap, 3);
 

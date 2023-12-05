@@ -1,4 +1,4 @@
-extends Node
+extends GlobalDataCpp
 
 #region Debugging configuration
 @export var ignore_joiners_readiness_on_start: bool = true

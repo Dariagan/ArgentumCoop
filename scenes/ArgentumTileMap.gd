@@ -20,7 +20,7 @@ func _process(_delta):
 
 func generate_world():
 	
-	const WORLD_SIZE: Vector2i = Vector2i(30000, 30000)
+	const WORLD_SIZE: Vector2i = Vector2i(20000, 20000)
 	
 	generate_world_matrix(WORLD_SIZE)
 	

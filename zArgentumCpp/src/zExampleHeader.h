@@ -18,12 +18,17 @@
 // class zExampleHeader: public RefCounted
 // {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 //     GDCLASS(zExampleHeader, RefCounted)
+
+//     private:
+
+//     protected:
+//         static void _bind_methods();//EL CUERPO DE ESTE VA SÍ O SÍ EN .cpp
+
 //     public:
 //         zExampleHeader(); ~zExampleHeader();
 
-//     protected:
-//         static void _bind_methods();
-//     private:
+
+//     
     
 // };
 // }

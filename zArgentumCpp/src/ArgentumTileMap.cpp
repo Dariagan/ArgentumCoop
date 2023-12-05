@@ -311,11 +311,11 @@ void ArgentumTileMap::placeFormationTile(
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
     auto& otherTilesAtPos = worldMatrixPtr->at(absoluteCoords);
     
-    //if (deletePreviousTiles){otherTilesAtPos.clear();}
+    if (deletePreviousTiles){initialize_uids_array_as_empty<WorldMatrix::MAX_TILES_PER_POS>();}
 
     for(char i = 0; i < WorldMatrix::MAX_TILES_PER_POS; i++)
     {
-        if(otherTilesAtPos[i] == WorldMatrix::NULL_UID){
+        if(otherTilesAtPos[i] == NULL_TILE_UID){
             otherTilesAtPos[i] = optTileUid;
             break;
         }

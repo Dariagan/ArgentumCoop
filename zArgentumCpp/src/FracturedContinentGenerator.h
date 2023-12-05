@@ -30,7 +30,7 @@ class FracturedContinentGenerator : public FormationGenerator
         float getBeachness(SafeVec coords) const;
         void placeDungeonEntrances(ArgentumTileMap& argentumTileMap, const unsigned char DUNGEONS_TO_PLACE);
         void resetState();                                        //add to the left of cave
-        enum Target { beach,  lake,  cont,  tree,  bush,  ocean,  cave_0,  cave_1,  cave_2, N_TARGETS}; static constexpr std::array<char*, N_TARGETS>
+        enum Target { beach,  lake,  cont,  tree,  bush,  ocean,  cave_0,  cave_1,  cave_2, N_TARGETS}; static constexpr std::array<const char*, N_TARGETS>
             TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
         
         static constexpr unsigned char N_CAVES = Target::N_TARGETS - Target::cave_0;   

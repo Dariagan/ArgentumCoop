@@ -9,21 +9,23 @@
 
 namespace godot{
 
+
+static constexpr uint16_t NULL_TILE_UID = std::numeric_limits<uint16_t>::max();
+
 template <unsigned size>
 constexpr std::array<uint16_t, size> initialize_uids_array_as_empty()
 {
     std::array<uint16_t, size> ret{};
     for (int i = 0; i < size; i++)
-        ret[i] = WorldMatrix::NULL_UID;
+        ret[i] = NULL_TILE_UID;
     return ret;
 }
+
 
 class WorldMatrix
 {
     public:
         const SafeVec SIZE;
-
-        static constexpr uint16_t NULL_UID = std::numeric_limits<uint16_t>::max();
 
         static constexpr unsigned char MAX_TILES_PER_POS = 5;
 
@@ -62,5 +64,3 @@ class WorldMatrix
 }
 
 #endif //WORLD_MATRIX_H
-
-/* CTRL + A, CTRL + K , CTRL + U, TO UNCOMMENT ALL THE LINES */

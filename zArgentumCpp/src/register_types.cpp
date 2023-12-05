@@ -26,10 +26,12 @@ void initialize_argentum_cpp(ModuleInitializationLevel p_level)
 
     std::cerr.rdbuf(errorsLogFile.rdbuf()); std::cout.rdbuf(stdoutLogFile.rdbuf());
 
+    ClassDB::register_class<GlobalDataCpp>();
     ClassDB::register_class<ArgentumTileMap>();
     ClassDB::register_class<BeingBuilder>();
     ClassDB::register_abstract_class<FormationGenerator>();
     ClassDB::register_class<FracturedContinentGenerator>();
+    
     // register custom classes here in order for them to show up in Godot!
 }
 void uninitialize_argentum_cpp(ModuleInitializationLevel p_level)

@@ -1,7 +1,9 @@
 #ifndef GLOBAL_DATA_SINGLETON
 #define GLOBAL_DATA_SINGLETON
-#include <godot_cpp/classes/node.hpp>
+#include <godot_cpp/classes/node.hpp> 
+#include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/variant/string.hpp>
+#include <godot_cpp/variant/string_name.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
@@ -15,17 +17,53 @@
 #include <limits>
 #include "WorldMatrix.cpp"
 
-namespace godot{
-
-class GlobalData: public Node
+namespace godot
 {
-    GDCLASS(GlobalData, Node)
-    
+class GlobalDataCpp: public Node
+{
+    GDCLASS(GlobalDataCpp, Node)
+
+    // PONER POR ARRIBA PORQ SINO NO LOS ENCUENTRA
+    private:
+        static std::vector<StringName> tilesUidMapping;
+
+        
+        static bool exceedsTileLimit(const u_int16_t count)
+        {
+            if (count >= NULL_TILE_UID - 1){
+                UtilityFunctions::printerr("too many tiles (GlobalDataCpp.cpp::set_tiles())");
+                return true;
+            }
+            return false;
+        }
+    protected:
+         static void _bind_methods();
+      
     public:
-
+        GlobalDataCpp(); ~GlobalDataCpp();
         Dictionary active_beings;//guarda referencias a Beings. cuando se erasee una tile se mira este diccionario pa ver si la local_to_map(being.position) está en la pos
-        //el godot side se tiene q encargar de agregar los beings
+    //     //el godot side se tiene q encargar de agregar los beings
 
+        static Dictionary 
+        item_data, 
+        sprites_datas, 
+        races, 
+        controllable_races, 
+        uncontrollable_races, 
+        klasses, 
+        tiles, 
+        tile_selections
+        ;
+
+        static std::optional<u_int16_t> getTileUid(const StringName& stringId)
+        {
+            for(u_int16_t i = 0; i < tilesUidMapping.size(); i++)
+            {
+                if(tilesUidMapping[i] == stringId)
+                    return i;
+            }
+            return {};
+        }
 
         static void add_tiles(const Dictionary& input_tiles)
         {
@@ -41,7 +79,7 @@ class GlobalData: public Node
                 const auto& tile_id = input_tiles.keys()[i];
 
                 //if not mapped already
-                if(std::find(tilesUidMapping.begin(), tilesUidMapping.end(), tile_id) == tilesUidMapping.end())//TA BIEN
+                if(getTileUid(tile_id).has_value())//TA BIEN
                 {//map the key
                     tilesUidMapping.push_back(tile_id);
                 }
@@ -69,48 +107,11 @@ class GlobalData: public Node
                 add_tiles(input_tiles);
             }
         }
-        static Dictionary get_tiles(){return tiles;}
-        
-        static std::optional<u_int16_t> getTileUid(const StringName& stringId)
-        {
-            for(u_int16_t i = 0; i < tilesUidMapping.size(); i++)
-            {
-                if(tilesUidMapping[i] == stringId)
-                    return i;
-            }
-            return {};
+
+        static Dictionary get_tiles(){
+            return GlobalDataCpp::tiles;//RETORNAR ESTO STATIC CAUSA ERROR.
         }
-        
-        //NO USAR, PROBAR SI TE DEJA BORRARLOS:
-        GlobalData(){}; ~GlobalData();
-
-    protected:
-        static void _bind_methods()
-        {
-            ClassDB::bind_static_method("GlobalData", D_METHOD("set_tiles", "tiles"), &GlobalData::set_tiles);
-            ClassDB::bind_static_method("GlobalData", D_METHOD("add_tiles", "tiles"), &GlobalData::set_tiles);
-        };
-    private:
-        static Dictionary item_data, 
-        sprites_datas, 
-        races, 
-        controllable_races, 
-        uncontrollable_races, 
-        klasses, 
-        tiles, 
-        tile_selections
-        ;
-
-        static bool exceedsTileLimit(const u_int16_t count)
-        {
-            if (count >= WorldMatrix::NULL_UID - 1){
-                UtilityFunctions::printerr("too many tiles (GlobalData.cpp::set_tiles())");
-                return true;
-            }
-            return false;
-        }
-
-        static std::vector<StringName> tilesUidMapping;
+   
 };
 }
 

@@ -17,4 +17,4 @@ static func _generate_random_string(length: int) -> String:
 	for i in range(length):
 		var random_index = randi() % chars.length()
 		random_string += chars.substr(random_index, 1)
-	return random_string
+	return random_string;;
