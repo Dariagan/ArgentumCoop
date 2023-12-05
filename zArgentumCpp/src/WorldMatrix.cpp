@@ -9,7 +9,6 @@
 
 namespace godot{
 
-
 static constexpr uint16_t NULL_TILE_UID = std::numeric_limits<uint16_t>::max();
 
 template <unsigned size>

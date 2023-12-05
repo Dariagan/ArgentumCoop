@@ -1,5 +1,6 @@
 #include "ArgentumTileMap.h"
 
+
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/classes/random_number_generator.hpp>
@@ -138,7 +139,7 @@ void ArgentumTileMap::doGlobalSpawnAttempts()
 bool ArgentumTileMap::setCell(const uint16_t uid, const SafeVec &coords)
 {
     // std::unordered_map<StringName, Variant> tileData;
-    // try{tileData = m_cppTilesData.at(TILE_ID);}
+    // try{tileData = CppTilesData.at(TILE_ID);}
     // catch(const std::out_of_range& e)
     // {UtilityFunctions::printerr(&TILE_ID[0], " not found in cppTilesData (at ArgentumTileMap.cpp::load_tiles_around())");
     //  return false;
@@ -173,7 +174,7 @@ bool ArgentumTileMap::setCell(const uint16_t uid, const SafeVec &coords)
     return true;
 }
 
-void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
+void ArgentumTileMap::generate_world_matrix(const Vector2i& size, const Dictionary& tiles_data)
 {
     if (size.x <= 0 || size.y <= 0)
     {
@@ -194,20 +195,72 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size)
 int ArgentumTileMap::get_seed(){return seed;}; 
 void ArgentumTileMap::set_seed(int seed){this->seed = seed;};
 
-Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
-void ArgentumTileMap::set_tiles_data(Dictionary all_tiles_data)
+void ArgentumTileMap::add_tiles_data(const Dictionary& input_tiles)
 {
-    this->tiles_data = all_tiles_data;
-    for(auto &tileData : m_cppTilesData)
-        tileData.second.clear();
-    m_cppTilesData.clear();
-    
-    for(int i = 0; i < all_tiles_data.values().size(); i++)
+    tiles_data.merge(input_tiles, true);
+    const u_int16_t NEW_TILES_COUNT = tiles_data.size();
+
+    if(exceedsTileLimit(NEW_TILES_COUNT)) return;
+
+    tilesUidMapping.reserve(NEW_TILES_COUNT);
+    tilesUidMapping.resize(NEW_TILES_COUNT);
+    for(u_int16_t i = 0; i < input_tiles.size(); i++)
     {
-        const String& gd_current_tile_key = (String)all_tiles_data.keys()[i];
+        const auto& tile_id = input_tiles.keys()[i];
+
+        //if not mapped already
+        if(getTileUid(tile_id).has_value())//TA BIEN
+        {//map the key
+            tilesUidMapping.push_back(tile_id);
+        }
+    }
+}
+
+void ArgentumTileMap::manageSettingTileData(const Dictionary& input_tiles)
+{
+    if(tiles_data.is_empty())
+    {
+        const u_int16_t TILES_COUNT = input_tiles.size();
+
+        if(exceedsTileLimit(TILES_COUNT)) return;
+
+        tiles_data = input_tiles;
+
+        tilesUidMapping.reserve(TILES_COUNT);
+        tilesUidMapping.resize(TILES_COUNT);
+        for(u_int16_t i = 0; i < TILES_COUNT; i++)
+            {tilesUidMapping[i] = input_tiles.keys()[0];}                    
+    }
+    else
+    {
+        tiles_data.clear();
+        add_tiles_data(input_tiles);
+    }
+}
+std::optional<u_int16_t> ArgentumTileMap::getTileUid(const StringName& stringId) const
+{
+    for(u_int16_t i = 0; i < tilesUidMapping.size(); i++)
+    {
+        if(tilesUidMapping[i] == stringId)
+            return i;
+    }
+    return {};
+}
+
+
+Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
+void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
+{
+    for(auto &tileData : CppTilesData){tileData.second.clear();}CppTilesData.clear();
+   
+    manageSettingTileData(input_tiles_data);
+    
+    for(int i = 0; i < tiles_data.values().size(); i++)
+    {
+        const String& gd_current_tile_key = (String)tiles_data.keys()[i];
         const std::string keyAsCppString = gd_current_tile_key.utf8().get_data();
         
-        const Ref<Resource>& tile = Object::cast_to<Resource>(all_tiles_data.values()[i]);
+        const Ref<Resource>& tile = Object::cast_to<Resource>(tiles_data.values()[i]);
 
         const Dictionary& gd_tile_data = tile->call("get_data");
 
@@ -255,7 +308,7 @@ void ArgentumTileMap::set_tiles_data(Dictionary all_tiles_data)
             cppTileData.insert({"ma", Vector2i(1, 1)});
         }
 
-        m_cppTilesData.insert({keyAsCppString, cppTileData});                
+        CppTilesData.insert({keyAsCppString, cppTileData});                
     }
 }
 // Vector2i godot::ArgentumTileMap::get_random_coord_with_tile_id(

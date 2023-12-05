@@ -1,9 +1,11 @@
 #ifndef __FORMATION_GENERATOR_H__
 #define __FORMATION_GENERATOR_H__
-#include "TileSelector.cpp"
 #include "SafeVector.cpp"
 #include "ArgentumTileMap.h"
+#include "TileSelector.h"
 
+#include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <unordered_set>
 #include <unordered_map>
@@ -12,6 +14,7 @@
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR
     class ArgentumTileMap;
+    class TileSelector;
     class FormationGenerator : public RefCounted{
         GDCLASS(FormationGenerator, RefCounted)
 

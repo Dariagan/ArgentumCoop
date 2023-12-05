@@ -1,4 +1,5 @@
 #include "FracturedContinentGenerator.h"
+
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
@@ -6,6 +7,7 @@
 #include <algorithm>
 #include <string>
 #include <format>
+#include <memory>
 
 using namespace godot;
 
@@ -48,7 +50,7 @@ void FracturedContinentGenerator::generate(
     //TODO posible randomización leve de parámetros
     this->m_origin = origin; this->m_size = size;
 
-    this->m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, SEED);
+    m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, &argentumTileMap, SEED);
 
     {
     continenter.set_seed(SEED); peninsuler.set_seed(SEED+1); bigLaker.set_seed(SEED+2); smallLaker.set_seed(SEED+3);

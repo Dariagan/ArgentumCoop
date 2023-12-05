@@ -1,8 +1,9 @@
 #ifndef __ARGENTUMTILEMAP_H__
 #define __ARGENTUMTILEMAP_H__
+
+#include "WorldMatrix.cpp"
 #include "FormationGenerator.h"
 #include "BeingBuilder.h"
-#include "WorldMatrix.cpp"
 
 #include <godot_cpp/classes/tile_map.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
@@ -25,14 +26,15 @@ struct std::hash<std::array<T, N>> {
 
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
-    static const Vector2i ERROR_VECTOR = {-999999, -999999};
+    static const Vector2i ERROR_VECTOR = {-999999, -999999};    
     class FormationGenerator;
-
     class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
 
         public:
             ArgentumTileMap();
             ~ArgentumTileMap();
+
+            std::optional<u_int16_t> getTileUid(const StringName& stringId) const;
 
             bool persist(String filename);
 
@@ -54,14 +56,14 @@ namespace godot
             
             int seed = 0;int get_seed(); void set_seed(int seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
 
-            Dictionary get_tiles_data(); void set_tiles_data(Dictionary data);//tiles_data ITSELF MUST BE PUBLIC
+            Dictionary get_tiles_data(); void set_tiles_data(const Dictionary& data); void add_tiles_data(const Dictionary& data);
 
             Vector2i get_random_coord_with_tile_id(const Vector2i& top_left_corner, const Vector2i& bottom_right_corner, const String& tile_id) const;
 
             void birthBeingOfKind(const String& being_kind_id);
             void freeze_and_store_being(const Vector2& glb_coords, const int individual_unique_id);
 
-            void generate_world_matrix(const Vector2i& size);
+            void generate_world_matrix(const Vector2i& size, const Dictionary& tiles_data);
             void generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, const Vector2i& size, 
                  const Ref<Resource>& tileSelectionSet, signed int seed, const Dictionary& data);
             
@@ -71,13 +73,19 @@ namespace godot
             void set_beings_in_chunk_count(const TypedArray<Array> beings_in_chunk_count);
             TypedArray<Array> get_beings_in_chunk_count();
             
-
+            
             static constexpr unsigned char MATRIXES_SIZE_RATIO = 70;
 
         protected:
             static void _bind_methods();
 
         private:
+            Dictionary tiles_data;//ORIGINAL
+            
+            std::vector<StringName> tilesUidMapping;
+
+            void manageSettingTileData(const Dictionary& input_tiles);
+
             std::unordered_map<std::string, SafeVec> m_trackedBeingsCoords;//updateado cada
 
             std::unique_ptr<WorldMatrix> worldMatrixPtr = nullptr;
@@ -95,6 +103,7 @@ namespace godot
             //en donde según la id extrae el being de un dictionary q tiene guardado
 
             void decrementSharedCount(const SafeVec& tileCoord);
+
             
             SafeVec m_worldSize;
 
@@ -104,14 +113,21 @@ namespace godot
             std::unordered_map<SafeVec, int, SafeVec::hash> m_tileSharedLoadsCount;
 
 //! CREO QUE ESTO YA NO HACE FALTA TENIENOD LA DATA EN GLOBALDATA
-            std::unordered_map<std::string, std::unordered_map<StringName, Variant>> m_cppTilesData;
+            std::unordered_map<std::string, std::unordered_map<StringName, Variant>> CppTilesData;
             static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const SafeVec &chunkSize);
 
             bool setCell(const uint16_t uid, const SafeVec& coords);
 
             void doGlobalSpawnAttempts();
 
-            Dictionary tiles_data;
+            static bool exceedsTileLimit(const u_int16_t count)
+            {
+                if (count >= NULL_TILE_UID - 1){
+                    UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");
+                    return true;
+                }
+                return false;
+            }
     };
 }
 

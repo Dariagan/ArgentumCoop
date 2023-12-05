@@ -1,10 +1,5 @@
 #include "FormationGenerator.h"
 
-#include <godot_cpp/variant/utility_functions.hpp>
-#include <godot_cpp/classes/resource.hpp>
-#include <string.h>
-
-
 
 using namespace godot;
 

@@ -64,6 +64,7 @@
         "thread": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "span_ext": "cpp"
+        "span_ext": "cpp",
+        "tileselector h": "cpp"
     }
 }
