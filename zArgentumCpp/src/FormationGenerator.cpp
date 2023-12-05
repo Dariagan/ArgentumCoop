@@ -37,7 +37,8 @@ void FormationGenerator::generate(ArgentumTileMap &argentumTileMap, const SafeVe
 {
 }
 
-FormationGenerator::FormationGenerator(){
+FormationGenerator::FormationGenerator()
+{
 
 }
 FormationGenerator::~FormationGenerator(){
@@ -45,6 +46,5 @@ FormationGenerator::~FormationGenerator(){
 }
 void FormationGenerator::_bind_methods()
 {
-
-
+    
 }

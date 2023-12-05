@@ -17,17 +17,6 @@ namespace godot{
 class BeingBuilder: public RefCounted
 {
     GDCLASS(BeingBuilder, RefCounted)
-    private:
-        std::optional<Dictionary> builtBeing = std::nullopt;
-        String name="random", factionId="", raceId="", klassId="random", bodyId="random", headId="random";
-        bool controllableRace = false;
-        Vector3 headScale = Vector3(1,1,1), bodyScale = Vector3(1,1,1);
-        float extraHealthMultiplier = 1;
-        bool isValidBeing() const;
-        void failAndPrint(bool& validationFailedMessageAlreadyPrinted) const;
-
-    protected:
-        static void _bind_methods();
     public:
         //TODO cargar los dicts del node autoload global_data
         static void load_game_data(Dictionary data); 
@@ -49,7 +38,12 @@ class BeingBuilder: public RefCounted
         bool build();
         std::optional<Dictionary> getResult() const;
 
+        BeingBuilder(); ~BeingBuilder();
+    protected:
+        static void _bind_methods();
+    private:
         // functions to be used exclusively on GDscript-side (not in C++)
+
         void _gd_set_name(const String& name);
         void _gd_randomize_name();
         void _gd_set_faction_id(const String& faction_id);
@@ -64,8 +58,15 @@ class BeingBuilder: public RefCounted
         void _gd_set_body_scale(const Vector3& body_scale);
         void _gd_set_extra_health_multiplier(const float multiplier);
         Dictionary _gd_get_result() const;
-        
-        BeingBuilder(); ~BeingBuilder();
+
+        std::optional<Dictionary> builtBeing = std::nullopt;
+        String name="random", factionId="", raceId="", klassId="random", bodyId="random", headId="random";
+        bool controllableRace = false;
+        Vector3 headScale = Vector3(1,1,1), bodyScale = Vector3(1,1,1);
+        float extraHealthMultiplier = 1;
+        bool isValidBeing() const;
+        void failAndPrint(bool& validationFailedMessageAlreadyPrinted) const;
+
 };
 }
 

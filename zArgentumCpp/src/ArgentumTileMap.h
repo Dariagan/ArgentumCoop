@@ -111,9 +111,6 @@ namespace godot
             void doGlobalSpawnAttempts();
 
             Dictionary tiles_data;
-        
-
-        
     };
 }
 

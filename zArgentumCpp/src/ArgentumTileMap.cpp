@@ -11,6 +11,7 @@
 #include <chrono>
 #include <thread>
 
+
 using namespace godot;
 
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i& origin, 
@@ -379,18 +380,16 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ArgentumTileMap::set_seed);
     ClassDB::bind_method(D_METHOD("get_seed"), &ArgentumTileMap::get_seed);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
-
     // ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
     // ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
     // ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
-
 
     // ClassDB::bind_method(D_METHOD("set_beings_in_chunk_count", "beings_in_chunk_count"), &ArgentumTileMap::set_beings_in_chunk_count);
     // ClassDB::bind_method(D_METHOD("get_beings_in_chunk_count"), &ArgentumTileMap::get_beings_in_chunk_count);
     // ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "beings_in_chunk_count"), "set_beings_in_chunk_count", "get_beings_in_chunk_count");
     
     // ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
-
+    
     // ADD_SIGNAL(MethodInfo("formation_formed"));
 
     // ADD_SIGNAL(MethodInfo("birth_being_kind", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::STRING_NAME, "being_kind_id")));

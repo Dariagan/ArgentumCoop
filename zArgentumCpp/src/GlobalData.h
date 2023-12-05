@@ -37,8 +37,10 @@ class GlobalData: public Node
             for(u_int16_t i = 0; i < input_tiles.size(); i++)
             {
                 const auto& tile_id = input_tiles.keys()[i];
+
+                //if not mapped already
                 if(std::find(tilesUidMapping.begin(), tilesUidMapping.end(), tile_id) == tilesUidMapping.end())//TA BIEN
-                {
+                {//map the key
                     tilesUidMapping.push_back(tile_id);
                 }
             }
@@ -46,7 +48,7 @@ class GlobalData: public Node
 
         void set_tiles(const Dictionary& input_tiles)
         {
-            if(input_tiles.is_empty())
+            if(this->tiles.is_empty())
             {
                 const u_int16_t TILES_COUNT = input_tiles.size();
 
@@ -54,28 +56,33 @@ class GlobalData: public Node
 
                 this->tiles = input_tiles;
 
-        
                 tilesUidMapping.reserve(TILES_COUNT);
                 tilesUidMapping.resize(TILES_COUNT);
                 for(u_int16_t i = 0; i < TILES_COUNT; i++)
                     {tilesUidMapping[i] = input_tiles.keys()[0];}                    
             }
             else
-                UtilityFunctions::printerr("cannot switch tiles after already having been set (GlobalData.cpp::set_tiles())");
+            {
+                this->tiles.clear();
+                add_tiles(input_tiles);
+            }
         }
         Dictionary get_tiles(){
             return tiles;
         }
         
-
-        // i = uid
         std::vector<StringName> tilesUidMapping;
+
 
         //NO USAR, PROBAR SI TE DEJA BORRARLOS:
         GlobalData(){}; ~GlobalData();
 
     protected:
-        static void _bind_methods();
+        static void _bind_methods()
+        {
+            ClassDB::bind_method(D_METHOD("set_tiles", "tiles"), &GlobalData::set_tiles);
+            ClassDB::bind_method(D_METHOD("add_tiles", "tiles"), &GlobalData::set_tiles);
+        };
     private:
         Dictionary item_data, 
         sprites_datas, 
@@ -85,7 +92,6 @@ class GlobalData: public Node
         klasses, 
         tiles = {}, 
         tile_selections
-        
         ;
 
         static bool exceedsTileLimit(const u_int16_t count)
