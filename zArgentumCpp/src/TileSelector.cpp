@@ -11,59 +11,29 @@
 #include <utility> 
 #include <optional>
 #include <algorithm>
+#include <limits>
+#include <variant>
+
+#include "GlobalData.h"
+#include "WorldMatrix.cpp"
 
 namespace godot
 {
 class TileSelector
 {
-    private:
-        std::default_random_engine randomEngine;
-
-        static constexpr unsigned char MAX_GROUPED_TILES_COUNT = 64;
-        
-
-        std::vector<std::string> TargetsToFill; //hacerlo std::string?
-        std::vector<uint16_t> tileUidOrGroupPlaceHolder;
-        std::vector<std::pair<std::array<uint16_t, MAX_GROUPED_TILES_COUNT>, std::discrete_distribution<int>>> idsDistributionOfGroups;
-
     public:
-        std::optional<uint16_t> getTileUid(const std::array<char, 32>& argTargetToFill)
+        TileSelector(const Ref<Resource>& gdTileSelection, int seed) try : 
+            TARGETS_COUNT(((Array)gdTileSelection->get("targets")).size())
         {
-            auto it = std::find_if(TargetsToFill.begin(), TargetsToFill.end(), [&](const std::string& target) {
-                return std::strcmp(target.c_str(), &argTargetToFill[0]) == 0;
-            });
-
-            if (it != TargetsToFill.end())
-            {
-                auto index = std::distance(TargetsToFill.begin(), it);
-
-                if (tileUidOrGroupPlaceHolder[index] != -1)
-                {
-                    return tileUidOrGroupPlaceHolder[index];
-                }
-                else
-                {
-                    auto pair = idsDistributionOfGroups[index];
-                    return pair.first[pair.second(randomEngine)];
-                }
-            }
-            UtilityFunctions::printerr("couldn't find any candidate tile for the target to be filled: \"",&argTargetToFill[0],"\" (at TileSelector.cpp::getTileId())");
-            return {};
-        }
-
-        void reseed(unsigned int seed){randomEngine.seed(seed);};
-
-        
-
-        TileSelector(const Ref<Resource>& gdTileSelection, int seed) try
-        {
-            randomEngine.seed(seed);
+            RandomEngine.seed(seed);
             TypedArray<String> gd_targets = gdTileSelection->get("targets");
 
-            const unsigned int TARGETS_COUNT = gd_targets.size();
-
-            TargetsToFill.reserve(TARGETS_COUNT);
-            TargetsToFill.resize(TARGETS_COUNT);
+            AvailableTargets.reserve(TARGETS_COUNT);
+            AvailableTargets.resize(TARGETS_COUNT);
+            TileUidOrGroupPlaceHolder.resize(TARGETS_COUNT);
+            TileUidOrGroupPlaceHolder.reserve(TARGETS_COUNT);
+            IdsDistributionOfGroups.resize(TARGETS_COUNT);
+            IdsDistributionOfGroups.reserve(TARGETS_COUNT);
 
             TypedArray<String> gd_tile_to_place = gdTileSelection->get("tile_to_place");
             TypedArray<Dictionary> gd_grouped_prob_weighted_tiles = gdTileSelection->get("grouped_prob_weighted_tiles");
@@ -76,36 +46,75 @@ class TileSelector
                         
             for (short unsigned int i = 0; i < TARGETS_COUNT; i++)
             {
-                TargetsToFill[i] = ((String)(gd_targets[i])).utf8().get_data();
+                AvailableTargets[i] = ((String)(gd_targets[i])).utf8().get_data();
 
                 if(((String)gd_tile_to_place[i])[0] != '_')
-                    //tileIdOrDesignatedGroupId[i] = GlobalSingleton.getUid((String)gd_tile_to_place[i]);//uncomment later
-                    char a = 1;
+                    TileUidOrGroupPlaceHolder[i] = GlobalData::getTileUid((String)gd_tile_to_place[i]);
                 else
                 {
+                    TileUidOrGroupPlaceHolder[i] = true;
+
                     Dictionary group_dict = gd_grouped_prob_weighted_tiles[i];
-                    const short unsigned int DICT_SIZE = group_dict.keys().size();
+                    uint16_t DICT_SIZE = group_dict.keys().size();
 
                     std::vector<uint16_t> groupTileUids(DICT_SIZE);
                     groupTileUids.reserve(DICT_SIZE);
 
-                    std::vector<int> groupTileUidsProbabilities(DICT_SIZE);
-                    for (short unsigned int j = 0; j < DICT_SIZE; j++)
+                    std::vector<uint16_t> groupTileUidsProbabilities(DICT_SIZE);
+                    groupTileUidsProbabilities.reserve(DICT_SIZE);
+
+                    for (uint16_t j = 0; j < DICT_SIZE; j++)
                     {
-                        //groupTileUids[j] = GlobalSingleton.getUid((String)(group_dict.keys()[j]));
+                        groupTileUids[j] = GlobalData::getTileUid((String)(group_dict.keys()[j])).value_or(std::numeric_limits<uint16_t>::max());
                     
                         groupTileUidsProbabilities[j] = (int)group_dict.values()[j];
                     }
                     
-                    const auto GROUP_P_DISTRIBUTION = std::discrete_distribution<int>(groupTileUidsProbabilities.begin(), groupTileUidsProbabilities.end());
+                    const auto GROUP_P_DISTRIBUTION = std::discrete_distribution<uint16_t>(groupTileUidsProbabilities.begin(), groupTileUidsProbabilities.end());
 
-                    //idsDistributionOfGroups[i] = std::make_pair(groupTileUids, GROUP_P_DISTRIBUTION);
+                    IdsDistributionOfGroups[i] = std::make_pair(groupTileUids, GROUP_P_DISTRIBUTION);
                 }
             }  
         } catch (const std::exception& e) {
             UtilityFunctions::printerr("An exception occurred (TileSelector): ", e.what());
         }
         ~TileSelector(){};
-    };
+
+        uint16_t getTileUidForTarget(const std::string inputTargetTofill)
+        {
+            auto it = std::find_if(AvailableTargets.begin(), AvailableTargets.end(), [&](const std::string& availableTarget) {
+                return std::strcmp(availableTarget.c_str(), &inputTargetTofill[0]) == 0;
+            });
+
+            if (it != AvailableTargets.end())
+            {
+                auto index = std::distance(AvailableTargets.begin(), it);
+                try
+                {
+                    const auto& optTileID = std::get<std::optional<uint16_t>>(TileUidOrGroupPlaceHolder[index]); // w contains int, not float: will throw
+                    return optTileID.value_or(WorldMatrix::NULL_UID);
+                }
+                catch (const std::bad_variant_access& ex)
+                {
+                    auto pair = IdsDistributionOfGroups[index];
+                    return pair.first[pair.second(RandomEngine)];
+                }          
+            }
+            UtilityFunctions::printerr("couldn't find any candidate tile for the target to be filled: \"",&inputTargetTofill[0],"\" (at TileSelector.cpp::getTileId())");
+            return WorldMatrix::NULL_UID;
+        }
+
+        void reseed(unsigned int seed){RandomEngine.seed(seed);};
+
+    private:
+        std::default_random_engine RandomEngine;
+
+        const unsigned int TARGETS_COUNT;
+
+        std::vector<std::string> AvailableTargets; 
+        std::vector<std::variant<std::optional<uint16_t>, bool>> TileUidOrGroupPlaceHolder; //bool: is group
+        std::vector<std::pair<std::vector<uint16_t>, std::discrete_distribution<uint16_t>>> IdsDistributionOfGroups;
+
+};
 }
 #endif

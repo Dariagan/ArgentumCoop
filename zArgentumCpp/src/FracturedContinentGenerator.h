@@ -2,6 +2,7 @@
 #define __FRACTUREDCONTINENT_GENERATOR_H__
 
 #include "FormationGenerator.h"
+#include "WorldMatrix.cpp"
 
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/fast_noise_lite.hpp>
@@ -28,7 +29,14 @@ class FracturedContinentGenerator : public FormationGenerator
         float getContinentness(SafeVec coords) const;
         float getBeachness(SafeVec coords) const;
         void placeDungeonEntrances(ArgentumTileMap& argentumTileMap, const unsigned char DUNGEONS_TO_PLACE);
-        void resetState();
+        void resetState();                                        //add to the left of cave
+        enum Target { beach,  lake,  cont,  tree,  bush,  ocean,  cave_0,  cave_1,  cave_2, N_TARGETS}; static constexpr std::array<char*, N_TARGETS>
+            TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
+        
+        static constexpr unsigned char N_CAVES = Target::N_TARGETS - Target::cave_0;   
+
+        //to be filled before entering the double for loops
+        std::array<uint16_t, Target::N_TARGETS> targetsUids = {initialize_uids_array_as_empty<N_TARGETS>()};
             
     protected:
         static void _bind_methods();

@@ -1,20 +1,20 @@
 #ifndef WORLD_MATRIX_H
 #define WORLD_MATRIX_H
 
+#include <type_traits>
+#include <limits>
 #include <vector>
 
 #include "SafeVector.cpp"
-#include <type_traits>
-#include <limits>
 
 namespace godot{
 
-template <unsigned len, uint16_t val>
-constexpr std::array<uint16_t, len> initialize_array()
+template <unsigned size>
+constexpr std::array<uint16_t, size> initialize_uids_array_as_empty()
 {
-    std::array<uint16_t, len> ret{};
-    for (int i = 0; i < len; i++)
-        ret[i] = val;
+    std::array<uint16_t, size> ret{};
+    for (int i = 0; i < size; i++)
+        ret[i] = WorldMatrix::NULL_UID;
     return ret;
 }
 
@@ -25,7 +25,7 @@ class WorldMatrix
 
         static constexpr uint16_t NULL_UID = std::numeric_limits<uint16_t>::max();
 
-        static constexpr unsigned char MAX_TILES_PER_POS = 4;
+        static constexpr unsigned char MAX_TILES_PER_POS = 5;
 
         std::array<uint16_t, MAX_TILES_PER_POS>& operator[](const SafeVec& coords)
         {
@@ -54,7 +54,7 @@ class WorldMatrix
             flattenedUidsMatrix.resize(SIZE.area());
             for(unsigned int i = 0; i < SIZE.area(); i++)
             {
-                constexpr static std::array<uint16_t, MAX_TILES_PER_POS> arrayOfZeroes{ initialize_array<MAX_TILES_PER_POS, NULL_UID>()};// DON'T FORGET TO ADD ZEROES IF
+                constexpr static std::array<uint16_t, MAX_TILES_PER_POS> arrayOfZeroes{ initialize_uids_array_as_empty<MAX_TILES_PER_POS>()};// DON'T FORGET TO ADD ZEROES IF
                 flattenedUidsMatrix[i] = arrayOfZeroes;
             }
         }

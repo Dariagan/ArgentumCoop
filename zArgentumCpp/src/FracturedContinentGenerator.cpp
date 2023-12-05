@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <format>
+
 using namespace godot;
 
 FracturedContinentGenerator::FracturedContinentGenerator()
@@ -68,6 +69,11 @@ void FracturedContinentGenerator::generate(
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
+    for(uint16_t i = 0; i < N_TARGETS; i++)
+    {
+        targetsUids[i] = m_tileSelector->getTileUidForTarget(TARGETS[i]);
+    }
+
 //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     for (uint16_t x = 0; x < size.lef; x++){
     for (uint16_t y = 0; y < size.RIGHT; y++)
@@ -78,12 +84,10 @@ void FracturedContinentGenerator::generate(
 
         const bool PENINSULER_CAVED = isPeninsulerCaved(coords);
 
-        constexpr char MAX_POSSIBLE_ENTRIES = 3;
-
 //! POTENCIAL BUG: STACK OVERFLOW SI SE ESCRIBE EN UN addedTargetsCount[i] CON i SIENDO MAYOR QUE EL TAMAÑO DEL ARRAY - 1
-        std::array<std::array<char, 32>, MAX_POSSIBLE_ENTRIES> targetsToFill;
+        static std::array<Target, WorldMatrix::MAX_TILES_PER_POS> targetsToFill;
         
-        unsigned char addedTargetsCount = 0;
+        unsigned char placementsCount = 0;
 
         if (CONTINENTAL && ! PENINSULER_CAVED)
         {            
@@ -95,7 +99,7 @@ void FracturedContinentGenerator::generate(
             // lo que hace el strncpy es copiar el array de chars "beach" dentro de la posición <addedTargetsCount> del array de arrays de chars "targetsToFill"
             // el string "beach" (un string es un array de chars)
             if (BEACH) 
-                strncpy(&targetsToFill[addedTargetsCount++][0], "beach", sizeof(targetsToFill[0]));
+                targetsToFill[placementsCount++] = Target::beach;
             else
             {
                 const bool AWAY_FROM_COAST = getContinentness(coords) > continental_cutoff + 0.01f && peninsuler.get_noise_2dv(coords) > peninsuler_cutoff + 0.27f;
@@ -103,10 +107,10 @@ void FracturedContinentGenerator::generate(
                 const bool LAKE = isLake(coords) && AWAY_FROM_COAST;
 
                 if (LAKE) 
-                    strncpy(&targetsToFill[addedTargetsCount++][0], "lake", sizeof(targetsToFill[0]));//! addedTargetsCount == 1
+                    targetsToFill[placementsCount++] = Target::lake;
                 else 
                 {
-                    strncpy(&targetsToFill[addedTargetsCount++][0], "cont", sizeof(targetsToFill[0]));//! addedTargetsCount == 1
+                    targetsToFill[placementsCount++] = Target::cont;
                     if(!BEACHNESS < beachCutoff - 0.05f ) 
                     {
                         // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
@@ -117,11 +121,11 @@ void FracturedContinentGenerator::generate(
                         if (TREE)
                         {
                             m_trees.insert(coords);
-                            strncpy(&targetsToFill[addedTargetsCount++][0], "tree", sizeof(targetsToFill[0]));//! addedTargetsCount == 2
+                            targetsToFill[placementsCount++] = Target::tree;
                         }
                         else if(m_rng.randi_range(0, 400) == 0 && clearOf(m_bushes, coords, 1)) {
                             m_bushes.insert(coords);
-                            strncpy(&targetsToFill[addedTargetsCount++][0], "bush", sizeof(targetsToFill[0]));//! addedTargetsCount == 2
+                            targetsToFill[placementsCount++] = Target::bush;
                         }
                         //! NO ESCRIBIR POR LA DERECHA DEL PROPIO ARRAY 
                         //! AL ESCRIBIR EN EL ARRAY targetsToFill,
@@ -131,16 +135,14 @@ void FracturedContinentGenerator::generate(
                 }
             }
         } else 
-            {strncpy(&targetsToFill[addedTargetsCount++][0], "ocean", sizeof(targetsToFill[0]));};// addedTargetsCount=0 //TODO HACER ESTO UN MACRO
+            {targetsToFill[placementsCount++] = Target::ocean;};
 
         //todo poner los spawnweights con targets, como haces con las tiles
 
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
-        for(unsigned char k = 0; k < addedTargetsCount; k++)
+        for(unsigned char k = 0; k < placementsCount; k++)
         {
-            const std::optional<uint16_t> tileUid = this->m_tileSelector->getTileUid(targetsToFill[k]);
-            argentumTileMap.placeFormationTile(origin, coords, tileUid);
-            
+            argentumTileMap.placeFormationTile(origin, coords, targetsUids[(unsigned char)targetsToFill[k]]);
         }
         
     }}
@@ -188,9 +190,11 @@ bool FracturedContinentGenerator::isLake(SafeVec coords) const
 
 //MUST BE CALLED AFTER TREES/ROCKS/WHATEVER BLOCKING OBJECTS ARE INSERTED
 void FracturedContinentGenerator::placeDungeonEntrances(
-    godot::ArgentumTileMap& argentumTileMap, const unsigned char dungeonsToPlace)
+    godot::ArgentumTileMap& argentumTileMap, unsigned char dungeonsToPlace)
 {
-    constexpr int MAX_TRIES = 1'000'000;
+    static constexpr int MAX_TRIES = 1'000'000;
+
+    dungeonsToPlace = std::min(dungeonsToPlace, N_CAVES);
 
     std::vector<SafeVec> placedDungeonsCoords(dungeonsToPlace);
 
@@ -212,11 +216,8 @@ void FracturedContinentGenerator::placeDungeonEntrances(
                 == placedDungeonsCoords.end())
             {
                 placedDungeonsCoords.push_back(rCoords);
-                std::array<char, 32> buffer;
-                sprintf(&buffer[0], "cave_%lu", placedDungeonsCoords.size()-1);
 
-                const auto tileId = this->m_tileSelector->getTileUid(buffer);
-                argentumTileMap.placeFormationTile(m_origin, rCoords, tileId);
+                argentumTileMap.placeFormationTile(m_origin, rCoords, targetsUids[Target::cave_0+placedDungeonsCoords.size()-1]);
                 UtilityFunctions::print((Vector2i)rCoords);
             }
             else{minDistanceMultiplier = std::clamp(1500.f / triesCount, 0.f, 1.f);}

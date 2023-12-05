@@ -45,7 +45,7 @@ namespace godot
             //SOLO USAR PARA FORMATIONS
             void placeFormationTile(
                 const SafeVec& formationOrigin, const SafeVec& tileCoordsRelativeToFormationOrigin, 
-                const std::optional<uint16_t>& optTileId, bool deleteOthers = false);
+                const uint16_t optTileUid, bool deleteOthers = false);
                 
             void birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder);
             

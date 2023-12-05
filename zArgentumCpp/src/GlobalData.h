@@ -11,6 +11,8 @@
 #include <godot_cpp/godot.hpp>
 #include <unordered_map>
 #include <algorithm>
+#include <optional>
+#include <limits>
 #include "WorldMatrix.cpp"
 
 namespace godot{
@@ -25,10 +27,10 @@ class GlobalData: public Node
         //el godot side se tiene q encargar de agregar los beings
 
 
-        void add_tiles(const Dictionary& input_tiles)
+        static void add_tiles(const Dictionary& input_tiles)
         {
-            this->tiles.merge(input_tiles, true);
-            const u_int16_t NEW_TILES_COUNT = this->tiles.size();
+            tiles.merge(input_tiles, true);
+            const u_int16_t NEW_TILES_COUNT = tiles.size();
 
             if(exceedsTileLimit(NEW_TILES_COUNT)) return;
 
@@ -46,15 +48,15 @@ class GlobalData: public Node
             }
         }
 
-        void set_tiles(const Dictionary& input_tiles)
+        static void set_tiles(const Dictionary& input_tiles)
         {
-            if(this->tiles.is_empty())
+            if(tiles.is_empty())
             {
                 const u_int16_t TILES_COUNT = input_tiles.size();
 
                 if(exceedsTileLimit(TILES_COUNT)) return;
 
-                this->tiles = input_tiles;
+                tiles = input_tiles;
 
                 tilesUidMapping.reserve(TILES_COUNT);
                 tilesUidMapping.resize(TILES_COUNT);
@@ -63,34 +65,39 @@ class GlobalData: public Node
             }
             else
             {
-                this->tiles.clear();
+                tiles.clear();
                 add_tiles(input_tiles);
             }
         }
-        Dictionary get_tiles(){
-            return tiles;
+        static Dictionary get_tiles(){return tiles;}
+        
+        static std::optional<u_int16_t> getTileUid(const StringName& stringId)
+        {
+            for(u_int16_t i = 0; i < tilesUidMapping.size(); i++)
+            {
+                if(tilesUidMapping[i] == stringId)
+                    return i;
+            }
+            return {};
         }
         
-        std::vector<StringName> tilesUidMapping;
-
-
         //NO USAR, PROBAR SI TE DEJA BORRARLOS:
         GlobalData(){}; ~GlobalData();
 
     protected:
         static void _bind_methods()
         {
-            ClassDB::bind_method(D_METHOD("set_tiles", "tiles"), &GlobalData::set_tiles);
-            ClassDB::bind_method(D_METHOD("add_tiles", "tiles"), &GlobalData::set_tiles);
+            ClassDB::bind_static_method("GlobalData", D_METHOD("set_tiles", "tiles"), &GlobalData::set_tiles);
+            ClassDB::bind_static_method("GlobalData", D_METHOD("add_tiles", "tiles"), &GlobalData::set_tiles);
         };
     private:
-        Dictionary item_data, 
+        static Dictionary item_data, 
         sprites_datas, 
         races, 
         controllable_races, 
         uncontrollable_races, 
         klasses, 
-        tiles = {}, 
+        tiles, 
         tile_selections
         ;
 
@@ -102,6 +109,8 @@ class GlobalData: public Node
             }
             return false;
         }
+
+        static std::vector<StringName> tilesUidMapping;
 };
 }
 

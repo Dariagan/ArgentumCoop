@@ -306,7 +306,7 @@ bool ArgentumTileMap::withinChunkBounds(
 
 void ArgentumTileMap::placeFormationTile( 
     const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
-    const std::optional<uint16_t>& optTileUid, const bool deletePreviousTiles){try
+    const uint16_t optTileUid, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
     auto& otherTilesAtPos = worldMatrixPtr->at(absoluteCoords);
@@ -315,8 +315,8 @@ void ArgentumTileMap::placeFormationTile(
 
     for(char i = 0; i < WorldMatrix::MAX_TILES_PER_POS; i++)
     {
-        if(otherTilesAtPos[i] == WorldMatrix::NULL_UID && optTileUid.has_value()){
-            otherTilesAtPos[i] = optTileUid.value();
+        if(otherTilesAtPos[i] == WorldMatrix::NULL_UID){
+            otherTilesAtPos[i] = optTileUid;
             break;
         }
     }
