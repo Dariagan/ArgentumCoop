@@ -110,7 +110,6 @@ namespace godot
 
             std::unordered_map<SafeVec, int, SafeVec::hash> m_tileSharedLoadsCount;
 
-//! CREO QUE ESTO YA NO HACE FALTA TENIENOD LA DATA EN GLOBALDATA
             std::unordered_map<StringName, std::unordered_map<StringName, Variant>> CppTilesData;
             static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const SafeVec &chunkSize);
 

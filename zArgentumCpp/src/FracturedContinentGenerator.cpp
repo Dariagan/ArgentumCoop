@@ -53,7 +53,7 @@ void FracturedContinentGenerator::generate(
     //TODO posible randomización leve de parámetros
     this->m_origin = origin; this->m_size = size;
 
-    m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, argentumTileMap, SEED);
+    m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, argentumTileMap, SEED, N_THREADS);
 
     {
     continenter.set_seed(SEED); peninsuler.set_seed(SEED+1); bigLaker.set_seed(SEED+2); smallLaker.set_seed(SEED+3);
@@ -74,26 +74,26 @@ void FracturedContinentGenerator::generate(
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
 
-    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> bushes(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
-    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> trees(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
+    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> bushes_thread(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
+    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> trees_thread(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
 
     std::vector<std::thread> threads;
     threads.reserve(N_THREADS);
 
-    for(unsigned char i = 0; i < N_THREADS; i++)
+    for(u_char thread_i = 0; thread_i < N_THREADS; thread_i++)
     {
-        const uint16_t startlef = i*m_size.lef/N_THREADS;
-        const uint16_t endlef = (i+1)*m_size.lef/N_THREADS;
+        const uint16_t startlef = thread_i*m_size.lef/N_THREADS;
+        const uint16_t endlef = (thread_i+1)*m_size.lef/N_THREADS;
         const SafeVec range(startlef, endlef);
 
-        threads.emplace_back(std::thread(&FracturedContinentGenerator::build, this, range, 
-                std::ref(argentumTileMap), m_origin, std::ref(bushes[i]), std::ref(trees[i])));
+        threads.emplace_back(std::thread(&FracturedContinentGenerator::buildSubSection, this, range, 
+                std::ref(argentumTileMap), m_origin, std::ref(bushes_thread[thread_i]), std::ref(trees_thread[thread_i]), thread_i));
     }
-    for(unsigned char i = 0; i < N_THREADS; i++)
+    for(u_char i = 0; i < N_THREADS; i++)
     {
         threads[i].join();
-        m_bushes.insert(bushes[i].begin(), bushes[i].end());
-        m_trees.insert(trees[i].begin(), trees[i].end());
+        m_bushes.insert(bushes_thread[i].begin(), bushes_thread[i].end());
+        m_trees.insert(trees_thread[i].begin(), trees_thread[i].end());
     }  
     //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     
@@ -102,9 +102,8 @@ void FracturedContinentGenerator::generate(
     this->resetState();
 }
 
-
-void godot::FracturedContinentGenerator::build(const SafeVec& rangelef, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
-    std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees)
+void godot::FracturedContinentGenerator::buildSubSection(const SafeVec& rangelef, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
+    std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees, const u_char thread_i)
 {
     for (uint16_t x = rangelef.lef; x < rangelef.RIGHT; x++)
     {
@@ -173,11 +172,10 @@ void godot::FracturedContinentGenerator::build(const SafeVec& rangelef, godot::A
 
             // todo poner los spawnweights con targets, como haces con las tiles
 
-            // shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
+// shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
             for (unsigned char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
             {
-                const auto &tileUid = m_tileSelector->getTileUidForTarget(TARGETS[targetsToFill[k]]);
-                //std::lock_guard<std::mutex> guard(mtx);
+                const auto &tileUid = m_tileSelector->getTileUidForTarget(TARGETS[targetsToFill[k]], thread_i);
                 argentumTileMap.placeFormationTile(origin, coords, tileUid);
             }
         }
@@ -223,7 +221,7 @@ bool FracturedContinentGenerator::isLake(SafeVec coords) const
 
 //MUST BE CALLED AFTER TREES/ROCKS/WHATEVER BLOCKING OBJECTS ARE INSERTED
 void FracturedContinentGenerator::placeDungeonEntrances(
-    godot::ArgentumTileMap& argentumTileMap, unsigned char dungeonsToPlace)
+    godot::ArgentumTileMap& argentumTileMap, u_char dungeonsToPlace)
 {
     static constexpr int MAX_TRIES = 1'000'000;
 
@@ -250,7 +248,7 @@ void FracturedContinentGenerator::placeDungeonEntrances(
             {
                 placedDungeonsCoords.push_back(rCoords);
 
-                const auto& tileUid = m_tileSelector->getTileUidForTarget(TARGETS[Target::cave_0+placedDungeonsCoords.size()-1]);
+                const auto& tileUid = m_tileSelector->getTileUidForTarget(TARGETS[Target::cave_0+placedDungeonsCoords.size()-1], 0);
 
                 argentumTileMap.placeFormationTile(m_origin, rCoords, tileUid);
                 UtilityFunctions::print((Vector2i)rCoords);

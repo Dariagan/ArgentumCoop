@@ -12,6 +12,8 @@ env = SConscript("godot-cpp/SConstruct")
 # - CPPDEFINES are for pre-processor defines
 # - LINKFLAGS are for linking flags
 
+#TODO cuando se exporte el game, usar la template de building de producción, no la debug
+
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/"])
 env.Append(CXXFLAGS=["-O3", "-fexceptions"])

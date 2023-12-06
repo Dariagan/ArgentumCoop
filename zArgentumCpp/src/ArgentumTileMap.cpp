@@ -373,6 +373,9 @@ bool ArgentumTileMap::withinChunkBounds(
         && loadedCoordToCheck.RIGHT <= chunkTopLeftCorner.RIGHT + CHUNK_SIZE.RIGHT;
 }
 
+//todo mejor guardar solo los chunks que fueron "conocidos" enteros, y los chunks "no conocidos" (no visitados/cargados nunca), regenerar totalmente con la misma seed
+//// GUARDAR LAS POS CON ARRAYS MODIFICADOS
+//// GUARDAR EN ALGUN LUGAR LAS TILES SELECCIONADAS ALEATORIAMENTE
 void ArgentumTileMap::placeFormationTile( 
     const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
     const uint16_t optTileUid, const bool deletePreviousTiles){try
@@ -385,12 +388,7 @@ void ArgentumTileMap::placeFormationTile(
     for(char i = 0; i < WorldMatrix::MAX_TILES_PER_POS; i++)
     {
         if(otherTilesAtPos[i] == NULL_TILE_UID){
-            otherTilesAtPos[i] = optTileUid;
-            // if(rand()%7000==0)
-            // {
-            //     UtilityFunctions::print("placed ", optTileUid);
-            // }
-            
+            otherTilesAtPos[i] = optTileUid;      
             break;
         }
     }

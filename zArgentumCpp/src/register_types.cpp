@@ -17,14 +17,13 @@ using namespace godot;
 // IMPORTANTE: AL CREAR UNA CLASE QUE HEREDE DE UNA CLASE DE GODOT:
 // HAY QUE ANTEPONERLE "public" A LA CLASE DE GODOT 
 
-static std::ofstream stdoutLogFile("zArgentumCpp/stdout.log");
-static std::ofstream errorsLogFile("zArgentumCpp/aerror.log");
+//static std::ofstream stdoutLogFile("zArgentumCpp/stdout.log");static std::ofstream errorsLogFile("zArgentumCpp/aerror.log");
 
 void initialize_argentum_cpp(ModuleInitializationLevel p_level)
 {
     if(p_level != MODULE_INITIALIZATION_LEVEL_SCENE){return;}
 
-    std::cerr.rdbuf(errorsLogFile.rdbuf()); std::cout.rdbuf(stdoutLogFile.rdbuf());
+    //std::cerr.rdbuf(errorsLogFile.rdbuf()); std::cout.rdbuf(stdoutLogFile.rdbuf());
 
     ClassDB::register_class<ArgentumTileMap>();
     ClassDB::register_class<BeingBuilder>();
@@ -36,8 +35,7 @@ void initialize_argentum_cpp(ModuleInitializationLevel p_level)
 void uninitialize_argentum_cpp(ModuleInitializationLevel p_level)
 {
     if(p_level != MODULE_INITIALIZATION_LEVEL_SCENE){
-        errorsLogFile.close();
-        stdoutLogFile.close();
+        //errorsLogFile.close();stdoutLogFile.close();
         return;
     }
 }

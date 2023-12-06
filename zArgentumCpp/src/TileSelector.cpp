@@ -4,10 +4,19 @@ using namespace godot;
 
 //TODO los groups se rompieron, arreglarlo.   
 
-TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const unsigned int seed) try : 
-    TARGETS_COUNT(((Array)gdTileSelection->get("targets")).size())
+TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const u_int seed, const char input_n_threads) try : 
+    TARGETS_COUNT(((Array)gdTileSelection->get("targets")).size()), N_THREADS(input_n_threads)
 {
-    m_randomEngine.seed(seed);
+    if (input_n_threads < 1)
+    {
+        UtilityFunctions::printerr("TIleSelector: less than 1 thread given");
+        return;
+    }
+
+    m_randomEngines.reserve(N_THREADS);
+    m_randomEngines.resize(N_THREADS);
+    this->reseed(seed);
+
     TypedArray<String> gd_targets = gdTileSelection->get("targets");
 
     m_availableTargets.reserve(TARGETS_COUNT);
@@ -67,7 +76,7 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
 }
 TileSelector::~TileSelector(){};
 
-uint16_t TileSelector::getTileUidForTarget(const char* inputTargetTofill)
+uint16_t TileSelector::getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i)
 {
     auto it = std::find_if(m_availableTargets.begin(), m_availableTargets.end(), [&](const std::string& availableTarget) {
         return std::strcmp(availableTarget.c_str(), inputTargetTofill) == 0;
@@ -89,43 +98,17 @@ uint16_t TileSelector::getTileUidForTarget(const char* inputTargetTofill)
         {
             auto& pair = m_idsDistributionOfGroups[index];
             //grabs a random tileUid from the group
-            return pair.first[pair.second(m_randomEngine)];
+            return pair.first[pair.second(m_randomEngines[thread_i])];
         }          
     }
     UtilityFunctions::printerr("couldn't find any candidate tile for the target to be filled: \"",&inputTargetTofill[0],"\" (at TileSelector.cpp::getTileId())");
     return std::numeric_limits<uint16_t>::max();
 }
-uint16_t TileSelector::getTileUidForTargetMultiThreaded(const char* inputTargetTofill)
-{
-    auto it = std::find_if(m_availableTargets.begin(), m_availableTargets.end(), [&](const std::string& availableTarget) {
-        return std::strcmp(availableTarget.c_str(), inputTargetTofill) == 0;
-    });
 
-    if (it != m_availableTargets.end())
+void TileSelector::reseed(const u_int seed){
+    for(u_char threadI = 0; threadI < N_THREADS; threadI++)
     {
-        auto index = std::distance(m_availableTargets.begin(), it);
-        try
-        {
-            const auto& optTileID = std::get<std::optional<uint16_t>>(m_tileUidOrGroup[index]);
-            
-            return optTileID.value_or(std::numeric_limits<uint16_t>::max());
-            
-            // UtilityFunctions::printerr("nullopt");
-            // return std::numeric_limits<uint16_t>::max();
-        }
-        catch (const std::bad_variant_access& ex)
-        {
-            auto& pair = m_idsDistributionOfGroups[index];
-            //grabs a random tileUid from the group
-            const auto& groupTiles = pair.first;
-            
-            std::lock_guard<std::mutex> guard(mtx);
-            return groupTiles[pair.second(m_randomEngine)];
-        }          
+        m_randomEngines[threadI].seed(seed+1);
     }
-    UtilityFunctions::printerr("couldn't find any candidate tile for the target to be filled: \"",&inputTargetTofill[0],"\" (at TileSelector.cpp::getTileId())");
-    return std::numeric_limits<uint16_t>::max();
 }
-
-void TileSelector::reseed(unsigned int seed){m_randomEngine.seed(seed);};
 

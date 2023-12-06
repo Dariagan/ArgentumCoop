@@ -25,8 +25,8 @@ class FracturedContinentGenerator : public FormationGenerator
 
         RandomNumberGenerator m_rng;    
         std::unordered_set<SafeVec, SafeVec::hash> m_trees, m_bushes;
-        void build(const SafeVec& rangelef, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
-            std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees);
+        void buildSubSection(const SafeVec& rangelef, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
+            std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees, const u_char thread_i);
 
         bool clearOf(const std::unordered_set<SafeVec, SafeVec::hash>& setToCheck, SafeVec coords, uint16_t radius, bool checkForwards = false) const;
         bool isPeninsulerCaved(SafeVec coords) const;
@@ -34,16 +34,16 @@ class FracturedContinentGenerator : public FormationGenerator
         bool isContinental(SafeVec coords) const;
         float getContinentness(SafeVec coords) const;
         float getBeachness(SafeVec coords) const;
-        void placeDungeonEntrances(ArgentumTileMap& argentumTileMap, const unsigned char DUNGEONS_TO_PLACE);
+        void placeDungeonEntrances(ArgentumTileMap& argentumTileMap, const u_char DUNGEONS_TO_PLACE);
         void resetState();                                        //add to the left of cave
         enum Target { beach,  lake,  cont,  tree,  bush,  ocean,  cave_0,  cave_1,  cave_2, N_TARGETS}; static constexpr std::array<const char*, N_TARGETS>
             TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
         
 
-        static constexpr unsigned char N_CAVES = Target::N_TARGETS - Target::cave_0;   
+        static constexpr u_char N_CAVES = Target::N_TARGETS - Target::cave_0;   
         
-        const OS os;
-        const char N_THREADS = std::clamp(os.get_processor_count(), 1, 32);
+        //TIENE QUE SER UN NÚMERO FIJO PARA QUE NO HAYA DESYNCS DE GENERACIÓN ALEATORIA ENTRE PCS POR TENER UN DISTINTO Nº DE THREADS
+        static constexpr u_char N_THREADS = 16;
 
     protected:
         static void _bind_methods();

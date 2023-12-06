@@ -19,8 +19,8 @@ func _process(_delta):
 
 func generate_world():
 	
-	const WORLD_SIZE: Vector2i = Vector2i(30000, 30000)
-	assert(WORLD_SIZE.x > 0 && WORLD_SIZE.y >0)
+	const WORLD_SIZE: Vector2i = Vector2i(5000, 5000)
+	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y >500)
 	
 	generate_world_matrix(WORLD_SIZE, GlobalData.tiles)
 	
