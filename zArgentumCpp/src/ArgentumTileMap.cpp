@@ -23,6 +23,7 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         UtilityFunctions::printerr("Negatively sized formation not allowed");
         return;
     }
+
     const bool outOfBoundsEast = origin.x + size.x > m_worldMatrixPtr->SIZE.lef;
     const bool outOfBoundsSouth = origin.y + size.y > m_worldMatrixPtr->SIZE.RIGHT;
     const bool negativeOrigin = origin.x < 0 || origin.y < 0;
@@ -78,6 +79,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
                 if (m_worldMatrixPtr->isNotEmptyAt(sTileMapCoords))//if more than 0 tileIds at coords:
                     for (const uint16_t& uid : (*m_worldMatrixPtr)[sTileMapCoords])
                         {setCell(uid, sTileMapCoords);}
+                //TODO
                 //else
                   //  {setCell("ocean_water", sTileMapCoords);}
             }
@@ -189,7 +191,6 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size, const Dictiona
     {
         m_worldMatrixPtr = std::make_unique<WorldMatrix>(size);
         set_tiles_data(tiles_data);
-        
         m_spawnWeightsMatrix.resize(size.x/10, std::vector<std::unordered_map<uint16_t, unsigned char>>(size.y/10));
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");

@@ -42,11 +42,8 @@ class FracturedContinentGenerator : public FormationGenerator
 
         static constexpr unsigned char N_CAVES = Target::N_TARGETS - Target::cave_0;   
         
-        OS os;
+        const OS os;
         const char N_THREADS = std::clamp(os.get_processor_count(), 1, 32);
-        //static constexpr unsigned char N_THREADS = 16;//TIENE Q TENER RAIZ CUADRADA ENTERA, 16,4,2
-        //static_assert(N_THREADS==1||N_THREADS==4||N_THREADS==9||N_THREADS==16);
-        
 
     protected:
         static void _bind_methods();

@@ -86,8 +86,7 @@ void FracturedContinentGenerator::generate(
         const uint16_t endlef = (i+1)*m_size.lef/N_THREADS;
         const SafeVec range(startlef, endlef);
 
-        threads.emplace_back(std::thread(&FracturedContinentGenerator::build, this, 
-                range, 
+        threads.emplace_back(std::thread(&FracturedContinentGenerator::build, this, range, 
                 std::ref(argentumTileMap), m_origin, std::ref(bushes[i]), std::ref(trees[i])));
     }
     for(unsigned char i = 0; i < N_THREADS; i++)

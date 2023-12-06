@@ -61,6 +61,8 @@ namespace godot
 
             Vector2i get_random_coord_with_tile_id(const Vector2i& top_left_corner, const Vector2i& bottom_right_corner, const String& tile_id) const;
 
+            //todo algun método para placear tiles ingame y q se guarden en un hashmap
+
             void birthBeingOfKind(const String& being_kind_id);
             void freeze_and_store_being(const Vector2& glb_coords, const int individual_unique_id);
 
