@@ -8,6 +8,7 @@
 #include <string>
 #include <format>
 #include <memory>
+#include <thread>
 
 using namespace godot;
 
@@ -70,80 +71,120 @@ void FracturedContinentGenerator::generate(
 // ASÍ QUE, PARA SPAWNEAR AL PLAYER ELEGIR UN PUNTO RANDOM HASTA Q TENGA UNA TILE TIERRA (COMO HAGO CON LOS DUNGEONS) 
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
+    
+    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> bushes(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
+    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> trees(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
+    
+    std::vector<std::thread> threads;
+    threads.reserve(N_THREADS);
 
-//CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
-    for (uint16_t x = 0; x < size.lef; x++){
-    for (uint16_t y = 0; y < size.RIGHT; y++)
+    unsigned char cnt = 0;
+    for(unsigned char i = 0; i < std::sqrt(N_THREADS); i++)
     {
-        const SafeVec coords(x, y);
-//! POTENCIAL BUG: STACK OVERFLOW SI SE ESCRIBE EN UN addedTargetsCount[i] CON i SIENDO MAYOR QUE EL TAMAÑO DEL ARRAY - 1
-        std::array<Target, WorldMatrix::MAX_TILES_PER_POS> targetsToFill;
-        unsigned char placementsCount = 0;
-
-        const bool CONTINENTAL = isContinental(coords);
-
-        const bool PENINSULER_CAVED = isPeninsulerCaved(coords);
-
-        if (CONTINENTAL && ! PENINSULER_CAVED)
-        {            
-            const float BEACHNESS = getBeachness(coords);
-            const bool BEACH = BEACHNESS > beachCutoff;
-            
-            // un array de chars = un string
-
-            // lo que hace el strncpy es copiar el array de chars "beach" dentro de la posición <addedTargetsCount> del array de arrays de chars "targetsToFill"
-            // el string "beach" (un string es un array de chars)
-            if (BEACH) 
-                targetsToFill[placementsCount++] = Target::beach;
-            else
-            {
-                const bool AWAY_FROM_COAST = getContinentness(coords) > continental_cutoff + 0.01f && peninsuler.get_noise_2dv(coords) > peninsuler_cutoff + 0.27f;
-                
-                const bool LAKE = isLake(coords) && AWAY_FROM_COAST;
-
-                if (LAKE) 
-                    targetsToFill[placementsCount++] = Target::lake;
-                else 
-                {
-                    targetsToFill[placementsCount++] = Target::cont;
-                    if(!BEACHNESS < beachCutoff - 0.05f ) 
-                    {
-                        // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
-                        const bool GOOD_DICE_ROLL = m_rng.randf_range(0, 4) + forest.get_noise_2dv(coords) * 1.4f > treeCutoff;
-                        const bool LUCKY_TREE = m_rng.randi_range(0, 1000) == 0;
-
-                        const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOf(m_trees, coords, 3);
-                        if (TREE)
-                        {
-                            m_trees.insert(coords);
-                            targetsToFill[placementsCount++] = Target::tree;
-                        }
-                        else if(m_rng.randi_range(0, 400) == 0 && clearOf(m_bushes, coords, 1)) {
-                            m_bushes.insert(coords);
-                            targetsToFill[placementsCount++] = Target::bush;
-                        }
-                        //! NO ESCRIBIR POR LA DERECHA DEL PROPIO ARRAY 
-                        //! AL ESCRIBIR EN EL ARRAY targetsToFill,
-                        //! PREVENIR QUE: addedTargetsCount >= MAX_POSSIBLE_ENTRIES,
-                        //! EN TODOS LOS POSIBLES RECORRIDOS DE EJECUCIÓN
-                    }
-                }
-            }
-        } else 
-            {targetsToFill[placementsCount++] = Target::ocean;};
-
-        //todo poner los spawnweights con targets, como haces con las tiles
-
-//shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
-        for(unsigned char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
+        for(unsigned char j = 0; j < std::sqrt(N_THREADS); j++)
         {
-            const auto& tileUid = m_tileSelector->getTileUidForTarget(TARGETS[targetsToFill[k]]);
-            argentumTileMap.placeFormationTile(origin, coords, tileUid);
+            const SafeVec start(m_size.lef*(i/std::sqrt(N_THREADS)), m_size.RIGHT*(j/std::sqrt(N_THREADS)));
+            threads.emplace_back(std::thread(&FracturedContinentGenerator::build, this, 
+                start, 
+                std::ref(argentumTileMap), m_origin, std::ref(bushes[cnt]), std::ref(trees[cnt])));
+            cnt++;
         }
-    }}
+    }
+    for(unsigned char i = 0; i < N_THREADS; i++)
+    {
+        threads[i].join();
+        m_bushes.insert(bushes[i].begin(), bushes[i].end());
+        m_trees.insert(trees[i].begin(), trees[i].end());
+    }  
+
+    //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
+    
     placeDungeonEntrances(argentumTileMap, 3);
 
     this->resetState();
+}
+
+
+void godot::FracturedContinentGenerator::build(const godot::SafeVec &start, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
+    std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees)
+{
+    const SafeVec end = start + m_size/std::sqrt(N_THREADS);
+    for (uint16_t x = start.lef; x < end.lef; x++)
+    {
+        for (uint16_t y = start.RIGHT; y < end.RIGHT; y++)
+        {
+            const SafeVec coords(x, y);
+            //! POTENCIAL BUG: STACK OVERFLOW SI SE ESCRIBE EN UN addedTargetsCount[i] CON i SIENDO MAYOR QUE EL TAMAÑO DEL ARRAY - 1
+            std::array<Target, WorldMatrix::MAX_TILES_PER_POS> targetsToFill;
+            unsigned char placementsCount = 0;
+
+            const bool CONTINENTAL = isContinental(coords);
+
+            const bool PENINSULER_CAVED = isPeninsulerCaved(coords);
+
+            if (CONTINENTAL && !PENINSULER_CAVED)
+            {
+                const float BEACHNESS = getBeachness(coords);
+                const bool BEACH = BEACHNESS > beachCutoff;
+
+                // un array de chars = un string
+
+                // lo que hace el strncpy es copiar el array de chars "beach" dentro de la posición <addedTargetsCount> del array de arrays de chars "targetsToFill"
+                // el string "beach" (un string es un array de chars)
+                if (BEACH)
+                    targetsToFill[placementsCount++] = Target::beach;
+                else
+                {
+                    const bool AWAY_FROM_COAST = getContinentness(coords) > continental_cutoff + 0.01f && peninsuler.get_noise_2dv(coords) > peninsuler_cutoff + 0.27f;
+
+                    const bool LAKE = isLake(coords) && AWAY_FROM_COAST;
+
+                    if (LAKE)
+                        targetsToFill[placementsCount++] = Target::lake;
+                    else
+                    {
+                        targetsToFill[placementsCount++] = Target::cont;
+                        if (!BEACHNESS < beachCutoff - 0.05f)
+                        {
+                            // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
+                            const bool GOOD_DICE_ROLL = m_rng.randf_range(0, 4) + forest.get_noise_2dv(coords) * 1.4f > treeCutoff;
+                            const bool LUCKY_TREE = m_rng.randi_range(0, 1000) == 0;
+
+                            const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOf(myTrees, coords, 3);
+                            if (TREE)
+                            {
+                                myTrees.insert(coords);
+                                targetsToFill[placementsCount++] = Target::tree;
+                            }
+                            else if (m_rng.randi_range(0, 400) == 0 && clearOf(myBushes, coords, 1))
+                            {
+                                myBushes.insert(coords);
+                                targetsToFill[placementsCount++] = Target::bush;
+                            }
+                            //! NO ESCRIBIR POR LA DERECHA DEL PROPIO ARRAY
+                            //! AL ESCRIBIR EN EL ARRAY targetsToFill,
+                            //! PREVENIR QUE: addedTargetsCount >= MAX_POSSIBLE_ENTRIES,
+                            //! EN TODOS LOS POSIBLES RECORRIDOS DE EJECUCIÓN
+                        }
+                    }
+                }
+            }
+            else
+            {
+                targetsToFill[placementsCount++] = Target::ocean;
+            };
+
+            // todo poner los spawnweights con targets, como haces con las tiles
+
+            // shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
+            for (unsigned char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
+            {
+                const auto &tileUid = m_tileSelector->getTileUidForTargetMultiThreaded(TARGETS[targetsToFill[k]]);
+                //std::lock_guard<std::mutex> guard(mtx);
+                argentumTileMap.placeFormationTile(origin, coords, tileUid);
+            }
+        }
+    }
 }
 
 bool FracturedContinentGenerator::isContinental(SafeVec coords) const

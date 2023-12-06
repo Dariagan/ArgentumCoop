@@ -7,7 +7,7 @@
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/fast_noise_lite.hpp>
 #include <godot_cpp/classes/random_number_generator.hpp>
-
+#include <mutex>
 
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING
@@ -18,6 +18,7 @@ class FracturedContinentGenerator : public FormationGenerator
     private:
         SafeVec m_origin;
         SafeVec m_size;
+        std::mutex mtx;
 
         static constexpr short int DEBUG_RANGE_MAX = 50, DEBUG_RANGE_MIN = -DEBUG_RANGE_MAX; 
 
@@ -35,7 +36,9 @@ class FracturedContinentGenerator : public FormationGenerator
             TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
         
         static constexpr unsigned char N_CAVES = Target::N_TARGETS - Target::cave_0;   
-            
+        
+        static constexpr unsigned char N_THREADS = 9;//TIENE Q TENER RAIZ CUADRADA ENTERA
+
     protected:
         static void _bind_methods();
 
@@ -52,6 +55,9 @@ class FracturedContinentGenerator : public FormationGenerator
         void generate(ArgentumTileMap& argentumTileMap, 
             const SafeVec& origin, const SafeVec& size, const Ref<Resource>& tileSelectionSet,
             const unsigned int seed = 0, const Dictionary& data = Dictionary()) override;
+
+
+void build(const godot::SafeVec &size, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees);
 };
 }
 
