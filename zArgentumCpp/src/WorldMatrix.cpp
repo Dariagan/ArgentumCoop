@@ -20,7 +20,6 @@ constexpr std::array<uint16_t, size> initialize_uids_array_as_empty()
     return ret;
 }
 
-
 class WorldMatrix
 {
     public:

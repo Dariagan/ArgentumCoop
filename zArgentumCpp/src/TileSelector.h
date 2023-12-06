@@ -16,6 +16,7 @@
 #include <limits>
 #include <variant>
 #include "ArgentumTileMap.h"
+#include "mutex"
 
 namespace godot
 {   
@@ -27,11 +28,14 @@ public:
     ~TileSelector();
 
     uint16_t getTileUidForTarget(const char* inputTargetTofill);
+    uint16_t getTileUidForTargetMultiThreaded(const char* inputTargetTofill);
 
     void reseed(unsigned int seed);
 
 private:
     std::default_random_engine m_randomEngine;
+
+    std::mutex mtx;
 
     const unsigned int TARGETS_COUNT;
 

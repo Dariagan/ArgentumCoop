@@ -37,7 +37,7 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
             m_tileUidOrGroup[i] = true;
 
             const Dictionary& group_dict = gd_grouped_prob_weighted_tiles[i];
-            UtilityFunctions::print(group_dict);
+            
             uint16_t GROUP_DICT_SIZE = group_dict.keys().size();
 
             std::vector<uint16_t> groupedTileUid(GROUP_DICT_SIZE);
@@ -79,17 +79,48 @@ uint16_t TileSelector::getTileUidForTarget(const char* inputTargetTofill)
         try
         {
             const auto& optTileID = std::get<std::optional<uint16_t>>(m_tileUidOrGroup[index]);
-            if(optTileID.has_value()){
-                return optTileID.value();
-            }
-            UtilityFunctions::printerr("nullopt");
+            
             return optTileID.value_or(std::numeric_limits<uint16_t>::max());
+            
+            // UtilityFunctions::printerr("nullopt");
+            // return std::numeric_limits<uint16_t>::max();
         }
         catch (const std::bad_variant_access& ex)
         {
             auto& pair = m_idsDistributionOfGroups[index];
             //grabs a random tileUid from the group
             return pair.first[pair.second(m_randomEngine)];
+        }          
+    }
+    UtilityFunctions::printerr("couldn't find any candidate tile for the target to be filled: \"",&inputTargetTofill[0],"\" (at TileSelector.cpp::getTileId())");
+    return std::numeric_limits<uint16_t>::max();
+}
+uint16_t TileSelector::getTileUidForTargetMultiThreaded(const char* inputTargetTofill)
+{
+    auto it = std::find_if(m_availableTargets.begin(), m_availableTargets.end(), [&](const std::string& availableTarget) {
+        return std::strcmp(availableTarget.c_str(), inputTargetTofill) == 0;
+    });
+
+    if (it != m_availableTargets.end())
+    {
+        auto index = std::distance(m_availableTargets.begin(), it);
+        try
+        {
+            const auto& optTileID = std::get<std::optional<uint16_t>>(m_tileUidOrGroup[index]);
+            
+            return optTileID.value_or(std::numeric_limits<uint16_t>::max());
+            
+            // UtilityFunctions::printerr("nullopt");
+            // return std::numeric_limits<uint16_t>::max();
+        }
+        catch (const std::bad_variant_access& ex)
+        {
+            auto& pair = m_idsDistributionOfGroups[index];
+            //grabs a random tileUid from the group
+            const auto& groupTiles = pair.first;
+            
+            std::lock_guard<std::mutex> guard(mtx);
+            return groupTiles[pair.second(m_randomEngine)];
         }          
     }
     UtilityFunctions::printerr("couldn't find any candidate tile for the target to be filled: \"",&inputTargetTofill[0],"\" (at TileSelector.cpp::getTileId())");
