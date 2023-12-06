@@ -37,7 +37,7 @@ class FracturedContinentGenerator : public FormationGenerator
         
         static constexpr unsigned char N_CAVES = Target::N_TARGETS - Target::cave_0;   
         
-        static constexpr unsigned char N_THREADS = 9;//TIENE Q TENER RAIZ CUADRADA ENTERA
+        static constexpr unsigned char N_THREADS = 16;//TIENE Q TENER RAIZ CUADRADA ENTERA, 16,4,2
 
     protected:
         static void _bind_methods();
