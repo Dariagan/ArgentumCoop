@@ -23,8 +23,8 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         UtilityFunctions::printerr("Negatively sized formation not allowed");
         return;
     }
-    const bool outOfBoundsEast = origin.x + size.x > m_worldSize.lef;
-    const bool outOfBoundsSouth = origin.y + size.y > m_worldSize.RIGHT;
+    const bool outOfBoundsEast = origin.x + size.x > m_worldMatrixPtr->SIZE.lef;
+    const bool outOfBoundsSouth = origin.y + size.y > m_worldMatrixPtr->SIZE.RIGHT;
     const bool negativeOrigin = origin.x < 0 || origin.y < 0;
     const bool outOfBounds = outOfBoundsEast || outOfBoundsSouth || negativeOrigin;
 
@@ -50,47 +50,47 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
 
 void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vector2i& CHUNK_SIZE, const int being_uid)//hacer q el chunk size cambie según el zoom ingame??
 {    
-    // const SafeVec beingCoords = local_to_map(global_coords);
+    const SafeVec beingCoords = local_to_map(global_coords);
     
-    // for (int i = -CHUNK_SIZE.x/2; i <= CHUNK_SIZE.x/2; i++) 
-    // for (int j = -CHUNK_SIZE.y/2; j <= CHUNK_SIZE.y/2; j++) 
-    // {
-    //     const SafeVec sTileMapCoords(beingCoords.lef + i, beingCoords.RIGHT + j);
-    //     if (sTileMapCoords.isNonNegative() && sTileMapCoords.lef < m_worldMatrix.size() && sTileMapCoords.RIGHT < m_worldMatrix[0].size())
-    //     {
-    //         if (m_tileSharedLoadsCount.count(sTileMapCoords) == 0)
-    //         {
-    //             m_tileSharedLoadsCount.insert({sTileMapCoords, 1});
+    for (int i = -CHUNK_SIZE.x/2; i <= CHUNK_SIZE.x/2; i++) 
+    for (int j = -CHUNK_SIZE.y/2; j <= CHUNK_SIZE.y/2; j++) 
+    {
+        const SafeVec sTileMapCoords(beingCoords.lef + i, beingCoords.RIGHT + j);
+        if (sTileMapCoords.isNonNegative() && sTileMapCoords.isStrictlySmallerThan(m_worldMatrixPtr->SIZE))
+        {
+            if (m_tileSharedLoadsCount.count(sTileMapCoords) == 0)
+            {
+                m_tileSharedLoadsCount.insert({sTileMapCoords, 1});
 
-    //             if (m_frozenBeings.count(sTileMapCoords))
-    //             {
-    //                 auto& tileFrozenBeings = m_frozenBeings[sTileMapCoords];
-    //                 auto it = tileFrozenBeings.begin();
+                if (m_frozenBeings.count(sTileMapCoords))
+                {
+                    auto& tileFrozenBeings = m_frozenBeings[sTileMapCoords];
+                    auto it = tileFrozenBeings.begin();
 
-    //                 while (it != tileFrozenBeings.end())
-    //                 {
-    //                     const Vector2& global_coords = it->first;
-    //                     const int individual_unique_id = it->second;
-    //                     emit_signal("being_unfrozen", global_coords, individual_unique_id);
-    //                     it = tileFrozenBeings.erase(it);
-    //                 }
-    //             }
-    //             if (m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT].size() > 0)//if more than 0 tileIds at coords:
-    //                 for (const uint16_t& id : m_worldMatrix[sTileMapCoords.lef][sTileMapCoords.RIGHT])
-    //                     {setCell(&id[0], sTileMapCoords);}
-    //             else
-    //                 {setCell("ocean_water", sTileMapCoords);}
-    //         }
-    //         else if (m_beingLoadedTiles[being_uid].count(sTileMapCoords) == 0)
-    //         {
-    //            m_tileSharedLoadsCount[sTileMapCoords] += 1;
-    //         }
-    //         m_beingLoadedTiles[being_uid].insert(sTileMapCoords);
-    //     }
-    // }
-    // const SafeVec topLeftCornerCoords = beingCoords - SafeVec(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
+                    while (it != tileFrozenBeings.end())
+                    {
+                        const Vector2& global_coords = it->first;
+                        const int individual_unique_id = it->second;
+                        emit_signal("being_unfrozen", global_coords, individual_unique_id);
+                        it = tileFrozenBeings.erase(it);
+                    }
+                }
+                if (m_worldMatrixPtr->isNotEmptyAt(sTileMapCoords))//if more than 0 tileIds at coords:
+                    for (const uint16_t& uid : (*m_worldMatrixPtr)[sTileMapCoords])
+                        {setCell(uid, sTileMapCoords);}
+                //else
+                  //  {setCell("ocean_water", sTileMapCoords);}
+            }
+            else if (m_beingLoadedTiles[being_uid].count(sTileMapCoords) == 0)
+            {
+               m_tileSharedLoadsCount[sTileMapCoords] += 1;
+            }
+            m_beingLoadedTiles[being_uid].insert(sTileMapCoords);
+        }
+    }
+    const SafeVec topLeftCornerCoords = beingCoords - SafeVec(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
 
-    // unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE, being_uid);
+    unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE, being_uid);
 }
 
 void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE, const int being_uid)
@@ -138,55 +138,59 @@ void ArgentumTileMap::doGlobalSpawnAttempts()
 
 bool ArgentumTileMap::setCell(const uint16_t uid, const SafeVec &coords)
 {
-    // std::unordered_map<StringName, Variant> tileData;
-    // try{tileData = CppTilesData.at(TILE_ID);}
-    // catch(const std::out_of_range& e)
-    // {UtilityFunctions::printerr(&TILE_ID[0], " not found in cppTilesData (at ArgentumTileMap.cpp::load_tiles_around())");
-    //  return false;
-    // }
+    if(uid == NULL_TILE_UID) return false;
 
-    // //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
-    // //PONER EL AGUA EN UNA LAYER INFERIOR? 
+    std::unordered_map<StringName, Variant> tileData;
+    StringName TILE_ID = getTileId(uid);
+    try{tileData = CppTilesData.at(TILE_ID);}
+    catch(const std::out_of_range& e)
+    {UtilityFunctions::printerr(TILE_ID, " not found in cppTilesData (at ArgentumTileMap.cpp::load_tiles_around())");
+     return false;
+    }
 
-    // const SafeVec& atlasOriginPosition = (SafeVec)tileData["op"];; 
+    //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
+    //PONER EL AGUA EN UNA LAYER INFERIOR? 
 
-    // const SafeVec& moduloTilingArea = (SafeVec)tileData["ma"];
+    const SafeVec& atlasOriginPosition = (SafeVec)tileData["op"];; 
 
-    // const SafeVec atlasPositionOffset(coords.lef % moduloTilingArea.lef, coords.RIGHT % moduloTilingArea.RIGHT);
+    const SafeVec& moduloTilingArea = (SafeVec)tileData["ma"];
+
+    const SafeVec atlasPositionOffset(coords.lef % moduloTilingArea.lef, coords.RIGHT % moduloTilingArea.RIGHT);
     
-    // int alt_id = 0;
-    // bool flipped = false;
-    // try
-    // {//temp code, replace trees by scenes to make scale and color randomizeable
-    //     alt_id = (int)tileData.at("alt_id");
-    //     const bool flippedAtRandom = tileData.at("fr");
+    int alt_id = 0;
+    bool flipped = false;
+    try
+    {//temp code, replace trees by scenes to make scale and color randomizeable
+        alt_id = (int)tileData.at("alt_id");
+        const bool flippedAtRandom = tileData.at("fr");
  
-    //     flipped = flippedAtRandom && rand() % 2;
-    // }
-    // catch(const std::exception& e)
-    // {
-    //     UtilityFunctions::printerr(e.what());
-    // }
-    // //aviso que existe get sorrounding cells, set_cells_terrain_connect(layer, get_used_cells_by_id(watar)) si usas terrain
+        flipped = flippedAtRandom && rand() % 2;
+    }
+    catch(const std::exception& e)
+    {
+        UtilityFunctions::printerr(e.what());
+    }
+    //aviso que existe get sorrounding cells, set_cells_terrain_connect(layer, get_used_cells_by_id(watar)) si usas terrain
 
-    // set_cell(tileData.at("layer"), coords, tileData.at("source_id"), atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
+    set_cell(tileData.at("layer"), coords, tileData.at("source_id"), atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
 
     return true;
 }
 
 void ArgentumTileMap::generate_world_matrix(const Vector2i& size, const Dictionary& tiles_data)
 {
+    
     if (size.x <= 0 || size.y <= 0)
     {
         UtilityFunctions::printerr("Negatively sized world matrix not allowed");
         return;
     }
-    if(worldMatrixPtr == nullptr)
+    if(m_worldMatrixPtr == nullptr)
     {
-        worldMatrixPtr = std::make_unique<WorldMatrix>(size);
+        m_worldMatrixPtr = std::make_unique<WorldMatrix>(size);
+        set_tiles_data(tiles_data);
         
         m_spawnWeightsMatrix.resize(size.x/10, std::vector<std::unordered_map<uint16_t, unsigned char>>(size.y/10));
-        this->m_worldSize = size;
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
     }
@@ -209,36 +213,37 @@ void ArgentumTileMap::add_tiles_data(const Dictionary& input_tiles)
         const auto& tile_id = input_tiles.keys()[i];
 
         //if not mapped already
-        if(getTileUid(tile_id).has_value())//TA BIEN
+        if(findTileUid(tile_id).has_value())//TA BIEN
         {//map the key
             tilesUidMapping.push_back(tile_id);
         }
     }
 }
 
-void ArgentumTileMap::manageSettingTileData(const Dictionary& input_tiles)
+void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_data)
 {
     if(tiles_data.is_empty())
     {
-        const u_int16_t TILES_COUNT = input_tiles.size();
+        const u_int16_t TILES_COUNT = input_tiles_data.size();
 
         if(exceedsTileLimit(TILES_COUNT)) return;
 
-        tiles_data = input_tiles;
+        tiles_data = input_tiles_data;
 
         tilesUidMapping.reserve(TILES_COUNT);
         tilesUidMapping.resize(TILES_COUNT);
         for(u_int16_t i = 0; i < TILES_COUNT; i++)
-            {tilesUidMapping[i] = input_tiles.keys()[0];}                    
+            {tilesUidMapping[i] = input_tiles_data.keys()[i];}                    
     }
     else
     {
         tiles_data.clear();
-        add_tiles_data(input_tiles);
+        add_tiles_data(input_tiles_data);
     }
 }
-std::optional<u_int16_t> ArgentumTileMap::getTileUid(const StringName& stringId) const
+std::optional<u_int16_t> ArgentumTileMap::findTileUid(const StringName& stringId) const
 {
+    
     for(u_int16_t i = 0; i < tilesUidMapping.size(); i++)
     {
         if(tilesUidMapping[i] == stringId)
@@ -247,18 +252,28 @@ std::optional<u_int16_t> ArgentumTileMap::getTileUid(const StringName& stringId)
     return {};
 }
 
+StringName ArgentumTileMap::getTileId(uint16_t uid) const
+{
+    try{
+        return tilesUidMapping.at(uid);
+    }catch(std::exception& e)
+    {
+        UtilityFunctions::printerr("no se encuentra id", uid);
+        return "no se encuentra id";
+    }
+}
 
 Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
 void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 {
     for(auto &tileData : CppTilesData){tileData.second.clear();}CppTilesData.clear();
    
-    manageSettingTileData(input_tiles_data);
+    replaceTilesDataProperly(input_tiles_data);
     
     for(int i = 0; i < tiles_data.values().size(); i++)
     {
-        const String& gd_current_tile_key = (String)tiles_data.keys()[i];
-        const std::string keyAsCppString = gd_current_tile_key.utf8().get_data();
+        const StringName& gd_current_tile_key = (StringName)tiles_data.keys()[i];
+        //const std::string keyAsCppString = gd_current_tile_key.utf8().get_data();
         
         const Ref<Resource>& tile = Object::cast_to<Resource>(tiles_data.values()[i]);
 
@@ -308,7 +323,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
             cppTileData.insert({"ma", Vector2i(1, 1)});
         }
 
-        CppTilesData.insert({keyAsCppString, cppTileData});                
+        CppTilesData.insert({gd_current_tile_key, cppTileData});                
     }
 }
 // Vector2i godot::ArgentumTileMap::get_random_coord_with_tile_id(
@@ -362,7 +377,7 @@ void ArgentumTileMap::placeFormationTile(
     const uint16_t optTileUid, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
-    auto& otherTilesAtPos = worldMatrixPtr->at(absoluteCoords);
+    auto& otherTilesAtPos = m_worldMatrixPtr->at(absoluteCoords);
     
     if (deletePreviousTiles){initialize_uids_array_as_empty<WorldMatrix::MAX_TILES_PER_POS>();}
 
@@ -370,6 +385,11 @@ void ArgentumTileMap::placeFormationTile(
     {
         if(otherTilesAtPos[i] == NULL_TILE_UID){
             otherTilesAtPos[i] = optTileUid;
+            // if(rand()%7000==0)
+            // {
+            //     UtilityFunctions::print("placed ", optTileUid);
+            // }
+            
             break;
         }
     }
@@ -433,26 +453,26 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ArgentumTileMap::set_seed);
     ClassDB::bind_method(D_METHOD("get_seed"), &ArgentumTileMap::get_seed);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
-    // ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
-    // ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
-    // ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
+    ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
+    ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
+    ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
 
-    // ClassDB::bind_method(D_METHOD("set_beings_in_chunk_count", "beings_in_chunk_count"), &ArgentumTileMap::set_beings_in_chunk_count);
-    // ClassDB::bind_method(D_METHOD("get_beings_in_chunk_count"), &ArgentumTileMap::get_beings_in_chunk_count);
-    // ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "beings_in_chunk_count"), "set_beings_in_chunk_count", "get_beings_in_chunk_count");
+    ClassDB::bind_method(D_METHOD("set_beings_in_chunk_count", "beings_in_chunk_count"), &ArgentumTileMap::set_beings_in_chunk_count);
+    ClassDB::bind_method(D_METHOD("get_beings_in_chunk_count"), &ArgentumTileMap::get_beings_in_chunk_count);
+    ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "beings_in_chunk_count"), "set_beings_in_chunk_count", "get_beings_in_chunk_count");
     
-    // ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
+    ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
     
-    // ADD_SIGNAL(MethodInfo("formation_formed"));
+    ADD_SIGNAL(MethodInfo("formation_formed"));
 
-    // ADD_SIGNAL(MethodInfo("birth_being_kind", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::STRING_NAME, "being_kind_id")));
+    ADD_SIGNAL(MethodInfo("birth_being_kind", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::STRING_NAME, "being_kind_id")));
 
-    // ADD_SIGNAL(MethodInfo("birth_being_kind_within_area", PropertyInfo(Variant::VECTOR2I, "top_left"), PropertyInfo(Variant::VECTOR2I, "bottom_right"), PropertyInfo(Variant::STRING_NAME, "being_kind_id")));
+    ADD_SIGNAL(MethodInfo("birth_being_kind_within_area", PropertyInfo(Variant::VECTOR2I, "top_left"), PropertyInfo(Variant::VECTOR2I, "bottom_right"), PropertyInfo(Variant::STRING_NAME, "being_kind_id")));
 
-    // ADD_SIGNAL(MethodInfo("birth_being_w_init_data", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::DICTIONARY, "init_data")));
+    ADD_SIGNAL(MethodInfo("birth_being_w_init_data", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::DICTIONARY, "init_data")));
 
-    // ADD_SIGNAL(MethodInfo("tile_unloaded", PropertyInfo(Variant::VECTOR2I, "local_coords")));
+    ADD_SIGNAL(MethodInfo("tile_unloaded", PropertyInfo(Variant::VECTOR2I, "local_coords")));
 
-    // ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "glb_coords"), PropertyInfo(Variant::INT, "being_uid")));
-    // ADD_SIGNAL(MethodInfo("birth_of_being_of_kind", PropertyInfo(Variant::STRING, "being_kind_id")));
+    ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "glb_coords"), PropertyInfo(Variant::INT, "being_uid")));
+    ADD_SIGNAL(MethodInfo("birth_of_being_of_kind", PropertyInfo(Variant::STRING, "being_kind_id")));
 }

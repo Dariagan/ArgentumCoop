@@ -1,8 +1,10 @@
 #include "TileSelector.h"
 
 using namespace godot;
-   
-TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, ArgentumTileMap* argentumTileMap, const unsigned int seed) try : 
+
+//TODO los groups se rompieron, arreglarlo.   
+
+TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const unsigned int seed) try : 
     TARGETS_COUNT(((Array)gdTileSelection->get("targets")).size())
 {
     m_randomEngine.seed(seed);
@@ -24,17 +26,18 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, ArgentumTileMap
         return;
     }
                 
-    for (short unsigned int i = 0; i < TARGETS_COUNT; i++)
+    for (uint16_t i = 0; i < TARGETS_COUNT; i++)
     {
         m_availableTargets[i] = ((String)(gd_targets[i])).utf8().get_data();
 
         if(((String)gd_tile_to_place[i])[0] != '_')
-            m_tileUidOrGroup[i] = argentumTileMap->getTileUid((String)gd_tile_to_place[i]).value_or(std::numeric_limits<uint16_t>::max());
+            m_tileUidOrGroup[i] = argentumTileMap.findTileUid((String)gd_tile_to_place[i]).value_or(std::numeric_limits<uint16_t>::max());
         else
         {
             m_tileUidOrGroup[i] = true;
 
             const Dictionary& group_dict = gd_grouped_prob_weighted_tiles[i];
+            UtilityFunctions::print(group_dict);
             uint16_t GROUP_DICT_SIZE = group_dict.keys().size();
 
             std::vector<uint16_t> groupedTileUid(GROUP_DICT_SIZE);
@@ -45,9 +48,13 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, ArgentumTileMap
 
             for (uint16_t j = 0; j < GROUP_DICT_SIZE; j++)
             {
-                groupedTileUid[j] = argentumTileMap->getTileUid(group_dict.keys()[j]).value_or(std::numeric_limits<uint16_t>::max());
-            
-                groupTileUidWeight[j] = (int)group_dict.values()[j];
+                const auto& opt = argentumTileMap.findTileUid(group_dict.keys()[j]);
+                groupedTileUid[j] = opt.value_or(std::numeric_limits<uint16_t>::max());
+                if(!opt.has_value())
+                {
+                    UtilityFunctions::printerr("couldn't find tile_id for: ", group_dict.keys()[j]);
+                }
+                groupTileUidWeight[j] = (uint16_t)group_dict.values()[j];
             }
             
             const auto GROUP_P_DISTRIBUTION = std::discrete_distribution<uint16_t>(groupTileUidWeight.begin(), groupTileUidWeight.end());
@@ -71,7 +78,11 @@ uint16_t TileSelector::getTileUidForTarget(const char* inputTargetTofill)
         auto index = std::distance(m_availableTargets.begin(), it);
         try
         {
-            const auto& optTileID = std::get<std::optional<uint16_t>>(m_tileUidOrGroup[index]); // w contains int, not float: will throw
+            const auto& optTileID = std::get<std::optional<uint16_t>>(m_tileUidOrGroup[index]);
+            if(optTileID.has_value()){
+                return optTileID.value();
+            }
+            UtilityFunctions::printerr("nullopt");
             return optTileID.value_or(std::numeric_limits<uint16_t>::max());
         }
         catch (const std::bad_variant_access& ex)

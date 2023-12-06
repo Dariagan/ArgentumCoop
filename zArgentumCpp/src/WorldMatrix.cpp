@@ -33,6 +33,26 @@ class WorldMatrix
             return flattenedUidsMatrix[SIZE.lef*coords.lef + coords.RIGHT];
         }
 
+        unsigned char countAt(const SafeVec& coords)
+        {
+            unsigned char count = 0;
+            const auto& tilesAtPos = this->operator[](coords); 
+            for(int i = 0; i < MAX_TILES_PER_POS; i++)
+            {
+                count += tilesAtPos[i] != NULL_TILE_UID;
+            }
+            return count;
+        }
+
+        bool isEmptyAt(const SafeVec& coords)
+        {
+            return countAt(coords) == 0;
+        }
+        bool isNotEmptyAt(const SafeVec& coords)
+        {
+            return countAt(coords) != 0;
+        }
+
         std::array<uint16_t, MAX_TILES_PER_POS>& at(const SafeVec& coords)
         {
             return flattenedUidsMatrix.at(SIZE.lef*coords.lef + coords.RIGHT);

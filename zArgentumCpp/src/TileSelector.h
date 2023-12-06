@@ -23,9 +23,7 @@ class ArgentumTileMap;
 class TileSelector
 {
 public:
-    TileSelector():TARGETS_COUNT(2){};
-
-    TileSelector(const Ref<Resource>& gdTileSelection, ArgentumTileMap* argentumTileMap, const unsigned int seed);
+    TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const unsigned int seed);
     ~TileSelector();
 
     uint16_t getTileUidForTarget(const char* inputTargetTofill);

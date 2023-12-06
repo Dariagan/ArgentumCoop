@@ -26,13 +26,6 @@ script = ExtResource("5_2eji3")
 being_scene = ExtResource("5_nor5b")
 
 [node name="ArgentumTileMap" type="ArgentumTileMap" parent="Lobby/Game"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-editor_description = ""
 y_sort_enabled = true
 tile_set = ExtResource("6_67353")
 layer_1/z_index = 5

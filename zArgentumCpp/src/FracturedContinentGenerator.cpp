@@ -50,7 +50,7 @@ void FracturedContinentGenerator::generate(
     //TODO posible randomización leve de parámetros
     this->m_origin = origin; this->m_size = size;
 
-    m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, &argentumTileMap, SEED);
+    m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, argentumTileMap, SEED);
 
     {
     continenter.set_seed(SEED); peninsuler.set_seed(SEED+1); bigLaker.set_seed(SEED+2); smallLaker.set_seed(SEED+3);
@@ -69,11 +69,6 @@ void FracturedContinentGenerator::generate(
 //EN EL CENTRO PUEDE ESTAR PENINSULEADO, HACIENDO Q EL PLAYER SPAWNEE EN EL AGUA SI EL CENTRO TIENE AGUA (EL PLAYER SPAWNEARÍA EN EL CENTRO).
 // ASÍ QUE, PARA SPAWNEAR AL PLAYER ELEGIR UN PUNTO RANDOM HASTA Q TENGA UNA TILE TIERRA (COMO HAGO CON LOS DUNGEONS) 
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
-    }
-
-    for(uint16_t i = 0; i < N_TARGETS; i++)
-    {
-        targetsUids[i] = m_tileSelector->getTileUidForTarget(TARGETS[i]);
     }
 
 //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
@@ -142,7 +137,8 @@ void FracturedContinentGenerator::generate(
 //shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
         for(unsigned char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
         {
-            argentumTileMap.placeFormationTile(origin, coords, targetsUids[targetsToFill[k]]);
+            const auto& tileUid = m_tileSelector->getTileUidForTarget(TARGETS[targetsToFill[k]]);
+            argentumTileMap.placeFormationTile(origin, coords, tileUid);
         }
     }}
     placeDungeonEntrances(argentumTileMap, 3);
@@ -216,7 +212,9 @@ void FracturedContinentGenerator::placeDungeonEntrances(
             {
                 placedDungeonsCoords.push_back(rCoords);
 
-                argentumTileMap.placeFormationTile(m_origin, rCoords, targetsUids[Target::cave_0+placedDungeonsCoords.size()-1]);
+                const auto& tileUid = m_tileSelector->getTileUidForTarget(TARGETS[Target::cave_0+placedDungeonsCoords.size()-1]);
+
+                argentumTileMap.placeFormationTile(m_origin, rCoords, tileUid);
                 UtilityFunctions::print((Vector2i)rCoords);
             }
             else{minDistanceMultiplier = std::clamp(1500.f / triesCount, 0.f, 1.f);}

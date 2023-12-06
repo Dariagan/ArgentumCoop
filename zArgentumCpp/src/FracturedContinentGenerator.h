@@ -35,9 +35,6 @@ class FracturedContinentGenerator : public FormationGenerator
             TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
         
         static constexpr unsigned char N_CAVES = Target::N_TARGETS - Target::cave_0;   
-
-        //to be filled before entering the double for loops
-        std::array<uint16_t, Target::N_TARGETS> targetsUids = {initialize_uids_array_as_empty<N_TARGETS>()};
             
     protected:
         static void _bind_methods();

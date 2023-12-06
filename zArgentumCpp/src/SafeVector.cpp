@@ -82,6 +82,9 @@ struct SafeVec
     SafeVec operator/(const SafeVec &oSafeVec) const
     {return SafeVec(lef / oSafeVec.lef, RIGHT / oSafeVec.RIGHT);}
 
+    bool isStrictlySmallerThan(const SafeVec &oSafeVec) const {return lef < oSafeVec.lef && RIGHT < oSafeVec.RIGHT;}
+    bool isStrictlyBiggerThan(const SafeVec &oSafeVec) const {return lef > oSafeVec.lef && RIGHT > oSafeVec.RIGHT;}
+
     bool operator<(const SafeVec &oSafeVec) const { return (lef == oSafeVec.lef) ? (RIGHT < oSafeVec.RIGHT) : (lef < oSafeVec.lef); }
 	bool operator>(const SafeVec &oSafeVec) const { return (lef == oSafeVec.lef) ? (RIGHT > oSafeVec.RIGHT) : (lef > oSafeVec.lef); }
 

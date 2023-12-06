@@ -13,19 +13,20 @@ func _setup_config():
 
 func _ready():
 	_setup_config()
-
 func _process(_delta):
 	pass
 	
 
 func generate_world():
 	
-	const WORLD_SIZE: Vector2i = Vector2i(20000, 20000)
+	const WORLD_SIZE: Vector2i = Vector2i(5000, 5000)
 	
-	generate_world_matrix(WORLD_SIZE)
+	generate_world_matrix(WORLD_SIZE, GlobalData.tiles)
 	
-	#var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	#generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), GlobalData.tile_selections["temperate"], 4, {})
+	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
+	
+	#TODO hacer cada generation en un thread distinto
+	generate_formation(fcg, Vector2i.ZERO, Vector2i(5000,5000), GlobalData.tile_selections["temperate"], 4, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
