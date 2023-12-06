@@ -3,12 +3,14 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+
 #include <unordered_set>
 #include <algorithm>
 #include <string>
 #include <format>
 #include <memory>
 #include <thread>
+
 
 using namespace godot;
 
@@ -71,24 +73,22 @@ void FracturedContinentGenerator::generate(
 // ASÍ QUE, PARA SPAWNEAR AL PLAYER ELEGIR UN PUNTO RANDOM HASTA Q TENGA UNA TILE TIERRA (COMO HAGO CON LOS DUNGEONS) 
         continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
     }
-    
+
     std::vector<std::unordered_set<SafeVec, SafeVec::hash>> bushes(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
     std::vector<std::unordered_set<SafeVec, SafeVec::hash>> trees(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
-    
+
     std::vector<std::thread> threads;
     threads.reserve(N_THREADS);
 
-    unsigned char cnt = 0;
-    for(unsigned char i = 0; i < std::sqrt(N_THREADS); i++)
+    for(unsigned char i = 0; i < N_THREADS; i++)
     {
-        for(unsigned char j = 0; j < std::sqrt(N_THREADS); j++)
-        {
-            const SafeVec start(m_size.lef*(i/std::sqrt(N_THREADS)), m_size.RIGHT*(j/std::sqrt(N_THREADS)));
-            threads.emplace_back(std::thread(&FracturedContinentGenerator::build, this, 
-                start, 
-                std::ref(argentumTileMap), m_origin, std::ref(bushes[cnt]), std::ref(trees[cnt])));
-            cnt++;
-        }
+        const uint16_t startlef = i*m_size.lef/N_THREADS;
+        const uint16_t endlef = (i+1)*m_size.lef/N_THREADS;
+        const SafeVec range(startlef, endlef);
+
+        threads.emplace_back(std::thread(&FracturedContinentGenerator::build, this, 
+                range, 
+                std::ref(argentumTileMap), m_origin, std::ref(bushes[i]), std::ref(trees[i])));
     }
     for(unsigned char i = 0; i < N_THREADS; i++)
     {
@@ -96,7 +96,6 @@ void FracturedContinentGenerator::generate(
         m_bushes.insert(bushes[i].begin(), bushes[i].end());
         m_trees.insert(trees[i].begin(), trees[i].end());
     }  
-
     //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     
     placeDungeonEntrances(argentumTileMap, 3);
@@ -105,13 +104,12 @@ void FracturedContinentGenerator::generate(
 }
 
 
-void godot::FracturedContinentGenerator::build(const godot::SafeVec &start, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
+void godot::FracturedContinentGenerator::build(const SafeVec& rangelef, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
     std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees)
 {
-    const SafeVec end = start + m_size/std::sqrt(N_THREADS);
-    for (uint16_t x = start.lef; x < end.lef; x++)
+    for (uint16_t x = rangelef.lef; x < rangelef.RIGHT; x++)
     {
-        for (uint16_t y = start.RIGHT; y < end.RIGHT; y++)
+        for (uint16_t y = 0; y < m_size.RIGHT; y++)
         {
             const SafeVec coords(x, y);
             //! POTENCIAL BUG: STACK OVERFLOW SI SE ESCRIBE EN UN addedTargetsCount[i] CON i SIENDO MAYOR QUE EL TAMAÑO DEL ARRAY - 1

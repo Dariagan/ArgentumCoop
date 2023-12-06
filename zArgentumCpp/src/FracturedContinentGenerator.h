@@ -7,6 +7,7 @@
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/fast_noise_lite.hpp>
 #include <godot_cpp/classes/random_number_generator.hpp>
+#include <godot_cpp/classes/os.hpp>
 #include <mutex>
 
 namespace godot 
@@ -24,6 +25,9 @@ class FracturedContinentGenerator : public FormationGenerator
 
         RandomNumberGenerator m_rng;    
         std::unordered_set<SafeVec, SafeVec::hash> m_trees, m_bushes;
+        void build(const SafeVec& rangelef, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
+            std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees);
+
         bool clearOf(const std::unordered_set<SafeVec, SafeVec::hash>& setToCheck, SafeVec coords, uint16_t radius, bool checkForwards = false) const;
         bool isPeninsulerCaved(SafeVec coords) const;
         bool isLake(SafeVec coords) const;
@@ -35,9 +39,14 @@ class FracturedContinentGenerator : public FormationGenerator
         enum Target { beach,  lake,  cont,  tree,  bush,  ocean,  cave_0,  cave_1,  cave_2, N_TARGETS}; static constexpr std::array<const char*, N_TARGETS>
             TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
         
+
         static constexpr unsigned char N_CAVES = Target::N_TARGETS - Target::cave_0;   
         
-        static constexpr unsigned char N_THREADS = 16;//TIENE Q TENER RAIZ CUADRADA ENTERA, 16,4,2
+        OS os;
+        const char N_THREADS = std::clamp(os.get_processor_count(), 1, 32);
+        //static constexpr unsigned char N_THREADS = 16;//TIENE Q TENER RAIZ CUADRADA ENTERA, 16,4,2
+        //static_assert(N_THREADS==1||N_THREADS==4||N_THREADS==9||N_THREADS==16);
+        
 
     protected:
         static void _bind_methods();
@@ -57,8 +66,8 @@ class FracturedContinentGenerator : public FormationGenerator
             const unsigned int seed = 0, const Dictionary& data = Dictionary()) override;
 
 
-void build(const godot::SafeVec &size, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees);
-};
+};//ENDCLASS
 }
+
 
 #endif // __FRACTUREDCONTINENT_GENERATOR_H__
