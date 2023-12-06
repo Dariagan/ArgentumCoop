@@ -21,13 +21,13 @@ namespace godot
         protected:
             static void _bind_methods();
              
-            std::unique_ptr<TileSelector> m_tileSelector;
+            std::unique_ptr<TileSelector> mTileSelector;
 
         public:
             FormationGenerator();
             virtual ~FormationGenerator();
             
-            static float getBorderClosenessFactor(const SafeVec& coords, const SafeVec& SIZE);
+            static float getBorderClosenessFactor(const SafeVec& coords, const SafeVec& SIZE, const float POW = 3.3f);
             
             virtual void generate(ArgentumTileMap& argentumTileMap, 
                 const SafeVec& origin, const SafeVec& size, const Ref<Resource>& tileSelectionSet, 

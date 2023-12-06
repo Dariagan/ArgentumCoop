@@ -24,8 +24,8 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         return;
     }
 
-    const bool outOfBoundsEast = origin.x + size.x > m_worldMatrixPtr->SIZE.lef;
-    const bool outOfBoundsSouth = origin.y + size.y > m_worldMatrixPtr->SIZE.RIGHT;
+    const bool outOfBoundsEast = origin.x + size.x > mWorldMatrixPtr->SIZE.lef;
+    const bool outOfBoundsSouth = origin.y + size.y > mWorldMatrixPtr->SIZE.RIGHT;
     const bool negativeOrigin = origin.x < 0 || origin.y < 0;
     const bool outOfBounds = outOfBoundsEast || outOfBoundsSouth || negativeOrigin;
 
@@ -57,15 +57,15 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
     for (int j = -CHUNK_SIZE.y/2; j <= CHUNK_SIZE.y/2; j++) 
     {
         const SafeVec sTileMapCoords(beingCoords.lef + i, beingCoords.RIGHT + j);
-        if (sTileMapCoords.isNonNegative() && sTileMapCoords.isStrictlySmallerThan(m_worldMatrixPtr->SIZE))
+        if (sTileMapCoords.isNonNegative() && sTileMapCoords.isStrictlySmallerThan(mWorldMatrixPtr->SIZE))
         {
-            if (m_tileSharedLoadsCount.count(sTileMapCoords) == 0)
+            if (mTileSharedLoadsCount.count(sTileMapCoords) == 0)
             {
-                m_tileSharedLoadsCount.insert({sTileMapCoords, 1});
+                mTileSharedLoadsCount.insert({sTileMapCoords, 1});
 
-                if (m_frozenBeings.count(sTileMapCoords))
+                if (mFrozenBeings.count(sTileMapCoords))
                 {
-                    auto& tileFrozenBeings = m_frozenBeings[sTileMapCoords];
+                    auto& tileFrozenBeings = mFrozenBeings[sTileMapCoords];
                     auto it = tileFrozenBeings.begin();
 
                     while (it != tileFrozenBeings.end())
@@ -76,18 +76,18 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
                         it = tileFrozenBeings.erase(it);
                     }
                 }
-                if (m_worldMatrixPtr->isNotEmptyAt(sTileMapCoords))//if more than 0 tileIds at coords:
-                    for (const uint16_t& uid : (*m_worldMatrixPtr)[sTileMapCoords])
+                if (mWorldMatrixPtr->isNotEmptyAt(sTileMapCoords))//if more than 0 tileIds at coords:
+                    for (const uint16_t& uid : (*mWorldMatrixPtr)[sTileMapCoords])
                         {setCell(uid, sTileMapCoords);}
                 //TODO
                 //else
                   //  {setCell("ocean_water", sTileMapCoords);}
             }
-            else if (m_beingLoadedTiles[being_uid].count(sTileMapCoords) == 0)
+            else if (mBeingLoadedTiles[being_uid].count(sTileMapCoords) == 0)
             {
-               m_tileSharedLoadsCount[sTileMapCoords] += 1;
+               mTileSharedLoadsCount[sTileMapCoords] += 1;
             }
-            m_beingLoadedTiles[being_uid].insert(sTileMapCoords);
+            mBeingLoadedTiles[being_uid].insert(sTileMapCoords);
         }
     }
     const SafeVec topLeftCornerCoords = beingCoords - SafeVec(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
@@ -97,9 +97,9 @@ void ArgentumTileMap::load_tiles_around(const Vector2& global_coords, const Vect
 
 void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE, const int being_uid)
 {
-    auto loadedTilesIter = m_beingLoadedTiles[being_uid].begin();
+    auto loadedTilesIter = mBeingLoadedTiles[being_uid].begin();
 
-    while (loadedTilesIter != m_beingLoadedTiles[being_uid].end())
+    while (loadedTilesIter != mBeingLoadedTiles[being_uid].end())
     {
         const SafeVec& tileCoord = *loadedTilesIter;
         
@@ -107,21 +107,21 @@ void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, cons
         {
             decrementSharedCount(tileCoord);
 
-            loadedTilesIter = m_beingLoadedTiles[being_uid].erase(loadedTilesIter);
+            loadedTilesIter = mBeingLoadedTiles[being_uid].erase(loadedTilesIter);
         }
         else{++loadedTilesIter;}
     }
 }
 void ArgentumTileMap::decrementSharedCount(const SafeVec& tileCoord)
 {
-    m_tileSharedLoadsCount[tileCoord] -= 1;
-    if (m_tileSharedLoadsCount[tileCoord] <= 0)
+    mTileSharedLoadsCount[tileCoord] -= 1;
+    if (mTileSharedLoadsCount[tileCoord] <= 0)
     {
         for (int layer_i = 0; layer_i < get_layers_count(); layer_i++)
             {erase_cell(layer_i, tileCoord);}
 
         emit_signal("tile_unloaded", (Vector2i)tileCoord);
-        m_tileSharedLoadsCount.erase(tileCoord);
+        mTileSharedLoadsCount.erase(tileCoord);
     }
 }
 
@@ -129,8 +129,8 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec& tileCoord)
 void ArgentumTileMap::doGlobalSpawnAttempts()
 {
     constexpr unsigned char SPAWNING_MACROSCOPIC_CHUNK_SIZE = 6;
-    for(int i = 0; i < m_spawnWeightsMatrix.size(); i += SPAWNING_MACROSCOPIC_CHUNK_SIZE)
-    for(int j = 0; j < m_spawnWeightsMatrix[0].size(); j += SPAWNING_MACROSCOPIC_CHUNK_SIZE)
+    for(int i = 0; i < mSpawnWeightsMatrix.size(); i += SPAWNING_MACROSCOPIC_CHUNK_SIZE)
+    for(int j = 0; j < mSpawnWeightsMatrix[0].size(); j += SPAWNING_MACROSCOPIC_CHUNK_SIZE)
     {
         const SafeVec coords(i, j);
         
@@ -144,7 +144,7 @@ bool ArgentumTileMap::setCell(const uint16_t uid, const SafeVec &coords)
 
     std::unordered_map<StringName, Variant> tileData;
     StringName TILE_ID = getTileId(uid);
-    try{tileData = CppTilesData.at(TILE_ID);}
+    try{tileData = mCppTilesData.at(TILE_ID);}
     catch(const std::out_of_range& e)
     {UtilityFunctions::printerr(TILE_ID, " not found in cppTilesData (at ArgentumTileMap.cpp::load_tiles_around())");
      return false;
@@ -187,11 +187,11 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size, const Dictiona
         UtilityFunctions::printerr("Negatively sized world matrix not allowed");
         return;
     }
-    if(m_worldMatrixPtr == nullptr)
+    if(mWorldMatrixPtr == nullptr)
     {
-        m_worldMatrixPtr = std::make_unique<WorldMatrix>(size);
+        mWorldMatrixPtr = std::make_unique<WorldMatrix>(size);
         set_tiles_data(tiles_data);
-        m_spawnWeightsMatrix.resize(size.x/10, std::vector<std::unordered_map<uint16_t, unsigned char>>(size.y/10));
+        mSpawnWeightsMatrix.resize(size.x/10, std::vector<std::unordered_map<uint16_t, unsigned char>>(size.y/10));
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
     }
@@ -207,8 +207,8 @@ void ArgentumTileMap::add_tiles_data(const Dictionary& input_tiles)
 
     if(exceedsTileLimit(NEW_TILES_COUNT)) return;
 
-    tilesUidMapping.reserve(NEW_TILES_COUNT);
-    tilesUidMapping.resize(NEW_TILES_COUNT);
+    mTilesUidMapping.reserve(NEW_TILES_COUNT);
+    mTilesUidMapping.resize(NEW_TILES_COUNT);
     for(u_int16_t i = 0; i < input_tiles.size(); i++)
     {
         const auto& tile_id = input_tiles.keys()[i];
@@ -216,7 +216,7 @@ void ArgentumTileMap::add_tiles_data(const Dictionary& input_tiles)
         //if not mapped already
         if(findTileUid(tile_id).has_value())//TA BIEN
         {//map the key
-            tilesUidMapping.push_back(tile_id);
+            mTilesUidMapping.push_back(tile_id);
         }
     }
 }
@@ -231,10 +231,10 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
 
         tiles_data = input_tiles_data;
 
-        tilesUidMapping.reserve(TILES_COUNT);
-        tilesUidMapping.resize(TILES_COUNT);
+        mTilesUidMapping.reserve(TILES_COUNT);
+        mTilesUidMapping.resize(TILES_COUNT);
         for(u_int16_t i = 0; i < TILES_COUNT; i++)
-            {tilesUidMapping[i] = input_tiles_data.keys()[i];}                    
+            {mTilesUidMapping[i] = input_tiles_data.keys()[i];}                    
     }
     else
     {
@@ -245,9 +245,9 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
 std::optional<u_int16_t> ArgentumTileMap::findTileUid(const StringName& stringId) const
 {
     
-    for(u_int16_t i = 0; i < tilesUidMapping.size(); i++)
+    for(u_int16_t i = 0; i < mTilesUidMapping.size(); i++)
     {
-        if(tilesUidMapping[i] == stringId)
+        if(mTilesUidMapping[i] == stringId)
             return i;
     }
     return {};
@@ -256,7 +256,7 @@ std::optional<u_int16_t> ArgentumTileMap::findTileUid(const StringName& stringId
 StringName ArgentumTileMap::getTileId(uint16_t uid) const
 {
     try{
-        return tilesUidMapping.at(uid);
+        return mTilesUidMapping.at(uid);
     }catch(std::exception& e)
     {
         UtilityFunctions::printerr("no se encuentra id", uid);
@@ -267,7 +267,7 @@ StringName ArgentumTileMap::getTileId(uint16_t uid) const
 Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
 void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 {
-    for(auto &tileData : CppTilesData){tileData.second.clear();}CppTilesData.clear();
+    for(auto &tileData : mCppTilesData){tileData.second.clear();}mCppTilesData.clear();
    
     replaceTilesDataProperly(input_tiles_data);
     
@@ -324,7 +324,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
             cppTileData.insert({"ma", Vector2i(1, 1)});
         }
 
-        CppTilesData.insert({gd_current_tile_key, cppTileData});                
+        mCppTilesData.insert({gd_current_tile_key, cppTileData});                
     }
 }
 // Vector2i godot::ArgentumTileMap::get_random_coord_with_tile_id(
@@ -381,7 +381,7 @@ void ArgentumTileMap::placeFormationTile(
     const uint16_t optTileUid, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
-    auto& otherTilesAtPos = m_worldMatrixPtr->at(absoluteCoords);
+    auto& otherTilesAtPos = mWorldMatrixPtr->at(absoluteCoords);
     
     if (deletePreviousTiles){initialize_uids_array_as_empty<WorldMatrix::MAX_TILES_PER_POS>();}
 
@@ -402,9 +402,9 @@ void ArgentumTileMap::placeSpawnWeight(
 {
     const SafeVec absolute_coordinates = (formationOrigin + coordsRelativeToFormationOrigin)/MATRIXES_SIZE_RATIO;
 
-    if(deleteOthers) {m_spawnWeightsMatrix[absolute_coordinates.lef][absolute_coordinates.RIGHT].clear();}
+    if(deleteOthers) {mSpawnWeightsMatrix[absolute_coordinates.lef][absolute_coordinates.RIGHT].clear();}
     
-    m_spawnWeightsMatrix[absolute_coordinates.lef][absolute_coordinates.RIGHT][beingKindId] = weight;
+    mSpawnWeightsMatrix[absolute_coordinates.lef][absolute_coordinates.RIGHT][beingKindId] = weight;
 }
 
 //ojo estas coords son absolutas, no relativas al origin de la formation
@@ -420,12 +420,12 @@ void ArgentumTileMap::birthBeingOfKind(const String& being_kind_id){emit_signal(
 void ArgentumTileMap::freeze_and_store_being(const Vector2& glb_coords, const int individual_unique_id)
 {
     SafeVec localCoords = local_to_map(glb_coords);
-    m_frozenBeings[localCoords].push_back({glb_coords, individual_unique_id});
-    for (const auto& loadedTile: m_beingLoadedTiles[individual_unique_id])
+    mFrozenBeings[localCoords].push_back({glb_coords, individual_unique_id});
+    for (const auto& loadedTile: mBeingLoadedTiles[individual_unique_id])
     {
         decrementSharedCount(loadedTile);
     }
-    m_beingLoadedTiles.erase(individual_unique_id);
+    mBeingLoadedTiles.erase(individual_unique_id);
 }
 
 

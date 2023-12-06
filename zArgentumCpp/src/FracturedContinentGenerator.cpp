@@ -16,31 +16,31 @@ using namespace godot;
 
 FracturedContinentGenerator::FracturedContinentGenerator()
 {
-    continenter.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
+    mContinenter.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
 
-    peninsuler.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
+    mPeninsuler.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
     
-    bigLaker.set_noise_type(FastNoiseLite::NoiseType::TYPE_VALUE_CUBIC);
-    smallLaker.set_noise_type(FastNoiseLite::NoiseType::TYPE_VALUE_CUBIC);
-    bigBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
-    smallBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
-    forest.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
+    mBigLaker.set_noise_type(FastNoiseLite::NoiseType::TYPE_VALUE_CUBIC);
+    mSmallLaker.set_noise_type(FastNoiseLite::NoiseType::TYPE_VALUE_CUBIC);
+    mBigBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
+    mSmallBeacher.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX_SMOOTH);
+    mForest.set_noise_type(FastNoiseLite::NoiseType::TYPE_SIMPLEX);
     
-    peninsuler_cutoff = -0.1f; bigLakeCutoff = 0.33f; smallLakeCutoff = 0.25f; beachCutoff = 0.8f, treeCutoff = 4.3f;
+    mPeninsulerCutoff = -0.1f; mBigLakeCutoff = 0.33f; mSmallLakeCutoff = 0.25f; mBeachCutoff = 0.8f, mTreeCutoff = 4.3f;
 
-    continenter.set_fractal_lacunarity(2.8f); continenter.set_fractal_weighted_strength(0.5f);
+    mContinenter.set_fractal_lacunarity(2.8f); mContinenter.set_fractal_weighted_strength(0.5f);
 
-    peninsuler.set_fractal_gain(0.56f);
+    mPeninsuler.set_fractal_gain(0.56f);
 
-    smallBeacher.set_fractal_octaves(3);
+    mSmallBeacher.set_fractal_octaves(3);
 
-    forest.set_fractal_lacunarity(3); forest.set_fractal_gain(0.77);
+    mForest.set_fractal_lacunarity(3); mForest.set_fractal_gain(0.77);
 }
 
 //! CLEAREAR COLECCIONES QUE SE REUTILIZAN CADA LLAMADA (SINO QUEDAN COMO TERMINARON EN LA EJECUCIÓN DE ANTERIOR, LLENAS DE ELEMENTOS)
 void FracturedContinentGenerator::resetState()
 {
-    m_trees.clear(); m_bushes.clear(); 
+    mTrees.clear(); mBushes.clear(); 
 }
 
 //definir spawn points para bosses?
@@ -51,49 +51,48 @@ void FracturedContinentGenerator::generate(
     const unsigned int SEED, const Dictionary& data)
 {
     //TODO posible randomización leve de parámetros
-    this->m_origin = origin; this->m_size = size;
+    this->mOrigin = origin; this->mSize = size;
 
-    m_tileSelector = std::make_unique<TileSelector>(tileSelectionSet, argentumTileMap, SEED, N_THREADS);
-
+    mTileSelector = std::make_unique<TileSelector>(tileSelectionSet, argentumTileMap, SEED, N_THREADS);
     {
-    continenter.set_seed(SEED); peninsuler.set_seed(SEED+1); bigLaker.set_seed(SEED+2); smallLaker.set_seed(SEED+3);
-    bigBeacher.set_seed(SEED+4); smallBeacher.set_seed(SEED+5); m_rng.set_seed(SEED); forest.set_seed(SEED + 9);
+    mContinenter.set_seed(SEED); mPeninsuler.set_seed(SEED+1); mBigLaker.set_seed(SEED+2); mSmallLaker.set_seed(SEED+3);
+    mBigBeacher.set_seed(SEED+4); mSmallBeacher.set_seed(SEED+5); mRng.set_seed(SEED); mForest.set_seed(SEED + 9);
     
-    continenter.set_frequency(0.15f/powf(size.length(), 0.995f)); peninsuler.set_frequency(5.f/powf(size.length(), 0.995f));
-    bigBeacher.set_frequency(4.3f/powf(size.length(), 0.995f)); smallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
-    bigLaker.set_frequency(40.f/powf(size.length(), 0.995f)); smallLaker.set_frequency(80.f/powf(size.length(), 0.995f));
-    forest.set_frequency(1.8f/powf(size.length(), 0.995f));
+    mContinenter.set_frequency(0.15f/powf(size.length(), 0.995f)); mPeninsuler.set_frequency(5.f/powf(size.length(), 0.995f));
+    mBigBeacher.set_frequency(4.3f/powf(size.length(), 0.995f)); mSmallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
+    mBigLaker.set_frequency(40.f/powf(size.length(), 0.995f)); mSmallLaker.set_frequency(80.f/powf(size.length(), 0.995f));
+    mForest.set_frequency(1.8f/powf(size.length(), 0.995f));
     //TODO hacer cada frequency ajustable desde gdscript
 
-    continental_cutoff = 0.61f * powf(size.length() / 1600.f, 0.05f);;
+    mContinentalCutoff = 0.61f * powf(size.length() / 1600.f, 0.05f);;
     }
 
-    while(continenter.get_noise_2dv(origin+size/(short int)2) < continental_cutoff + 0.13f){//! NO METER EL PENINSULER EN ESTA CONDICIÓN, DESCENTRA LA FORMACIÓN
+    while(mContinenter.get_noise_2dv(origin+size/(short int)2) < mContinentalCutoff + 0.13f){//! NO METER EL PENINSULER EN ESTA CONDICIÓN, DESCENTRA LA FORMACIÓN
 //EN EL CENTRO PUEDE ESTAR PENINSULEADO, HACIENDO Q EL PLAYER SPAWNEE EN EL AGUA SI EL CENTRO TIENE AGUA (EL PLAYER SPAWNEARÍA EN EL CENTRO).
 // ASÍ QUE, PARA SPAWNEAR AL PLAYER ELEGIR UN PUNTO RANDOM HASTA Q TENGA UNA TILE TIERRA (COMO HAGO CON LOS DUNGEONS) 
-        continenter.set_offset(continenter.get_offset() + Vector3(3,3,0));
+        mContinenter.set_offset(mContinenter.get_offset() + Vector3(3,3,0));
     }
 
-    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> bushes_thread(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
-    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> trees_thread(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
+    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> bushesOfThread(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
+    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> treesOfThread(N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
 
     std::vector<std::thread> threads;
     threads.reserve(N_THREADS);
 
-    for(u_char thread_i = 0; thread_i < N_THREADS; thread_i++)
+    for(char thread_i = 0; thread_i < N_THREADS; thread_i++)
     {
-        const uint16_t startlef = thread_i*m_size.lef/N_THREADS;
-        const uint16_t endlef = (thread_i+1)*m_size.lef/N_THREADS;
-        const SafeVec range(startlef, endlef);
+        const uint16_t startlef = thread_i*mSize.lef/N_THREADS;
+        const uint16_t endlef = (thread_i+1)*mSize.lef/N_THREADS;
+        const SafeVec horizontalRange(startlef, endlef);
 
-        threads.emplace_back(std::thread(&FracturedContinentGenerator::buildSubSection, this, range, 
-                std::ref(argentumTileMap), m_origin, std::ref(bushes_thread[thread_i]), std::ref(trees_thread[thread_i]), thread_i));
+        threads.emplace_back(std::thread(&FracturedContinentGenerator::generateSubSection, this, horizontalRange, 
+            std::ref(argentumTileMap), mOrigin, std::ref(bushesOfThread[thread_i]), std::ref(treesOfThread[thread_i]), thread_i));
     }
-    for(u_char i = 0; i < N_THREADS; i++)
+    for(char i = 0; i < N_THREADS; i++)
     {
         threads[i].join();
-        m_bushes.insert(bushes_thread[i].begin(), bushes_thread[i].end());
-        m_trees.insert(trees_thread[i].begin(), trees_thread[i].end());
+        mBushes.insert(bushesOfThread[i].begin(), bushesOfThread[i].end());
+        mTrees.insert(treesOfThread[i].begin(), treesOfThread[i].end());
     }  
     //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     
@@ -102,15 +101,15 @@ void FracturedContinentGenerator::generate(
     this->resetState();
 }
 
-void godot::FracturedContinentGenerator::buildSubSection(const SafeVec& rangelef, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
-    std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees, const u_char thread_i)
+void godot::FracturedContinentGenerator::generateSubSection(const SafeVec& horizontalRange, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
+    std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees, const char thread_i)
 {
-    for (uint16_t x = rangelef.lef; x < rangelef.RIGHT; x++)
+    for (uint16_t x = horizontalRange.lef; x < horizontalRange.RIGHT; x++)
     {
-        for (uint16_t y = 0; y < m_size.RIGHT; y++)
+        for (uint16_t y = 0; y < mSize.RIGHT; y++)
         {
             const SafeVec coords(x, y);
-            //! POTENCIAL BUG: STACK OVERFLOW SI SE ESCRIBE EN UN addedTargetsCount[i] CON i SIENDO MAYOR QUE EL TAMAÑO DEL ARRAY - 1
+
             std::array<Target, WorldMatrix::MAX_TILES_PER_POS> targetsToFill;
             unsigned char placementsCount = 0;
 
@@ -121,17 +120,13 @@ void godot::FracturedContinentGenerator::buildSubSection(const SafeVec& rangelef
             if (CONTINENTAL && !PENINSULER_CAVED)
             {
                 const float BEACHNESS = getBeachness(coords);
-                const bool BEACH = BEACHNESS > beachCutoff;
+                const bool BEACH = BEACHNESS > mBeachCutoff;
 
-                // un array de chars = un string
-
-                // lo que hace el strncpy es copiar el array de chars "beach" dentro de la posición <addedTargetsCount> del array de arrays de chars "targetsToFill"
-                // el string "beach" (un string es un array de chars)
                 if (BEACH)
                     targetsToFill[placementsCount++] = Target::beach;
                 else
                 {
-                    const bool AWAY_FROM_COAST = getContinentness(coords) > continental_cutoff + 0.01f && peninsuler.get_noise_2dv(coords) > peninsuler_cutoff + 0.27f;
+                    const bool AWAY_FROM_COAST = getContinentness(coords) > mContinentalCutoff + 0.01f && mPeninsuler.get_noise_2dv(coords) > mPeninsulerCutoff + 0.27f;
 
                     const bool LAKE = isLake(coords) && AWAY_FROM_COAST;
 
@@ -140,11 +135,11 @@ void godot::FracturedContinentGenerator::buildSubSection(const SafeVec& rangelef
                     else
                     {
                         targetsToFill[placementsCount++] = Target::cont;
-                        if (!BEACHNESS < beachCutoff - 0.05f)
+                        if (!BEACHNESS < mBeachCutoff - 0.05f)
                         {
                             // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
-                            const bool GOOD_DICE_ROLL = m_rng.randf_range(0, 4) + forest.get_noise_2dv(coords) * 1.4f > treeCutoff;
-                            const bool LUCKY_TREE = m_rng.randi_range(0, 1000) == 0;
+                            const bool GOOD_DICE_ROLL = mRng.randf_range(0, 4) + mForest.get_noise_2dv(coords) * 1.4f > mTreeCutoff;
+                            const bool LUCKY_TREE = mRng.randi_range(0, 1000) == 0;
 
                             const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOf(myTrees, coords, 3);
                             if (TREE)
@@ -152,7 +147,7 @@ void godot::FracturedContinentGenerator::buildSubSection(const SafeVec& rangelef
                                 myTrees.insert(coords);
                                 targetsToFill[placementsCount++] = Target::tree;
                             }
-                            else if (m_rng.randi_range(0, 400) == 0 && clearOf(myBushes, coords, 1))
+                            else if (mRng.randi_range(0, 400) == 0 && clearOf(myBushes, coords, 1))
                             {
                                 myBushes.insert(coords);
                                 targetsToFill[placementsCount++] = Target::bush;
@@ -175,7 +170,7 @@ void godot::FracturedContinentGenerator::buildSubSection(const SafeVec& rangelef
 // shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
             for (unsigned char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
             {
-                const auto &tileUid = m_tileSelector->getTileUidForTarget(TARGETS[targetsToFill[k]], thread_i);
+                const auto &tileUid = mTileSelector->getTileUidForTarget(TARGETS[targetsToFill[k]], thread_i);
                 argentumTileMap.placeFormationTile(origin, coords, tileUid);
             }
         }
@@ -183,20 +178,20 @@ void godot::FracturedContinentGenerator::buildSubSection(const SafeVec& rangelef
 }
 
 bool FracturedContinentGenerator::isContinental(SafeVec coords) const
-{return getContinentness(coords) > continental_cutoff;}
+{return getContinentness(coords) > mContinentalCutoff;}
 
 
 float FracturedContinentGenerator::getContinentness(SafeVec coords) const
 {
-    const float BCF = FormationGenerator::getBorderClosenessFactor(coords, m_size);
+    const float BCF = FormationGenerator::getBorderClosenessFactor(coords, mSize);
 
-    return continenter.get_noise_2dv(coords) * (1-BCF);
+    return mContinenter.get_noise_2dv(coords) * (1-BCF);
 }
 float FracturedContinentGenerator::getBeachness(SafeVec coords) const
 {
     return std::max(
-    0.72f + bigBeacher.get_noise_2dv(coords) / 2.3f - powf(getContinentness(coords) - continental_cutoff, 0.6f), 
-    0.8f + smallBeacher.get_noise_2dv(coords) / 2.3f - powf(peninsuler.get_noise_2dv(coords) - peninsuler_cutoff, 0.45f));
+    0.72f + mBigBeacher.get_noise_2dv(coords) / 2.3f - powf(getContinentness(coords) - mContinentalCutoff, 0.6f), 
+    0.8f + mSmallBeacher.get_noise_2dv(coords) / 2.3f - powf(mPeninsuler.get_noise_2dv(coords) - mPeninsulerCutoff, 0.45f));
 }
 
 bool FracturedContinentGenerator::clearOf(
@@ -211,12 +206,12 @@ bool FracturedContinentGenerator::clearOf(
 }
 
 bool FracturedContinentGenerator::isPeninsulerCaved(SafeVec coords) const
-{return peninsuler.get_noise_2dv(coords) < peninsuler_cutoff;}
+{return mPeninsuler.get_noise_2dv(coords) < mPeninsulerCutoff;}
 
 bool FracturedContinentGenerator::isLake(SafeVec coords) const
 {
-    return (((smallLaker.get_noise_2dv(coords) + 1)*0.65f) - getBeachness(coords) > smallLakeCutoff) 
-        || (((bigLaker.get_noise_2dv(coords) + 1)*0.65f) - getBeachness(coords) > bigLakeCutoff);
+    return (((mSmallLaker.get_noise_2dv(coords) + 1)*0.65f) - getBeachness(coords) > mSmallLakeCutoff) 
+        || (((mBigLaker.get_noise_2dv(coords) + 1)*0.65f) - getBeachness(coords) > mBigLakeCutoff);
 }
 
 //MUST BE CALLED AFTER TREES/ROCKS/WHATEVER BLOCKING OBJECTS ARE INSERTED
@@ -233,13 +228,13 @@ void FracturedContinentGenerator::placeDungeonEntrances(
     float triesCount = 1;
     for (; placedDungeonsCoords.size() < dungeonsToPlace; triesCount++)
     {
-        const SafeVec rCoords(m_rng.randi_range(0, m_size.lef), m_rng.randi_range(0, m_size.RIGHT));
+        const SafeVec rCoords(mRng.randi_range(0, mSize.lef), mRng.randi_range(0, mSize.RIGHT));
 
-        if (getContinentness(rCoords) > continental_cutoff + 0.005 
-        && peninsuler.get_noise_2dv(rCoords) > peninsuler_cutoff + 0.1f 
-        && !isLake(rCoords) && clearOf(m_trees, rCoords, 3, true))
+        if (getContinentness(rCoords) > mContinentalCutoff + 0.005 
+        && mPeninsuler.get_noise_2dv(rCoords) > mPeninsulerCutoff + 0.1f 
+        && !isLake(rCoords) && clearOf(mTrees, rCoords, 3, true))
         {
-            const float minDistanceBetweenDungeons = m_size.length() * 0.25f * minDistanceMultiplier;
+            const float minDistanceBetweenDungeons = mSize.length() * 0.25f * minDistanceMultiplier;
 
             const auto isTooClose = [&](const auto& coord){return rCoords.distanceTo(coord) <  minDistanceBetweenDungeons;};
 
@@ -248,9 +243,9 @@ void FracturedContinentGenerator::placeDungeonEntrances(
             {
                 placedDungeonsCoords.push_back(rCoords);
 
-                const auto& tileUid = m_tileSelector->getTileUidForTarget(TARGETS[Target::cave_0+placedDungeonsCoords.size()-1], 0);
+                const auto& tileUid = mTileSelector->getTileUidForTarget(TARGETS[Target::cave_0+placedDungeonsCoords.size()-1], 0);
 
-                argentumTileMap.placeFormationTile(m_origin, rCoords, tileUid);
+                argentumTileMap.placeFormationTile(mOrigin, rCoords, tileUid);
                 UtilityFunctions::print((Vector2i)rCoords);
             }
             else{minDistanceMultiplier = std::clamp(1500.f / triesCount, 0.f, 1.f);}
@@ -261,8 +256,8 @@ void FracturedContinentGenerator::placeDungeonEntrances(
         }
     }
 }
-float FracturedContinentGenerator::get_continental_cutoff()const{return continental_cutoff;}
-void FracturedContinentGenerator::set_continental_cutoff(float cutoff){continental_cutoff = cutoff;} 
+float FracturedContinentGenerator::get_continental_cutoff()const{return mContinentalCutoff;}
+void FracturedContinentGenerator::set_continental_cutoff(float cutoff){mContinentalCutoff = cutoff;} 
 void FracturedContinentGenerator::_bind_methods()
 {
     ClassDB::bind_method(D_METHOD("set_continental_cutoff", "continental_cutoff"), &FracturedContinentGenerator::set_continental_cutoff);

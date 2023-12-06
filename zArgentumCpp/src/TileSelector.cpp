@@ -9,7 +9,7 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
 {
     if (input_n_threads < 1)
     {
-        UtilityFunctions::printerr("TIleSelector: less than 1 thread given");
+        UtilityFunctions::printerr("TIleSelector: thread count is less than 1");
         return;
     }
 
@@ -66,9 +66,9 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
                 groupTileUidWeight[j] = (uint16_t)group_dict.values()[j];
             }
             
-            const auto GROUP_P_DISTRIBUTION = std::discrete_distribution<uint16_t>(groupTileUidWeight.begin(), groupTileUidWeight.end());
+            const auto groupProbsDistribution = std::discrete_distribution<uint16_t>(groupTileUidWeight.begin(), groupTileUidWeight.end());
 
-            m_idsDistributionOfGroups[i] = std::make_pair(groupedTileUid, GROUP_P_DISTRIBUTION);
+            m_idsDistributionOfGroups[i] = std::make_pair(groupedTileUid, groupProbsDistribution);
         }
     }  
 } catch (const std::exception& e) {

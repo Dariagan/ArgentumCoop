@@ -18,14 +18,12 @@ using namespace godot;
 // }
 
 
-float FormationGenerator::getBorderClosenessFactor(const SafeVec& coords, const SafeVec& SIZE)
+float FormationGenerator::getBorderClosenessFactor(const SafeVec& coords, const SafeVec& SIZE, const float POW)
 {
-    const float I_BORDER_CLOSENESS = abs(coords.lef-SIZE.lef/2.f)/(SIZE.lef/2.f);
-    const float J_BORDER_CLOSENESS = abs(coords.RIGHT-SIZE.RIGHT/2.f)/(SIZE.RIGHT/2.f);
-
-    constexpr float POW = 3.3f;
+    const float borderClosenessHorizontally = abs(coords.lef-SIZE.lef/2.f)/(SIZE.lef/2.f);
+    const float borderClosenessVertically = abs(coords.RIGHT-SIZE.RIGHT/2.f)/(SIZE.RIGHT/2.f);
     
-    return std::max(powf(I_BORDER_CLOSENESS, POW), powf(J_BORDER_CLOSENESS, POW));
+    return std::max(powf(borderClosenessHorizontally, POW), powf(borderClosenessVertically, POW));
 }
 
 void FormationGenerator::generate(ArgentumTileMap &argentumTileMap, const SafeVec &origin, const SafeVec &size, const Ref<Resource> &tileSelectionSet, const unsigned int seed, const Dictionary &data)

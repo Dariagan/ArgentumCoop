@@ -37,8 +37,6 @@ private:
     //1 random engine per thread, for pseudorandom generation determinism
     std::vector<std::default_random_engine> m_randomEngines;
 
-    std::mutex mtx;
-
     const u_int TARGETS_COUNT;
     const u_char N_THREADS;
 

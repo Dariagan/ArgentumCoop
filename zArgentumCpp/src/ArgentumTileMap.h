@@ -85,20 +85,20 @@ namespace godot
         private:
             Dictionary tiles_data;
             void replaceTilesDataProperly(const Dictionary& input_tiles_data);
-            std::vector<StringName> tilesUidMapping;   
+            std::vector<StringName> mTilesUidMapping;   
 
-            std::unordered_map<std::string, SafeVec> m_trackedBeingsCoords;//updateado cada
+            std::unordered_map<std::string, SafeVec> mTrackedBeingsCoords;//updateado cada
 
-            std::unique_ptr<WorldMatrix> m_worldMatrixPtr = nullptr;
+            std::unique_ptr<WorldMatrix> mWorldMatrixPtr = nullptr;
 
             //chunk size: 7x7 puntos de spawnweights
             //TypedArray<TypedArray<long>>
             TypedArray<Array> beings_in_chunk_count;
             
             //contiene ids de BeingKinds
-            std::vector<std::vector<std::unordered_map<uint16_t, unsigned char>>> m_spawnWeightsMatrix;
+            std::vector<std::vector<std::unordered_map<uint16_t, unsigned char>>> mSpawnWeightsMatrix;
 
-            std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> m_frozenBeings;
+            std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> mFrozenBeings;
 
             //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
             //en donde según la id extrae el being de un dictionary q tiene guardado
@@ -106,11 +106,11 @@ namespace godot
             void decrementSharedCount(const SafeVec& tileCoord);
 
             //keeps track of tracks of the tiles loaded by the being with the specific uid (int)
-            std::unordered_map<int, std::unordered_set<SafeVec, SafeVec::hash>> m_beingLoadedTiles;
+            std::unordered_map<int, std::unordered_set<SafeVec, SafeVec::hash>> mBeingLoadedTiles;
 
-            std::unordered_map<SafeVec, int, SafeVec::hash> m_tileSharedLoadsCount;
+            std::unordered_map<SafeVec, int, SafeVec::hash> mTileSharedLoadsCount;
 
-            std::unordered_map<StringName, std::unordered_map<StringName, Variant>> CppTilesData;
+            std::unordered_map<StringName, std::unordered_map<StringName, Variant>> mCppTilesData;
             static bool withinChunkBounds(const SafeVec &loadedCoordToCheck, const SafeVec &topLeftCorner, const SafeVec &chunkSize);
 
             bool setCell(const uint16_t uid, const SafeVec& coords);
