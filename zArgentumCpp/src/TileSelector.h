@@ -27,14 +27,16 @@ public:
     TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const u_int seed, const char N_THREADS);
     ~TileSelector();
 
-    //⚠️ argument u_char thread_i  must be within 0 and N_THREADS-1 !
+    //⚠️ argument "thread_i" must be within 0 and N_THREADS-1 ⚠️
     uint16_t getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i);
 
     void reseed(const u_int seed);
 
 private:
 
-    //1 random engine per thread, for pseudorandom generation determinism
+    // 1 random engine for each thread, this is for making
+    // the pseudorandom generation deterministic on the seed value
+    // (so world can be re-generated after leaving)
     std::vector<std::default_random_engine> m_randomEngines;
 
     const u_int TARGETS_COUNT;

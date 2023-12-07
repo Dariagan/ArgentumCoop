@@ -4,13 +4,10 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
+
 #include <unordered_set>
 #include <algorithm>
-#include <string>
-#include <format>
-#include <memory>
 #include <thread>
-
 
 using namespace godot;
 
@@ -104,6 +101,7 @@ void FracturedContinentGenerator::generate(
 void godot::FracturedContinentGenerator::generateSubSection(const SafeVec& horizontalRange, godot::ArgentumTileMap &argentumTileMap, const godot::SafeVec &origin, 
     std::unordered_set<SafeVec, SafeVec::hash>& myBushes, std::unordered_set<SafeVec, SafeVec::hash>& myTrees, const char thread_i)
 {
+    //TODO volver este for una template así es más safe para reusar q el copy paste
     for (uint16_t x = horizontalRange.lef; x < horizontalRange.RIGHT; x++)
     {
         for (uint16_t y = 0; y < mSize.RIGHT; y++)
@@ -140,14 +138,14 @@ void godot::FracturedContinentGenerator::generateSubSection(const SafeVec& horiz
                             // HAY Q USAR UNA DISCRETE DISTRIBUTION PLANA EN EL MEDIO, MU BAJA PROBABILIDAD EN LOS EXTREMOS
                             const bool GOOD_DICE_ROLL = mRng.randf_range(0, 4) + mForest.get_noise_2dv(coords) * 1.4f > mTreeCutoff;
                             const bool LUCKY_TREE = mRng.randi_range(0, 1000) == 0;
-
-                            const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOf(myTrees, coords, 3);
+                            const bool NOT_ON_HORI_RANGE_LIMIT = (x != horizontalRange.RIGHT - 1);
+                            const bool TREE = (LUCKY_TREE || GOOD_DICE_ROLL) && clearOf(myTrees, coords, 3) && NOT_ON_HORI_RANGE_LIMIT;
                             if (TREE)
                             {
                                 myTrees.insert(coords);
                                 targetsToFill[placementsCount++] = Target::tree;
                             }
-                            else if (mRng.randi_range(0, 400) == 0 && clearOf(myBushes, coords, 1))
+                            else if (mRng.randi_range(0, 400) == 0 && clearOf(myBushes, coords, 1) && NOT_ON_HORI_RANGE_LIMIT)
                             {
                                 myBushes.insert(coords);
                                 targetsToFill[placementsCount++] = Target::bush;
@@ -159,11 +157,10 @@ void godot::FracturedContinentGenerator::generateSubSection(const SafeVec& horiz
                         }
                     }
                 }
-            }
-            else
+            }else
             {
                 targetsToFill[placementsCount++] = Target::ocean;
-            };
+            }
 
             // todo poner los spawnweights con targets, como haces con las tiles
 

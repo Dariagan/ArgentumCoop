@@ -4,11 +4,7 @@
 #include "WorldMatrix.cpp"
 #include "FormationGenerator.h"
 
-#include <godot_cpp/godot.hpp>
-#include <godot_cpp/classes/fast_noise_lite.hpp>
-#include <godot_cpp/classes/random_number_generator.hpp>
-#include <godot_cpp/classes/os.hpp>
-#include <mutex>
+
 
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING

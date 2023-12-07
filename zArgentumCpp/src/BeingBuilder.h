@@ -14,11 +14,13 @@
 
 namespace godot{
 
+
+//hacer q en el gdside si chequee si la id es válida
 class BeingBuilder: public RefCounted
 {
     GDCLASS(BeingBuilder, RefCounted)
     public:
-        //TODO cargar los dicts del node autoload global_data
+        //TODO cargar los dicts del node autoload global_data???? AL FINAL PUEDE Q NO PORQ NO SE PUEDE HACER SINGLETONS
         static void load_game_data(Dictionary data); 
 
         BeingBuilder& setName(const String& name);

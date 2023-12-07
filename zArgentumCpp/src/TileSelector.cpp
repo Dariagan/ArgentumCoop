@@ -106,9 +106,9 @@ uint16_t TileSelector::getTileUidForTarget(const char* inputTargetTofill, const 
 }
 
 void TileSelector::reseed(const u_int seed){
-    for(u_char threadI = 0; threadI < N_THREADS; threadI++)
+    for(u_char thread_i = 0; thread_i < N_THREADS; thread_i++)
     {
-        m_randomEngines[threadI].seed(seed+1);
+        m_randomEngines[thread_i].seed(seed+thread_i);
     }
 }
 

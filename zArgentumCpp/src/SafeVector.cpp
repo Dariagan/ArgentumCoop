@@ -41,11 +41,11 @@ struct SafeVec
     void addAssign_lef(const SafeVec &oSafeVec){lef += oSafeVec.lef;}
     void addAssignRIGHT(const SafeVec &oSafeVec){RIGHT += oSafeVec.RIGHT;}
 
-    SafeVec add_lef(const int i){return SafeVec(this->lef + i, RIGHT);}
-    SafeVec addRight(const int j){return SafeVec(lef, this->RIGHT + j);}
+    SafeVec sum_lef(const int i){return SafeVec(this->lef + i, RIGHT);}
+    SafeVec sumRight(const int j){return SafeVec(lef, this->RIGHT + j);}
 
-    SafeVec add_lef(const SafeVec &oSafeVec){return SafeVec(lef + oSafeVec.lef, RIGHT);}
-    SafeVec addRIGHT(const SafeVec &oSafeVec){return SafeVec(lef, RIGHT + oSafeVec.RIGHT);}
+    SafeVec sum_lef(const SafeVec &oSafeVec){return SafeVec(lef + oSafeVec.lef, RIGHT);}
+    SafeVec sumRIGHT(const SafeVec &oSafeVec){return SafeVec(lef, RIGHT + oSafeVec.RIGHT);}
 
     char compare_lef(const SafeVec &oSafeVec)
     {

@@ -1,6 +1,6 @@
 // #ifndef CHANGE_ME_WITH_DOUBLE_CLICK_AND_CTRL_F2
 // #define CHANGE_ME_WITH_DOUBLE_CLICK_AND_CTRL_F2
-
+//#include <godot_cpp/classes/node.hpp>
 // #include <godot_cpp/classes/ref_counted.hpp>
 // #include <godot_cpp/variant/string.hpp>
 // #include <godot_cpp/variant/dictionary.hpp>
@@ -15,17 +15,18 @@
 // namespace godot{
 
 // /* RENAME THE CLASS USING: CTRL + F2 */
-// class zExampleHeader: public RefCounted
+// class zExampleHeader: public RefCounted //CHANGE CLASS TYPE WITH CTRL + F2, NOT JUST F2
 // {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 //     GDCLASS(zExampleHeader, RefCounted)
-
-//     private:
-
-//     protected:
-//         static void _bind_methods();//EL CUERPO DE ESTE VA SÍ O SÍ EN .cpp
-
-//     public:
+//     public: 
 //         zExampleHeader(); ~zExampleHeader();
+//     private:
+//     protected: static void _bind_methods();//EL CUERPO DE ESTE VA SÍ O SÍ EN .cpp
+
+
+
+
+//     
 
 
 //     

@@ -27,7 +27,7 @@ func generate_world():
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
 	
 	#TODO hacer cada generation en un thread distinto
-	generate_formation(fcg, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections["temperate"], 7, {})
+	generate_formation(fcg, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections["temperate"], 4, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT

@@ -23,6 +23,11 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         UtilityFunctions::printerr("Negatively sized formation not allowed");
         return;
     }
+    if (size.x < 600 || size.y < 600)
+    {
+        UtilityFunctions::printerr("World size is too small, must be at least be 600x600");
+        return;
+    }
 
     const bool outOfBoundsEast = origin.x + size.x > mWorldMatrixPtr->SIZE.lef;
     const bool outOfBoundsSouth = origin.y + size.y > mWorldMatrixPtr->SIZE.RIGHT;
@@ -117,7 +122,7 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec& tileCoord)
     mTileSharedLoadsCount[tileCoord] -= 1;
     if (mTileSharedLoadsCount[tileCoord] <= 0)
     {
-        for (int layer_i = 0; layer_i < get_layers_count(); layer_i++)
+        for (u_char layer_i = 0; layer_i < get_layers_count(); layer_i++)
             {erase_cell(layer_i, tileCoord);}
 
         emit_signal("tile_unloaded", (Vector2i)tileCoord);
@@ -129,18 +134,12 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec& tileCoord)
 void ArgentumTileMap::doGlobalSpawnAttempts()
 {
     constexpr unsigned char SPAWNING_MACROSCOPIC_CHUNK_SIZE = 6;
-    for(int i = 0; i < mSpawnWeightsMatrix.size(); i += SPAWNING_MACROSCOPIC_CHUNK_SIZE)
-    for(int j = 0; j < mSpawnWeightsMatrix[0].size(); j += SPAWNING_MACROSCOPIC_CHUNK_SIZE)
-    {
-        const SafeVec coords(i, j);
-        
-
-    }
+  
 }
 
 bool ArgentumTileMap::setCell(const uint16_t uid, const SafeVec &coords)
 {
-    if(uid == NULL_TILE_UID) return false;
+    if(uid == WorldMatrix::NULL_TILE_UID) return false;
 
     std::unordered_map<StringName, Variant> tileData;
     StringName TILE_ID = getTileId(uid);
@@ -191,7 +190,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size, const Dictiona
     {
         mWorldMatrixPtr = std::make_unique<WorldMatrix>(size);
         set_tiles_data(tiles_data);
-        mSpawnWeightsMatrix.resize(size.x/10, std::vector<std::unordered_map<uint16_t, unsigned char>>(size.y/10));
+        mNaturalSpawningModule = std::make_unique<SpawningModule>(size);
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
     }
@@ -202,8 +201,8 @@ void ArgentumTileMap::set_seed(int seed){this->seed = seed;};
 
 void ArgentumTileMap::add_tiles_data(const Dictionary& input_tiles)
 {
-    tiles_data.merge(input_tiles, true);
-    const u_int16_t NEW_TILES_COUNT = tiles_data.size();
+    m_tiles_data.merge(input_tiles, true);
+    const u_int16_t NEW_TILES_COUNT = m_tiles_data.size();
 
     if(exceedsTileLimit(NEW_TILES_COUNT)) return;
 
@@ -223,13 +222,13 @@ void ArgentumTileMap::add_tiles_data(const Dictionary& input_tiles)
 
 void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_data)
 {
-    if(tiles_data.is_empty())
+    if(m_tiles_data.is_empty())
     {
         const u_int16_t TILES_COUNT = input_tiles_data.size();
 
         if(exceedsTileLimit(TILES_COUNT)) return;
 
-        tiles_data = input_tiles_data;
+        m_tiles_data = input_tiles_data;
 
         mTilesUidMapping.reserve(TILES_COUNT);
         mTilesUidMapping.resize(TILES_COUNT);
@@ -238,7 +237,7 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
     }
     else
     {
-        tiles_data.clear();
+        m_tiles_data.clear();
         add_tiles_data(input_tiles_data);
     }
 }
@@ -264,19 +263,19 @@ StringName ArgentumTileMap::getTileId(uint16_t uid) const
     }
 }
 
-Dictionary ArgentumTileMap::get_tiles_data(){return tiles_data;}; 
+Dictionary ArgentumTileMap::get_tiles_data(){return m_tiles_data;}; 
 void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 {
     for(auto &tileData : mCppTilesData){tileData.second.clear();}mCppTilesData.clear();
    
     replaceTilesDataProperly(input_tiles_data);
     
-    for(int i = 0; i < tiles_data.values().size(); i++)
+    for(int i = 0; i < m_tiles_data.values().size(); i++)
     {
-        const StringName& gd_current_tile_key = (StringName)tiles_data.keys()[i];
+        const StringName& gd_current_tile_key = (StringName)m_tiles_data.keys()[i];
         //const std::string keyAsCppString = gd_current_tile_key.utf8().get_data();
         
-        const Ref<Resource>& tile = Object::cast_to<Resource>(tiles_data.values()[i]);
+        const Ref<Resource>& tile = Object::cast_to<Resource>(m_tiles_data.values()[i]);
 
         const Dictionary& gd_tile_data = tile->call("get_data");
 
@@ -373,50 +372,31 @@ bool ArgentumTileMap::withinChunkBounds(
         && loadedCoordToCheck.RIGHT <= chunkTopLeftCorner.RIGHT + CHUNK_SIZE.RIGHT;
 }
 
-//todo mejor guardar solo los chunks que fueron "conocidos" enteros, y los chunks "no conocidos" (no visitados/cargados nunca), regenerar totalmente con la misma seed
 //// GUARDAR LAS POS CON ARRAYS MODIFICADOS
 //// GUARDAR EN ALGUN LUGAR LAS TILES SELECCIONADAS ALEATORIAMENTE
 void ArgentumTileMap::placeFormationTile( 
     const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
-    const uint16_t optTileUid, const bool deletePreviousTiles){try
+    const uint16_t optTileUid, const bool deletePreviousTiles)//{try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
-    auto& otherTilesAtPos = mWorldMatrixPtr->at(absoluteCoords);
+    auto& otherTilesAtPos = mWorldMatrixPtr->operator[](absoluteCoords);
     
     if (deletePreviousTiles){initialize_uids_array_as_empty<WorldMatrix::MAX_TILES_PER_POS>();}
 
     for(char i = 0; i < WorldMatrix::MAX_TILES_PER_POS; i++)
     {
-        if(otherTilesAtPos[i] == NULL_TILE_UID){
+        if(otherTilesAtPos[i] == WorldMatrix::NULL_TILE_UID){
             otherTilesAtPos[i] = optTileUid;      
             break;
         }
     }
-
 }
-catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
+//catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
-void ArgentumTileMap::placeSpawnWeight(
-    const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
-    const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers)
-{
-    const SafeVec absolute_coordinates = (formationOrigin + coordsRelativeToFormationOrigin)/MATRIXES_SIZE_RATIO;
 
-    if(deleteOthers) {mSpawnWeightsMatrix[absolute_coordinates.lef][absolute_coordinates.RIGHT].clear();}
-    
-    mSpawnWeightsMatrix[absolute_coordinates.lef][absolute_coordinates.RIGHT][beingKindId] = weight;
-}
 
-//ojo estas coords son absolutas, no relativas al origin de la formation
-void ArgentumTileMap::birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder)
-{
-    if(beingBuilder.getResult().has_value())
-    {
-        emit_signal("birth_being_w_init_data", coords, beingBuilder.getResult().value());
-    }//shouldn't print anything otherwise, that's the builder's task when building
-}
 
-void ArgentumTileMap::birthBeingOfKind(const String& being_kind_id){emit_signal("birth_of_being_of_kind", being_kind_id);}
+
 void ArgentumTileMap::freeze_and_store_being(const Vector2& glb_coords, const int individual_unique_id)
 {
     SafeVec localCoords = local_to_map(glb_coords);
