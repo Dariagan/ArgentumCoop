@@ -17,12 +17,14 @@
 
 namespace godot{
 
+//no olvidarse de registrarla despues
+
 class SpawningModule: public Node//TODO no sé si hacerlo un Node o RefCounted, o nada. tal vez un node por las signals
 {
 GDCLASS(SpawningModule, Node)
 
 public:
-    void SpawningModule::placeNaturalSpawningWeight(
+    void placeNaturalSpawningWeight(
         const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
         const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers);
 

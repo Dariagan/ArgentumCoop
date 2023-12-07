@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <algorithm>
 #include <thread>
+#include <execution>
 
 using namespace godot;
 
@@ -85,12 +86,13 @@ void FracturedContinentGenerator::generate(
         threads.emplace_back(std::thread(&FracturedContinentGenerator::generateSubSection, this, horizontalRange, 
             std::ref(argentumTileMap), mOrigin, std::ref(bushesOfThread[thread_i]), std::ref(treesOfThread[thread_i]), thread_i));
     }
-    for(char i = 0; i < N_THREADS; i++)
-    {
-        threads[i].join();
+
+    std::for_each(std::execution::unseq, threads.begin(), threads.end(), [&](std::thread& thread) {
+        char i = &thread - &threads[0];    
+        thread.join(); 
         mBushes.insert(bushesOfThread[i].begin(), bushesOfThread[i].end());
         mTrees.insert(treesOfThread[i].begin(), treesOfThread[i].end());
-    }  
+    });
     //CÓMO HACER RIOS: ELEGIR PUNTO RANDOM DE ALTA CONTINENTNESS -> "CAMINAR HACIA LA TILE ADYACENTE CON CONTINENTNESS MAS BAJA" -> HACER HASTA LLEGAR AL AGUA O LAKE
     
     placeDungeonEntrances(argentumTileMap, 3);

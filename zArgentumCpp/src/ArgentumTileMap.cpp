@@ -190,7 +190,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i& size, const Dictiona
     {
         mWorldMatrixPtr = std::make_unique<WorldMatrix>(size);
         set_tiles_data(tiles_data);
-        mNaturalSpawningModule = std::make_unique<SpawningModule>(size);
+        //mNaturalSpawningModule = std::make_unique<SpawningModule>(size);
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
     }
