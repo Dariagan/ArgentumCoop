@@ -37,7 +37,7 @@ class FracturedContinentGenerator : public FormationGenerator
         
         //TIENE QUE SER UN NÚMERO FIJO PARA QUE NO HAYA DESYNCS DE GENERACIÓN ALEATORIA ENTRE PCS POR TENER UN DISTINTO Nº DE THREADS
         //sino se generan distinto los trees y bushes
-        static constexpr char N_THREADS = 24;
+        static constexpr char N_THREADS = 30;//no poner demasiado porq se van a notar las líneas de no-arboles
 
     protected:
         static void _bind_methods();
