@@ -19,9 +19,15 @@ void BeingsModule::birthBeing(const Vector2i coords, const BeingBuilder& beingBu
 {
     if(beingBuilder.getResult().has_value())
     {
-        emit_signal("birth_being_w_init_data", coords, beingBuilder.getResult().value());
+        //emit_signal("birth_being_w_init_data", coords, beingBuilder.getResult().value());
     }//shouldn't print anything otherwise, that's the builder's task when building
 }
 
 void BeingsModule::birthBeingOfKind(const String& being_kind_id)
-{emit_signal("birth_of_being_of_kind", being_kind_id);}
+{/*emit_signal("birth_of_being_of_kind", being_kind_id);*/}
+
+BeingsModule::BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size)
+{
+    this->mArgentumTileMap = argentumTileMap;
+    this->mSpawnWeightsMatrix = std::make_unique<SpawnWeightsMatrix>(size);
+}

@@ -24,9 +24,13 @@ struct std::hash<std::array<T, N>> {
     }
 };
 
+
+
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 static const Vector2i ERROR_VECTOR = {-999999, -999999};    
+
+class BeingsModule;
 class FormationGenerator;
 class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
 
@@ -93,7 +97,6 @@ private:
     
     //contiene ids de BeingKinds
 
-    
 
     //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
     //en donde según la id extrae el being de un dictionary q tiene guardado
