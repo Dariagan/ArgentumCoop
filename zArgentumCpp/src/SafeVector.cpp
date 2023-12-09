@@ -24,30 +24,30 @@ struct SafeVec
         RIGHT = vector2i.y;
     }
 
-    bool operator==(const SafeVec &oSafeVec) const
+    bool operator==(const SafeVec oSafeVec) const
     {return lef == oSafeVec.lef && RIGHT == oSafeVec.RIGHT;}
-    bool operator!=(const SafeVec &oSafeVec) const {return !operator==(oSafeVec);}
+    bool operator!=(const SafeVec oSafeVec) const {return !operator==(oSafeVec);}
 
-    void operator+=(const SafeVec &oSafeVec) 
+    void operator+=(const SafeVec oSafeVec) 
     {lef += oSafeVec.lef; RIGHT += oSafeVec.RIGHT;}
-    void operator-=(const SafeVec &oSafeVec) 
+    void operator-=(const SafeVec oSafeVec) 
     {lef -= oSafeVec.lef; RIGHT -= oSafeVec.RIGHT;}
-    void operator*=(const SafeVec &oSafeVec) 
+    void operator*=(const SafeVec oSafeVec) 
     {lef *= oSafeVec.lef; RIGHT *= oSafeVec.RIGHT;}
-    void operator/=(const SafeVec &oSafeVec) 
+    void operator/=(const SafeVec oSafeVec) 
     {lef /= oSafeVec.lef; RIGHT /= oSafeVec.RIGHT;}
 
 
-    void addAssign_lef(const SafeVec &oSafeVec){lef += oSafeVec.lef;}
-    void addAssignRIGHT(const SafeVec &oSafeVec){RIGHT += oSafeVec.RIGHT;}
+    void addAssign_lef(const SafeVec oSafeVec){lef += oSafeVec.lef;}
+    void addAssignRIGHT(const SafeVec oSafeVec){RIGHT += oSafeVec.RIGHT;}
 
     SafeVec sum_lef(const int i){return SafeVec(this->lef + i, RIGHT);}
     SafeVec sumRight(const int j){return SafeVec(lef, this->RIGHT + j);}
 
-    SafeVec sum_lef(const SafeVec &oSafeVec){return SafeVec(lef + oSafeVec.lef, RIGHT);}
-    SafeVec sumRIGHT(const SafeVec &oSafeVec){return SafeVec(lef, RIGHT + oSafeVec.RIGHT);}
+    SafeVec sum_lef(const SafeVec oSafeVec){return SafeVec(lef + oSafeVec.lef, RIGHT);}
+    SafeVec sumRIGHT(const SafeVec oSafeVec){return SafeVec(lef, RIGHT + oSafeVec.RIGHT);}
 
-    char compare_lef(const SafeVec &oSafeVec)
+    char compare_lef(const SafeVec oSafeVec)
     {
         if (lef == oSafeVec.lef) 
             return 0;
@@ -56,7 +56,7 @@ struct SafeVec
         else 
             return 1;
     }
-    char compareRIGHT(const SafeVec &oSafeVec)
+    char compareRIGHT(const SafeVec oSafeVec)
     {
         if (RIGHT == oSafeVec.RIGHT) 
             return 0;
@@ -69,27 +69,27 @@ struct SafeVec
     operator godot::Vector2i() const {return godot::Vector2i(lef, RIGHT);}
     operator godot::Vector2() const {return godot::Vector2(lef, RIGHT);}
 
-    SafeVec operator+(const SafeVec &oSafeVec) const
+    SafeVec operator+(const SafeVec oSafeVec) const
     {return SafeVec(lef + oSafeVec.lef, RIGHT + oSafeVec.RIGHT);}
-    SafeVec operator-(const SafeVec &oSafeVec) const
+    SafeVec operator-(const SafeVec oSafeVec) const
     {return SafeVec(lef - oSafeVec.lef, RIGHT - oSafeVec.RIGHT);}
 
     SafeVec operator-()const
     {return SafeVec(-lef, -RIGHT);}
 
-    SafeVec operator*(const SafeVec &oSafeVec) const
+    SafeVec operator*(const SafeVec oSafeVec) const
     {return SafeVec(lef * oSafeVec.lef, RIGHT * oSafeVec.RIGHT);}
-    SafeVec operator/(const SafeVec &oSafeVec) const
+    SafeVec operator/(const SafeVec oSafeVec) const
     {return SafeVec(lef / oSafeVec.lef, RIGHT / oSafeVec.RIGHT);}
 
-    bool isStrictlySmallerThan(const SafeVec &oSafeVec) const {return lef < oSafeVec.lef && RIGHT < oSafeVec.RIGHT;}
-    bool isStrictlyBiggerThan(const SafeVec &oSafeVec) const {return lef > oSafeVec.lef && RIGHT > oSafeVec.RIGHT;}
+    bool isStrictlySmallerThan(const SafeVec oSafeVec) const {return lef < oSafeVec.lef && RIGHT < oSafeVec.RIGHT;}
+    bool isStrictlyBiggerThan(const SafeVec oSafeVec) const {return lef > oSafeVec.lef && RIGHT > oSafeVec.RIGHT;}
 
-    bool operator<(const SafeVec &oSafeVec) const { return (lef == oSafeVec.lef) ? (RIGHT < oSafeVec.RIGHT) : (lef < oSafeVec.lef); }
-	bool operator>(const SafeVec &oSafeVec) const { return (lef == oSafeVec.lef) ? (RIGHT > oSafeVec.RIGHT) : (lef > oSafeVec.lef); }
+    bool operator<(const SafeVec oSafeVec) const { return (lef == oSafeVec.lef) ? (RIGHT < oSafeVec.RIGHT) : (lef < oSafeVec.lef); }
+	bool operator>(const SafeVec oSafeVec) const { return (lef == oSafeVec.lef) ? (RIGHT > oSafeVec.RIGHT) : (lef > oSafeVec.lef); }
 
-	bool operator<=(const SafeVec &oSafeVec) const { return lef == oSafeVec.lef ? (RIGHT <= oSafeVec.RIGHT) : (lef < oSafeVec.lef); }
-	bool operator>=(const SafeVec &oSafeVec) const { return lef == oSafeVec.lef ? (RIGHT >= oSafeVec.RIGHT) : (lef > oSafeVec.lef); }
+	bool operator<=(const SafeVec oSafeVec) const { return lef == oSafeVec.lef ? (RIGHT <= oSafeVec.RIGHT) : (lef < oSafeVec.lef); }
+	bool operator>=(const SafeVec oSafeVec) const { return lef == oSafeVec.lef ? (RIGHT >= oSafeVec.RIGHT) : (lef > oSafeVec.lef); }
 
     bool isAnyCompNegative() const {return lef < 0 || RIGHT < 0;}
 
@@ -111,10 +111,10 @@ struct SafeVec
     float length() const{return distanceTo(SafeVec(0,0));}
     size_t area() const{return lef*RIGHT;}
 
-    float distanceTo(const SafeVec &oSafeVec) const 
+    float distanceTo(const SafeVec oSafeVec) const 
     {return std::sqrt((lef-oSafeVec.lef)*(lef-oSafeVec.lef) + (RIGHT-oSafeVec.RIGHT)*(RIGHT-oSafeVec.RIGHT));}
 
-    float distanceSquaredTo(const SafeVec &oSafeVec) const 
+    float distanceSquaredTo(const SafeVec oSafeVec) const 
     {return (lef - oSafeVec.lef)*(lef - oSafeVec.lef) + (RIGHT - oSafeVec.RIGHT)*(RIGHT - oSafeVec.RIGHT);}
 
     float distanceSquaredTo(const godot::Vector2i &oVector2i) const 
@@ -122,7 +122,7 @@ struct SafeVec
 
     struct hash
     {
-        size_t operator()( const SafeVec &vec ) const
+        size_t operator()( const SafeVec vec ) const
         {return vec.lef*31 + vec.RIGHT ;}
     };
 };

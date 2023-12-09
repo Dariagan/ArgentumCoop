@@ -14,29 +14,28 @@ class SpawnWeightsMatrix
 public:
     const SafeVec SIZE;
 
-
-    auto& operator[](const SafeVec& worldMatrixCoords)
+    auto& operator[](const SafeVec worldMatrixCoords)
     {
         const SafeVec downScaledCoords = worldMatrixCoords/DOWNSCALING_FACTOR;
         return flattenedSpawnWeightsMatrix[SIZE.lef*downScaledCoords.lef + downScaledCoords.RIGHT];
     }
-    auto& at(const SafeVec& worldMatrixCoords)
+    auto& at(const SafeVec worldMatrixCoords)
     {
         const SafeVec downScaledCoords = worldMatrixCoords/DOWNSCALING_FACTOR;
         return flattenedSpawnWeightsMatrix.at(SIZE.lef*downScaledCoords.lef + downScaledCoords.RIGHT);
     }
 
-    void clearAt(const SafeVec& worldMatrixCoords){operator[](worldMatrixCoords).clear();}
+    void clearAt(const SafeVec worldMatrixCoords){operator[](worldMatrixCoords).clear();}
 
-    uint16_t countAt(const SafeVec& coords)
+    uint16_t countAt(const SafeVec coords)
     {
         const auto& spawnWeightsAtPos = this->operator[](coords); 
         return spawnWeightsAtPos.size();
     }
-    bool isEmptyAt(const SafeVec& coords){return countAt(coords) == 0;}
-    bool hasSpawnsAt(const SafeVec& coords){return countAt(coords) != 0;}
+    bool isEmptyAt(const SafeVec coords){return countAt(coords) == 0;}
+    bool hasSpawnsAt(const SafeVec coords){return countAt(coords) != 0;}
 
-    SpawnWeightsMatrix(const SafeVec& WORLD_MATRIX_SIZE) : SIZE(WORLD_MATRIX_SIZE/DOWNSCALING_FACTOR)
+    SpawnWeightsMatrix(const SafeVec WORLD_MATRIX_SIZE) : SIZE(WORLD_MATRIX_SIZE/DOWNSCALING_FACTOR)
     {resize();} 
         
 private:

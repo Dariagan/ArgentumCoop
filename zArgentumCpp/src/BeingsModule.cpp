@@ -1,10 +1,10 @@
-#include "SpawningModule.h"
+#include "BeingsModule.h"
 
 using namespace godot;
 
 
-void SpawningModule::placeNaturalSpawningWeight(
-    const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
+void BeingsModule::placeNaturalSpawningWeight(
+    const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
     const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers)
 {
     const SafeVec absoluteCoordinates = (formationOrigin + coordsRelativeToFormationOrigin);
@@ -15,7 +15,7 @@ void SpawningModule::placeNaturalSpawningWeight(
 }
 
 //ojo estas coords son absolutas, no relativas al origin de la formation
-void SpawningModule::birthBeing(const Vector2i& coords, const BeingBuilder& beingBuilder)
+void BeingsModule::birthBeing(const Vector2i coords, const BeingBuilder& beingBuilder)
 {
     if(beingBuilder.getResult().has_value())
     {
@@ -23,4 +23,5 @@ void SpawningModule::birthBeing(const Vector2i& coords, const BeingBuilder& bein
     }//shouldn't print anything otherwise, that's the builder's task when building
 }
 
-void SpawningModule::birthBeingOfKind(const String& being_kind_id){emit_signal("birth_of_being_of_kind", being_kind_id);}
+void BeingsModule::birthBeingOfKind(const String& being_kind_id)
+{emit_signal("birth_of_being_of_kind", being_kind_id);}

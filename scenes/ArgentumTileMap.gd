@@ -19,7 +19,7 @@ func _process(_delta):
 
 func generate_world():
 	
-	const WORLD_SIZE: Vector2i = Vector2i(10000, 10000)
+	const WORLD_SIZE: Vector2i = Vector2i(6000, 6000)
 	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y >500)
 	
 	generate_world_matrix(WORLD_SIZE, GlobalData.tiles)
@@ -27,7 +27,7 @@ func generate_world():
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
 	
 	#TODO hacer cada generation en un thread distinto
-	generate_formation(fcg, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections["temperate"], 2, {})
+	generate_formation(fcg, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections["temperate"], 3333, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT

@@ -27,15 +27,15 @@ public:
 
     static constexpr unsigned char MAX_TILES_PER_POS = 5;
 
-    std::array<uint16_t, MAX_TILES_PER_POS>& operator[](const SafeVec& coords)
+    std::array<uint16_t, MAX_TILES_PER_POS>& operator[](const SafeVec coords)
     {
         return flattenedUidsMatrix[SIZE.lef*coords.lef + coords.RIGHT];
     }
-    std::array<uint16_t, MAX_TILES_PER_POS>& at(const SafeVec& coords)
+    std::array<uint16_t, MAX_TILES_PER_POS>& at(const SafeVec coords)
     {
         return flattenedUidsMatrix.at(SIZE.lef*coords.lef + coords.RIGHT);
     }
-    unsigned char countAt(const SafeVec& coords)
+    unsigned char countAt(const SafeVec coords)
     {
         unsigned char count = 0;
         const auto& tilesAtPos = this->operator[](coords); 
@@ -45,10 +45,10 @@ public:
         }
         return count;
     }
-    bool isEmptyAt(const SafeVec& coords){return countAt(coords) == 0;}
-    bool isNotEmptyAt(const SafeVec& coords){return countAt(coords) != 0;}
+    bool isEmptyAt(const SafeVec coords){return countAt(coords) == 0;}
+    bool isNotEmptyAt(const SafeVec coords){return countAt(coords) != 0;}
 
-    WorldMatrix(const SafeVec& size) : SIZE(size)
+    WorldMatrix(const SafeVec size) : SIZE(size)
     {resize();} 
         
 private:
