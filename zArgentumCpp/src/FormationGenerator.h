@@ -2,7 +2,7 @@
 #define __FORMATION_GENERATOR_H__
 #include "SafeVector.cpp"
 #include "ArgentumTileMap.h"
-#include "WorldMatrix.cpp"
+#include "WorldMatrix.h"
 #include "TileSelector.h"
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/fast_noise_lite.hpp>

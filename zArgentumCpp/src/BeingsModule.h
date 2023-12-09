@@ -1,5 +1,7 @@
-#ifndef NATURAL_SPAWNING_MODULE_H
-#define NATURAL_SPAWNING_MODULE_H
+
+
+#ifndef BEINGS_MODULE_H
+#define BEINGS_MODULE_H
 
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
@@ -19,25 +21,25 @@
 namespace godot{
 class ArgentumTileMap;
 //no olvidarse de registrarla despues
-class BeingsModule//TODO no sé si hacerlo un Node o RefCounted, o nada. tal vez un node por las signals
+class BeingsModule
 {
-
 public:
     void placeNaturalSpawningWeight(
         const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
         const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers);
 
     void birthBeing(const Vector2i coords, const BeingBuilder& beingBuilder);
-    void birthBeingOfKind(const String& being_kind_id);
+    void birthBeingOfKind(const Vector2i coords, const String& being_kind_id);
     
-    BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size); ~BeingsModule(){};
+    BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size); 
+    ~BeingsModule(){};
     std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> mFrozenBeings;
 private:
     std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix = nullptr;
     godot::ArgentumTileMap* mArgentumTileMap;
+    static constexpr unsigned char SPAWNING_MACROSCOPIC_CHUNK_SIZE = 6;
 
-protected: static void _bind_methods();//EL CUERPO DE ESTE VA SÍ O SÍ EN .cpp    
 };
 }
 
-#endif //NATURAL_SPAWNING_MODULE_H
+#endif //BEINGS_MODULE_H

@@ -1,7 +1,7 @@
 #ifndef __ARGENTUMTILEMAP_H__
 #define __ARGENTUMTILEMAP_H__
 
-#include "WorldMatrix.cpp"
+#include "WorldMatrix.h"
 #include "FormationGenerator.h"
 #include "BeingsModule.h"
 
@@ -23,9 +23,6 @@ struct std::hash<std::array<T, N>> {
         return result;
     }
 };
-
-
-
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 static const Vector2i ERROR_VECTOR = {-999999, -999999};    
@@ -35,10 +32,10 @@ class FormationGenerator;
 class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
 
 public:
-    ArgentumTileMap(){};
-    ~ArgentumTileMap(){};
+    ArgentumTileMap();
+    ~ArgentumTileMap();
 
-    std::optional<u_int16_t> findTileUid(const StringName& stringId) const;
+    std::optional<tile_uid_t> findTileUid(const StringName& stringId) const;
     StringName getTileId(uint16_t uid) const;
 
     bool persist(String filename);
@@ -48,9 +45,10 @@ public:
         const SafeVec formationOrigin, const SafeVec tileCoordsRelativeToFormationOrigin, 
         const uint16_t optTileUid, bool deleteOthers = false);
     
-    bool placeIngameTile(const SafeVec coords, const StringName& id);//akí la id puede ser un stringname directamente, no se está iterando y así se puede agregar a godot el method
-    //false: out of bounds u otro error (util para el godot-side)
+    bool placeIngameTile(const SafeVec coords, const StringName& id);//akí la id puede ser un stringname directamente, no se está iterando y así se puede bindear a godot el method
+    //false: out of array bounds u otro error (usado por el godot-side)
 
+    //BeingModuleMethod only
     
     //TODO algún método para escribir en un archivo el estado del mapa actual (intentar escribir en el .tres?)
     //TODO algún método para cargar el worldMatrix a partir de un archivo
@@ -80,8 +78,8 @@ public:
 
 private:
     unsigned int seed = 0;
-    Dictionary m_tiles_data;
-    void replaceTilesDataProperly(const Dictionary& input_tiles_data);
+    Dictionary m_tiles_data; void replaceTilesDataProperly(const Dictionary& input_tiles_data);
+    std::unordered_map<StringName, std::unordered_map<StringName, Variant>> mCppTilesData;
     std::vector<StringName> mTilesUidMapping;   
 
     std::unordered_map<SafeVec, std::array<uint16_t, WorldMatrix::MAX_TILES_PER_POS>, SafeVec::hash> mModifiedPositions;
@@ -89,10 +87,12 @@ private:
     std::unordered_map<std::string, SafeVec> mTrackedBeingsCoords;//updateado cada
 
     std::unique_ptr<WorldMatrix> mWorldMatrixPtr = nullptr;
-    std::unique_ptr<BeingsModule> mBeingsModule = nullptr;//HACER SUBCLASS DE mWorldMatrixPtr?
+    BeingsModule* mBeingsModule;
 
+    friend class BeingsModule;
     //chunk size: 7x7 puntos de spawnweights
     //TypedArray<TypedArray<long>>
+    //tiene q estar actualizado en real time. el gd side le mete a cada chunk su respectiva count
     TypedArray<Array> beings_in_chunk_count;
     
     //contiene ids de BeingKinds
@@ -108,20 +108,14 @@ private:
 
     std::unordered_map<SafeVec, int, SafeVec::hash> mTileSharedLoadsCount;
 
-    std::unordered_map<StringName, std::unordered_map<StringName, Variant>> mCppTilesData;
+    
     static bool withinChunkBounds(const SafeVec loadedCoordToCheck, const SafeVec topLeftCorner, const SafeVec chunkSize);
 
     bool setCell(const uint16_t uid, const SafeVec coords);
 
-    static bool exceedsTileLimit(const u_int16_t count)
-    {
-        if (count >= WorldMatrix::NULL_TILE_UID - 1){
-            UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");
-            return true;
-        }
-        return false;
-    }
-protected: static void _bind_methods();
+    static bool exceedsTileLimit(const tile_uid_t count);
+
+    protected: static void _bind_methods();
 };
 }
 

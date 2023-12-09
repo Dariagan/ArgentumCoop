@@ -125,9 +125,6 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec tileCoord)
     }
 }
 
-    constexpr unsigned char SPAWNING_MACROSCOPIC_CHUNK_SIZE = 6;
-  
-
 bool ArgentumTileMap::setCell(const uint16_t uid, const SafeVec coords)
 {
     if(uid == WorldMatrix::NULL_TILE_UID) return false;
@@ -170,7 +167,6 @@ bool ArgentumTileMap::setCell(const uint16_t uid, const SafeVec coords)
 
 void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionary& tiles_data)
 {
-    
     if (size.x <= 0 || size.y <= 0)
     {
         UtilityFunctions::printerr("Negatively sized world matrix not allowed");
@@ -180,7 +176,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionar
     {
         mWorldMatrixPtr = std::make_unique<WorldMatrix>(size);
         set_tiles_data(tiles_data);
-        mBeingsModule = std::make_unique<BeingsModule>(this, size);
+        mBeingsModule = new BeingsModule(this, size);
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
     }
@@ -231,7 +227,11 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
         add_tiles_data(input_tiles_data);
     }
 }
-std::optional<u_int16_t> ArgentumTileMap::findTileUid(const StringName& stringId) const
+
+ArgentumTileMap::ArgentumTileMap(){}
+ArgentumTileMap::~ArgentumTileMap(){delete mBeingsModule;}
+
+std::optional<tile_uid_t> ArgentumTileMap::findTileUid(const StringName& stringId) const
 {
     
     for(u_int16_t i = 0; i < mTilesUidMapping.size(); i++)
@@ -394,6 +394,8 @@ void ArgentumTileMap::freeze_and_store_being(const Vector2 glb_coords, const int
     }
     mBeingLoadedTiles.erase(individual_unique_id);
 }
+
+bool ArgentumTileMap::exceedsTileLimit(const tile_uid_t count){if (count >= WorldMatrix::NULL_TILE_UID - 1){UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");return true;}return false;}
 
 //se pueden llamar metodos de godot de guardar desde acá, aviso
 //solo guardar los arrays modificados
