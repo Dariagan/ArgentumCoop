@@ -17,9 +17,8 @@
 #include "SpawnWeightsMatrix.cpp"
 
 namespace godot{
-
+class ArgentumTileMap;
 //no olvidarse de registrarla despues
-
 class BeingsModule//TODO no sé si hacerlo un Node o RefCounted, o nada. tal vez un node por las signals
 {
 
@@ -31,11 +30,11 @@ public:
     void birthBeing(const Vector2i coords, const BeingBuilder& beingBuilder);
     void birthBeingOfKind(const String& being_kind_id);
     
-    BeingsModule(const ArgentumTileMap& argentumTileMap, const SafeVec size); ~BeingsModule(){};
+    BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size); ~BeingsModule(){};
     std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> mFrozenBeings;
 private:
     std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix = nullptr;
-    ArgentumTileMap& ArgentumTileMap;
+    godot::ArgentumTileMap* mArgentumTileMap;
 
 protected: static void _bind_methods();//EL CUERPO DE ESTE VA SÍ O SÍ EN .cpp    
 };
