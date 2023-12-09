@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=14 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -7,8 +7,10 @@
 [ext_resource type="Script" path="res://scripts/game.gd" id="5_2eji3"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
 [ext_resource type="PackedScene" uid="uid://bxcw3yocig3he" path="res://scenes/being.tscn" id="5_nor5b"]
-[ext_resource type="Script" path="res://scripts/ui/menu_control.gd" id="7_6o24h"]
-[ext_resource type="Script" path="res://scripts/tile_map.gd" id="7_hh7e5"]
+[ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resources/world/tile_set.tres" id="6_67353"]
+[ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
+[ext_resource type="Script" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
+[ext_resource type="Script" path="res://scenes/ArgentumTileMap.gd" id="7_itdl2"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="8_rvt7q"]
 
@@ -23,13 +25,22 @@ character_creation_scene = ExtResource("4_lphit")
 script = ExtResource("5_2eji3")
 being_scene = ExtResource("5_nor5b")
 
+[node name="ArgentumTileMap" type="ArgentumTileMap" parent="Lobby/Game"]
+y_sort_enabled = true
+tile_set = ExtResource("6_67353")
+layer_1/z_index = 5
+layer_1/tile_data = PackedInt32Array()
+layer_2/y_sort_enabled = true
+layer_2/z_index = 10
+layer_2/tile_data = PackedInt32Array()
+script = ExtResource("7_itdl2")
+
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
-spawn_path = NodePath("../TileMap")
+spawn_path = NodePath("../ArgentumTileMap")
+script = ExtResource("6_r3dut")
 
-[node name="TileMap" type="TileMap" parent="Lobby/Game"]
-format = 2
-script = ExtResource("7_hh7e5")
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Lobby/Game"]
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 

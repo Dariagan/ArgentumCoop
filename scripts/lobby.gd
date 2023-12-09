@@ -1,8 +1,6 @@
 extends Node
 # local peer
 var peer = ENetMultiplayerPeer.new()
-# local username
-
 
 @export var character_creation_scene: PackedScene
 
@@ -12,11 +10,8 @@ var _peers: Array = []
 var _ready_peers: Array = []
 var _characters_spawn_data: Array = [] 
 
-
-
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
 	_lobby_interface = lobby_interface
-	
 	_connect_signals(_lobby_interface)
 	
 	#_lobby_interface.follower_body_i_selected.connect(_on_follower_body_selected)
@@ -30,8 +25,10 @@ func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: 
 		_lobby_interface.player_clicked_leave.connect(_leave_as_client, CONNECT_ONE_SHOT)
 		_join(joined_ip)
 
+const PORT: int = 1025 #PORTS BELOW 1024 MAY NOT WORK
+
 func _host() -> void:
-	peer.create_server(135)
+	peer.create_server(PORT)
 	multiplayer.multiplayer_peer = peer
 	multiplayer.peer_connected.connect(_on_player_join)
 	multiplayer.peer_disconnected.connect(_on_player_disconnect)
@@ -40,8 +37,10 @@ func _host() -> void:
 	_characters_spawn_data.push_back({})
 	
 func _join(ip: String) -> void:
-	peer.create_client(ip, 135)
+	peer.create_client(ip, PORT)
+	
 	multiplayer.multiplayer_peer = peer
+
 	#TODO: check if connection is successful
 	
 	
@@ -63,7 +62,7 @@ func _on_player_disconnect(peer_id: int) -> void:
 	_ready_peers.erase(peer_id)
 	_sync_state_for_clients()
 	_update_players_for_gui()
-# executed ONLY server-side 
+# executed ONLY on the host's PC
 	
 func _sync_state_for_clients() -> void: 
 	_give_player_list.rpc(_players) 
@@ -106,14 +105,13 @@ func _update_players_for_gui() -> void:
 @onready var game: Node = $Game
 
 # when ready is pressed in the GUI
-func _on_player_ready(ready: bool) -> void:
+func _on_player_ready(_ready: bool) -> void:
 	if multiplayer.get_unique_id() != 1:
-		_peer_is_ready.rpc(ready)
+		_peer_is_ready.rpc(_ready)
 		
-	elif true or _is_everybody_ready():
+	elif GlobalData.ignore_joiners_readiness_on_start or _is_everybody_ready():
 		_on_game_start.rpc()
 		game.start_new_game(_characters_spawn_data, _peers)
-		print(_characters_spawn_data)
 		
 @rpc("call_local")
 func _on_game_start():
@@ -121,11 +119,11 @@ func _on_game_start():
 
 
 @rpc("call_local", "any_peer")
-func _peer_is_ready(ready: bool) -> void:
+func _peer_is_ready(_ready: bool) -> void:
 	var peer_id: int = multiplayer.get_remote_sender_id()
-	if ready and peer_id not in _ready_peers:
+	if _ready and peer_id not in _ready_peers:
 		_ready_peers.push_back(peer_id)
-	elif not ready:
+	elif not _ready:
 		_ready_peers.erase(peer_id)
 	
 func _is_everybody_ready() -> bool:
@@ -142,7 +140,7 @@ func _connect_signals(lobby_interface: LobbyInterface):
 	lobby_interface.body_scale_changed.connect(_on_body_scale_changed)
 	
 # EN VEZ DE TODO ESTO HACER Q APENAS SE UNA EL PLAYER ESTE EJECUTE UN .RPC_ID(1, _username) Y EL SERVER SE LO QUEDA AHÍ
-# for requesting a peer's username
+#region for requesting a peer's username
 signal player_username_received(username: String)
 var requested_peer: int = -1
 func _request_player_username(peer_id: int) -> void:
@@ -156,12 +154,10 @@ func _receive_player_username(username: String) -> void:
 	if  multiplayer.get_remote_sender_id() == requested_peer:
 		player_username_received.emit(username)
 	requested_peer = -1
-# for requesting a peer's username
+#endregion for requesting a peer's username
 
 
-# ----------------------------------------------------------------------------------
-# ----------------------- character creation synchronization -----------------------
-# ----------------------------------------------------------------------------------
+#region Character creation synchronization
 func _on_name_selected(new_name: String):
 	if new_name: _update_characterization_for_everyone.rpc("name", new_name)
 	else: _update_characterization_for_everyone.rpc("name")
@@ -178,7 +174,7 @@ func _on_head_selected(head : SpriteData):
 	else: 
 		_update_characterization_for_everyone.rpc("head")
 	
-func _on_class_selected(klass: Class):
+func _on_class_selected(klass: Klass):
 	if klass: _update_characterization_for_everyone.rpc("klass", klass.id)
 	else: _update_characterization_for_everyone.rpc("klass")
 func _on_follower_selected(follower: UncontrollableRace):
@@ -194,5 +190,6 @@ func _update_characterization_for_everyone(characterization_key: String, value =
 		_characters_spawn_data[sender_i][characterization_key] = value
 	else:
 		_characters_spawn_data[sender_i].erase(characterization_key)
+#endregion
 
 

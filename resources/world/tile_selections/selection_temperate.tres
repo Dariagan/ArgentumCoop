@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TileSelection" load_steps=2 format=3 uid="uid://dewua1lavi80"]
+
+[ext_resource type="Script" path="res://scripts/resources/world/tile_selection.gd" id="1_1vs1g"]
+
+[resource]
+script = ExtResource("1_1vs1g")
+id = &"temperate"
+targets = Array[String](["tree", "bush", "cont", "ocean", "lake", "beach", "cave_0", "cave_1", "cave_2"])
+tile_to_place = Array[String](["_temperate_trees", "_bushes", "grass", "ocean_water", "lake_water", "beach_sand", "cave_mossy", "cave_mossy", "cave_mossy"])
+grouped_prob_weighted_tiles = Array[Dictionary]([{
+"tree_temp_0": 10,
+"tree_temp_1": 10,
+"tree_temp_2": 10,
+"tree_temp_3": 10,
+"tree_temp_4": 10,
+"tree_temp_5": 10,
+"tree_temp_6": 10,
+"tree_temp_7": 10
+}, {
+"bush_0": 10,
+"bush_1": 10
+}, {}, {}, {}])

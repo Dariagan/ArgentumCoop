@@ -2,6 +2,7 @@ extends Faction
 class_name PlayerFaction
 
 var id: String = "player"
+var instance_id: String = "player"
 
 var members: Array[Being] = []
 	

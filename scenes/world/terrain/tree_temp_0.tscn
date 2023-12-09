@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://xgqfnqydvqwo"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_gmaiv"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_led20"]
+
+[node name="StaticBody2D" type="StaticBody2D"]
+physics_material_override = SubResource("PhysicsMaterial_gmaiv")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("CanvasTexture_led20")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]

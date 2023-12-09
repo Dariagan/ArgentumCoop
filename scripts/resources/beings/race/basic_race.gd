@@ -4,6 +4,11 @@ class_name BasicRace
 @export var name: StringName = &" "
 @export var icon: Texture2D
 
+@export var default_being_names: Array[StringName] = []
+
+#may be overriden by specific beingkinds
+@export var default_blacklisted_tiles_for_spawning: Array[String]
+
 @export var head_sprites_datas: Array[SpriteData]
 
 @export var body_sprites_datas: Array[BodySpriteData]

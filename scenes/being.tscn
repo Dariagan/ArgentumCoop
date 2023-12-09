@@ -1,36 +1,42 @@
-[gd_scene load_steps=5 format=3 uid="uid://bxcw3yocig3he"]
+[gd_scene load_steps=6 format=3 uid="uid://bxcw3yocig3he"]
 
 [ext_resource type="Script" path="res://scripts/beings/being.gd" id="1_qp2au"]
 [ext_resource type="PackedScene" uid="uid://dh6xc1ceawroh" path="res://scenes/animated_body_portion.tscn" id="2_7wa3q"]
+[ext_resource type="Script" path="res://scripts/resources/beings/being_internal_state.gd" id="3_ptxgd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c0jbg"]
-size = Vector2(20, 20.7143)
+size = Vector2(11.7222, 5.52427)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_p46nv"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
-properties/0/sync = true
-properties/0/watch = false
+properties/0/replication_mode = 1
 
 [node name="Being" type="CharacterBody2D"]
+z_index = 10
+collision_layer = 2
+collision_mask = 15
+motion_mode = 1
+slide_on_ceiling = false
+platform_on_leave = 2
 script = ExtResource("1_qp2au")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(0.15, 0.15)
+offset = Vector2(0, -5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 0.5)
-scale = Vector2(0.9, 1.4)
+position = Vector2(0, 15)
+scale = Vector2(1, 2)
 shape = SubResource("RectangleShape2D_c0jbg")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_p46nv")
 
 [node name="Name" type="Label" parent="."]
-offset_left = -20.0
-offset_top = -4.0
-offset_right = 20.0
-offset_bottom = 19.0
+offset_left = 42.0
+offset_top = -9.0
+offset_right = 82.0
+offset_bottom = 14.0
 horizontal_alignment = 1
 
 [node name="Meditation" type="AnimatedSprite2D" parent="."]
@@ -46,3 +52,9 @@ horizontal_alignment = 1
 [node name="LeftHand" type="Node" parent="BodyHolder"]
 
 [node name="RightHand" type="Node" parent="BodyHolder"]
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+debug_enabled = true
+
+[node name="InternalState" type="Node" parent="."]
+script = ExtResource("3_ptxgd")
