@@ -19,11 +19,14 @@
 #include "SpawnWeightsMatrix.cpp"
 
 namespace godot{
+typedef short unsigned int being_uid_t;
+
 class ArgentumTileMap;
 //no olvidarse de registrarla despues
 class BeingsModule
 {
 public:
+
     void placeNaturalSpawningWeight(
         const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
         const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers);

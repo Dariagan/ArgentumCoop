@@ -19,8 +19,8 @@
 
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR
-class ArgentumTileMap;class TileSelector;
-
+class ArgentumTileMap;
+class TileSelector;
 class FormationGenerator : public RefCounted
 {GDCLASS(FormationGenerator, RefCounted)
 
