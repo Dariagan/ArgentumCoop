@@ -1,8 +1,5 @@
 #ifndef __ARGENTUMTILEMAP_H__
 #define __ARGENTUMTILEMAP_H__
-#include "WorldMatrix.h"
-#include "FormationGenerator.h"
-#include "BeingsModule.h"
 #include <godot_cpp/classes/tile_map.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/godot.hpp>
@@ -11,6 +8,9 @@
 #include <memory>
 #include <limits>
 #include "pseudo_rust.h"
+#include "WorldMatrix.h"
+#include "FormationGenerator.h"
+#include "BeingsModule.h"
 template<class T, size_t N> 
 struct std::hash<std::array<T, N>> {
     std::hash<T> hasher;
@@ -34,15 +34,17 @@ public:
     ArgentumTileMap();
     ~ArgentumTileMap();
 
-    std::optional<tile_class_uid> findTileUid(const StringName& stringId) const;
-    StringName getTileId(tile_class_uid uid) const;
+    std::optional<tileclass_uid> findTileUid(const StringName& stringId) const;
+    StringName getTileId(tileclass_uid uid) const;
 
+    //HAY QUE ESCRIBIR EN BINARIO. NO EN ASCII. EN ASCII 1 DIGITO = 1 BYTE
+    //HAY QUE GUARDAR: LA SEED + USER MODIFIED DATA
     bool persist(String filename);
 
     //SOLO USAR PARA FORMATIONS
     void placeFormationTile(
         const SafeVec formationOrigin, const SafeVec tileCoordsRelativeToFormationOrigin, 
-        const tile_class_uid newTile, bool deletePreviousTiles = false);
+        const tileclass_uid newTile, bool deletePreviousTiles = false);
     
     bool placeIngameTile(const SafeVec coords, const StringName& id);//akí la id puede ser un stringname directamente, no se está iterando y así se puede bindear a godot el method
     //false: out of array bounds u otro error (usado por el godot-side)
@@ -83,16 +85,20 @@ private:
     std::unordered_map<StringName, std::unordered_map<StringName, Variant>> mCppTilesData;
     std::vector<StringName> mTilesUidMapping;   
 
-    std::unordered_map<SafeVec, std::array<tile_class_uid, WorldMatrix::MAX_TILES_PER_POS>, SafeVec::hash> mPositionsWithChangedTiles;
+    std::unordered_map<SafeVec, std::array<tileclass_uid, WorldMatrix::MAX_TILES_PER_POS>, SafeVec::hash> mPositionsWithChangedTiles;
 
     //TIENE Q SER UN INT, PORQ SINO EN EL GODOT NO SE PUEDE VER EL ESTADO DEL OBJECT EN EL INSPECTOR. 
     //ACA HAY Q GUARDAR UN UIDQ REFERENCIE EL STATE GUARDADO EN GODOT.
-    typedef unsigned int tile_instance_uid;
-    std::unordered_map<SafeVec, std::array<tile_instance_uid, WorldMatrix::MAX_TILES_PER_POS>, SafeVec::hash> mTileInstancesState;
+    typedef unsigned int tileinstance_uid;
+    //NO ES UN ARRAY LA DATA STRUCTURE INTERNA PORQ PUEDE Q EL RESTO DE TILES EN LA MISMA POS NO TENGAN STATE INICIALIZADO, Y NO SE PUEDE SABER SI SI O SI NO EN UN ARRAY
+    
+    //update: creo q no hace falta esto. con un dictionary en godot con key coordx_coordy_zi y value el state ya se puede hacer todo
+    std::unordered_map<SafeVec, std::unordered_set<tileinstance_uid>, SafeVec::hash> mTileInstancesState;
+    std::unordered_map<SafeVec, std::unordered_map<u_char, Object>, SafeVec::hash> mTileInstancesState1;
+    std::unordered_map<SafeVec, std::unordered_map<u_char, tileinstance_uid>, SafeVec::hash> mTileInstancesState2;
 
     std::unordered_map<std::string, SafeVec> mTrackedBeingsCoords;//updateado cada
 
-    
     BeingsModule* mBeingsModule;
     friend class BeingsModule;
     //chunk size: 7x7 puntos de spawnweights
@@ -115,9 +121,9 @@ private:
     
     static bool withinChunkBounds(const SafeVec loadedCoordToCheck, const SafeVec topLeftCorner, const SafeVec chunkSize);
 
-    bool setCell(const tile_class_uid newTile, const SafeVec coords);
+    bool setCell(const tileclass_uid newTile, const SafeVec coords);
 
-    static bool exceedsTileLimit(const tile_class_uid count);
+    static bool exceedsTileLimit(const tileclass_uid count);
 
     protected: static void _bind_methods();
 };

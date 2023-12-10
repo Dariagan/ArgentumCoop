@@ -47,7 +47,7 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
             
             u_int16_t GROUP_DICT_SIZE = group_dict.keys().size();
 
-            std::vector<tile_class_uid> groupedTileUid(GROUP_DICT_SIZE);
+            std::vector<tileclass_uid> groupedTileUid(GROUP_DICT_SIZE);
             groupedTileUid.reserve(GROUP_DICT_SIZE);
 
             std::vector<u_int> groupTileUidWeight(GROUP_DICT_SIZE);
@@ -74,7 +74,7 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
 }
 TileSelector::~TileSelector(){};
 
-tile_class_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i)
+tileclass_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i)
 {
     const auto it = std::find_if(m_availableTargets.begin(), m_availableTargets.end(), [&](const std::string& availableTarget) {
         return std::strcmp(availableTarget.c_str(), inputTargetTofill) == 0;
@@ -85,7 +85,7 @@ tile_class_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, 
         auto index = std::distance(m_availableTargets.begin(), it);
         try
         {
-            const auto& optTileID = std::get<std::optional<tile_class_uid>>(m_tileUidOrGroup[index]);
+            const auto& optTileID = std::get<std::optional<tileclass_uid>>(m_tileUidOrGroup[index]);
             
             return optTileID.value_or(WorldMatrix::NULL_TILE_UID);
         }

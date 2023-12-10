@@ -5,11 +5,11 @@ using namespace godot;
 WorldMatrix::WorldMatrix(const SafeVec size): SIZE(size)
 {resize();} 
 
-std::array<tile_class_uid, WorldMatrix::MAX_TILES_PER_POS>& WorldMatrix::operator[](const SafeVec coords)
+std::array<tileclass_uid, WorldMatrix::MAX_TILES_PER_POS>& WorldMatrix::operator[](const SafeVec coords)
 {
     return flattenedUidsMatrix[SIZE.lef*coords.lef + coords.RIGHT];
 }
-std::array<tile_class_uid, WorldMatrix::MAX_TILES_PER_POS>& WorldMatrix::at(const SafeVec coords)
+std::array<tileclass_uid, WorldMatrix::MAX_TILES_PER_POS>& WorldMatrix::at(const SafeVec coords)
 {
     return flattenedUidsMatrix.at(SIZE.lef*coords.lef + coords.RIGHT);
 }
@@ -32,7 +32,7 @@ void WorldMatrix::resize()
     flattenedUidsMatrix.resize(SIZE.area());
     for(unsigned int i = 0; i < SIZE.area(); i++)
     {
-        constexpr static std::array<tile_class_uid, MAX_TILES_PER_POS> ARRAY_OF_NULL_TILES{initialize_uids_array_as_empty<MAX_TILES_PER_POS>()};// DON'T FORGET TO ADD ZEROES IF
+        constexpr static std::array<tileclass_uid, MAX_TILES_PER_POS> ARRAY_OF_NULL_TILES{initialize_uids_array_as_empty<MAX_TILES_PER_POS>()};// DON'T FORGET TO ADD ZEROES IF
         flattenedUidsMatrix[i] = ARRAY_OF_NULL_TILES;
     }
 }

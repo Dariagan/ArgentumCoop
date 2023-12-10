@@ -28,7 +28,7 @@ public:
     ~TileSelector();
 
     //⚠️ argument "thread_i" must be within 0 and N_THREADS-1 ⚠️
-    tile_class_uid getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i);
+    tileclass_uid getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i);
 
     void reseed(const u_int seed);
 
@@ -46,8 +46,8 @@ private:
     static constexpr group IS_A_GROUP = 1;
 
     std::vector<std::string> m_availableTargets; 
-    std::vector<std::variant<std::optional<tile_class_uid>, group>> m_tileUidOrGroup; //bool: is group
-    std::vector<std::pair<std::vector<tile_class_uid>, std::discrete_distribution<u_int>>> m_idsDistributionOfGroups;
+    std::vector<std::variant<std::optional<tileclass_uid>, group>> m_tileUidOrGroup; //bool: is group
+    std::vector<std::pair<std::vector<tileclass_uid>, std::discrete_distribution<u_int>>> m_idsDistributionOfGroups;
 };
 }
 #endif

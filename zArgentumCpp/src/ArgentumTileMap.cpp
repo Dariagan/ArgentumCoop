@@ -2,7 +2,6 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/classes/random_number_generator.hpp>
-#include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <string>
 #include <typeinfo>
@@ -10,7 +9,6 @@
 #include <chrono>
 #include <thread>
 using namespace godot;
-
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i origin, 
     const Vector2i size, const Ref<Resource>& tileSelectionSet, unsigned int seed, const Dictionary& data)
 {   
@@ -77,7 +75,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2 global_coords, const Vecto
                     }
                 }
                 if (mWorldMatrixPtr->isNotEmptyAt(tileMapCoords))//if more than 0 tileIds at coords:
-                    for (const tile_class_uid& uid : (*mWorldMatrixPtr)[tileMapCoords])
+                    for (const tileclass_uid& uid : (*mWorldMatrixPtr)[tileMapCoords])
                         {setCell(uid, tileMapCoords);}
                 //TODO
                 //else
@@ -124,7 +122,7 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec tileCoord)
     }
 }
 
-bool ArgentumTileMap::setCell(const tile_class_uid uid, const SafeVec coords)
+bool ArgentumTileMap::setCell(const tileclass_uid uid, const SafeVec coords)
 {
     if(uid == WorldMatrix::NULL_TILE_UID) return false;
 
@@ -230,7 +228,7 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
 ArgentumTileMap::ArgentumTileMap(){}
 ArgentumTileMap::~ArgentumTileMap(){delete mBeingsModule;}
 
-std::optional<tile_class_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
+std::optional<tileclass_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
 {
     
     for(u_int16_t i = 0; i < mTilesUidMapping.size(); i++)
@@ -241,7 +239,7 @@ std::optional<tile_class_uid> ArgentumTileMap::findTileUid(const StringName& str
     return {};
 }
 
-StringName ArgentumTileMap::getTileId(tile_class_uid uid) const
+StringName ArgentumTileMap::getTileId(tileclass_uid uid) const
 {
     try{
         return mTilesUidMapping.at(uid);
@@ -351,7 +349,6 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 //     UtilityFunctions::printerr("ArgentumTileMap::get_random_coord_with_tile_id: couldn't get random coord");
 //     return ERROR_VECTOR;
 // }
-
 bool ArgentumTileMap::withinChunkBounds(
     const SafeVec loadedCoordToCheck, const SafeVec chunkTopLeftCorner, const SafeVec CHUNK_SIZE)
 {
@@ -360,12 +357,11 @@ bool ArgentumTileMap::withinChunkBounds(
         && loadedCoordToCheck.lef <= chunkTopLeftCorner.lef + CHUNK_SIZE.lef
         && loadedCoordToCheck.RIGHT <= chunkTopLeftCorner.RIGHT + CHUNK_SIZE.RIGHT;
 }
-
 // GUARDAR LAS POS CON ARRAYS MODIFICADOS
 // GUARDAR EN ALGUN LUGAR LAS TILES SELECCIONADAS ALEATORIAMENTE
 void ArgentumTileMap::placeFormationTile( 
     const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
-    const tile_class_uid newTile, const bool deletePreviousTiles){try
+    const tileclass_uid newTile, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
     auto& otherTilesAtPos = (*mWorldMatrixPtr)[absoluteCoords];
@@ -374,16 +370,13 @@ void ArgentumTileMap::placeFormationTile(
         otherTilesAtPos[0] = newTile;
         for(u_char i = 1; i < WorldMatrix::MAX_TILES_PER_POS; i++)
             otherTilesAtPos[i] = WorldMatrix::NULL_TILE_UID;
-        return;
     }
-
+    else
     for(char i = 0; i < WorldMatrix::MAX_TILES_PER_POS; i++)
-    {
         if(otherTilesAtPos[i] == WorldMatrix::NULL_TILE_UID){
             otherTilesAtPos[i] = newTile;      
             break;
         }
-    }
 }
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
@@ -398,7 +391,7 @@ void ArgentumTileMap::freeze_and_store_being(const Vector2 glb_coords, const bei
     mBeingLoadedTiles.erase(individual_unique_id);
 }
 
-bool ArgentumTileMap::exceedsTileLimit(const tile_class_uid count){if (count >= WorldMatrix::NULL_TILE_UID - 1){UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");return true;}return false;}
+bool ArgentumTileMap::exceedsTileLimit(const tileclass_uid count){if (count >= WorldMatrix::NULL_TILE_UID - 1){UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");return true;}return false;}
 
 //se pueden llamar metodos de godot de guardar desde acá, aviso
 //solo guardar los arrays modificados
@@ -431,6 +424,8 @@ void ArgentumTileMap::_bind_methods()
     
     ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
     
+    ADD_SIGNAL(MethodInfo("load_state_into_tilenaseblabldinstance_w_uid", PropertyInfo(Variant::INT, "tileinstance_uid")));
+
     ADD_SIGNAL(MethodInfo("formation_formed"));
 
     ADD_SIGNAL(MethodInfo("birth_being_kind", PropertyInfo(Variant::VECTOR2I, "local_coords"), PropertyInfo(Variant::STRING_NAME, "being_kind_id")));
