@@ -1,5 +1,4 @@
 #include "FracturedContinentGenerator.h"
-#include <thread>
 
 using namespace godot;
 
