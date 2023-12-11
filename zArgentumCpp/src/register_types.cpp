@@ -24,7 +24,6 @@ void initialize_argentum_cpp(ModuleInitializationLevel p_level)
     if(p_level != MODULE_INITIALIZATION_LEVEL_SCENE){return;}
 
     //std::cerr.rdbuf(errorsLogFile.rdbuf()); std::cout.rdbuf(stdoutLogFile.rdbuf());
-
     ClassDB::register_class<ArgentumTileMap>();
     ClassDB::register_class<BeingBuilder>();
     ClassDB::register_abstract_class<FormationGenerator>();

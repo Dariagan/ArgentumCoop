@@ -2,6 +2,7 @@ extends ArgentumTileMap
 class_name GdTileMap
 
 var _beings: Dictionary # key(str): individual unique id. value: Being. el multiplayerspawner se encarga del sync
+var tiles_states: Dictionary # key: posx_posy_zi. value: state object
 
 func _setup_config():
 	#self.tiles_data = GlobalData.tiles
@@ -26,7 +27,6 @@ func generate_world():
 	
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
 	
-	#TODO hacer cada generation en un thread distinto
 	generate_formation(fcg, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections["temperate"], 3333, {})
 	
 	_players_start_position = WORLD_SIZE/2

@@ -2,7 +2,7 @@
 #define __FORMATION_GENERATOR_H__
 #include "SafeVector.cpp"
 #include "ArgentumTileMap.h"
-#include "WorldMatrix.cpp"
+#include "WorldMatrix.h"
 #include "TileSelector.h"
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/fast_noise_lite.hpp>
@@ -14,13 +14,12 @@
 #include <unordered_map>
 #include <memory>
 #include <algorithm>
-#include <thread>
 #include <execution>
-
+#include "typealiases.h"
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR
-class ArgentumTileMap;class TileSelector;
-
+class ArgentumTileMap;
+class TileSelector;
 class FormationGenerator : public RefCounted
 {GDCLASS(FormationGenerator, RefCounted)
 

@@ -16,7 +16,8 @@
 #include <limits>
 #include <variant>
 #include "ArgentumTileMap.h"
-#include "mutex"
+#include "WorldMatrix.h"
+#include "typealiases.h"
 
 namespace godot
 {   
@@ -28,7 +29,7 @@ public:
     ~TileSelector();
 
     //⚠️ argument "thread_i" must be within 0 and N_THREADS-1 ⚠️
-    uint16_t getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i);
+    tileclass_uid getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i);
 
     void reseed(const u_int seed);
 
@@ -42,9 +43,13 @@ private:
     const u_int TARGETS_COUNT;
     const u_char N_THREADS;
 
+    typedef bool group;
+    static constexpr group IS_A_GROUP = 1;
+
     std::vector<std::string> m_availableTargets; 
-    std::vector<std::variant<std::optional<uint16_t>, bool>> m_tileUidOrGroup; //bool: is group
-    std::vector<std::pair<std::vector<uint16_t>, std::discrete_distribution<uint16_t>>> m_idsDistributionOfGroups;
+    std::vector<std::variant<std::optional<tileclass_uid>, group>> m_tileUidOrGroup; //bool: is group
+    std::vector<std::pair<std::vector<tileclass_uid>, std::discrete_distribution<u_int>>> m_idsDistributionOfGroups;
 };
 }
 #endif
+

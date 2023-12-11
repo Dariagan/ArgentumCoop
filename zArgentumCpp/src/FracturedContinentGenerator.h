@@ -1,6 +1,7 @@
 #ifndef __FRACTUREDCONTINENT_GENERATOR_H__
 #define __FRACTUREDCONTINENT_GENERATOR_H__
 #include "FormationGenerator.h"
+#include <thread>
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING
 class FracturedContinentGenerator : public FormationGenerator
