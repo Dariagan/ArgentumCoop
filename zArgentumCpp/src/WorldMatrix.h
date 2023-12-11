@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <limits>
 #include <vector>
-
+#include "typealiases.h"
 #include "SafeVector.cpp"
 
 namespace godot{

@@ -11,6 +11,7 @@
 #include "WorldMatrix.h"
 #include "FormationGenerator.h"
 #include "BeingsModule.h"
+#include "typealiases.h"
 template<class T, size_t N> 
 struct std::hash<std::array<T, N>> {
     std::hash<T> hasher;
@@ -26,7 +27,8 @@ namespace godot
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 static const Vector2i ERROR_VECTOR = {-999999, -999999};    
 
-class BeingsModule;
+
+class BeingsModule;typedef unsigned short int being_uid_t;
 class FormationGenerator;
 class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
 
@@ -75,7 +77,6 @@ public:
     void set_beings_in_chunk_count(const TypedArray<Array> beings_in_chunk_count);
     TypedArray<Array> get_beings_in_chunk_count();
     
-
 
 private:
     std::unique_ptr<WorldMatrix> mWorldMatrixPtr = nullptr;

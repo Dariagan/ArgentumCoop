@@ -32,3 +32,6 @@ BeingsModule::BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVe
     this->mSpawnWeightsMatrix = std::make_unique<SpawnWeightsMatrix>(size);
 }
 
+godot::BeingsModule::~BeingsModule()
+{
+}

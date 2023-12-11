@@ -17,6 +17,7 @@
 #include <variant>
 #include "ArgentumTileMap.h"
 #include "WorldMatrix.h"
+#include "typealiases.h"
 
 namespace godot
 {   

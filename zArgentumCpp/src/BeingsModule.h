@@ -16,17 +16,18 @@
 #include <memory>
 #include "ArgentumTileMap.h"
 #include "BeingBuilder.h"
-#include "SpawnWeightsMatrix.cpp"
+#include "SpawnWeightsMatrix.h"
+#include "typealiases.h"
 
 namespace godot{
-typedef short unsigned int being_uid_t;
 
+typedef short unsigned int being_uid_t;
 class ArgentumTileMap;
 //no olvidarse de registrarla despues
 class BeingsModule
 {
 public:
-
+    
     void placeNaturalSpawningWeight(
         const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
         const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers);
@@ -35,7 +36,7 @@ public:
     void birthBeingOfKind(const Vector2i coords, const String& being_kind_id);
     
     BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size); 
-    ~BeingsModule(){};
+    ~BeingsModule();
     std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> mFrozenBeings;
 private:
     std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix = nullptr;
