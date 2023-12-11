@@ -16,6 +16,9 @@ env = SConscript("godot-cpp/SConstruct")
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/"])
+
+#sudo update-alternatives --config x86_64-w64-mingw32-g++ # Set the default mingw32 g++ compiler option to posix.
+
 env.Append(CXXFLAGS=["-O3", "-fexceptions", "-std=c++17", "-pthread"])
 sources = Glob("src/*.cpp")
 
