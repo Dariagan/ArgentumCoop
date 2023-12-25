@@ -17,12 +17,12 @@
 #include <memory>
 namespace godot{
 
-typedef short unsigned int being_uid_t;
 class ArgentumTileMap;
 //no olvidarse de registrarla despues
 class BeingsModule
 {
 public:
+    typedef unsigned short int being_uid;
     
     void placeNaturalSpawningWeight(
         const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
@@ -33,11 +33,16 @@ public:
     
     BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size); 
     ~BeingsModule();
-    std::unordered_map<SafeVec, std::vector<std::pair<Vector2, int>>, SafeVec::hash> mFrozenBeings;
+    std::unordered_map<SafeVec, std::vector<std::pair<Vector2, being_uid>>, SafeVec::hash> mFrozenBeings;
+
+
 private:
     std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix = nullptr;
-    godot::ArgentumTileMap* mArgentumTileMap;
-    static constexpr unsigned char SPAWNING_MACROSCOPIC_CHUNK_SIZE = 6;
+    ArgentumTileMap* mArgentumTileMap;
+    static constexpr u_char MACROSCOPIC_SPAWNING_CHUNK_SIZE = 6;
+    static constexpr u_int16_t BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK = 100;
+
+    void updateChunkBeingCounts();
 
 };
 }

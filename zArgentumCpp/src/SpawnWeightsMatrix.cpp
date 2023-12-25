@@ -1,13 +1,13 @@
 #include "SpawnWeightsMatrix.h"
 using namespace godot;
 
-std::unordered_map<uint16_t, uint16_t>& SpawnWeightsMatrix::operator[](const SafeVec worldMatrixCoords)
+std::unordered_map<SWM_MAP_TYPES>& SpawnWeightsMatrix::operator[](const SafeVec worldMatrixCoords)
 {
     const SafeVec downScaledCoords = worldMatrixCoords/SpawnWeightsMatrix::DOWNSCALING_FACTOR;
     return SpawnWeightsMatrix::flattenedSpawnWeightsMatrix[SIZE.lef*downScaledCoords.lef + downScaledCoords.RIGHT];
 }
 
-std::unordered_map<uint16_t, uint16_t>& SpawnWeightsMatrix::at(const SafeVec worldMatrixCoords)
+std::unordered_map<SWM_MAP_TYPES>& SpawnWeightsMatrix::at(const SafeVec worldMatrixCoords)
 {
     const SafeVec downScaledCoords = worldMatrixCoords/SpawnWeightsMatrix::DOWNSCALING_FACTOR;
     return SpawnWeightsMatrix::flattenedSpawnWeightsMatrix.at(SIZE.lef*downScaledCoords.lef + downScaledCoords.RIGHT);
@@ -15,7 +15,7 @@ std::unordered_map<uint16_t, uint16_t>& SpawnWeightsMatrix::at(const SafeVec wor
 
 void SpawnWeightsMatrix::clearAt(const SafeVec worldMatrixCoords){operator[](worldMatrixCoords).clear();}
 
-uint16_t SpawnWeightsMatrix::countAt(const SafeVec coords)
+short unsigned int SpawnWeightsMatrix::countAt(const SafeVec coords)
 {
     const auto& spawnWeightsAtPos = this->operator[](coords); 
     return spawnWeightsAtPos.size();
@@ -26,7 +26,6 @@ bool SpawnWeightsMatrix::hasSpawnsAt(const SafeVec coords){return countAt(coords
 SpawnWeightsMatrix::SpawnWeightsMatrix(const SafeVec WORLD_MATRIX_SIZE) : SIZE(WORLD_MATRIX_SIZE/SpawnWeightsMatrix::DOWNSCALING_FACTOR)
 {resize();} 
     
-
 void SpawnWeightsMatrix::resize()
 {
     flattenedSpawnWeightsMatrix.reserve(SIZE.area());

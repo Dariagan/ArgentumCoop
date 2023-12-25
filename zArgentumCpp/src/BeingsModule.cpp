@@ -7,7 +7,7 @@ void BeingsModule::placeNaturalSpawningWeight(
     const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
     const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers)
 {
-    const SafeVec absoluteCoordinates = (formationOrigin + coordsRelativeToFormationOrigin);
+    let absoluteCoordinates = formationOrigin + coordsRelativeToFormationOrigin;
 
     if(deleteOthers) {mSpawnWeightsMatrix->clearAt(absoluteCoordinates);}
     
@@ -26,12 +26,17 @@ void BeingsModule::birthBeing(const Vector2i coords, const BeingBuilder& beingBu
 void BeingsModule::birthBeingOfKind(const Vector2i local_coords, const String& being_kind_id)
 {mArgentumTileMap->emit_signal("birth_of_being_of_kind", local_coords, being_kind_id);}
 
+void BeingsModule::updateChunkBeingCounts()
+{
+    
+}
+
 BeingsModule::BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size)
 {
     this->mArgentumTileMap = argentumTileMap;
     this->mSpawnWeightsMatrix = std::make_unique<SpawnWeightsMatrix>(size);
 }
 
-godot::BeingsModule::~BeingsModule()
+BeingsModule::~BeingsModule()
 {
 }

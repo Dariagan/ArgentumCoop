@@ -40,10 +40,8 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
 
             const Dictionary& group_dict = gd_grouped_prob_weighted_tiles[i];
             
-            let group_dict_size = group_dict.keys().size();
+            let group_dict_size = group_dict.keys().size(); if(group_dict_size >= WorldMatrix::NULL_TILE_UID){UtilityFunctions::printerr("TileSelector.cpp: passed dict is too big");}
 
-            if(group_dict_size >= WorldMatrix::NULL_TILE_UID){UtilityFunctions::printerr("TileSelector.cpp: passed dict is too big");return;
-            }
             std::vector<tiletype_uid> groupedTileUid(group_dict_size);
             groupedTileUid.reserve(group_dict_size);
 
@@ -71,9 +69,10 @@ TileSelector::~TileSelector(){};
 
 tiletype_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i)
 {
-    let iter = std::find_if(mAvailableTargets.begin(), mAvailableTargets.end(), [&](const std::string& availableTarget) {
-        return std::strcmp(availableTarget.c_str(), inputTargetTofill) == 0;
-    });
+    let iter = std::find_if(mAvailableTargets.begin(), mAvailableTargets.end(), 
+        [&](const std::string& availableTarget) {
+            return std::strcmp(availableTarget.c_str(), inputTargetTofill) == 0;
+        });
 
     if (iter != mAvailableTargets.end())
     {
