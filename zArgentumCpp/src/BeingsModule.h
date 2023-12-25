@@ -1,8 +1,9 @@
-
-
 #ifndef BEINGS_MODULE_H
 #define BEINGS_MODULE_H
-
+#include "ArgentumTileMap.h"
+#include "BeingBuilder.h"
+#include "SpawnWeightsMatrix.h"
+#include "typealiases.h"
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/variant/string.hpp>
@@ -14,11 +15,6 @@
 #include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/godot.hpp>
 #include <memory>
-#include "ArgentumTileMap.h"
-#include "BeingBuilder.h"
-#include "SpawnWeightsMatrix.h"
-#include "typealiases.h"
-
 namespace godot{
 
 typedef short unsigned int being_uid_t;

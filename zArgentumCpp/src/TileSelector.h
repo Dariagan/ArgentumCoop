@@ -1,5 +1,9 @@
 #ifndef __TILE_SELECTOR_H__
 #define __TILE_SELECTOR_H__
+#include "ArgentumTileMap.h"
+#include "WorldMatrix.h"
+#include "typealiases.h"
+#include "rust.h"
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/variant/string.hpp>
@@ -15,10 +19,6 @@
 #include <algorithm>
 #include <limits>
 #include <variant>
-#include "ArgentumTileMap.h"
-#include "WorldMatrix.h"
-#include "typealiases.h"
-
 namespace godot
 {   
 class ArgentumTileMap; 
@@ -29,26 +29,27 @@ public:
     ~TileSelector();
 
     //⚠️ argument "thread_i" must be within 0 and N_THREADS-1 ⚠️
-    tileclass_uid getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i);
+    tiletype_uid getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i);
 
-    void reseed(const u_int seed);
+    void reseedEngines(const u_int seed);
 
 private:
 
     // 1 random engine for each thread, this is for making
     // the pseudorandom generation deterministic on the seed value
     // (so world can be re-generated after leaving)
-    std::vector<std::default_random_engine> m_randomEngines;
+    std::vector<std::default_random_engine> mRandomEngines;
 
     const u_int TARGETS_COUNT;
     const u_char N_THREADS;
 
     typedef bool group;
-    static constexpr group IS_A_GROUP = 1;
 
-    std::vector<std::string> m_availableTargets; 
-    std::vector<std::variant<std::optional<tileclass_uid>, group>> m_tileUidOrGroup; //bool: is group
-    std::vector<std::pair<std::vector<tileclass_uid>, std::discrete_distribution<u_int>>> m_idsDistributionOfGroups;
+    typedef unsigned int weight;
+
+    std::vector<std::string> mAvailableTargets; 
+    std::vector<std::variant<tiletype_uid, group>> mTileUidOrGroup; 
+    std::vector<std::pair<std::vector<tiletype_uid>, std::discrete_distribution<u_int>>> mIdsDistributionOfGroups;
 };
 }
 #endif

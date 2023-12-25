@@ -7,21 +7,14 @@
 #include <typeinfo>
 #include <algorithm>
 #include <chrono>
-#include <thread>
 using namespace godot;
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i origin, 
     const Vector2i size, const Ref<Resource>& tileSelectionSet, unsigned int seed, const Dictionary& data)
 {   
-    if (size.x < 0 || size.y < 0)
-    {
-        UtilityFunctions::printerr("Negatively sized formation not allowed");
-        return;
-    }
-    if (size.x < 600 || size.y < 600)
-    {
-        UtilityFunctions::printerr("World size is too small, must be at least be 600x600");
-        return;
-    }
+    if (size.x < 0 || size.y < 0){
+        UtilityFunctions::printerr("Negatively sized formation not allowed");return;}
+    if (size.x < 600 || size.y < 600){
+        UtilityFunctions::printerr("World size is too small, must be at least be 600x600");return;}
     const bool outOfBoundsEast = origin.x + size.x > mWorldMatrixPtr->SIZE.lef;
     const bool outOfBoundsSouth = origin.y + size.y > mWorldMatrixPtr->SIZE.RIGHT;
     const bool negativeOrigin = origin.x < 0 || origin.y < 0;
@@ -36,8 +29,7 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
             if(outOfBoundsSouth) UtilityFunctions::printerr("   -South");
         }
     }
-    else
-    {
+    else{
         auto start = std::chrono::high_resolution_clock::now();
         formation_generator->generate(*this, origin, SafeVec(size), tileSelectionSet, seed, data);
         auto stop = std::chrono::high_resolution_clock::now();
@@ -46,7 +38,6 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
         emit_signal("formation_formed");
     }
 }
-
 void ArgentumTileMap::load_tiles_around(const Vector2 global_coords, const Vector2i CHUNK_SIZE, const int being_uid)//hacer q el chunk size cambie según el zoom ingame??
 {   
     const SafeVec beingCoords = local_to_map(global_coords);
@@ -75,7 +66,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2 global_coords, const Vecto
                     }
                 }
                 if (mWorldMatrixPtr->isNotEmptyAt(tileMapCoords))//if more than 0 tileIds at coords:
-                    for (const tileclass_uid& uid : (*mWorldMatrixPtr)[tileMapCoords])
+                    for (const tiletype_uid& uid : (*mWorldMatrixPtr)[tileMapCoords])
                         {setCell(uid, tileMapCoords);}
                 //TODO
                 //else
@@ -122,7 +113,7 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec tileCoord)
     }
 }
 
-bool ArgentumTileMap::setCell(const tileclass_uid uid, const SafeVec coords)
+bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
 {
     if(uid == WorldMatrix::NULL_TILE_UID) return false;
 
@@ -158,10 +149,8 @@ bool ArgentumTileMap::setCell(const tileclass_uid uid, const SafeVec coords)
         UtilityFunctions::printerr(e.what());
     }
     set_cell(tileData.at("layer"), coords, tileData.at("source_id"), atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
-
     return true;
 }
-
 void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionary& tiles_data)
 {
     if (size.x <= 0 || size.y <= 0)
@@ -180,7 +169,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionar
 }
 
 int ArgentumTileMap::get_seed(){return seed;}; 
-void ArgentumTileMap::set_seed(unsigned int seed){this->seed = seed; srand(seed);};
+void ArgentumTileMap::set_seed(const u_int seed){this->seed=seed; srand(seed);};
 
 void ArgentumTileMap::add_tiles_data(const Dictionary& input_tiles)
 {
@@ -228,18 +217,14 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
 ArgentumTileMap::ArgentumTileMap(){}
 ArgentumTileMap::~ArgentumTileMap(){delete mBeingsModule;}
 
-std::optional<tileclass_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
+std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
 {
-    
     for(u_int16_t i = 0; i < mTilesUidMapping.size(); i++)
-    {
-        if(mTilesUidMapping[i] == stringId)
-            return i;
-    }
+        if(mTilesUidMapping[i] == stringId) return i;
     return {};
 }
 
-StringName ArgentumTileMap::getTileId(tileclass_uid uid) const
+StringName ArgentumTileMap::getTileId(tiletype_uid uid) const
 {
     try{
         return mTilesUidMapping.at(uid);
@@ -361,7 +346,7 @@ bool ArgentumTileMap::withinChunkBounds(
 // GUARDAR EN ALGUN LUGAR LAS TILES SELECCIONADAS ALEATORIAMENTE
 void ArgentumTileMap::placeFormationTile( 
     const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
-    const tileclass_uid newTile, const bool deletePreviousTiles){try
+    const tiletype_uid newTile, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
     auto& otherTilesAtPos = (*mWorldMatrixPtr)[absoluteCoords];
@@ -391,7 +376,7 @@ void ArgentumTileMap::freeze_and_store_being(const Vector2 glb_coords, const bei
     mBeingLoadedTiles.erase(individual_unique_id);
 }
 
-bool ArgentumTileMap::exceedsTileLimit(const tileclass_uid count){if (count >= WorldMatrix::NULL_TILE_UID - 1){UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");return true;}return false;}
+bool ArgentumTileMap::exceedsTileLimit(const tiletype_uid count){if (count >= WorldMatrix::NULL_TILE_UID - 1){UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");return true;}return false;}
 
 //se pueden llamar metodos de godot de guardar desde acá, aviso
 //solo guardar los arrays modificados
@@ -399,9 +384,6 @@ bool godot::ArgentumTileMap::persist(String file_name)
 {
     return false;
 }
-
-void ArgentumTileMap::set_beings_in_chunk_count(const TypedArray<Array> beings_in_chunk_count){this->beings_in_chunk_count = beings_in_chunk_count;}
-TypedArray<Array> ArgentumTileMap::get_beings_in_chunk_count(){return beings_in_chunk_count;}
 
 void ArgentumTileMap::_bind_methods()
 {   
@@ -417,10 +399,6 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
     ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
-
-    ClassDB::bind_method(D_METHOD("set_beings_in_chunk_count", "beings_in_chunk_count"), &ArgentumTileMap::set_beings_in_chunk_count);
-    ClassDB::bind_method(D_METHOD("get_beings_in_chunk_count"), &ArgentumTileMap::get_beings_in_chunk_count);
-    ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "beings_in_chunk_count"), "set_beings_in_chunk_count", "get_beings_in_chunk_count");
     
     ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
     

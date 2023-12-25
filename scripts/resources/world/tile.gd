@@ -23,14 +23,6 @@ func get_data() -> Dictionary:
 	if source_id == 0:
 		printerr("source id is empty for tile with id %d", id)
 		return {}
-	
-	var ID_LENGTH: int = id.length()
-
-	if ID_LENGTH > GlobalData.CPP_BUFFER_LENGTH_MINUS_ONE:
-		var original_id: String = id
-		id = id.substr(ID_LENGTH % GlobalData.CPP_BUFFER_LENGTH_MINUS_ONE)
-		id[0] = '#'
-		printerr("tile.gd: using modified substring for tile_id '%s' -> '%s'" % [original_id, id])
 		
 	return {
 		"id" = id, 

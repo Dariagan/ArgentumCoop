@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <memory>
 #include <limits>
-#include "pseudo_rust.h"
+#include "rust.h"
 #include "WorldMatrix.h"
 #include "FormationGenerator.h"
 #include "BeingsModule.h"
@@ -36,8 +36,8 @@ public:
     ArgentumTileMap();
     ~ArgentumTileMap();
 
-    std::optional<tileclass_uid> findTileUid(const StringName& stringId) const;
-    StringName getTileId(tileclass_uid uid) const;
+    std::optional<tiletype_uid> findTileUid(const StringName& stringId) const;
+    StringName getTileId(tiletype_uid uid) const;
 
     //HAY QUE ESCRIBIR EN BINARIO. NO EN ASCII. EN ASCII 1 DIGITO = 1 BYTE
     //HAY QUE GUARDAR: LA SEED + USER MODIFIED DATA
@@ -46,7 +46,7 @@ public:
     //SOLO USAR PARA FORMATIONS
     void placeFormationTile(
         const SafeVec formationOrigin, const SafeVec tileCoordsRelativeToFormationOrigin, 
-        const tileclass_uid newTile, bool deletePreviousTiles = false);
+        const tiletype_uid newTile, bool deletePreviousTiles = false);
     
     bool placeIngameTile(const SafeVec coords, const StringName& id);//akí la id puede ser un stringname directamente, no se está iterando y así se puede bindear a godot el method
     //false: out of array bounds u otro error (usado por el godot-side)
@@ -56,7 +56,7 @@ public:
     //TODO algún método para escribir en un archivo el estado del mapa actual (intentar escribir en el .tres?)
     //TODO algún método para cargar el worldMatrix a partir de un archivo
     
-    int get_seed(); void set_seed(unsigned int seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
+    int get_seed();void set_seed(const u_int seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
 
     Dictionary get_tiles_data(); void set_tiles_data(const Dictionary& data); void add_tiles_data(const Dictionary& data);
 
@@ -73,10 +73,7 @@ public:
     
     void load_tiles_around(const Vector2 coords, const Vector2i chunk_size, const int uid);
     void unloadExcessTiles(const SafeVec topLeftCornerCoords, const SafeVec chunkSize, const int uid);
-
-    void set_beings_in_chunk_count(const TypedArray<Array> beings_in_chunk_count);
-    TypedArray<Array> get_beings_in_chunk_count();
-    
+ 
 
 private:
     std::unique_ptr<WorldMatrix> mWorldMatrixPtr = nullptr;
@@ -86,7 +83,7 @@ private:
     std::unordered_map<StringName, std::unordered_map<StringName, Variant>> mCppTilesData;
     std::vector<StringName> mTilesUidMapping;   
 
-    std::unordered_map<SafeVec, std::array<tileclass_uid, WorldMatrix::MAX_TILES_PER_POS>, SafeVec::hash> mPositionsWithChangedTiles;
+    std::unordered_map<SafeVec, std::array<tiletype_uid, WorldMatrix::MAX_TILES_PER_POS>, SafeVec::hash> mPositionsWithChangedTiles;
 
     //TIENE Q SER UN INT, PORQ SINO EN EL GODOT NO SE PUEDE VER EL ESTADO DEL OBJECT EN EL INSPECTOR. 
     //ACA HAY Q GUARDAR UN UIDQ REFERENCIE EL STATE GUARDADO EN GODOT.
@@ -122,9 +119,9 @@ private:
     
     static bool withinChunkBounds(const SafeVec loadedCoordToCheck, const SafeVec topLeftCorner, const SafeVec chunkSize);
 
-    bool setCell(const tileclass_uid newTile, const SafeVec coords);
+    bool setCell(const tiletype_uid newTile, const SafeVec coords);
 
-    static bool exceedsTileLimit(const tileclass_uid count);
+    static bool exceedsTileLimit(const tiletype_uid count);
 
     protected: static void _bind_methods();
 };

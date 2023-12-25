@@ -1,6 +1,6 @@
 // #ifndef CHANGE_ME_WITH_DOUBLE_CLICK_AND_CTRL_F2
 // #define CHANGE_ME_WITH_DOUBLE_CLICK_AND_CTRL_F2
-//#include <godot_cpp/classes/node.hpp>
+// #include <godot_cpp/classes/node.hpp>
 // #include <godot_cpp/classes/ref_counted.hpp>
 // #include <godot_cpp/variant/string.hpp>
 // #include <godot_cpp/variant/dictionary.hpp>
@@ -22,14 +22,6 @@
 //         zExampleHeader(); ~zExampleHeader();
 //     private:
 //     protected: static void _bind_methods();//EL CUERPO DE ESTE VA SÍ O SÍ EN .cpp
-
-
-
-
-//     
-
-
-//     
     
 // };
 // }
