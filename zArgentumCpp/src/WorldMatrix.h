@@ -19,7 +19,7 @@ class WorldMatrix
 public:
     const SafeVec SIZE;
 
-    static constexpr tiletype_uid NULL_TILE_UID = std::numeric_limits<u_int16_t>::max();//!DEBE SER IGUAL
+    static constexpr tiletype_uid NULL_TILE_UID = std::numeric_limits<u_int16_t>::max();
 
     static constexpr unsigned char MAX_TILES_PER_POS = 5;
 
@@ -45,7 +45,7 @@ constexpr std::array<tiletype_uid, size> initialize_uids_array_as_empty()
 {
     std::array<tiletype_uid, size> ret{};
     for (int i = 0; i < size; i++)
-        ret[i] = WorldMatrix::NULL_TILE_UID;//!DEBE SER IGUAL
+        ret[i] = WorldMatrix::NULL_TILE_UID;
     return ret;
 };
 

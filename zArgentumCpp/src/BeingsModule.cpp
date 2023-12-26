@@ -35,6 +35,7 @@ BeingsModule::BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVe
 {
     this->mArgentumTileMap = argentumTileMap;
     this->mSpawnWeightsMatrix = std::make_unique<SpawnWeightsMatrix>(size);
+    this->mBeingsInChunkCount = std::make_unique<matrix<u_int16_t>>(size, MACROSCOPIC_SPAWNING_CHUNK_SIZE);
 }
 
 BeingsModule::~BeingsModule()

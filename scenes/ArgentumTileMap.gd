@@ -38,17 +38,23 @@ var _players_start_position: Vector2i
 
 var _player_i: int = 0
 func spawn_starting_player(being: Being):
-	birth_being_at(being, _players_start_position + Vector2i(_player_i, 0))
+	birth_being_at(being, _players_start_position + Vector2i(_player_i, 0), true)
 	_player_i += 1
 	
 
 var _birthed_beings_i: int = 0
-func birth_being_at(being: Being, pos: Vector2i):
+func birth_being_at(being: Being, glb_coords: Vector2, player: bool):
 	being.uid = _birthed_beings_i
-	add_child(being)
-	_birthed_beings_i += 1
-	being.position = map_to_local(pos)
-	being.z_index = 10
+	var local_coords: Vector2i = map_to_local(glb_coords)
+	#está mal el add_child, solo deberia usarse el add_child si está en una tile cargada
+	
+	if player or get_cell_tile_data(0, local_coords):
+		add_child(being)
+		_birthed_beings_i += 1
+		being.position = local_coords
+		being.z_index = 10
+	else:
+		freeze_and_store_being(glb_coords, being.uid)
 
 #endregion SPAWNING
 

@@ -369,6 +369,7 @@ void ArgentumTileMap::freeze_and_store_being(const Vector2 glb_coords, const bei
 {
     const SafeVec localCoords = local_to_map(glb_coords);
     mBeingsModule->mFrozenBeings[localCoords].push_back({glb_coords, individual_unique_id});
+
     for (const auto& loadedTile: mBeingLoadedTiles[individual_unique_id])
     {
         decrementSharedCount(loadedTile);
@@ -380,7 +381,7 @@ bool ArgentumTileMap::exceedsTileLimit(const tiletype_uid count){if (count >= Wo
 
 //se pueden llamar metodos de godot de guardar desde acá, aviso
 //solo guardar los arrays modificados
-bool godot::ArgentumTileMap::persist(String file_name)
+bool ArgentumTileMap::persist(String file_name)
 {
     return false;
 }

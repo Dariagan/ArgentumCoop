@@ -56,7 +56,7 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
                 }
                 groupedTileUid[j] = optUid.value_or(WorldMatrix::NULL_TILE_UID);
                 
-                groupTileUidWeight[j] = CLAMP(group_dict.values()[j], 0, std::numeric_limits<weight>::max());
+                groupTileUidWeight[j] = CLAMP((long)group_dict.values()[j], 0, std::numeric_limits<weight>::max());
             }
             let groupProbsDistribution = std::discrete_distribution<weight>(groupTileUidWeight.begin(), groupTileUidWeight.end());
 

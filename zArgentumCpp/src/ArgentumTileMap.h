@@ -27,7 +27,6 @@ namespace godot
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 static const Vector2i ERROR_VECTOR = {-999999, -999999};    
 
-
 class BeingsModule;typedef unsigned short int being_uid_t;
 class FormationGenerator;
 class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
@@ -104,7 +103,7 @@ private:
     //tiene q estar actualizado en real time (actualizado cada minuto). el gd side le mete a cada chunk su respectiva count
     TypedArray<Array> beings_in_chunk_count;
     
-
+    //USAR ESTO EN VEZ DE add_child
 
     //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
     //en donde según la id extrae el being de un dictionary q tiene guardado
@@ -115,7 +114,6 @@ private:
     std::unordered_map<being_uid_t, std::unordered_set<SafeVec, SafeVec::hash>> mBeingLoadedTiles;
 
     std::unordered_map<SafeVec, int16_t, SafeVec::hash> mTileSharedLoadsCount;
-
     
     static bool withinChunkBounds(const SafeVec loadedCoordToCheck, const SafeVec topLeftCorner, const SafeVec chunkSize);
 
