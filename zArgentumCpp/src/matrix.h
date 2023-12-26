@@ -6,7 +6,7 @@ namespace godot{
 template<typename T> 
 class matrix {
 private:
-    const unsigned short int DOWNSCALING_FACTOR;
+    const unsigned int DOWNSCALE_FACTOR;
     std::vector<T> flattenedMatrix;
 
 public: 
@@ -14,7 +14,7 @@ public:
     const unsigned long AREA;
 
     matrix(const SafeVec size) : 
-        DOWNSCALING_FACTOR(1), SIZE(size), AREA(SIZE.lef*SIZE.RIGHT)
+        DOWNSCALE_FACTOR(1), SIZE(size), AREA(SIZE.lef*SIZE.RIGHT)
     {
         if( ! size.isStrictlyPositive()){
             UtilityFunctions::printerr("matrix.cpp constructor error");flattenedMatrix.reserve(0);flattenedMatrix.resize(0);
@@ -22,11 +22,10 @@ public:
         }
         flattenedMatrix.reserve(AREA); flattenedMatrix.resize(AREA);
     }
-
     //downscaling constructor
-    matrix(const SafeVec originalSize, const unsigned short int DOWNSCALING_FACTOR) : 
-        DOWNSCALING_FACTOR(DOWNSCALING_FACTOR),
-        SIZE(originalSize/DOWNSCALING_FACTOR), AREA(SIZE.lef*SIZE.RIGHT)
+    matrix(const SafeVec originalSize, const unsigned int DOWNSCALE_FACTOR) : 
+        DOWNSCALE_FACTOR(MAX(DOWNSCALE_FACTOR, 1)),
+        SIZE(originalSize/DOWNSCALE_FACTOR), AREA(SIZE.lef*SIZE.RIGHT)
     {
         if( ! originalSize.isStrictlyPositive()){
             UtilityFunctions::printerr("matrix.cpp downscaling constructor error");flattenedMatrix.reserve(0);flattenedMatrix.resize(0);
@@ -35,15 +34,15 @@ public:
         flattenedMatrix.reserve(AREA); flattenedMatrix.resize(AREA);
     }
 
-    T& operator[](const SafeVec coords)
+    T& operator[](const SafeVec coords) const  
     {
-        let downscaledCoords = coords/DOWNSCALING_FACTOR;
+        let downscaledCoords = coords/DOWNSCALE_FACTOR;
         return flattenedMatrix[SIZE.lef*downscaledCoords.lef + downscaledCoords.RIGHT];
     }
 
-    T& at(const SafeVec coords)
+    T& at(const SafeVec coords) const 
     {
-        let downscaledCoords = coords/DOWNSCALING_FACTOR;
+        let downscaledCoords = coords/DOWNSCALE_FACTOR;
         return flattenedMatrix.at(SIZE.lef*downscaledCoords.lef + downscaledCoords.RIGHT);
     }
 };

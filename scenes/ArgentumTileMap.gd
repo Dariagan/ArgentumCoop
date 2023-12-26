@@ -43,7 +43,7 @@ func spawn_starting_player(being: Being):
 	
 
 var _birthed_beings_i: int = 0
-func birth_being_at(being: Being, glb_coords: Vector2, player: bool):
+func birth_being_at(being: Being, glb_coords: Vector2, player: bool = false):
 	being.uid = _birthed_beings_i
 	var local_coords: Vector2i = map_to_local(glb_coords)
 	#está mal el add_child, solo deberia usarse el add_child si está en una tile cargada

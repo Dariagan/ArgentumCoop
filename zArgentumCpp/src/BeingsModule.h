@@ -4,7 +4,7 @@
 #include "BeingBuilder.h"
 #include "SpawnWeightsMatrix.h"
 #include "typealiases.h"
-#include "Matrix.h"
+#include "matrix.h"
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/variant/string.hpp>
@@ -32,7 +32,7 @@ public:
     void birthBeing(const Vector2i coords, const BeingBuilder& beingBuilder);
     void birthBeingOfKind(const Vector2i coords, const String& being_kind_id);
     
-    BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size); 
+    BeingsModule(ArgentumTileMap* argentumTileMap, const SafeVec size); 
     ~BeingsModule();
     std::unordered_map<SafeVec, std::vector<std::pair<Vector2, being_uid>>, SafeVec::hash> mFrozenBeings;
 
