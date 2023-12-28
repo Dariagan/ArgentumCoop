@@ -288,9 +288,9 @@ def generate(env):
 
     # Require C++17
     if env.get("is_msvc", False):
-        env.Append(CXXFLAGS=["/std:c++17"])
+        env.Append(CXXFLAGS=["/std:c++23"])
     else:
-        env.Append(CXXFLAGS=["-std=c++17"])
+        env.Append(CXXFLAGS=["-std=c++23"])
 
     if env["precision"] == "double":
         env.Append(CPPDEFINES=["REAL_T_IS_DOUBLE"])

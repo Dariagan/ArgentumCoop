@@ -18,6 +18,7 @@
 #include <memory>
 namespace godot{
 
+class SpawnWeightsMatrix;
 class ArgentumTileMap;
 //no olvidarse de registrarla despues
 class BeingsModule

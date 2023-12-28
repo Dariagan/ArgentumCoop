@@ -213,8 +213,21 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
         add_tiles_data(input_tiles_data);
     }
 }
+std::optional<int> ff()
+{
+    std::optional<int> asd = std::make_optional(5);
 
-ArgentumTileMap::ArgentumTileMap(){}
+    return asd.and_then(fgg);
+}
+
+void fgg(){
+    
+}
+
+//constinit int compile_time_value = 42;
+ArgentumTileMap::ArgentumTileMap(){
+    
+}
 ArgentumTileMap::~ArgentumTileMap(){delete mBeingsModule;}
 
 std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
@@ -251,7 +264,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 
         const Dictionary& gd_tile_data = tile->call("get_data");
 
-        if(gd_tile_data.is_empty() || gd_tile_data["id"] == "" || (int)gd_tile_data["source_id"] == -1)
+        if(gd_tile_data.is_empty() || (String)gd_tile_data["id"] == "" || (int)gd_tile_data["source_id"] == -1)
         {
             UtilityFunctions::printerr("read gd_tile_data is not valid (ArgentumTileMap.cpp::set_tiles_data())");
             continue;

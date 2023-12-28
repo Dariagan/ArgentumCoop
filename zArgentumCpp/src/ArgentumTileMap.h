@@ -24,12 +24,13 @@ struct std::hash<std::array<T, N>> {
     }
 };
 namespace godot 
-{//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
+{//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉNc+ VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 static const Vector2i ERROR_VECTOR = {-999999, -999999};    
 
 class BeingsModule;typedef unsigned short int being_uid_t;
 class FormationGenerator;
 class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
+
 
 public:
     ArgentumTileMap();

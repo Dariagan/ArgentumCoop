@@ -40,4 +40,5 @@ BeingsModule::BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVe
 
 BeingsModule::~BeingsModule()
 {
+    
 }
