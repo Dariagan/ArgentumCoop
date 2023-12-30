@@ -376,10 +376,10 @@ void ArgentumTileMap::placeFormationTile(
 }
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
-void ArgentumTileMap::freeze_and_store_being(const Vector2 glb_coords, const being_uid individual_unique_id)
+void ArgentumTileMap::freeze_and_store_being(const Vector2 loc_coords, const being_uid individual_unique_id)
 {
-    const SafeVec localCoords = local_to_map(glb_coords);
-    mBeingsModule->mFrozenBeings[localCoords].push_back({glb_coords, individual_unique_id});
+    const SafeVec tileMapCoords = local_to_map(loc_coords);
+    mBeingsModule->mFrozenBeings[tileMapCoords].push_back({loc_coords, individual_unique_id});
 
     for (const auto& loadedTile: mBeingLoadedTiles[individual_unique_id])
     {
@@ -412,7 +412,7 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
     
-    ClassDB::bind_method(D_METHOD("freeze_and_store_being", "glb_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
+    ClassDB::bind_method(D_METHOD("freeze_and_store_being", "loc_coords", "individual_unique_id"), &ArgentumTileMap::freeze_and_store_being);
     
     ADD_SIGNAL(MethodInfo("load_state_into_tilenaseblabldinstance_w_uid", PropertyInfo(Variant::INT, "tileinstance_uid")));
 
@@ -426,6 +426,6 @@ void ArgentumTileMap::_bind_methods()
 
     ADD_SIGNAL(MethodInfo("tile_unloaded", PropertyInfo(Variant::VECTOR2I, "local_coords")));
 
-    ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "glb_coords"), PropertyInfo(Variant::INT, "being_uid")));
+    ADD_SIGNAL(MethodInfo("being_unfrozen", PropertyInfo(Variant::VECTOR2, "loc_coords"), PropertyInfo(Variant::INT, "being_uid")));
     ADD_SIGNAL(MethodInfo("birth_of_being_of_kind", PropertyInfo(Variant::STRING, "being_kind_id")));
 }
