@@ -170,7 +170,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionar
 
         mWorldMatrixPtr = std::make_unique<WorldMatrix>(size);
         set_tiles_data(tiles_data);
-        mBeingsModule = new BeingsModule(this, size);
+        mBeingsModule = std::make_unique<BeingsModule>(this, size);
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
     }
@@ -232,7 +232,7 @@ std::optional<int> divide(int a, int b) {
 //constinit int compile_time_value = 42;
 ArgentumTileMap::ArgentumTileMap(){}
 
-ArgentumTileMap::~ArgentumTileMap(){delete mBeingsModule;}
+ArgentumTileMap::~ArgentumTileMap(){}
 
 std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
 {

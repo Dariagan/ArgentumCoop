@@ -103,7 +103,7 @@ private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del l
 
     std::unordered_map<std::string, SafeVec> mTrackedBeingsCoords;//updateado cada
 
-    BeingsModule* mBeingsModule;
+    std::unique_ptr<BeingsModule> mBeingsModule;
     friend class BeingsModule;
     //chunk size: 7x7 puntos de spawnweights
     //TypedArray<TypedArray<long>>

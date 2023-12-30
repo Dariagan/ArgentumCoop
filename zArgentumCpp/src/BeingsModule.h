@@ -23,7 +23,6 @@ namespace godot{
 
 class SpawnWeightsMatrix;
 class ArgentumTileMap;
-//no olvidarse de registrarla despues
 class BeingsModule
 {
 public:
@@ -39,8 +38,6 @@ public:
     BeingsModule(ArgentumTileMap* argentumTileMap, const SafeVec size); 
     ~BeingsModule();
     std::unordered_map<SafeVec, std::vector<std::pair<Vector2, being_uid>>, SafeVec::hash> mFrozenBeings;
-
-//get_node("/root/GlobalData"); USAR get_node para acceder a un nodo específico directamente (útil par acceder a GlobalData)
 
 private:
     std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix;
