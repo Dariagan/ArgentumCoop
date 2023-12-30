@@ -372,7 +372,7 @@ void ClassDB::deinitialize(GDExtensionInitializationLevel p_level) {
 	}
 
 	{
-		// The following is equivalent to c++20 `std::erase_if(class_register_order, [&](const StringName& name){ return to_erase.contains(name); });`
+		// The following is equivalent to c++17 `std::erase_if(class_register_order, [&](const StringName& name){ return to_erase.contains(name); });`
 		std::vector<StringName>::iterator it = std::remove_if(class_register_order.begin(), class_register_order.end(), [&](const StringName &p_name) {
 			return to_erase.count(p_name) > 0;
 		});

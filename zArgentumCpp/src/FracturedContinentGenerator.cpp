@@ -24,10 +24,6 @@ FracturedContinentGenerator::FracturedContinentGenerator()
 
     mForest.set_fractal_lacunarity(3); mForest.set_fractal_gain(0.77);
 
-    auto asd {std::make_tuple(2,4)};
-
-    auto [a,b] = asd;
-
 }
 
 //! CLEAREAR COLECCIONES QUE SE REUTILIZAN CADA LLAMADA (SINO QUEDAN COMO TERMINARON EN LA EJECUCIÓN DE ANTERIOR, LLENAS DE ELEMENTOS)
@@ -172,7 +168,6 @@ void godot::FracturedContinentGenerator::generateSubSection(
             argentumTileMap.placeFormationTile(origin, coords, tileUid);
         }
     }
-    
 }
 
 bool FracturedContinentGenerator::isContinental(SafeVec coords) const

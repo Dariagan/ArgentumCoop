@@ -23,8 +23,57 @@ void BeingsModule::birthBeing(const Vector2i coords, const BeingBuilder& beingBu
     }
 }
 
-void BeingsModule::birthBeingOfKind(const Vector2i local_coords, const String& being_kind_id)
-{mArgentumTileMap->emit_signal("birth_of_being_of_kind", local_coords, being_kind_id);}
+void BeingsModule::birthBeingOfKind(const Vector2i tile_map_coords, const String& being_kind_id)
+{mArgentumTileMap->emit_signal("birth_of_being_of_kind", tile_map_coords, being_kind_id);}
+
+void BeingsModule::birthBeingOfKind(
+    const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const String& being_kind_id)
+{
+    const Variant& getbeingkinds_result = mArgentumTileMap->global_data->get("beingkinds");
+    if(getbeingkinds_result.get_type() != Variant::DICTIONARY)
+    {
+        UtilityFunctions::printerr("couldn't get dict beingkinds from global_data");
+        return;
+    }
+    const Dictionary& beingkinds = (const Dictionary&)getbeingkinds_result;
+
+    if( ! beingkinds.has(being_kind_id))
+    {
+        UtilityFunctions::printerr("beingkind with id \"",being_kind_id,"\" not found. (birthBeingOfKind() - BeingsModule.cpp)");return;
+    }
+    const Variant& get_whitelisted_tiles_for_spawning_result = beingkinds[being_kind_id].get("whitelisted_tiles_for_spawning");
+    if(get_whitelisted_tiles_for_spawning_result.get_type() != Variant::DICTIONARY)
+    {
+        UtilityFunctions::printerr("couldn't get whitelisted_tiles_for_spawning from ", being_kind_id);return;
+    }
+    const Dictionary& whitelisted_tiles = (const Dictionary&)get_whitelisted_tiles_for_spawning_result;
+    //TODO HANDLEAR blacklisted tiles
+    //TODO handlear objectos con colisión/impasables en layers superiores
+
+    std::uniform_int_distribution<> distr_x(tl_tile_map_coords.x, br_tile_map_coords.x-1);
+    std::uniform_int_distribution<> distr_y(tl_tile_map_coords.y, br_tile_map_coords.y-1);
+
+    unsigned long tries = 0;
+    bool suitableTileFound = false;
+    Vector2i randPos;
+    do
+    {
+        if(++ tries > (br_tile_map_coords-tl_tile_map_coords).length()*10 || tries >= std::numeric_limits<long>::max() - 1)
+        {
+            UtilityFunctions::printerr("too many unsuccessful tries"); return;
+        }
+        randPos = Vector2i(distr_x(mEngine), distr_y(mEngine));
+
+        letref tilesAtPos = mArgentumTileMap->mWorldMatrixPtr->operator[](randPos);
+        const StringName tile_id0 = mArgentumTileMap->getTileId(tilesAtPos[0]);
+        const StringName tile_id1 = mArgentumTileMap->getTileId(tilesAtPos[1]);
+
+        suitableTileFound = whitelisted_tiles.has(tile_id0) && (tile_id1==WorldMatrix::NULL_TILE_UID || whitelisted_tiles.has(tile_id1));
+
+    } while( ! suitableTileFound);
+
+    birthBeingOfKind(randPos, being_kind_id);
+}
 
 void BeingsModule::updateChunkBeingCounts()
 {
@@ -58,7 +107,7 @@ void BeingsModule::doNaturalSpawning()
                 std::discrete_distribution<spawnweight> distribution(weights.begin(), weights.end());
 
                 letref beingkindUids = spawnWeightsMapping.first;
-                let randomBeingkindUid = beingkindUids[distribution(mBeingkindUidEngine)];
+                let randomBeingkindUid = beingkindUids[distribution(mEngine)];
 
                 birthBeingOfKind(swCoords*SpawnWeightsMatrix::DOWNSCALING_FACTOR, randomBeingkindUid);
                 (*mBeingsInChunkCount)[chunkCoords]++;

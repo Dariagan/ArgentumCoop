@@ -16,8 +16,11 @@ class_name BeingKindDef
 @export var loot_distribution: Dictionary
 @export var raid_unit_cost: int
 
-@export var blacklisted_tiles_for_spawning: Array[Tile] = []
+#if none specified (array is empty), race defaults are used
+#NOTA: EL DICTIONARY ES PA USAR COMO UN SET, PONER UN DUMMY VALUE
+@export var blacklisted_tiles_for_spawning: Dictionary = {}
 
 #if used, only these can be used
+#if none specified (array is empty), race defaults are used
 #TODO hacer sets de tiles whitelisted comúnes para reutilizar
-@export var whitelisted_tiles_for_spawning: Array[Tile] = []
+@export var whitelisted_tiles_for_spawning: Dictionary = {}

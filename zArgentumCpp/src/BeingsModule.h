@@ -18,6 +18,7 @@
 #include <godot_cpp/godot.hpp>
 #include <memory>
 #include <random>
+#include <limits>
 namespace godot{
 
 class SpawnWeightsMatrix;
@@ -33,6 +34,7 @@ public:
 
     void birthBeing(const Vector2i coords, const BeingBuilder& beingBuilder);
     void birthBeingOfKind(const Vector2i coords, const String& being_kind_id);
+    void birthBeingOfKind(const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const String& being_kind_id);
     
     BeingsModule(ArgentumTileMap* argentumTileMap, const SafeVec size); 
     ~BeingsModule();
@@ -46,7 +48,8 @@ private:
     static constexpr u_char MACROSCOPIC_SPAWNING_CHUNK_SIZE = 6;
     static constexpr u_int16_t BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK = 100;
 
-    std::default_random_engine mBeingkindUidEngine{std::default_random_engine(rand())};
+    std::random_device rd;
+    std::default_random_engine mEngine{std::default_random_engine(rd())};
 
     std::unique_ptr<matrix<u_int16_t>> mBeingsInChunkCount;
 

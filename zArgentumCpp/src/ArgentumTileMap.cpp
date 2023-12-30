@@ -112,6 +112,7 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec tileCoord)
         emit_signal("tile_unloaded", (Vector2i)tileCoord);
         mTileSharedLoadsCount.erase(tileCoord);
     }
+    
 }
 
 bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
@@ -161,6 +162,12 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionar
     }
     if(mWorldMatrixPtr == nullptr)
     {
+        global_data = get_node<Node>("/root/GlobalData");
+        if(global_data == NULL)
+        {
+            UtilityFunctions::printerr("couldn't get global_data node (ArgentumTilemap.cpp)");
+        }
+
         mWorldMatrixPtr = std::make_unique<WorldMatrix>(size);
         set_tiles_data(tiles_data);
         mBeingsModule = new BeingsModule(this, size);
@@ -223,9 +230,8 @@ std::optional<int> divide(int a, int b) {
 
 
 //constinit int compile_time_value = 42;
-ArgentumTileMap::ArgentumTileMap(){
-   
-}
+ArgentumTileMap::ArgentumTileMap(){}
+
 ArgentumTileMap::~ArgentumTileMap(){delete mBeingsModule;}
 
 std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const

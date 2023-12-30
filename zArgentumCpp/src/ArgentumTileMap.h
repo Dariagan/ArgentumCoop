@@ -34,14 +34,13 @@ class FormationGenerator;
 class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
 
 public:
-    
-
     ArgentumTileMap();
     ~ArgentumTileMap();
 
     std::optional<tiletype_uid> findTileUid(const StringName& stringId) const;
     StringName getTileId(tiletype_uid uid) const;
 
+    Node* global_data;
 
     //HAY QUE ESCRIBIR EN BINARIO. NO EN ASCII. EN ASCII 1 DIGITO = 1 BYTE
     //HAY QUE GUARDAR: LA SEED + USER MODIFIED DATA
