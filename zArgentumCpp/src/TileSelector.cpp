@@ -1,109 +1,98 @@
 #include "TileSelector.h"
-
 using namespace godot;
 
 TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const u_int seed, const char input_n_threads) try : 
     TARGETS_COUNT(((Array)gdTileSelection->get("targets")).size()), N_THREADS(input_n_threads)
 {
-    if (input_n_threads < 1)
-    {
-        UtilityFunctions::printerr("TIleSelector: thread count is less than 1");
-        return;
-    }
+    if (input_n_threads < 1){UtilityFunctions::printerr("TileSelector.cpp: passed input_n_threads is less than 1");return;}
 
-    m_randomEngines.reserve(N_THREADS);
-    m_randomEngines.resize(N_THREADS);
-    this->reseed(seed);
+    mRandomEngines.resize(N_THREADS); this->reseedEngines(seed);
 
     TypedArray<String> gd_targets = gdTileSelection->get("targets");
 
-    m_availableTargets.reserve(TARGETS_COUNT);
-    m_availableTargets.resize(TARGETS_COUNT);
-    m_tileUidOrGroup.resize(TARGETS_COUNT);
-    m_tileUidOrGroup.reserve(TARGETS_COUNT);
-    m_idsDistributionOfGroups.resize(TARGETS_COUNT);
-    m_idsDistributionOfGroups.reserve(TARGETS_COUNT);
+    mAvailableTargets.reserve(TARGETS_COUNT);
+    mAvailableTargets.resize(TARGETS_COUNT);
+    mTileUidOrGroup.resize(TARGETS_COUNT);
+    mTileUidOrGroup.reserve(TARGETS_COUNT);
+    mIdsDistributionOfGroups.resize(TARGETS_COUNT);
+    mIdsDistributionOfGroups.reserve(TARGETS_COUNT);
 
     TypedArray<String> gd_tile_to_place = gdTileSelection->get("tile_to_place");
     TypedArray<Dictionary> gd_grouped_prob_weighted_tiles = gdTileSelection->get("grouped_prob_weighted_tiles");
 
-    if (gd_tile_to_place.size() < TARGETS_COUNT)
-    {
-        UtilityFunctions::printerr("TileSelection.tres error");
-        return;
-    }
+    if (gd_tile_to_place.size() < TARGETS_COUNT){UtilityFunctions::printerr("TileSelector.cpp: passed dictionary doesn't cover all needed targets for the formation");return;}
                 
     for (u_int16_t i = 0; i < TARGETS_COUNT; i++)
     {
-        m_availableTargets[i] = ((String)(gd_targets[i])).utf8().get_data();
+        mAvailableTargets[i] = ((String)(gd_targets[i])).utf8().get_data();
 
+        // if it isn't a group of tiles
         if(((String)gd_tile_to_place[i])[0] != '_')
-            m_tileUidOrGroup[i] = argentumTileMap.findTileUid((String)gd_tile_to_place[i]).value_or(WorldMatrix::NULL_TILE_UID);
-        else
         {
-            m_tileUidOrGroup[i] = IS_A_GROUP;
+            let optUid = argentumTileMap.findTileUid((String)gd_tile_to_place[i]);
+            if( ! optUid.has_value()) 
+                UtilityFunctions::printerr("couldn't find tile_id for: ", (String)gd_tile_to_place[i], " in the tilemap's tiledata, using NULL_TILE_UID");
+          
+            mTileUidOrGroup[i] = optUid.value_or(WorldMatrix::NULL_TILE_UID);        
+        }
+        else{
+            mTileUidOrGroup[i] = group(true);
 
             const Dictionary& group_dict = gd_grouped_prob_weighted_tiles[i];
             
-            u_int16_t GROUP_DICT_SIZE = group_dict.keys().size();
+            let group_dict_size = group_dict.keys().size(); if(group_dict_size >= WorldMatrix::NULL_TILE_UID){UtilityFunctions::printerr("TileSelector.cpp: passed dict is too big");}
 
-            std::vector<tileclass_uid> groupedTileUid(GROUP_DICT_SIZE);
-            groupedTileUid.reserve(GROUP_DICT_SIZE);
+            std::vector<tiletype_uid> groupedTileUid(group_dict_size);
+            groupedTileUid.reserve(group_dict_size);
 
-            std::vector<u_int> groupTileUidWeight(GROUP_DICT_SIZE);
-            groupTileUidWeight.reserve(GROUP_DICT_SIZE);
+            std::vector<weight> groupTileUidWeight(group_dict_size);
+            groupTileUidWeight.reserve(group_dict_size);
 
-            for (u_int16_t j = 0; j < GROUP_DICT_SIZE; j++)
+            for (u_int j = 0; j < MIN(group_dict_size, WorldMatrix::NULL_TILE_UID-1); j++)
             {
-                const auto& opt = argentumTileMap.findTileUid(group_dict.keys()[j]);
-                groupedTileUid[j] = opt.value_or(WorldMatrix::NULL_TILE_UID);
-                if(!opt.has_value())
-                {
-                    UtilityFunctions::printerr("couldn't find tile_id for: ", group_dict.keys()[j]);
+                let optUid = argentumTileMap.findTileUid(group_dict.keys()[j]);
+                if( ! optUid.has_value()){
+                    UtilityFunctions::printerr("couldn't find tile_id: ", group_dict.keys()[j], " in tilemap's UID mapping, using NULL_TILE_UID");
                 }
-                groupTileUidWeight[j] = (u_int)group_dict.values()[j];
+                groupedTileUid[j] = optUid.value_or(WorldMatrix::NULL_TILE_UID);
+                
+                groupTileUidWeight[j] = CLAMP((int64_t)group_dict.values()[j], 0, std::numeric_limits<weight>::max());
             }
-            
-            const auto groupProbsDistribution = std::discrete_distribution<u_int>(groupTileUidWeight.begin(), groupTileUidWeight.end());
+            let groupProbsDistribution = std::discrete_distribution<weight>(groupTileUidWeight.begin(), groupTileUidWeight.end());
 
-            m_idsDistributionOfGroups[i] = std::make_pair(groupedTileUid, groupProbsDistribution);
+            mIdsDistributionOfGroups[i] = std::make_pair(groupedTileUid, groupProbsDistribution);
         }
     }  
-} catch (const std::exception& e) {
-    UtilityFunctions::printerr("An exception occurred (TileSelector): ", e.what());
-}
+} catch (const std::exception& e) {UtilityFunctions::printerr("TileSelector.cpp exception: ", e.what());}
+
 TileSelector::~TileSelector(){};
 
-tileclass_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i)
+tiletype_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i)
 {
-    const auto it = std::find_if(m_availableTargets.begin(), m_availableTargets.end(), [&](const std::string& availableTarget) {
-        return std::strcmp(availableTarget.c_str(), inputTargetTofill) == 0;
-    });
+    let iter = std::find_if(mAvailableTargets.begin(), mAvailableTargets.end(), 
+        [&](const std::string& availableTarget) {
+            return std::strcmp(availableTarget.c_str(), inputTargetTofill) == 0;
+        });
 
-    if (it != m_availableTargets.end())
+    if (iter != mAvailableTargets.end())
     {
-        auto index = std::distance(m_availableTargets.begin(), it);
-        try
+        let index = std::distance(mAvailableTargets.begin(), iter);
+        letref variantValue = mTileUidOrGroup[index];
+
+        if(std::holds_alternative<tiletype_uid>(variantValue))
         {
-            const auto& optTileID = std::get<std::optional<tileclass_uid>>(m_tileUidOrGroup[index]);
-            
-            return optTileID.value_or(WorldMatrix::NULL_TILE_UID);
+            return std::get<tiletype_uid>(variantValue);
         }
-        catch (const std::bad_variant_access& ex)
-        {
-            auto& pair = m_idsDistributionOfGroups[index];
-            //grabs a random tileUid from the group
-            return pair.first[pair.second(m_randomEngines[thread_i])];
-        }          
+        auto& pair = mIdsDistributionOfGroups[index];
+        return pair.first[pair.second(mRandomEngines[thread_i])];
     }
     UtilityFunctions::printerr("couldn't find any candidate tile for the target to be filled: \"",&inputTargetTofill[0],"\" (at TileSelector.cpp::getTileId())");
     return WorldMatrix::NULL_TILE_UID;
 }
 
-void TileSelector::reseed(const u_int seed){
-    for(u_char thread_i = 0; thread_i < N_THREADS; thread_i++)
-    {
-        m_randomEngines[thread_i].seed(seed+thread_i);
+void TileSelector::reseedEngines(const u_int seed){
+    for(u_char thread_i = 0; thread_i < N_THREADS; thread_i++){
+        mRandomEngines[thread_i].seed(seed+thread_i);
     }
 }
 

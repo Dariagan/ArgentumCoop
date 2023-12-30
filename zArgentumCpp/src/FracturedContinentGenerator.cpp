@@ -23,6 +23,7 @@ FracturedContinentGenerator::FracturedContinentGenerator()
     mSmallBeacher.set_fractal_octaves(3);
 
     mForest.set_fractal_lacunarity(3); mForest.set_fractal_gain(0.77);
+
 }
 
 //! CLEAREAR COLECCIONES QUE SE REUTILIZAN CADA LLAMADA (SINO QUEDAN COMO TERMINARON EN LA EJECUCIÓN DE ANTERIOR, LLENAS DE ELEMENTOS)
@@ -102,8 +103,7 @@ void godot::FracturedContinentGenerator::generateSubSection(
     std::unordered_set<SafeVec, SafeVec::hash>& myTrees, const char thread_i)
 {
     for (uint16_t x = horizontalRange.lef; x < horizontalRange.RIGHT; x++)
-    for (uint16_t y = 0; y < mSize.RIGHT; y++)
-    {
+    for (uint16_t y = 0; y < mSize.RIGHT; y++){
         const SafeVec coords(x, y);
 
         std::array<Target, WorldMatrix::MAX_TILES_PER_POS> targetsToFill;
@@ -158,10 +158,7 @@ void godot::FracturedContinentGenerator::generateSubSection(
                     }
                 }
             }
-        }else
-        {
-            targetsToFill[placementsCount++] = Target::ocean;
-        }
+        }else{targetsToFill[placementsCount++] = Target::ocean;}
 
 // shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
         for (u_char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
@@ -171,7 +168,6 @@ void godot::FracturedContinentGenerator::generateSubSection(
             argentumTileMap.placeFormationTile(origin, coords, tileUid);
         }
     }
-    
 }
 
 bool FracturedContinentGenerator::isContinental(SafeVec coords) const

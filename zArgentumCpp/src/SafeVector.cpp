@@ -126,5 +126,7 @@ struct SafeVec
         {return vec.lef*31 + vec.RIGHT ;}
     };
 };
+
+
 }
 #endif

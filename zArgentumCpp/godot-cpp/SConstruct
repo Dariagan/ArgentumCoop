@@ -6,9 +6,7 @@ import sys
 import subprocess
 from binding_generator import scons_generate_bindings, scons_emit_files
 
-
 EnsureSConsVersion(4, 0)
-
 
 try:
     Import("env")

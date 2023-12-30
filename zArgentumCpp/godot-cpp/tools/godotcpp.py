@@ -286,7 +286,7 @@ def generate(env):
             env.Append(CCFLAGS=["-fvisibility=hidden"])
             env.Append(LINKFLAGS=["-fvisibility=hidden"])
 
-    # Require C++17
+    # Require c++17
     if env.get("is_msvc", False):
         env.Append(CXXFLAGS=["/std:c++17"])
     else:

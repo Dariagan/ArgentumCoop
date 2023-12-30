@@ -11,6 +11,10 @@ func _ready() -> void:
 	if GlobalData.insta_start:
 		start_new_game([{}], [1])
 
+@rpc("call_local")
+func generate_world() -> void:
+	tile_map.generate_world()
+
 func start_new_game(players_start_data: Array, peers: Array) -> void:
 	
 	#TODO hacer un subviewport de tamaño fijo para el game, y poner gui en los costados
@@ -59,10 +63,6 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		being.give_control.rpc(peers[i])
 		
 		i+=1
-		
-@rpc("call_local")
-func generate_world() -> void:
-	tile_map.generate_world()
 
 func _get_configuration_warnings():
 	if being_scene == null: return ["being_scene must not be empty!"]

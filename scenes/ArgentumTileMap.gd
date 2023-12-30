@@ -19,14 +19,12 @@ func _process(_delta):
 	
 
 func generate_world():
-	
 	const WORLD_SIZE: Vector2i = Vector2i(5000, 5000)
 	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y >500)
 	
 	generate_world_matrix(WORLD_SIZE, GlobalData.tiles)
 	
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	
 	generate_formation(fcg, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections["temperate"], 3333, {})
 	
 	_players_start_position = WORLD_SIZE/2
@@ -38,20 +36,26 @@ var _players_start_position: Vector2i
 
 var _player_i: int = 0
 func spawn_starting_player(being: Being):
-	birth_being_at(being, _players_start_position + Vector2i(_player_i, 0))
+	birth_being_snapped_at(being, _players_start_position + Vector2i(_player_i, 0), true)
 	_player_i += 1
 	
 
 var _birthed_beings_i: int = 0
-func birth_being_at(being: Being, pos: Vector2i):
-	being.uid = _birthed_beings_i
-	add_child(being)
-	_birthed_beings_i += 1
-	being.position = map_to_local(pos)
-	being.z_index = 10
+func birth_being_snapped_at(being: Being, tilemap_coords: Vector2i, player: bool = false):
+	birth_being_at(being, map_to_local(tilemap_coords), player)
 
+func birth_being_at(being: Being, loc_coords: Vector2, player: bool = false):
+	being.uid = _birthed_beings_i
+	_birthed_beings_i += 1
+	
+	if player or get_cell_tile_data(0, local_to_map(loc_coords)):
+		add_child(being)
+		
+		being.position = loc_coords
+		being.z_index = 10
+	else:
+		freeze_and_store_being(loc_coords, being.uid)
+		
 #endregion SPAWNING
 
-func _free_and_store_being():
-	pass
 	

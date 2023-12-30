@@ -39,6 +39,7 @@ var races: Dictionary
 var controllable_races: Dictionary
 var uncontrollable_races: Dictionary
 var klasses: Dictionary
+var beingkinds: Dictionary
 
 var tiles: Dictionary
 
