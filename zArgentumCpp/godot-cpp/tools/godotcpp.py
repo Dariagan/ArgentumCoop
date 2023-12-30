@@ -286,7 +286,7 @@ def generate(env):
             env.Append(CCFLAGS=["-fvisibility=hidden"])
             env.Append(LINKFLAGS=["-fvisibility=hidden"])
 
-    # Require c++17
+    # Require C++17
     if env.get("is_msvc", False):
         env.Append(CXXFLAGS=["/std:c++17"])
     else:
@@ -294,6 +294,9 @@ def generate(env):
 
     if env["precision"] == "double":
         env.Append(CPPDEFINES=["REAL_T_IS_DOUBLE"])
+
+    # Allow detecting when building as a GDExtension.
+    env.Append(CPPDEFINES=["GDEXTENSION"])
 
     # Suffix
     suffix = ".{}.{}".format(env["platform"], env["target"])
