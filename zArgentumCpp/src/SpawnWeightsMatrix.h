@@ -24,7 +24,7 @@ public:
     const SWMAT_TYPE& operator[] (const SafeVec worldMatrixCoords) const;
     const SWMAT_TYPE& at (const SafeVec worldMatrixCoords) const;
     const SWMAT_TYPE& atNoDownscale (const SafeVec coords) const;
-
+    
     void insertAt(const SafeVec coords,
         const beingkind_id beingkindUid, const spawnweight weight);
     void clearAt(const SafeVec worldMatrixCoords);
