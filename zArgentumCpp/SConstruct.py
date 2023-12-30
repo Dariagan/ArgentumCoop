@@ -35,10 +35,11 @@ env.Append(CPPPATH=["src/"])
 #2 poner esto en la Selection=1:
 #sudo update-alternatives --config x86_64-w64-mingw32-g++ # Set the default mingw32 g++ compiler option to posix (1).
 
+#FIXME HACER LO SIGUIENTE HACE Q DEJE DE FUNCIONAR EL COMPILE FOR WINDOWS:
 #sudo update-alternatives --install /usr/bin/x86_64-w64-mingw32-g++ x86_64-w64-mingw32-g++ /usr/bin/g++-13 100
 #sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/g++-13
 
-env.Append(CXXFLAGS=["", "-fexceptions", "-std=c++23", "-pthread"])
+env.Append(CXXFLAGS=["", "-fexceptions", "-std=c++20", "-pthread", "-fPIC"])
 sources = Glob("src/*.cpp")
 
 if env["platform"] == "macos":

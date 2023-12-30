@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include <algorithm>
 #include <chrono>
+
 using namespace godot;
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i origin, 
     const Vector2i size, const Ref<Resource>& tileSelectionSet, unsigned int seed, const Dictionary& data)
@@ -166,6 +167,7 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionar
     } else{
         UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
     }
+
 }
 
 int ArgentumTileMap::get_seed(){return seed;}; 
@@ -213,20 +215,16 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
         add_tiles_data(input_tiles_data);
     }
 }
-std::optional<int> ff()
-{
-    std::optional<int> asd = std::make_optional(5);
 
-    return asd.and_then(fgg);
+std::optional<int> divide(int a, int b) {
+    if (b == 0) return std::nullopt;
+    return a / b;
 }
 
-void fgg(){
-    
-}
 
 //constinit int compile_time_value = 42;
 ArgentumTileMap::ArgentumTileMap(){
-    
+   
 }
 ArgentumTileMap::~ArgentumTileMap(){delete mBeingsModule;}
 
@@ -378,7 +376,7 @@ void ArgentumTileMap::placeFormationTile(
 }
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
-void ArgentumTileMap::freeze_and_store_being(const Vector2 glb_coords, const being_uid_t individual_unique_id)
+void ArgentumTileMap::freeze_and_store_being(const Vector2 glb_coords, const being_uid individual_unique_id)
 {
     const SafeVec localCoords = local_to_map(glb_coords);
     mBeingsModule->mFrozenBeings[localCoords].push_back({glb_coords, individual_unique_id});

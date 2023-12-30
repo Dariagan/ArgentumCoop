@@ -14,7 +14,7 @@ public:
     const unsigned long AREA;
 
     matrix(const SafeVec size) : 
-        DOWNSCALE_FACTOR(1), SIZE(size), AREA(SIZE.area())
+        DOWNSCALE_FACTOR(1), SIZE(size/1), AREA(SIZE.area())
     {
         if( ! size.isStrictlyPositive()){
             UtilityFunctions::printerr("matrix.cpp constructor error");flattenedMatrix.reserve(0);flattenedMatrix.resize(0);
@@ -43,6 +43,15 @@ public:
     {
         let downscaledCoords = coords/DOWNSCALE_FACTOR;
         return flattenedMatrix[SIZE.lef*downscaledCoords.lef + downscaledCoords.RIGHT];
+    }
+
+    T& atNoDownscale(const SafeVec coords)  
+    {
+        return flattenedMatrix[SIZE.lef*coords.lef + coords.RIGHT];
+    }
+    const T& atNoDownscale(const SafeVec coords) const
+    {
+        return flattenedMatrix[SIZE.lef*coords.lef + coords.RIGHT];
     }
 
     T& at(const SafeVec coords)  

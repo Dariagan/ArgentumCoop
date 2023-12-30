@@ -4,11 +4,11 @@
 #include "SafeVector.cpp"
 #include "typealiases.h"
 #include "matrix.h"
+#include "beingtypes.h"
 #include <utility>
 #include <type_traits>
 #include <limits>
 #include <vector>
-#include <unordered_map>
 #include <memory>
 namespace godot{
 
@@ -19,28 +19,24 @@ public:
     //CREO QUE NO DEBERÍA ESTAR DISPONIBLE EL SIZE (POSIBLES DOWNSCALING BUGS SI SE HACEN for i MANUALES)
     const SafeVec SIZE;
 
-    typedef unsigned short int beingkind_uid;
-    typedef unsigned short int spawnweight;
+#define SWMAT_TYPE std::pair<std::vector<beingkind_id>, std::vector<spawnweight>>
 
-                     //key: beingKIND's uid; value: weight
-#define SWM_MAP_TYPES SpawnWeightsMatrix::beingkind_uid, SpawnWeightsMatrix::spawnweight
+    const SWMAT_TYPE& operator[] (const SafeVec worldMatrixCoords) const;
+    const SWMAT_TYPE& at (const SafeVec worldMatrixCoords) const;
+    const SWMAT_TYPE& atNoDownscale (const SafeVec coords) const;
 
-    std::unordered_map<SWM_MAP_TYPES>& operator[](const SafeVec worldMatrixCoords);
-    std::unordered_map<SWM_MAP_TYPES>& at(const SafeVec worldMatrixCoords);
-
+    void insertAt(const SafeVec coords,
+        const beingkind_id beingkindUid, const spawnweight weight);
     void clearAt(const SafeVec worldMatrixCoords);
 
-    short unsigned int countAt(const SafeVec coords) const;
+    short int countAt(const SafeVec coords) const;
     bool isEmptyAt(const SafeVec coords) const;
     bool hasSpawnsAt (const SafeVec coords) const;
 
     SpawnWeightsMatrix(const SafeVec WORLD_MATRIX_SIZE);
-
-    //TODO HACER ITERATORS!!!
-    //O ALGO PARA ITERAR SOBRE UN CIERTO ÁREA DE SPAWNWEIGHTS, SAFELY SIN CAGARLA (DEBIDO AL DOWNSCALING)
         
 private: 
-    std::unique_ptr<matrix<std::unordered_map<SWM_MAP_TYPES>>> mWeightsMatrix;
+    std::unique_ptr<matrix<SWMAT_TYPE>> mWeightsMatrix;
 };  
 
 

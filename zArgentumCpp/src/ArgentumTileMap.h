@@ -12,6 +12,8 @@
 #include "FormationGenerator.h"
 #include "BeingsModule.h"
 #include "typealiases.h"
+#include "beingtypes.h"
+
 template<class T, size_t N> 
 struct std::hash<std::array<T, N>> {
     std::hash<T> hasher;
@@ -27,17 +29,19 @@ namespace godot
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉNc+ VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR 
 static const Vector2i ERROR_VECTOR = {-999999, -999999};    
 
-class BeingsModule;typedef unsigned short int being_uid_t;
+class BeingsModule;
 class FormationGenerator;
 class ArgentumTileMap : public TileMap{ GDCLASS(ArgentumTileMap, TileMap)
 
-
 public:
+    
+
     ArgentumTileMap();
     ~ArgentumTileMap();
 
     std::optional<tiletype_uid> findTileUid(const StringName& stringId) const;
     StringName getTileId(tiletype_uid uid) const;
+
 
     //HAY QUE ESCRIBIR EN BINARIO. NO EN ASCII. EN ASCII 1 DIGITO = 1 BYTE
     //HAY QUE GUARDAR: LA SEED + USER MODIFIED DATA
@@ -63,9 +67,8 @@ public:
     Vector2i get_random_coord_with_tile_id(const Vector2i top_left_corner, const Vector2i bottom_right_corner, const String& tile_id) const;
 
 //todo algun método para placear/cambiar/modificar/buildear tiles cuando ya se está ingame y q se guarden en un hashmap con las modificadas
-
     
-    void freeze_and_store_being(const Vector2 glb_coords, const being_uid_t individual_unique_id);
+    void freeze_and_store_being(const Vector2 glb_coords, const being_uid individual_unique_id);
 
     void generate_world_matrix(const Vector2i size, const Dictionary& tiles_data);
     void generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i origin, const Vector2i size, 
@@ -74,8 +77,10 @@ public:
     void load_tiles_around(const Vector2 coords, const Vector2i chunk_size, const int uid);
     void unloadExcessTiles(const SafeVec topLeftCornerCoords, const SafeVec chunkSize, const int uid);
  
+//!SE PUEDE USAR get_node("root/...") para conseguir un puntero a un nodo de godot, y, call sobre este para llamar un método de este
+private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del lado de gdscript usando simplemente call("",""...) (llama a métodos de gdscript propios de este nodo)
+    
 
-private:
     std::unique_ptr<WorldMatrix> mWorldMatrixPtr = nullptr;
 
     unsigned int seed = 0;
@@ -112,7 +117,7 @@ private:
     void decrementSharedCount(const SafeVec tileCoord);
 
     //keeps track of tracks of the tiles loaded by the being with the specific uid (int)
-    std::unordered_map<being_uid_t, std::unordered_set<SafeVec, SafeVec::hash>> mBeingLoadedTiles;
+    std::unordered_map<being_uid, std::unordered_set<SafeVec, SafeVec::hash>> mBeingLoadedTiles;
 
     std::unordered_map<SafeVec, int16_t, SafeVec::hash> mTileSharedLoadsCount;
     

@@ -5,6 +5,7 @@
 #include "SpawnWeightsMatrix.h"
 #include "typealiases.h"
 #include "matrix.h"
+#include "beingtypes.h"
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/variant/string.hpp>
@@ -16,6 +17,7 @@
 #include <godot_cpp/variant/typed_array.hpp>
 #include <godot_cpp/godot.hpp>
 #include <memory>
+#include <random>
 namespace godot{
 
 class SpawnWeightsMatrix;
@@ -24,11 +26,10 @@ class ArgentumTileMap;
 class BeingsModule
 {
 public:
-    typedef unsigned short int being_uid;
     
     void placeNaturalSpawningWeight(
         const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
-        const uint16_t& beingKindId, const unsigned char weight, bool deleteOthers);
+        const beingkind_id& beingKindId, const spawnweight weight, bool deleteOthers);
 
     void birthBeing(const Vector2i coords, const BeingBuilder& beingBuilder);
     void birthBeingOfKind(const Vector2i coords, const String& being_kind_id);
@@ -37,17 +38,21 @@ public:
     ~BeingsModule();
     std::unordered_map<SafeVec, std::vector<std::pair<Vector2, being_uid>>, SafeVec::hash> mFrozenBeings;
 
-//get_node("/root/MyAutoloadName"); USAR get_node para acceder a un nodo específico directamente (útil par acceder al argentum tilemap)
+//get_node("/root/GlobalData"); USAR get_node para acceder a un nodo específico directamente (útil par acceder a GlobalData)
 
 private:
-    std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix = nullptr;
+    std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix;
     ArgentumTileMap* mArgentumTileMap;
     static constexpr u_char MACROSCOPIC_SPAWNING_CHUNK_SIZE = 6;
     static constexpr u_int16_t BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK = 100;
 
-    std::unique_ptr<matrix<u_int16_t>> mBeingsInChunkCount = nullptr;
+    std::default_random_engine mBeingkindUidEngine{std::default_random_engine(rand())};
+
+    std::unique_ptr<matrix<u_int16_t>> mBeingsInChunkCount;
 
     void updateChunkBeingCounts();
+
+    void doNaturalSpawning();
 
 };
 }
