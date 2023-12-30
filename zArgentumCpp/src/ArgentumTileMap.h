@@ -63,6 +63,8 @@ public:
 
     Dictionary get_tiles_data(); void set_tiles_data(const Dictionary& data); void add_tiles_data(const Dictionary& data);
 
+    void set_tiles_data_placeholder(const Dictionary& input_tiles_data);
+
     Vector2i get_random_coord_with_tile_id(const Vector2i top_left_corner, const Vector2i bottom_right_corner, const String& tile_id) const;
 
 //todo algun método para placear/cambiar/modificar/buildear tiles cuando ya se está ingame y q se guarden en un hashmap con las modificadas

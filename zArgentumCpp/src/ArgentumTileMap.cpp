@@ -253,6 +253,11 @@ StringName ArgentumTileMap::getTileId(tiletype_uid uid) const
 }
 
 Dictionary ArgentumTileMap::get_tiles_data(){return m_tiles_data;}; 
+void ArgentumTileMap::set_tiles_data_placeholder(const Dictionary& input_tiles_data)
+{
+    m_tiles_data = input_tiles_data;
+}
+
 void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 {
     for(auto &tileData : mCppTilesData){tileData.second.clear();}mCppTilesData.clear();
@@ -414,7 +419,10 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ArgentumTileMap::set_seed);
     ClassDB::bind_method(D_METHOD("get_seed"), &ArgentumTileMap::get_seed);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
-    ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
+    ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data_placeholder);
+    
+    ClassDB::bind_method(D_METHOD("settiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
+
     ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
     

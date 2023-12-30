@@ -5,7 +5,7 @@ var _beings: Dictionary # key(str): individual unique id. value: Being. el multi
 var tiles_states: Dictionary # key: posx_posy_zi. value: state object
 
 func _setup_config():
-	#self.tiles_data = GlobalData.tiles
+	settiles_data(GlobalData.tiles)
 	self.tile_set = preload("res://resources/world/tile_set.tres")
 	add_layer(0);add_layer(1);add_layer(2)
 	set_layer_z_index(2, 10)

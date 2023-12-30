@@ -56,8 +56,7 @@ void BeingsModule::birthBeingOfKind(
     unsigned long tries = 0;
     bool suitableTileFound = false;
     Vector2i randPos;
-    do
-    {
+    do{
         if(++ tries > (br_tile_map_coords-tl_tile_map_coords).length()*10 || tries >= std::numeric_limits<long>::max() - 1)
         {
             UtilityFunctions::printerr("too many unsuccessful tries"); return;
@@ -69,8 +68,8 @@ void BeingsModule::birthBeingOfKind(
         const StringName tile_id1 = mArgentumTileMap->getTileId(tilesAtPos[1]);
 
         suitableTileFound = whitelisted_tiles.has(tile_id0) && (tile_id1==WorldMatrix::NULL_TILE_UID || whitelisted_tiles.has(tile_id1));
-
-    } while( ! suitableTileFound);
+    } 
+    while( ! suitableTileFound);
 
     birthBeingOfKind(randPos, being_kind_id);
 }
