@@ -103,13 +103,8 @@ private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del l
     std::unordered_map<SafeVec, std::unordered_map<u_char, tileinstance_uid>, SafeVec::hash> mTileInstancesState2;
 
     std::unordered_map<std::string, SafeVec> mTrackedBeingsCoords;//updateado cada
-
-    
-    friend class BeingsModule;
-    //chunk size: 7x7 puntos de spawnweights
-    //TypedArray<TypedArray<long>>
-    //tiene q estar actualizado en real time (actualizado cada minuto). el gd side le mete a cada chunk su respectiva count
-    TypedArray<Array> beings_in_chunk_count;
+   
+    friend class BeingsModule; 
     
     //USAR ESTO EN VEZ DE add_child
 

@@ -39,7 +39,6 @@ var _player_i: int = 0
 func spawn_starting_player(being: Being):
 	birth_being_snapped_at(being, _players_start_position + Vector2i(_player_i, 0), true)
 	_player_i += 1
-	
 
 var _birthed_beings_i: int = 0
 func birth_being_snapped_at(being: Being, tilemap_coords: Vector2i, player: bool = false):

@@ -39,8 +39,10 @@ func construct(being_birth_dict: Dictionary) -> void:
 	var race_id: String = being_birth_dict["race"]
 	if race_id.begins_with("controllable"):
 		race = handle_key("race", being_birth_dict, GlobalData.controllable_races)
-	else:
+	elif race_id.begins_with("controllable"):
 		race = handle_key("race", being_birth_dict, GlobalData.uncontrollable_races)
+	else:
+		push_error("not a valid race id")
 		
 	klass = handle_key("klass", being_birth_dict, GlobalData.klasses)
 	
@@ -60,6 +62,17 @@ func construct(being_birth_dict: Dictionary) -> void:
 	result = handle_key("body_scale", being_birth_dict)
 	if result: body_scale = result; result = null
 	
+	var sex_value = being_birth_dict["sex"]
+	
+	if sex_value is String or sex_value == Enums.Sex.ANY:
+		var sex_probs: Dictionary = {
+			Enums.Sex.MALE: race.males_ratio,
+			Enums.Sex.FEMALE: 1 - race.males_ratio
+		}
+		sex = WeightedChoice.pick(sex_probs)
+	elif sex_value is Enums.Sex:
+		sex = sex_value
+
 	internal_state = BeingInternalState.new()
 	internal_state.construct_locally(sex, race, faction, null, klass)
 
@@ -79,7 +92,6 @@ func serialize() -> Dictionary:
 		#extra_stats_multiplier
 	}
 	#dict["followers"] = get_array_of_ids(followers)
-	
 	return dict
 
 #NO IMPLEMENTAR ESTA FUNCIÓN, PERO IMPLEMENTAR LA IDEA DE CARGAR STARTER CHARACTERS ASÍ NO PERDÉS TIEMPO RE-CREÁNDOLOS EN CADA LOBBY

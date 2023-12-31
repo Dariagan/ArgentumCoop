@@ -26,7 +26,7 @@ const tile_selections_directories: Array[String] =["res://resources/world/tile_s
 const klasses_directories: Array[String] = ["res://resources/beings/klasses/"]
 const tiles_directories: Array[String] = ["res://resources/world/terrain/", "res://resources/world/buildings/"]
 const spawnable_scenes_directories: Array[String] = ["res://scenes/world/terrain/", "res://scenes/world/buildings/"]
-#TODO USAR MULTIPLE RESOURCE LOADER?
+#TODO hacer un player mods directory
 
 var item_data: Dictionary
 
@@ -98,7 +98,7 @@ func _index_all_found_resources(directories: Array[String], check_subfolders: bo
 					else:
 						printerr("File %s%s couldn't be loaded as a resource" % [directory, file_name])
 				elif check_subfolders:
-					table.merge(_index_all_found_resources([directory+file_name+"/"]), true)
+					table.merge(_index_all_found_resources([directory+file_name+"/"]), false)
 					
 				file_name = dir_access.get_next()
 		else:

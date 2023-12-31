@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=31 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -6,13 +6,10 @@
 [ext_resource type="Script" path="res://scripts/lobby.gd" id="4_vtap0"]
 [ext_resource type="Script" path="res://scripts/game.gd" id="5_2eji3"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
-[ext_resource type="Script" path="res://scripts/beings/being.gd" id="5_80l37"]
 [ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resources/world/tile_set.tres" id="6_67353"]
 [ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
-[ext_resource type="PackedScene" uid="uid://dh6xc1ceawroh" path="res://scenes/animated_body_portion.tscn" id="6_tdn56"]
 [ext_resource type="Script" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
 [ext_resource type="Script" path="res://scenes/ArgentumTileMap.gd" id="7_itdl2"]
-[ext_resource type="Script" path="res://scripts/resources/beings/being_internal_state.gd" id="7_nltyk"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="Script" path="res://scripts/ui/uim_lobby_interface.gd" id="14_xwx6r"]
 [ext_resource type="Script" path="res://scripts/ui/uim_chat_component.gd" id="15_iym2t"]
@@ -25,27 +22,6 @@
 [ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resources/ui/lineeditname.tres" id="22_uo2mf"]
 [ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="23_m410m"]
 [ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/lobby/character_characterization.tscn" id="24_741ey"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_c0jbg"]
-size = Vector2(11.7222, 5.52427)
-
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_p46nv"]
-properties/0/path = NodePath(".:position")
-properties/0/spawn = true
-properties/0/replication_mode = 1
-
-[sub_resource type="PackedScene" id="PackedScene_s4gye"]
-_bundled = {
-"conn_count": 0,
-"conns": PackedInt32Array(),
-"editable_instances": [],
-"names": PackedStringArray("Being", "CharacterBody2D", "z_index", "collision_layer", "collision_mask", "motion_mode", "slide_on_ceiling", "platform_on_leave", "script", "Camera2D", "Camera2D", "offset", "CollisionShape2D", "CollisionShape2D", "position", "scale", "shape", "MultiplayerSynchronizer", "MultiplayerSynchronizer", "replication_config", "Name", "Label", "offset_left", "offset_top", "offset_right", "offset_bottom", "horizontal_alignment", "Meditation", "AnimatedSprite2D", "BodyHolder", "Node2D", "Helmet", "Body", "Head", "LeftHand", "Node", "RightHand", "Node", "NavigationAgent2D", "NavigationAgent2D", "debug_enabled", "InternalState", "Node", "script"),
-"node_count": 14,
-"node_paths": [NodePath("."), NodePath("."), NodePath("."), NodePath("."), NodePath("."), NodePath("."), NodePath("./BodyHolder"), NodePath("./BodyHolder"), NodePath("./BodyHolder"), NodePath("./BodyHolder"), NodePath("./BodyHolder"), NodePath("."), NodePath(".")],
-"nodes": PackedInt32Array(-1, -1, 1, 0, -1, 7, 2, 0, 3, 1, 4, 2, 5, 3, 6, 4, 7, 5, 8, 6, 0, 1073741824, 0, 10, 9, -1, 1, 11, 7, 0, 1073741825, 0, 13, 12, -1, 3, 14, 8, 15, 9, 16, 10, 0, 1073741826, 0, 18, 17, -1, 1, 19, 11, 0, 1073741827, 0, 21, 20, -1, 5, 22, 12, 23, 13, 24, 14, 25, 15, 26, 16, 0, 1073741828, 0, 28, 27, -1, 0, 0, 1073741829, 0, 30, 29, -1, 0, 0, 1073741830, 0, 2147483647, 31, 17, 0, 0, 1073741831, 0, 2147483647, 32, 18, 0, 0, 1073741832, 0, 2147483647, 33, 19, 0, 0, 1073741833, 0, 35, 34, -1, 0, 0, 1073741834, 0, 37, 36, -1, 0, 0, 1073741835, 0, 39, 38, -1, 1, 40, 20, 0, 1073741836, 0, 42, 41, -1, 1, 43, 21, 0),
-"variants": [10, 2, 15, 1, false, 2, ExtResource("5_80l37"), Vector2(0, -5), Vector2(0, 15), Vector2(1, 2), SubResource("RectangleShape2D_c0jbg"), SubResource("SceneReplicationConfig_p46nv"), 42.0, -9.0, 82.0, 14.0, 1, ExtResource("6_tdn56"), ExtResource("6_tdn56"), ExtResource("6_tdn56"), true, ExtResource("7_nltyk")],
-"version": 3
-}
 
 [sub_resource type="PackedScene" id="PackedScene_63sr3"]
 _bundled = {
@@ -122,7 +98,6 @@ character_creation_scene = ExtResource("4_lphit")
 
 [node name="Game" type="Node" parent="Lobby"]
 script = ExtResource("5_2eji3")
-being_scene = SubResource("PackedScene_s4gye")
 
 [node name="ArgentumTileMap" type="ArgentumTileMap" parent="Lobby/Game"]
 y_sort_enabled = true

@@ -165,8 +165,7 @@ void godot::FracturedContinentGenerator::generateSubSection(
 // shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
         for (u_char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
         {
-            const auto &tileUid = mTileSelector->
-                getTileUidForTarget(TARGETS[targetsToFill[k]], thread_i);
+            const auto &tileUid = mTileSelector->getTileUidForTarget(TARGETS[targetsToFill[k]], thread_i);
             argentumTileMap.placeFormationTile(origin, coords, tileUid);
         }
     }

@@ -1,6 +1,8 @@
 extends CharacterBody2D
+
+#todo separar funciones en componentes hijos?
 class_name Being
-#para persistirlo habrá que usar packedscene para guardar las cosas custom variables q puede ser q tenga, sino habrá q iterar por cada child
+#para persistirlo habrá que usar packedscene para guardar las cosas custom children q puede ser q tenga, sino habrá q iterar por cada child
 
 var uid: int = randi_range(-9223372036854775808, 9223372036854775807)
 
@@ -33,7 +35,7 @@ func construct(data: BeingReqInitData) -> void:
 			head.construct(data.sprite_head, data.head_scale, data.sprite_body.head_v_offset, data.body_scale.z)
 	construct_internal_state.rpc(data.serialize())
 	
-@rpc("call_local")
+@rpc
 func construct_internal_state(data: Dictionary):
 	internal_state.construct(data["state"])
 

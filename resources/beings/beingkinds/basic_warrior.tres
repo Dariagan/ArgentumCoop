@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BeingKind" load_steps=2 format=3 uid="uid://bhd0ufukmdxnm"]
+
+[ext_resource type="Script" path="res://scripts/beings/initialization/being_kind.gd" id="1_sjg4q"]
+
+[resource]
+script = ExtResource("1_sjg4q")
+id = "basic_warrior"
+race_id = null
+klass_id = null
+sex = 0
+extra_health_multiplier_range = null
+head_scale_range = null
+body_scale_range = null
+names_distribution = null
+equipment_distribution = null
+loot_distribution = null
+raid_unit_cost = null
+blacklisted_tiles_for_spawning = null
+whitelisted_tiles_for_spawning = null

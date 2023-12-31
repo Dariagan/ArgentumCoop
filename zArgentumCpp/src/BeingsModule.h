@@ -42,8 +42,8 @@ public:
 private:
     std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix;
     ArgentumTileMap* mArgentumTileMap;
-    static constexpr u_char MACROSCOPIC_SPAWNING_CHUNK_SIZE = 6;
-    static constexpr u_int16_t BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK = 100;
+    static constexpr u_char MACROSCOPIC_SPAWNING_CHUNK_SIZE = 15;
+    static constexpr u_int16_t BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK = 200;
 
     std::random_device rd;
     std::default_random_engine mEngine{std::default_random_engine(rd())};

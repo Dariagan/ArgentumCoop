@@ -33,15 +33,15 @@ private:
         const SafeVec origin, std::unordered_set<SafeVec, SafeVec::hash>& myBushes,
         std::unordered_set<SafeVec, SafeVec::hash>& myTrees, const char thread_i);
 
-    bool clearOf(const std::unordered_set<SafeVec, SafeVec::hash>& setToCheck, 
+    inline bool clearOf(const std::unordered_set<SafeVec, SafeVec::hash>& setToCheck, 
         SafeVec coords, uint16_t radius, bool checkForwards = false) const;
-    bool isPeninsulerCaved(SafeVec coords) const;
-    bool isLake(SafeVec coords) const;
-    bool isContinental(SafeVec coords) const;
-    float getContinentness(SafeVec coords) const;
-    float getBeachness(SafeVec coords) const;
+    inline bool isPeninsulerCaved(SafeVec coords) const;
+    inline bool isLake(SafeVec coords) const;
+    inline bool isContinental(SafeVec coords) const;
+    inline float getContinentness(SafeVec coords) const;
+    inline float getBeachness(SafeVec coords) const;
     void placeDungeonEntrances(ArgentumTileMap& argentumTileMap, const u_char nDungeonsToPlace);
-    void resetState();                                        //add to the left of cave
+    inline void resetState();                                        //add to the left of cave
     enum Target { beach,  lake,  cont,  tree,  bush,  ocean,  cave_0,  cave_1,  cave_2, N_TARGETS}; static constexpr std::array<const char*, N_TARGETS>
         TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
     

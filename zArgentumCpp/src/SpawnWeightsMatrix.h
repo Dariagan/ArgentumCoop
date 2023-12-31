@@ -15,7 +15,7 @@ namespace godot{
 class SpawnWeightsMatrix
 {
 public:
-    static constexpr u_char DOWNSCALING_FACTOR = 20;
+    static constexpr u_char DOWNSCALING_FACTOR = 40;
     //CREO QUE NO DEBERÍA ESTAR DISPONIBLE EL SIZE (POSIBLES DOWNSCALING BUGS SI SE HACEN for i MANUALES)
     const SafeVec SIZE;
 

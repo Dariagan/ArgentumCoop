@@ -4,8 +4,7 @@ extends Node
 
 @onready var tile_map: GdTileMap = $ArgentumTileMap
 
-@export var being_scene: PackedScene:
-	set(value): being_scene = value; update_configuration_warnings()
+var being_scene: PackedScene = preload("res://scenes/being.tscn")
 
 func _ready() -> void:
 	if GlobalData.insta_start:

@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="BodySpriteData" load_steps=3 format=3 uid="uid://br6gqx36f275l"]
 
 [ext_resource type="SpriteFrames" uid="uid://cpbf4jct427rl" path="res://resources/beings/sprites/frames/body/human_male_frames.tres" id="1_pilrn"]
-[ext_resource type="Script" path="res://scripts/resources/beings/sprites/body_sprite_data.gd" id="2_omixe"]
+[ext_resource type="Script" path="res://scripts/beings/sprites/body_sprite_data.gd" id="2_omixe"]
 
 [resource]
 script = ExtResource("2_omixe")
