@@ -286,11 +286,11 @@ def generate(env):
             env.Append(CCFLAGS=["-fvisibility=hidden"])
             env.Append(LINKFLAGS=["-fvisibility=hidden"])
 
-    # Require C++17
+    # Require c++20
     if env.get("is_msvc", False):
-        env.Append(CXXFLAGS=["/std:c++17"])
+        env.Append(CXXFLAGS=["/std:c++20"])
     else:
-        env.Append(CXXFLAGS=["-std=c++17"])
+        env.Append(CXXFLAGS=["-std=c++20"])
 
     if env["precision"] == "double":
         env.Append(CPPDEFINES=["REAL_T_IS_DOUBLE"])

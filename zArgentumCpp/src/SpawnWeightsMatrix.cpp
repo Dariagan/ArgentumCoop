@@ -9,12 +9,18 @@ const SWMAT_TYPE& SpawnWeightsMatrix::atNoDownscale (const SafeVec coords) const
 {return SpawnWeightsMatrix::mWeightsMatrix->atNoDownscale(coords);}
 
 void SpawnWeightsMatrix::insertAt(
-    const SafeVec coords, const beingkind_id beingkindUid, const spawnweight weight)
+    const SafeVec coords, const beingkind_id& beingkindId, const spawnweight newWeight)
 {
     auto& pairAtPos = SpawnWeightsMatrix::mWeightsMatrix->operator[](coords);
-    
-    pairAtPos.first.push_back(beingkindUid);
-    pairAtPos.second.push_back(weight);
+    auto& beingkindIds = pairAtPos.first; auto& weights = pairAtPos.second;
+
+    const auto iter = std::find(beingkindIds.begin(), beingkindIds.end(), beingkindId);
+    if (iter == beingkindIds.end())
+    {
+        beingkindIds.push_back(beingkindId);
+        weights.push_back(newWeight);
+    }
+    else weights[std::distance(beingkindIds.begin(), iter)] = newWeight;
 }
 
 void SpawnWeightsMatrix::clearAt(const SafeVec worldMatrixCoords)

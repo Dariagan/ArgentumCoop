@@ -4,8 +4,9 @@ class_name GdTileMap
 var _beings: Dictionary # key(str): individual unique id. value: Being. el multiplayerspawner se encarga del sync
 var tiles_states: Dictionary # key: posx_posy_zi. value: state object
 
+# IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
+
 func _setup_config():
-	settiles_data(GlobalData.tiles)
 	self.tile_set = preload("res://resources/world/tile_set.tres")
 	add_layer(0);add_layer(1);add_layer(2)
 	set_layer_z_index(2, 10)
@@ -56,6 +57,8 @@ func birth_being_at(being: Being, loc_coords: Vector2, player: bool = false):
 	else:
 		freeze_and_store_being(loc_coords, being.uid)
 		
+func birth_beingkind_at(beingkind: StringName, loc_coords: Vector2):
+	pass
 #endregion SPAWNING
 
 	

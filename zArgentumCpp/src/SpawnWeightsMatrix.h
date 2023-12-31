@@ -26,7 +26,7 @@ public:
     const SWMAT_TYPE& atNoDownscale (const SafeVec coords) const;
     
     void insertAt(const SafeVec coords,
-        const beingkind_id beingkindUid, const spawnweight weight);
+        const beingkind_id& beingkindUid, const spawnweight weight);
     void clearAt(const SafeVec worldMatrixCoords);
 
     short int countAt(const SafeVec coords) const;

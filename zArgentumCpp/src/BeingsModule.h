@@ -29,11 +29,11 @@ public:
     
     void placeNaturalSpawningWeight(
         const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
-        const beingkind_id& beingKindId, const spawnweight weight, bool deleteOthers);
+        const beingkind_id& beingKindId, const spawnweight weight);
 
     void birthBeing(const Vector2i coords, const BeingBuilder& beingBuilder);
-    void birthBeingOfKind(const Vector2i coords, const String& being_kind_id);
-    void birthBeingOfKind(const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const String& being_kind_id);
+    void birthBeingOfKind(const Vector2i coords, const beingkind_id& being_kind_id);
+    void birthBeingOfKind(const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const beingkind_id& being_kind_id);
     
     BeingsModule(ArgentumTileMap* argentumTileMap, const SafeVec size); 
     ~BeingsModule();

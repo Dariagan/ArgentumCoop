@@ -5,11 +5,11 @@ using namespace godot;
 
 void BeingsModule::placeNaturalSpawningWeight(
     const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
-    const beingkind_id& beingKindId, const spawnweight weight, bool deleteOthers)
+    const beingkind_id& beingKindId, const spawnweight weight)
 {
     let absoluteCoordinates = formationOrigin + coordsRelativeToFormationOrigin;
 
-    if(deleteOthers) {mSpawnWeightsMatrix->clearAt(absoluteCoordinates);}
+    //if(deleteOthers) {mSpawnWeightsMatrix->clearAt(absoluteCoordinates);}
     
     mSpawnWeightsMatrix->insertAt(absoluteCoordinates, beingKindId, weight);
 }
@@ -23,11 +23,11 @@ void BeingsModule::birthBeing(const Vector2i coords, const BeingBuilder& beingBu
     }
 }
 
-void BeingsModule::birthBeingOfKind(const Vector2i tile_map_coords, const String& being_kind_id)
+void BeingsModule::birthBeingOfKind(const Vector2i tile_map_coords, const beingkind_id& being_kind_id)
 {mArgentumTileMap->emit_signal("birth_of_being_of_kind", tile_map_coords, being_kind_id);}
 
 void BeingsModule::birthBeingOfKind(
-    const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const String& being_kind_id)
+    const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const beingkind_id& being_kind_id)
 {
     const Variant& getbeingkinds_result = mArgentumTileMap->global_data->get("beingkinds");
     if(getbeingkinds_result.get_type() != Variant::DICTIONARY)
@@ -85,7 +85,7 @@ void BeingsModule::updateChunkBeingCounts()
     );
 }
 
-//hacerlo async
+//! hacerlo async (no bloqueante)
 //solo debería ejecutar esto el host y desp retransmitir los spawneos específicos
 void BeingsModule::doNaturalSpawning()
 {

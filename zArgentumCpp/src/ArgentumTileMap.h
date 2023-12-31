@@ -37,10 +37,11 @@ public:
     ArgentumTileMap();
     ~ArgentumTileMap();
 
-    std::optional<tiletype_uid> findTileUid(const StringName& stringId) const;
-    StringName getTileId(tiletype_uid uid) const;
+    std::optional<tiletype_uid> findTileUid(const String& stringId) const;
+    String getTileId(tiletype_uid uid) const;
 
     Node* global_data;
+    std::unique_ptr<BeingsModule> mBeingsModule;
 
     //HAY QUE ESCRIBIR EN BINARIO. NO EN ASCII. EN ASCII 1 DIGITO = 1 BYTE
     //HAY QUE GUARDAR: LA SEED + USER MODIFIED DATA
@@ -96,14 +97,14 @@ private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del l
     typedef unsigned int tileinstance_uid;
     //NO ES UN ARRAY LA DATA STRUCTURE INTERNA PORQ PUEDE Q EL RESTO DE TILES EN LA MISMA POS NO TENGAN STATE INICIALIZADO, Y NO SE PUEDE SABER SI SI O SI NO EN UN ARRAY
     
-    //update: creo q no hace falta esto. con un dictionary en godot con key coordx_coordy_zi y value el state ya se puede hacer todo
+    //update: creo q no hace falta esto. con un dictionary en godot con key coordx_coordy_coordz y value el state ya se puede hacer todo
     std::unordered_map<SafeVec, std::unordered_set<tileinstance_uid>, SafeVec::hash> mTileInstancesState;
     std::unordered_map<SafeVec, std::unordered_map<u_char, Object>, SafeVec::hash> mTileInstancesState1;
     std::unordered_map<SafeVec, std::unordered_map<u_char, tileinstance_uid>, SafeVec::hash> mTileInstancesState2;
 
     std::unordered_map<std::string, SafeVec> mTrackedBeingsCoords;//updateado cada
 
-    std::unique_ptr<BeingsModule> mBeingsModule;
+    
     friend class BeingsModule;
     //chunk size: 7x7 puntos de spawnweights
     //TypedArray<TypedArray<long>>

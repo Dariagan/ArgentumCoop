@@ -234,14 +234,14 @@ ArgentumTileMap::ArgentumTileMap(){}
 
 ArgentumTileMap::~ArgentumTileMap(){}
 
-std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
+std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const String& stringId) const
 {
     for(u_int16_t i = 0; i < mTilesUidMapping.size(); i++)
         if(mTilesUidMapping[i] == stringId) return i;
     return {};
 }
 
-StringName ArgentumTileMap::getTileId(tiletype_uid uid) const
+String ArgentumTileMap::getTileId(tiletype_uid uid) const
 {
     try{
         return mTilesUidMapping.at(uid);

@@ -159,6 +159,8 @@ void godot::FracturedContinentGenerator::generateSubSection(
                 }
             }
         }else{targetsToFill[placementsCount++] = Target::ocean;}
+        
+        argentumTileMap.mBeingsModule->placeNaturalSpawningWeight(origin, coords, "asd", 10);
 
 // shallow ocean: donde continentness está high. deep ocean: donde continentness está low o si se es una empty tile fuera de cualquier generation
         for (u_char k = 0; k < std::min(placementsCount, WorldMatrix::MAX_TILES_PER_POS); k++)
