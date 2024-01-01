@@ -28,6 +28,7 @@ func _connect_tile_map():
 	var tile_map: ArgentumTileMap = get_parent()
 	load_tiles_around_me.connect(tile_map.load_tiles_around)
 
+#constructs for multiplayer too
 func construct(data: BeingStatePreIniter) -> void:
 	if data.sprite_body:
 		body.construct(data.sprite_body, data.body_scale)

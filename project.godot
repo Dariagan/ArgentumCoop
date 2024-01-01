@@ -27,7 +27,7 @@ config/features=PackedStringArray("4.3")
 [autoload]
 
 GlobalData="*res://scripts/singletons/global_data.gd"
-GameData="*res://scripts/singletons/singleton_game_data.gd"
+GameData="*res://scripts/singletons/game_data.gd"
 
 [display]
 
@@ -55,7 +55,10 @@ enabled=PackedStringArray("res://addons/safe_resource_loader/plugin.cfg", "res:/
 
 folder_colors={
 "res://addons/": "gray",
+"res://assets/": "teal",
 "res://bin/": "gray",
+"res://resources/": "yellow",
+"res://scripts/": "green",
 "res://scripts/beings/": "green"
 }
 

@@ -91,7 +91,6 @@ func _index_all_found_resources(directories: Array[String], check_subfolders: bo
 				
 				if !dir_access.current_is_dir():
 					var resource
-					
 					if not use_safe_loader:
 						resource = ResourceLoader.load(directory + file_name)
 					else:#NO USAR SI ESTÁ EN .res/ EL DIRECTORIO, NO HACE FALTA

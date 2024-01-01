@@ -12,10 +12,12 @@ using namespace godot;
 void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i origin, 
     const Vector2i size, const Ref<Resource>& tileSelectionSet, unsigned int seed, const Dictionary& data)
 {   
+    
     if (size.x < 0 || size.y < 0){
         UtilityFunctions::printerr("Negatively sized formation not allowed");return;}
-    if (size.x < 600 || size.y < 600){
-        UtilityFunctions::printerr("World size is too small, must be at least be 600x600");return;}
+    constexpr uint16_t MIN_SIZE = 600;
+    if (size.x < MIN_SIZE || size.y < MIN_SIZE){
+        UtilityFunctions::printerr("World size is too small, must be at least ",MIN_SIZE,"x",MIN_SIZE);return;}
     const bool outOfBoundsEast = origin.x + size.x > mWorldMatrixPtr->SIZE.lef;
     const bool outOfBoundsSouth = origin.y + size.y > mWorldMatrixPtr->SIZE.RIGHT;
     const bool negativeOrigin = origin.x < 0 || origin.y < 0;
@@ -56,14 +58,11 @@ void ArgentumTileMap::load_tiles_around(const Vector2 global_coords, const Vecto
                 if (mBeingsModule->mFrozenBeings.count(tileMapCoords))
                 {
                     auto& tileFrozenBeings = mBeingsModule->mFrozenBeings[tileMapCoords];
-                    auto it = tileFrozenBeings.begin();
 
-                    while (it != tileFrozenBeings.end())
-                    {
+                    for (auto it = tileFrozenBeings.begin(); it != tileFrozenBeings.end(); it = tileFrozenBeings.erase(it)){
                         const Vector2 global_coords = it->first;
                         const int individual_unique_id = it->second;
                         emit_signal("being_unfrozen", global_coords, individual_unique_id);
-                        it = tileFrozenBeings.erase(it);
                     }
                 }
                 if (mWorldMatrixPtr->isNotEmptyAt(tileMapCoords))//if more than 0 tileIds at coords:
@@ -112,8 +111,14 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec tileCoord)
         emit_signal("tile_unloaded", (Vector2i)tileCoord);
         mTileSharedLoadsCount.erase(tileCoord);
     }
-    
 }
+
+#define ID StringName("id", true)
+#define SOURCE_ATLAS StringName("source_atlas", true)
+#define LAYER StringName("layer", true)
+#define ATLAS_ORIGIN_POSITION StringName("op", true)
+#define ALTERNATIVE_ID StringName("alt_id", true)
+#define MODULO_TILING_AREA StringName("ma", true)
 
 bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
 {
@@ -130,9 +135,9 @@ bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
     //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
     //PONER EL AGUA EN UNA LAYER INFERIOR? 
 
-    const SafeVec atlasOriginPosition = (SafeVec)tileData[StringName("op")];; 
+    const SafeVec atlasOriginPosition = (SafeVec)tileData[ATLAS_ORIGIN_POSITION];; 
 
-    const SafeVec moduloTilingArea = (SafeVec)tileData[StringName("ma")];
+    const SafeVec moduloTilingArea = (SafeVec)tileData[MODULO_TILING_AREA];
 
     const SafeVec atlasPositionOffset(coords.lef % moduloTilingArea.lef, coords.RIGHT % moduloTilingArea.RIGHT);
     
@@ -140,7 +145,7 @@ bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
     bool flipped = false;
     try
     {//temp code, replace trees by scenes to make scale and color randomizeable
-        alt_id = (int)tileData.at("alt_id");
+        alt_id = (int)tileData.at(ALTERNATIVE_ID);
         const bool flippedAtRandom = tileData.at("fr");
  
         // PROBLEMÓN: DESYNC MULTIPLAYER
@@ -150,13 +155,12 @@ bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
     {
         UtilityFunctions::printerr(e.what());
     }
-    set_cell(tileData[StringName("layer")], coords, tileData[StringName("source_atlas")], atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
+    set_cell(tileData[LAYER], coords, tileData[SOURCE_ATLAS], atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
     return true;
 }
 void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionary& tiles_data)
 {
-    if (size.x <= 0 || size.y <= 0)
-    {
+    if (size.x <= 0 || size.y <= 0){
         UtilityFunctions::printerr("Negatively sized world matrix not allowed");
         return;
     }
@@ -171,35 +175,12 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionar
         mWorldMatrixPtr = std::make_unique<WorldMatrix>(size);
         set_tiles_data(tiles_data);
         mBeingsModule = std::make_unique<BeingsModule>(this, size);
-    } else{
-        UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
-    }
-
+    } 
+    else UtilityFunctions::printerr("World matrix was already generated, cannot be re-generated.");
 }
 
-int ArgentumTileMap::get_seed(){return seed;}; 
-void ArgentumTileMap::set_seed(const u_int seed){this->seed=seed; srand(seed);};
-
-void ArgentumTileMap::add_tiles_data(const Dictionary& input_tiles)
-{
-    m_tiles_data.merge(input_tiles, true);
-    const u_int16_t NEW_TILES_COUNT = m_tiles_data.size();
-
-    if(exceedsTileLimit(NEW_TILES_COUNT)) return;
-
-    mTilesUidMapping.reserve(NEW_TILES_COUNT);
-    mTilesUidMapping.resize(NEW_TILES_COUNT);
-    for(u_int16_t i = 0; i < input_tiles.size(); i++)
-    {
-        const auto& tile_id = input_tiles.keys()[i];
-
-        //if not mapped already
-        if(findTileUid(tile_id).has_value())//TA BIEN
-        {//map the key
-            mTilesUidMapping.push_back(tile_id);
-        }
-    }
-}
+int ArgentumTileMap::get_seed(){return seed;}
+void ArgentumTileMap::set_seed(const u_int seed){this->seed=seed; srand(seed);}
 
 void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_data)
 {
@@ -211,22 +192,31 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
 
         m_tiles_data = input_tiles_data;
 
-        mTilesUidMapping.reserve(TILES_COUNT);
         mTilesUidMapping.resize(TILES_COUNT);
         for(u_int16_t i = 0; i < TILES_COUNT; i++)
             {mTilesUidMapping[i] = input_tiles_data.keys()[i];}                    
     }
-    else{
-        m_tiles_data.clear();
-        add_tiles_data(input_tiles_data);
+    else overrideTilesDataAndAddNewMappings(input_tiles_data);   
+}
+void ArgentumTileMap::overrideTilesDataAndAddNewMappings(const Dictionary& input_tiles_data)
+{
+    m_tiles_data = input_tiles_data;
+    const u_int16_t NEW_TILES_COUNT = m_tiles_data.size();
+
+    if(exceedsTileLimit(NEW_TILES_COUNT)) return;
+
+    for(u_int16_t i = 0; i < input_tiles_data.size(); i++)
+    {
+        const auto& tile_id = input_tiles_data.keys()[i];
+
+        if( ! findTileUid(tile_id).has_value())
+            mTilesUidMapping.push_back(tile_id);
     }
 }
-
 std::optional<int> divide(int a, int b) {
     if (b == 0) return std::nullopt;
     return a / b;
 }
-
 
 //constinit int compile_time_value = 42;
 ArgentumTileMap::ArgentumTileMap(){}
@@ -250,10 +240,7 @@ const StringName ArgentumTileMap::getTileId(tiletype_uid uid) const
 }
 
 Dictionary ArgentumTileMap::get_tiles_data(){return m_tiles_data;}; 
-void ArgentumTileMap::set_tiles_data_placeholder(const Dictionary& input_tiles_data)
-{
-    m_tiles_data = input_tiles_data;
-}
+
 
 void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 {
@@ -270,7 +257,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 
         const Dictionary& gd_tile_data = tile->call("get_data");
 
-        if(gd_tile_data.is_empty() || (String)gd_tile_data["id"] == "" || (int)gd_tile_data["source_atlas"] == -1)
+        if(gd_tile_data.is_empty() || (StringName)gd_tile_data[ID] == StringName("", true) || (int)gd_tile_data[SOURCE_ATLAS] == -1)
         {
             UtilityFunctions::printerr("read gd_tile_data is not valid (ArgentumTileMap.cpp::set_tiles_data())");
             continue;
@@ -281,7 +268,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
         for(int j = 0; j < gd_tile_data.values().size(); j++)
         {
             const StringName& tile_field_key = gd_tile_data.keys()[j];
-            if (tile_field_key == StringName("op"))
+            if (tile_field_key == ATLAS_ORIGIN_POSITION)
             {
                 const Vector2i atlas_origin_position = gd_tile_data.values()[j];
                 if (((SafeVec)atlas_origin_position).isAnyCompNegative())//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
@@ -291,7 +278,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
                     continue;
                 }
             }
-            else if (tile_field_key == StringName("op"))
+            else if (tile_field_key == MODULO_TILING_AREA)
             {
                 const Vector2i modulo_area = gd_tile_data.values()[j];
                 if (((SafeVec)modulo_area).isStrictlyPositive() == false)//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
@@ -303,15 +290,15 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
             }
             cppTileData.insert({gd_tile_data.keys()[j], gd_tile_data.values()[j]});
         }
-        if (cppTileData.count(StringName("op")) == 0)
+        if (cppTileData.count(ATLAS_ORIGIN_POSITION) == 0)
         {
             UtilityFunctions::printerr("op not found, using (0,0) (at ArgentumTileMap.cpp::set_tiles_data())");
-            cppTileData.insert({StringName("op"), Vector2i(0, 0)});
+            cppTileData.insert({ATLAS_ORIGIN_POSITION, Vector2i(0, 0)});
         }
-        if (cppTileData.count(StringName("op")) == 0)
+        if (cppTileData.count(MODULO_TILING_AREA) == 0)
         {
             UtilityFunctions::printerr("ma not found, using (1,1) (at ArgentumTileMap.cpp::set_tiles_data())");
-            cppTileData.insert({StringName("op"), Vector2i(1, 1)});
+            cppTileData.insert({MODULO_TILING_AREA, Vector2i(1, 1)});
         }
 
         mCppTilesData.insert({gd_current_tile_key, cppTileData});                
@@ -416,10 +403,8 @@ void ArgentumTileMap::_bind_methods()
     ClassDB::bind_method(D_METHOD("set_seed", "seed"), &ArgentumTileMap::set_seed);
     ClassDB::bind_method(D_METHOD("get_seed"), &ArgentumTileMap::get_seed);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
-    ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data_placeholder);
-    
-    ClassDB::bind_method(D_METHOD("settiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
 
+    ClassDB::bind_method(D_METHOD("set_tiles_data", "tiles_data"), &ArgentumTileMap::set_tiles_data);
     ClassDB::bind_method(D_METHOD("get_tiles_data"), &ArgentumTileMap::get_tiles_data);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "tiles_data"), "set_tiles_data", "get_tiles_data");
     

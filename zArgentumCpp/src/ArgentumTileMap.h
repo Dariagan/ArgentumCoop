@@ -62,9 +62,7 @@ public:
     
     int get_seed();void set_seed(const u_int seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
 
-    Dictionary get_tiles_data(); void set_tiles_data(const Dictionary& data); void add_tiles_data(const Dictionary& data);
-
-    void set_tiles_data_placeholder(const Dictionary& input_tiles_data);
+    Dictionary get_tiles_data(); void set_tiles_data(const Dictionary& data); void overrideTilesDataAndAddNewMappings(const Dictionary& data);
 
     Vector2i get_random_coord_with_tile_id(const Vector2i top_left_corner, const Vector2i bottom_right_corner, const String& tile_id) const;
 
@@ -81,7 +79,6 @@ public:
  
 //!SE PUEDE USAR get_node("root/...") para conseguir un puntero a un nodo de godot, y, call sobre este para llamar un método de este
 private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del lado de gdscript usando simplemente call("",""...) (llama a métodos de gdscript propios de este nodo)
-    
 
     std::unique_ptr<WorldMatrix> mWorldMatrixPtr = nullptr;
 

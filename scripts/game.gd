@@ -7,9 +7,7 @@ func _ready() -> void:
 	if GlobalData.insta_start:
 		start_new_game([{}], [1])
 
-@rpc("call_local")
-func generate_world() -> void:
-	tile_map.generate_world()
+
 
 func start_new_game(players_start_data: Array, peers: Array) -> void:
 	
@@ -24,7 +22,7 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 	get_tree().root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 	get_tree().root.content_scale_stretch = Window.CONTENT_SCALE_STRETCH_FRACTIONAL #nota: esto afecta al viewport stretching"""
 
-	generate_world.rpc()
+	tile_map.generate_world.rpc()
 	
 	var i: int = 0
 	for player_start_data: Dictionary in players_start_data:
@@ -51,12 +49,11 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		player_being_preinit_data.construct(player_start_data)
 		
 		var being: Being = tile_map.spawn_starting_player(player_being_preinit_data)
-		being.name = str(peers[i])
 		
-		await get_tree().create_timer(0.00001).timeout
+		await get_tree().create_timer(0.0001).timeout
 		being.give_control.rpc(peers[i])
 		
 		i+=1
+		
 	
-	#tile_map.birth_beingkind_at(&"basic_warrior", &"mal", tile_map.map_to_local(Vector2(500,500)))
 
