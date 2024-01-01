@@ -6,7 +6,7 @@
 script = ExtResource("1_ld7wy")
 id = &"cave_mossy"
 layer = 2
-source_id = 3
+source_atlas = 3
 origin_position = Vector2i(0, 3)
 flipped_at_random = false
 random_scale_range = Vector4(0, 0, 0, 0)

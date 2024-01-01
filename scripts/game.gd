@@ -50,7 +50,7 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		var player_being_preinit_data = BeingStatePreIniter.new()
 		player_being_preinit_data.construct(player_start_data)
 		
-		var being: Being = await tile_map.spawn_starting_player(player_being_preinit_data)
+		var being: Being = tile_map.spawn_starting_player(player_being_preinit_data)
 		being.name = str(peers[i])
 		
 		await get_tree().create_timer(0.00001).timeout
@@ -58,5 +58,5 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		
 		i+=1
 	
-	tile_map.birth_beingkind_at("basic_warrior", tile_map.map_to_local(Vector2(500,500)))
+	#tile_map.birth_beingkind_at(&"basic_warrior", &"mal", tile_map.map_to_local(Vector2(500,500)))
 

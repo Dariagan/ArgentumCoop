@@ -51,6 +51,14 @@ movie_writer/fps=8
 
 enabled=PackedStringArray("res://addons/safe_resource_loader/plugin.cfg", "res://addons/weighted_choice/plugin.cfg")
 
+[file_customization]
+
+folder_colors={
+"res://addons/": "gray",
+"res://bin/": "gray",
+"res://scripts/beings/": "green"
+}
+
 [importer_defaults]
 
 texture={

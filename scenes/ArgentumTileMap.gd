@@ -38,11 +38,11 @@ var _player_i: int = -1
 #TODO buscar suitable tiles
 func spawn_starting_player(preinitdata: BeingStatePreIniter) -> Being:
 	_player_i += 1
-	return await birth_being_snapped_at(preinitdata, _players_start_position + Vector2i(_player_i, 0), true)
+	return birth_being_snapped_at(preinitdata, _players_start_position + Vector2i(_player_i, 0), true)
 
 var _birthed_beings_i: int = 0
 func birth_being_snapped_at(preinitdata: BeingStatePreIniter, tilemap_coords: Vector2i, player: bool = false) -> Being:
-	return await birth_being_at(preinitdata, map_to_local(tilemap_coords), player)
+	return birth_being_at(preinitdata, map_to_local(tilemap_coords), player)
 
 func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, player: bool = false) -> Being:
 	
@@ -60,11 +60,17 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 		freeze_and_store_being(loc_coords, being.uid)
 		return null
 		
-func birth_beingkind_at(beingkind_id: StringName, loc_coords: Vector2) -> Being:
+func birth_beingkind_at(beingkind_id: StringName, faction: StringName, loc_coords: Vector2) -> Being:
 	assert(GlobalData.beingkinds.has(beingkind_id))
 	var beingkind: BeingKind = GlobalData.beingkinds[beingkind_id]
-	var preinitdata: BeingStatePreIniter = beingkind.instantiate()
-	return await birth_being_at(preinitdata, loc_coords)
+	
+	var being_pre_init = BeingStatePreIniter.new()
+	var birth_dict: Dictionary = beingkind.serialize_rand_instance()
+	birth_dict[BeingStatePreIniter.K.FACTION] = faction
+	
+	being_pre_init.construct(birth_dict)
+	
+	return birth_being_at(being_pre_init, loc_coords)
 #endregion SPAWNING
 
 	

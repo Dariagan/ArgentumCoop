@@ -130,9 +130,9 @@ bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
     //TODO HACER EL AUTOTILING MANUALMENTE EN ESTA PARTE SEGÚN LAS 4 TILES Q SE TENGA ADYACENTES EN LA WORLDMATRIX
     //PONER EL AGUA EN UNA LAYER INFERIOR? 
 
-    const SafeVec atlasOriginPosition = (SafeVec)tileData["op"];; 
+    const SafeVec atlasOriginPosition = (SafeVec)tileData[StringName("op")];; 
 
-    const SafeVec moduloTilingArea = (SafeVec)tileData["ma"];
+    const SafeVec moduloTilingArea = (SafeVec)tileData[StringName("ma")];
 
     const SafeVec atlasPositionOffset(coords.lef % moduloTilingArea.lef, coords.RIGHT % moduloTilingArea.RIGHT);
     
@@ -150,7 +150,7 @@ bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
     {
         UtilityFunctions::printerr(e.what());
     }
-    set_cell(tileData.at("layer"), coords, tileData.at("source_id"), atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
+    set_cell(tileData[StringName("layer")], coords, tileData[StringName("source_atlas")], atlasOriginPosition + atlasPositionOffset, alt_id + flipped);
     return true;
 }
 void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionary& tiles_data)
@@ -216,8 +216,7 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
         for(u_int16_t i = 0; i < TILES_COUNT; i++)
             {mTilesUidMapping[i] = input_tiles_data.keys()[i];}                    
     }
-    else
-    {
+    else{
         m_tiles_data.clear();
         add_tiles_data(input_tiles_data);
     }
@@ -234,22 +233,20 @@ ArgentumTileMap::ArgentumTileMap(){}
 
 ArgentumTileMap::~ArgentumTileMap(){}
 
-std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const String& stringId) const
+std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
 {
     for(u_int16_t i = 0; i < mTilesUidMapping.size(); i++)
         if(mTilesUidMapping[i] == stringId) return i;
-    return {};
+    return std::nullopt;
 }
 
-String ArgentumTileMap::getTileId(tiletype_uid uid) const
+const StringName ArgentumTileMap::getTileId(tiletype_uid uid) const
 {
-    try{
-        return mTilesUidMapping.at(uid);
-    }catch(std::exception& e)
-    {
-        UtilityFunctions::printerr("no se encuentra id", uid);
-        return "no se encuentra id";
-    }
+    if(uid < mTilesUidMapping.size()) 
+        return mTilesUidMapping[uid];
+    
+    UtilityFunctions::printerr("Couldn't find tile.id for uid:", uid, "argentumtilemap.cpp");
+    return "no se encuentra id";
 }
 
 Dictionary ArgentumTileMap::get_tiles_data(){return m_tiles_data;}; 
@@ -273,7 +270,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 
         const Dictionary& gd_tile_data = tile->call("get_data");
 
-        if(gd_tile_data.is_empty() || (String)gd_tile_data["id"] == "" || (int)gd_tile_data["source_id"] == -1)
+        if(gd_tile_data.is_empty() || (String)gd_tile_data["id"] == "" || (int)gd_tile_data["source_atlas"] == -1)
         {
             UtilityFunctions::printerr("read gd_tile_data is not valid (ArgentumTileMap.cpp::set_tiles_data())");
             continue;
@@ -283,8 +280,8 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 
         for(int j = 0; j < gd_tile_data.values().size(); j++)
         {
-            const String& tile_field_key = gd_tile_data.keys()[j];
-            if (tile_field_key == "op")
+            const StringName& tile_field_key = gd_tile_data.keys()[j];
+            if (tile_field_key == StringName("op"))
             {
                 const Vector2i atlas_origin_position = gd_tile_data.values()[j];
                 if (((SafeVec)atlas_origin_position).isAnyCompNegative())//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
@@ -294,7 +291,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
                     continue;
                 }
             }
-            else if (tile_field_key == "ma")
+            else if (tile_field_key == StringName("op"))
             {
                 const Vector2i modulo_area = gd_tile_data.values()[j];
                 if (((SafeVec)modulo_area).isStrictlyPositive() == false)//ESTO ESTÁ MAL, SE DEBERÍA CHEQUEAR EN EL MOMENTO CUANDO SE AGREGA TILEDATA, SINO CAUSA SLOWDOWN SI SE CHEQUEA CADA ITERACIÓN
@@ -306,15 +303,15 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
             }
             cppTileData.insert({gd_tile_data.keys()[j], gd_tile_data.values()[j]});
         }
-        if (cppTileData.count("op") == 0)
+        if (cppTileData.count(StringName("op")) == 0)
         {
             UtilityFunctions::printerr("op not found, using (0,0) (at ArgentumTileMap.cpp::set_tiles_data())");
-            cppTileData.insert({"op", Vector2i(0, 0)});
+            cppTileData.insert({StringName("op"), Vector2i(0, 0)});
         }
-        if (cppTileData.count("ma") == 0)
+        if (cppTileData.count(StringName("op")) == 0)
         {
             UtilityFunctions::printerr("ma not found, using (1,1) (at ArgentumTileMap.cpp::set_tiles_data())");
-            cppTileData.insert({"ma", Vector2i(1, 1)});
+            cppTileData.insert({StringName("op"), Vector2i(1, 1)});
         }
 
         mCppTilesData.insert({gd_current_tile_key, cppTileData});                

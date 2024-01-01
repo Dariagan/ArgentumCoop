@@ -2,7 +2,7 @@ extends Resource
 ## Defines a specific Being initialization
 class_name BeingKind
 
-@export var id: String = ""
+@export var id: StringName = ""
 
 @export var race_id: String
 @export var klass_id: String = "random"

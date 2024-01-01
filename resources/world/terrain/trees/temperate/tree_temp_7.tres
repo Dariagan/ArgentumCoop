@@ -6,7 +6,7 @@
 script = ExtResource("1_0vvyq")
 id = &"tree_temp_7"
 layer = 2
-source_id = 4
+source_atlas = 4
 origin_position = Vector2i(56, 0)
 flipped_at_random = true
 random_scale_range = Vector4(0, 0, 0, 0)

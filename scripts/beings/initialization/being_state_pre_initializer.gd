@@ -20,19 +20,19 @@ var extra_health_multiplier: float = 1
 var internal_state: BeingInternalState
 
 const K: Dictionary = { 
-	NAME = "name",
-	SEX = "sex",
-	RACE = "race",
-	FACTION = "faction",
-	KLASS = "klass",
-	FOLLOWERS = "followers",
-	HEAD_SCALE = "head_scale",
-	BODY_SCALE = "body_scale",
-	HEAD = "head",
-	BODY = "body",
-	EXTRA_HEALTH_MULTI = "eh",
-	BEINGKIND = "beingkind",
-	INTERNAL_STATE = "istate",
+	NAME = &"name",
+	SEX = &"sex",
+	RACE = &"race",
+	FACTION = &"faction",
+	KLASS = &"klass",
+	FOLLOWERS = &"followers",
+	HEAD_SCALE = &"head_scale",
+	BODY_SCALE = &"body_scale",
+	HEAD = &"head",
+	BODY = &"body",
+	EXTRA_HEALTH_MULTI = &"eh",
+	BEINGKIND = &"beingkind",
+	INTERNAL_STATE = &"istate",
 }
 
 func construct(being_birth_dict: Dictionary) -> void:
@@ -96,7 +96,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 		push_error("invalid type for \"sex\" entry in birth dict")
 		
 	if being_birth_dict.has(K.BEINGKIND):
-		beingkind = handle_key("beingkind", being_birth_dict, GlobalData.beingkinds)
+		beingkind = handle_key(K.BEINGKIND, being_birth_dict, GlobalData.beingkinds)
 
 	internal_state = BeingInternalState.new()
 	internal_state.construct_locally(sex, race, faction, null, klass, beingkind)

@@ -37,8 +37,8 @@ public:
     ArgentumTileMap();
     ~ArgentumTileMap();
 
-    std::optional<tiletype_uid> findTileUid(const String& stringId) const;
-    String getTileId(tiletype_uid uid) const;
+    std::optional<tiletype_uid> findTileUid(const StringName& stringId) const;
+    const StringName getTileId(tiletype_uid uid) const;
 
     Node* global_data;
     std::unique_ptr<BeingsModule> mBeingsModule;
