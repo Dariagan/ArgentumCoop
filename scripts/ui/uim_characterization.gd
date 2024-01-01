@@ -118,11 +118,11 @@ func _update_popup_menu(popup_menu: PopupMenu, items: Array):
 func _setup_sex_menu_popup(current_race: ControllableRace):
 	var popup: PopupMenu = sex_menu_button.get_popup()
 	popup.clear()
-	if current_race.males_females_ratio == 1:
+	if current_race.males_ratio == 1:
 		popup.add_item("Male", 1)
 		_current_sex = Enums.Sex.MALE
 		sex_menu_button.text = "Sex: Male"
-	elif current_race.males_females_ratio == 0:
+	elif current_race.males_ratio == 0:
 		popup.add_item("Female", 2)
 		_current_sex = Enums.Sex.FEMALE
 		sex_menu_button.text = "Sex: Female"

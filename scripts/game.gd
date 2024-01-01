@@ -1,10 +1,7 @@
-@tool
 extends Node
 # PONER EN LA GUI ARRIBA A LA DERECHA DAYS SURVIVED: X, EN FUENTE DIABLESCA
 
 @onready var tile_map: GdTileMap = $ArgentumTileMap
-
-var being_scene: PackedScene = preload("res://scenes/being.tscn")
 
 func _ready() -> void:
 	if GlobalData.insta_start:
@@ -32,38 +29,34 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 	var i: int = 0
 	for player_start_data: Dictionary in players_start_data:
 		
-		if not player_start_data.has("name"):
-			player_start_data["name"] = "nameless_player%d"%i
-		if not player_start_data.has("race"):
-			player_start_data["race"] = "controllable_random"
-		if not player_start_data.has("sex"):
-			player_start_data["sex"] = "random"
-		if not player_start_data.has("klass"):
-			player_start_data["klass"] = "random"
-		if not player_start_data.has("head"):
-			player_start_data["head"] = "random"
-		if not player_start_data.has("body"):
-			player_start_data["body"] = "random"
+		if not player_start_data.has(BeingStatePreIniter.K.NAME):
+			player_start_data[BeingStatePreIniter.K.NAME] = "nameless_player%d"%i
+		if not player_start_data.has(BeingStatePreIniter.K.RACE):
+			player_start_data[BeingStatePreIniter.K.RACE] = "controllable_random"
+		if not player_start_data.has(BeingStatePreIniter.K.KLASS):
+			player_start_data[BeingStatePreIniter.K.KLASS] = "random"
+		if not player_start_data.has(BeingStatePreIniter.K.SEX):
+			player_start_data[BeingStatePreIniter.K.SEX] = "random"
+		if not player_start_data.has(BeingStatePreIniter.K.HEAD):
+			player_start_data[BeingStatePreIniter.K.HEAD] = "random"
+		if not player_start_data.has(BeingStatePreIniter.K.BODY):
+			player_start_data[BeingStatePreIniter.K.BODY] = "random"
 		
-		player_start_data["fac"] = "player"	
+		player_start_data[BeingStatePreIniter.K.FACTION] = "player"	
 		
 		#extra health para los protagonists
-		player_start_data["eh"] = 2	
+		player_start_data[BeingStatePreIniter.K.EXTRA_HEALTH_MULTI] = 2	
 		
-		var player_being_init_data = BeingReqInitData.new()
-		player_being_init_data.construct(player_start_data)
+		var player_being_preinit_data = BeingStatePreIniter.new()
+		player_being_preinit_data.construct(player_start_data)
 		
-		var being: Being = being_scene.instantiate()
+		var being: Being = await tile_map.spawn_starting_player(player_being_preinit_data)
 		being.name = str(peers[i])
-		tile_map.spawn_starting_player(being)
 		
-		being.construct(player_being_init_data)
-		await get_tree().create_timer(0.0001).timeout
+		await get_tree().create_timer(0.00001).timeout
 		being.give_control.rpc(peers[i])
 		
 		i+=1
-
-func _get_configuration_warnings():
-	if being_scene == null: return ["being_scene must not be empty!"]
-	else: return []
+	
+	tile_map.birth_beingkind_at("basic_warrior", tile_map.map_to_local(Vector2(500,500)))
 

@@ -28,16 +28,16 @@ func _connect_tile_map():
 	var tile_map: ArgentumTileMap = get_parent()
 	load_tiles_around_me.connect(tile_map.load_tiles_around)
 
-func construct(data: BeingReqInitData) -> void:
+func construct(data: BeingStatePreIniter) -> void:
 	if data.sprite_body:
 		body.construct(data.sprite_body, data.body_scale)
 		if data.sprite_head:
 			head.construct(data.sprite_head, data.head_scale, data.sprite_body.head_v_offset, data.body_scale.z)
 	construct_internal_state.rpc(data.serialize())
 	
-@rpc
+@rpc("call_local")#dejar esto
 func construct_internal_state(data: Dictionary):
-	internal_state.construct(data["state"])
+	internal_state.construct(data[BeingStatePreIniter.K.INTERNAL_STATE])
 
 var uncontrolled: bool = true
 

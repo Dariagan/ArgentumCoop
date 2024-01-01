@@ -1,10 +1,10 @@
 extends RefCounted 
 #BeingRequiredInitializationData
-class_name BeingReqInitData
-#se diferencia de un pawnkinddef en q el pawnkinddef puede incluir rangos de aleatoriedad/sets weighteados configurables para ciertos atributos/variables
-#dentro de ahí, (money, possible loot, health, possible names). y en pawnkinddef no se especifica la faction. en esto sí, para saber en cual meter al being
+class_name BeingStatePreIniter
+#se diferencia de un beingkind en q el beingkind puede incluir rangos de aleatoriedad/sets weighteados configurables para ciertos atributos/variables
+#dentro de ahí, (money, possible loot, health, possible names). y en beingkind no se especifica la faction. en esto sí, para saber en cual meter al being
 #
-#esto contiene solo valores deterministas para el spawning de un individuo (excepto por la randomización de la cara y cuerpo si no se especifican)
+#esto contiene solo valores deterministas para el spawning de un individuo específico(excepto por la randomización de la cara y cuerpo si no se especifican)
 
 var name: String 
 var head_scale: Vector3 = Vector3.ONE
@@ -18,51 +18,71 @@ var chosen_extra_sprites: Array[int] = []
 var extra_health_multiplier: float = 1
 
 var internal_state: BeingInternalState
-	
+
+const K: Dictionary = { 
+	NAME = "name",
+	SEX = "sex",
+	RACE = "race",
+	FACTION = "faction",
+	KLASS = "klass",
+	FOLLOWERS = "followers",
+	HEAD_SCALE = "head_scale",
+	BODY_SCALE = "body_scale",
+	HEAD = "head",
+	BODY = "body",
+	EXTRA_HEALTH_MULTI = "eh",
+	BEINGKIND = "beingkind",
+	INTERNAL_STATE = "istate",
+}
+
 func construct(being_birth_dict: Dictionary) -> void:
 	assert(being_birth_dict != null && being_birth_dict != {})
+	
+	#region are constructed inside internal_state
 	var sex: Enums.Sex
 	var race: BasicRace
 	var klass: Klass
 	var faction: Faction
-	var followers: Array[UncontrollableRace]  
+	var followers: Array[UncontrollableRace] 
+	var beingkind: BeingKind 
+	#endregion
 	var result
-	result = handle_key("name", being_birth_dict)
+	result = handle_key(K.NAME, being_birth_dict)
 	if result: name = result; result = null
 	
-	result = handle_key("eh", being_birth_dict)
+	result = handle_key(K.EXTRA_HEALTH_MULTI, being_birth_dict)
 	if result: extra_health_multiplier = result; result = null
 		
 	#result = handle_key("level", being_birth_dict)
 	#if result: level = result; result = null
 		
-	var race_id: String = being_birth_dict["race"]
+	var race_id: String = being_birth_dict[K.RACE]
 	if race_id.begins_with("controllable"):
-		race = handle_key("race", being_birth_dict, GlobalData.controllable_races)
+		race = handle_key(K.RACE, being_birth_dict, GlobalData.controllable_races)
 	elif race_id.begins_with("controllable"):
-		race = handle_key("race", being_birth_dict, GlobalData.uncontrollable_races)
+		race = handle_key(K.RACE, being_birth_dict, GlobalData.uncontrollable_races)
 	else:
 		push_error("not a valid race id")
 		
-	klass = handle_key("klass", being_birth_dict, GlobalData.klasses)
+	klass = handle_key(K.KLASS, being_birth_dict, GlobalData.klasses)
 	
-	faction = handle_key("fac", being_birth_dict, GameData.factions)
+	faction = handle_key(K.FACTION, being_birth_dict, GameData.factions)
 		
-	if being_birth_dict.has("followers"):
+	if being_birth_dict.has(K.FOLLOWERS):
 		# BUG, ARREGLAR. DICE  AHÍ. HAY Q ARREGLAR ETO
-		followers = GlobalData.klasses[being_birth_dict["followers"]]
+		followers = GlobalData.klasses[being_birth_dict[K.FOLLOWERS]]
 			
-	sprite_head = handle_key("head", being_birth_dict, race.head_sprites_datas)
+	sprite_head = handle_key(K.HEAD, being_birth_dict, race.head_sprites_datas)
 			
-	sprite_body = handle_key("body", being_birth_dict, race.body_sprites_datas) as BodySpriteData
+	sprite_body = handle_key(K.BODY, being_birth_dict, race.body_sprites_datas) as BodySpriteData
 	
-	result = handle_key("head_scale", being_birth_dict)
+	result = handle_key(K.HEAD_SCALE, being_birth_dict)
 	if result: head_scale = result; result = null
 	
-	result = handle_key("body_scale", being_birth_dict)
+	result = handle_key(K.BODY_SCALE, being_birth_dict)
 	if result: body_scale = result; result = null
 	
-	var sex_value = being_birth_dict["sex"]
+	var sex_value = being_birth_dict[K.SEX]
 	
 	if sex_value is String or sex_value == Enums.Sex.ANY:
 		var sex_probs: Dictionary = {
@@ -72,9 +92,14 @@ func construct(being_birth_dict: Dictionary) -> void:
 		sex = WeightedChoice.pick(sex_probs)
 	elif sex_value is Enums.Sex:
 		sex = sex_value
+	else:
+		push_error("invalid type for \"sex\" entry in birth dict")
+		
+	if being_birth_dict.has(K.BEINGKIND):
+		beingkind = handle_key("beingkind", being_birth_dict, GlobalData.beingkinds)
 
 	internal_state = BeingInternalState.new()
-	internal_state.construct_locally(sex, race, faction, null, klass)
+	internal_state.construct_locally(sex, race, faction, null, klass, beingkind)
 
 # TODO
 func construct_from_serialized(serialized_being_spawn_data: Dictionary) -> void:
@@ -82,16 +107,16 @@ func construct_from_serialized(serialized_being_spawn_data: Dictionary) -> void:
 
 func serialize() -> Dictionary:
 	var dict: Dictionary = {
-		"name": name,
-		"head_scale": head_scale,
-		"body_scale": body_scale,
-		"head": sprite_head.id,
-		"body": sprite_body.id,
-		"state": internal_state.serialize(),
-		"eh": extra_health_multiplier
-		#extra_stats_multiplier
+		K.NAME: name,
+		K.HEAD_SCALE: head_scale,
+		K.BODY_SCALE: body_scale,
+		K.HEAD: sprite_head.id,
+		K.BODY: sprite_body.id,
+		K.INTERNAL_STATE: internal_state.serialize(),
+		K.EXTRA_HEALTH_MULTI: extra_health_multiplier,
+		#extra_stats_multiplier,
 	}
-	#dict["followers"] = get_array_of_ids(followers)
+	#dict[K.FOLLOWERS] = get_array_of_ids(followers)
 	return dict
 
 #NO IMPLEMENTAR ESTA FUNCIÓN, PERO IMPLEMENTAR LA IDEA DE CARGAR STARTER CHARACTERS ASÍ NO PERDÉS TIEMPO RE-CREÁNDOLOS EN CADA LOBBY
