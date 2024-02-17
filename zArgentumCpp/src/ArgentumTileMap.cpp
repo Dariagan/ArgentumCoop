@@ -373,6 +373,8 @@ catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::
 
 void ArgentumTileMap::freeze_and_store_being(const Vector2 loc_coords, const being_uid individual_unique_id)
 {
+    //TODO ARREGLAR PARA MULTIPLAYER
+    //get_multiplayer()
     const SafeVec tileMapCoords = local_to_map(loc_coords);
     mBeingsModule->mFrozenBeings[tileMapCoords].push_back({loc_coords, individual_unique_id});
 

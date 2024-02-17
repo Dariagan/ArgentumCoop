@@ -81,9 +81,10 @@ bool BeingBuilder::build()
 {
     if (isValidBeing())
     {
+        //TODO: definir las keys como constantes en algun lugar
         Dictionary data;
         data["name"] = name;
-        data["fac"] = factionId;
+        data["faction"] = factionId;
         data["race"] = raceId;
         if (controllableRace) {data["klass"] = klassId;}
         data["head"] = headId;

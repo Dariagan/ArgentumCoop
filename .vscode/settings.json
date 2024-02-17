@@ -68,7 +68,8 @@
         "variant": "cpp",
         "iomanip": "cpp",
         "templateheader": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "cinttypes": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/gcc-13",
     "cmake.configureOnOpen": false

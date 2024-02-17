@@ -42,19 +42,19 @@ void FracturedContinentGenerator::generate(
 {
     //TODO posible randomización leve de parámetros
     this->mOrigin = origin; this->mSize = size;
-
     mTileSelector = std::make_unique<TileSelector>(tileSelectionSet, argentumTileMap, seed, N_THREADS);
-    {
-    mContinenter.set_seed(seed); mPeninsuler.set_seed(seed+1); mBigLaker.set_seed(seed+2); mSmallLaker.set_seed(seed+3);
-    mBigBeacher.set_seed(seed+4); mSmallBeacher.set_seed(seed+5); mRng.set_seed(seed); mForest.set_seed(seed + 9);
     
-    mContinenter.set_frequency(0.15f/powf(size.length(), 0.995f)); mPeninsuler.set_frequency(5.f/powf(size.length(), 0.995f));
-    mBigBeacher.set_frequency(4.3f/powf(size.length(), 0.995f)); mSmallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
-    mBigLaker.set_frequency(40.f/powf(size.length(), 0.995f)); mSmallLaker.set_frequency(80.f/powf(size.length(), 0.995f));
-    mForest.set_frequency(1.6f/powf(size.length(), 0.995f));
-    //TODO hacer cada frequency ajustable desde gdscript
+    {//configuration of noises 
+        mContinenter.set_seed(seed); mPeninsuler.set_seed(seed+1); mBigLaker.set_seed(seed+2); mSmallLaker.set_seed(seed+3);
+        mBigBeacher.set_seed(seed+4); mSmallBeacher.set_seed(seed+5); mRng.set_seed(seed); mForest.set_seed(seed + 9);
+        
+        mContinenter.set_frequency(0.15f/powf(size.length(), 0.995f)); mPeninsuler.set_frequency(5.f/powf(size.length(), 0.995f));
+        mBigBeacher.set_frequency(4.3f/powf(size.length(), 0.995f)); mSmallBeacher.set_frequency(8.f/powf(size.length(), 0.995f));
+        mBigLaker.set_frequency(40.f/powf(size.length(), 0.995f)); mSmallLaker.set_frequency(80.f/powf(size.length(), 0.995f));
+        mForest.set_frequency(1.6f/powf(size.length(), 0.995f));
+        //TODO hacer cada frequency ajustable desde gdscript
 
-    mContinentalCutoff = 0.61f * powf(size.length() / 1600.f, 0.05f);;
+        mContinentalCutoff = 0.61f * powf(size.length() / 1600.f, 0.05f);;
     }
 
     while(mContinenter.get_noise_2dv(origin+size/(int)2) < mContinentalCutoff + 0.13f){//! NO METER EL PENINSULER EN ESTA CONDICIÓN, DESCENTRA LA FORMACIÓN
@@ -62,14 +62,11 @@ void FracturedContinentGenerator::generate(
 // ASÍ QUE, PARA SPAWNEAR AL PLAYER ELEGIR UN PUNTO RANDOM HASTA Q TENGA UNA TILE TIERRA (COMO HAGO CON LOS DUNGEONS) 
         mContinenter.set_offset(mContinenter.get_offset() + Vector3(3,3,0));
     }
-    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> bushesOfThread(
-        N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
+    std::array<std::unordered_set<SafeVec, SafeVec::hash>, N_THREADS> bushesOfThread;
 
-    std::vector<std::unordered_set<SafeVec, SafeVec::hash>> treesOfThread(
-        N_THREADS, std::unordered_set<SafeVec, SafeVec::hash>());
+    std::array<std::unordered_set<SafeVec, SafeVec::hash>, N_THREADS> treesOfThread;
 
-    std::vector<std::thread> threads;
-    threads.reserve(N_THREADS);
+    std::array<std::thread, N_THREADS> threads;
 
     for(char thread_i = 0; thread_i < N_THREADS; thread_i++)
     {
@@ -77,10 +74,10 @@ void FracturedContinentGenerator::generate(
         const uint16_t endlef = (thread_i+1)*mSize.lef/N_THREADS;
         const SafeVec horizontalRange(startlef, endlef);
 
-        threads.emplace_back(std::thread(
+        threads[thread_i] = std::thread(
             &FracturedContinentGenerator::generateSubSection, this, horizontalRange, 
             std::ref(argentumTileMap), mOrigin, std::ref(bushesOfThread[thread_i]), 
-            std::ref(treesOfThread[thread_i]), thread_i));
+            std::ref(treesOfThread[thread_i]), thread_i);
     }
 
     std::for_each(std::execution::par_unseq, threads.begin(), threads.end(), 

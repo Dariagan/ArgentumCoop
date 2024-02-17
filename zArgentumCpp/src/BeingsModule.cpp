@@ -17,8 +17,7 @@ void BeingsModule::placeNaturalSpawningWeight(
 //ojo estas coords son absolutas, no relativas al origin de la formation
 void BeingsModule::birthBeing(const Vector2i coords, const BeingBuilder& beingBuilder)
 {
-    if(beingBuilder.getResult().has_value())
-    {
+    if(beingBuilder.getResult().has_value()){
         mArgentumTileMap->emit_signal("birth_being_w_init_data", coords, beingBuilder.getResult().value());
     }
 }
