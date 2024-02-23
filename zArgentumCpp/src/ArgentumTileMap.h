@@ -11,7 +11,6 @@
 #include "WorldMatrix.h"
 #include "FormationGenerator.h"
 #include "BeingsModule.h"
-#include "typealiases.h"
 #include "beingtypes.h"
 
 template<class T, size_t N> 
@@ -37,8 +36,8 @@ public:
     ArgentumTileMap();
     ~ArgentumTileMap();
 
-    std::optional<tiletype_uid> findTileUid(const StringName& stringId) const;
-    const StringName getTileId(tiletype_uid uid) const;
+    std::optional<TileTypeUid> findTileUid(const StringName& stringId) const;
+    const StringName getTileId(TileTypeUid uid) const;
 
     Node* global_data;
     std::unique_ptr<BeingsModule> mBeingsModule;
@@ -49,10 +48,10 @@ public:
 
     //SOLO USAR PARA FORMATIONS
     void placeFormationTile(
-        const SafeVec formationOrigin, const SafeVec tileCoordsRelativeToFormationOrigin, 
-        const tiletype_uid newTile, bool deletePreviousTiles = false);
+        const SafeVec& formationOrigin, const SafeVec& tileCoordsRelativeToFormationOrigin, 
+        const TileTypeUid newTile, bool deletePreviousTiles = false);
     
-    bool placeIngameTile(const SafeVec coords, const StringName& id);//akí la id puede ser un stringname directamente, no se está iterando y así se puede bindear a godot el method
+    bool placeIngameTile(const SafeVec& coords, const StringName& id);//akí la id puede ser un stringname directamente, no se está iterando y así se puede bindear a godot el method
     //false: out of array bounds u otro error (usado por el godot-side)
 
     //BeingModuleMethod only
@@ -60,7 +59,7 @@ public:
     //TODO algún método para escribir en un archivo el estado del mapa actual (intentar escribir en el .tres?)
     //TODO algún método para cargar el worldMatrix a partir de un archivo
     
-    int get_seed();void set_seed(const u_int seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
+    int get_seed();void set_seed(const std::uint_fast32_t seed);//global seed (picks random seeds for generations with a seeded gdscript RNG)
 
     Dictionary get_tiles_data(); void set_tiles_data(const Dictionary& data); void overrideTilesDataAndAddNewMappings(const Dictionary& data);
 
@@ -68,14 +67,14 @@ public:
 
 //todo algun método para placear/cambiar/modificar/buildear tiles cuando ya se está ingame y q se guarden en un hashmap con las modificadas
     
-    void freeze_and_store_being(const Vector2 glb_coords, const being_uid individual_unique_id);
+    void freeze_and_store_being(const Vector2 glb_coords, const BeingUid individual_unique_id);
 
     void generate_world_matrix(const Vector2i size, const Dictionary& tiles_data);
     void generate_formation(const Ref<FormationGenerator>& formation_generator, const Vector2i origin, const Vector2i size, 
             const Ref<Resource>& tileSelectionSet, unsigned int seed, const Dictionary& data);
     
     void load_tiles_around(const Vector2 coords, const Vector2i chunk_size, const int uid);
-    void unloadExcessTiles(const SafeVec topLeftCornerCoords, const SafeVec chunkSize, const int uid);
+    void unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& chunkSize, const int uid);
  
 //!SE PUEDE USAR get_node("root/...") para conseguir un puntero a un nodo de godot, y, call sobre este para llamar un método de este
 private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del lado de gdscript usando simplemente call("",""...) (llama a métodos de gdscript propios de este nodo)
@@ -87,7 +86,7 @@ private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del l
     std::unordered_map<StringName, std::unordered_map<StringName, Variant>> mCppTilesData;
     std::vector<StringName> mTilesUidMapping;   
 
-    std::unordered_map<SafeVec, std::array<tiletype_uid, WorldMatrix::MAX_TILES_PER_POS>, SafeVec::hash> mPositionsWithChangedTiles;
+    std::unordered_map<SafeVec, std::array<TileTypeUid, WorldMatrix::MAX_TILES_PER_POS>, SafeVec::hash> mPositionsWithChangedTiles;
 
     //TIENE Q SER UN INT, PORQ SINO EN EL GODOT NO SE PUEDE VER EL ESTADO DEL OBJECT EN EL INSPECTOR. 
     //ACA HAY Q GUARDAR UN UIDQ REFERENCIE EL STATE GUARDADO EN GODOT.
@@ -96,8 +95,8 @@ private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del l
     
     //update: creo q no hace falta esto. con un dictionary en godot con key coordx_coordy_coordz y value el state ya se puede hacer todo
     std::unordered_map<SafeVec, std::unordered_set<tileinstance_uid>, SafeVec::hash> mTileInstancesState;
-    std::unordered_map<SafeVec, std::unordered_map<u_char, Object>, SafeVec::hash> mTileInstancesState1;
-    std::unordered_map<SafeVec, std::unordered_map<u_char, tileinstance_uid>, SafeVec::hash> mTileInstancesState2;
+    std::unordered_map<SafeVec, std::unordered_map<std::uint_fast8_t, Object>, SafeVec::hash> mTileInstancesState1;
+    std::unordered_map<SafeVec, std::unordered_map<std::uint_fast8_t, tileinstance_uid>, SafeVec::hash> mTileInstancesState2;
 
     std::unordered_map<std::string, SafeVec> mTrackedBeingsCoords;//updateado cada
    
@@ -108,18 +107,18 @@ private: //!NOTA: se pueden llamar a funciones propias q estén en el nodo del l
     //el String es la uniqueid del being específico (individuo). esta unique id es pasada al GDscript-side cuando toca spawnear, 
     //en donde según la id extrae el being de un dictionary q tiene guardado
 
-    void decrementSharedCount(const SafeVec tileCoord);
+    void decrementSharedCount(const SafeVec& tileCoord);
 
     //keeps track of tracks of the tiles loaded by the being with the specific uid (int)
-    std::unordered_map<being_uid, std::unordered_set<SafeVec, SafeVec::hash>> mBeingLoadedTiles;
+    std::unordered_map<BeingUid, std::unordered_set<SafeVec, SafeVec::hash>> mBeingLoadedTiles;
 
-    std::unordered_map<SafeVec, int16_t, SafeVec::hash> mTileSharedLoadsCount;
+    std::unordered_map<SafeVec, std::uint_fast16_t, SafeVec::hash> mTileSharedLoadsCount;
     
-    static bool withinChunkBounds(const SafeVec loadedCoordToCheck, const SafeVec topLeftCorner, const SafeVec chunkSize);
+    static bool withinChunkBounds(const SafeVec& loadedCoordToCheck, const SafeVec& topLeftCorner, const SafeVec& chunkSize);
 
-    bool setCell(const tiletype_uid newTile, const SafeVec coords);
+    bool setCell(const TileTypeUid newTile, const SafeVec& coords);
 
-    static bool exceedsTileLimit(const tiletype_uid count);
+    static bool exceedsTileLimit(const TileTypeUid count);
 
     protected: static void _bind_methods();
 };

@@ -3,8 +3,8 @@
 #include <godot_cpp/variant/string.hpp>
 namespace godot
 {
-typedef unsigned int being_uid;
-typedef String beingkind_id;
-typedef unsigned short int spawnweight;
+using BeingUid = unsigned int;
+using BeingKindId = String;
+using SpawnWeight = unsigned short int;
 }
 #endif //argcpp_beingtypes_H__

@@ -13,7 +13,7 @@ public:
     const SafeVec SIZE;
     const unsigned long AREA;
 
-    matrix(const SafeVec size) : 
+    matrix(const SafeVec& size) : 
         DOWNSCALE_FACTOR(1), SIZE(size/1), AREA(SIZE.area())
     {
         if( ! size.isStrictlyPositive()){
@@ -23,7 +23,7 @@ public:
         flattenedMatrix.reserve(AREA); flattenedMatrix.resize(AREA);
     }
     //downscaling constructor
-    matrix(const SafeVec originalSize, const unsigned int DOWNSCALE_FACTOR) : 
+    matrix(const SafeVec& originalSize, const unsigned int DOWNSCALE_FACTOR) : 
         DOWNSCALE_FACTOR(MAX(DOWNSCALE_FACTOR, 1)),
         SIZE(originalSize/DOWNSCALE_FACTOR), AREA(SIZE.area())
     {
@@ -34,32 +34,32 @@ public:
         flattenedMatrix.reserve(AREA); flattenedMatrix.resize(AREA);
     }
 
-    T& operator[](const SafeVec coords)  
+    T& operator[](const SafeVec& coords)  
     {
         let downscaledCoords = coords/DOWNSCALE_FACTOR;
         return flattenedMatrix[SIZE.lef*downscaledCoords.lef + downscaledCoords.RIGHT];
     }
-    const T& operator[](const SafeVec coords) const
+    const T& operator[](const SafeVec& coords) const
     {
         let downscaledCoords = coords/DOWNSCALE_FACTOR;
         return flattenedMatrix[SIZE.lef*downscaledCoords.lef + downscaledCoords.RIGHT];
     }
 
-    T& atNoDownscale(const SafeVec coords)  
+    T& atNoDownscale(const SafeVec& coords)  
     {
         return flattenedMatrix[SIZE.lef*coords.lef + coords.RIGHT];
     }
-    const T& atNoDownscale(const SafeVec coords) const
+    const T& atNoDownscale(const SafeVec& coords) const
     {
         return flattenedMatrix[SIZE.lef*coords.lef + coords.RIGHT];
     }
 
-    T& at(const SafeVec coords)  
+    T& at(const SafeVec& coords)  
     {
         let downscaledCoords = coords/DOWNSCALE_FACTOR;
         return flattenedMatrix.at(SIZE.lef*downscaledCoords.lef + downscaledCoords.RIGHT);
     }
-    const T& at(const SafeVec coords) const
+    const T& at(const SafeVec& coords) const
     {
         let downscaledCoords = coords/DOWNSCALE_FACTOR;
         return flattenedMatrix.at(SIZE.lef*downscaledCoords.lef + downscaledCoords.RIGHT);

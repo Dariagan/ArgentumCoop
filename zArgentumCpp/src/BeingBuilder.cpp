@@ -35,7 +35,7 @@ BeingBuilder& BeingBuilder::setHeadScale(const Vector3& headScale)//agregar rese
 BeingBuilder& BeingBuilder::setBodyScale(const Vector3& bodyScale)//agregar reset
 {this->bodyScale = bodyScale; return *this;}
 
-BeingBuilder& BeingBuilder::setExtraHealthMultiplier(const float extraHealthMultiplier)//agregar reset
+BeingBuilder& BeingBuilder::setExtraHealthMultiplier(const double extraHealthMultiplier)//agregar reset
 {this->extraHealthMultiplier = extraHealthMultiplier; return *this;}
 
 // also sets validationSuccessful to false
@@ -122,7 +122,7 @@ void BeingBuilder::_gd_set_body_id(const String& body_id){setBodyId(body_id);}
 void BeingBuilder::_gd_randomize_body_id(){randomizeBodyId();}
 void BeingBuilder::_gd_set_head_scale(const Vector3& head_scale){setHeadScale(head_scale);}
 void BeingBuilder::_gd_set_body_scale(const Vector3& body_scale){setBodyScale(body_scale);}
-void BeingBuilder::_gd_set_extra_health_multiplier(const float multiplier){setExtraHealthMultiplier(extraHealthMultiplier);}
+void BeingBuilder::_gd_set_extra_health_multiplier(const double multiplier){setExtraHealthMultiplier(extraHealthMultiplier);}
 Dictionary BeingBuilder::_gd_get_result() const
 {
     Dictionary emptyDict; emptyDict.make_read_only();

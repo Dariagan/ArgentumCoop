@@ -4,8 +4,8 @@ using namespace godot;
 
 
 void BeingsModule::placeNaturalSpawningWeight(
-    const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
-    const beingkind_id& beingKindId, const spawnweight weight)
+    const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
+    const BeingKindId& beingKindId, const SpawnWeight weight)
 {
     let absoluteCoordinates = formationOrigin + coordsRelativeToFormationOrigin;
 
@@ -22,11 +22,11 @@ void BeingsModule::birthBeing(const Vector2i coords, const BeingBuilder& beingBu
     }
 }
 
-void BeingsModule::birthBeingOfKind(const Vector2i tile_map_coords, const beingkind_id& being_kind_id)
+void BeingsModule::birthBeingOfKind(const Vector2i tile_map_coords, const BeingKindId& being_kind_id)
 {mArgentumTileMap->emit_signal("birth_of_being_of_kind", tile_map_coords, being_kind_id);}
 
 void BeingsModule::birthBeingOfKind(
-    const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const beingkind_id& being_kind_id)
+    const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const BeingKindId& being_kind_id)
 {
     const Variant& getbeingkinds_result = mArgentumTileMap->global_data->get("beingkinds");
     if(getbeingkinds_result.get_type() != Variant::DICTIONARY)
@@ -76,7 +76,7 @@ void BeingsModule::birthBeingOfKind(
 void BeingsModule::updateChunkBeingCounts()
 {
     std::for_each(std::execution::par_unseq, mFrozenBeings.begin(), mFrozenBeings.end(), 
-        [&](const std::pair<const SafeVec, std::vector<std::pair<Vector2, being_uid>>> & frozenBeing)
+        [&](const std::pair<const SafeVec, std::vector<std::pair<Vector2, BeingUid>>> & frozenBeing)
         { 
             const auto&[coords, vec] = frozenBeing;
             (*mBeingsInChunkCount)[coords] = vec.size();
@@ -88,12 +88,12 @@ void BeingsModule::updateChunkBeingCounts()
 //solo debería ejecutar esto el host y desp retransmitir los spawneos específicos
 void BeingsModule::doNaturalSpawning()
 {
-    for(u_int16_t chunk_i = 0; chunk_i < mBeingsInChunkCount->SIZE.lef; chunk_i++)
-    for(u_int16_t chunk_j = 0; chunk_j < mBeingsInChunkCount->SIZE.RIGHT; chunk_j++)
+    for(std::uint_fast16_t chunk_i = 0; chunk_i < mBeingsInChunkCount->SIZE.lef; chunk_i++)
+    for(std::uint_fast16_t chunk_j = 0; chunk_j < mBeingsInChunkCount->SIZE.RIGHT; chunk_j++)
     {
         const SafeVec chunkCoords(chunk_i, chunk_j);
-        for(u_int16_t sw_i = 0; sw_i < MACROSCOPIC_SPAWNING_CHUNK_SIZE; sw_i++)
-        for(u_int16_t sw_j = 0; sw_j < MACROSCOPIC_SPAWNING_CHUNK_SIZE; sw_j++)
+        for(std::uint_fast16_t sw_i = 0; sw_i < MACROSCOPIC_SPAWNING_CHUNK_SIZE; sw_i++)
+        for(std::uint_fast16_t sw_j = 0; sw_j < MACROSCOPIC_SPAWNING_CHUNK_SIZE; sw_j++)
         {
             if((*mBeingsInChunkCount)[chunkCoords] < BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK)
             {
@@ -102,7 +102,7 @@ void BeingsModule::doNaturalSpawning()
                 letref spawnWeightsMapping = mSpawnWeightsMatrix->atNoDownscale(swCoords);
                 letref weights = spawnWeightsMapping.second;
 
-                std::discrete_distribution<spawnweight> distribution(weights.begin(), weights.end());
+                std::discrete_distribution<SpawnWeight> distribution(weights.begin(), weights.end());
 
                 letref beingkindUids = spawnWeightsMapping.first;
                 let randomBeingkindUid = beingkindUids[distribution(mEngine)];
@@ -117,10 +117,10 @@ void BeingsModule::doNaturalSpawning()
     
 }
 
-BeingsModule::BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec size)
+BeingsModule::BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec& size)
 {
     this->mArgentumTileMap = argentumTileMap;
-    this->mBeingsInChunkCount = std::make_unique<matrix<u_int16_t>>(size, MACROSCOPIC_SPAWNING_CHUNK_SIZE*mSpawnWeightsMatrix->DOWNSCALING_FACTOR);
+    this->mBeingsInChunkCount = std::make_unique<matrix<std::uint_fast16_t>>(size, MACROSCOPIC_SPAWNING_CHUNK_SIZE*mSpawnWeightsMatrix->DOWNSCALING_FACTOR);
     this->mSpawnWeightsMatrix = std::make_unique<SpawnWeightsMatrix>(size);
     
 }

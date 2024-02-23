@@ -35,7 +35,7 @@ class BeingBuilder: public RefCounted
         BeingBuilder& randomizeBodyId();
         BeingBuilder& setHeadScale(const Vector3& headScale);
         BeingBuilder& setBodyScale(const Vector3& bodyScale);
-        BeingBuilder& setExtraHealthMultiplier(const float extraHealthMultiplier);
+        BeingBuilder& setExtraHealthMultiplier(const double extraHealthMultiplier);
 
         bool build();
         std::optional<Dictionary> getResult() const;
@@ -58,14 +58,14 @@ class BeingBuilder: public RefCounted
         void _gd_randomize_body_id(); 
         void _gd_set_head_scale(const Vector3& head_scale);
         void _gd_set_body_scale(const Vector3& body_scale);
-        void _gd_set_extra_health_multiplier(const float multiplier);
+        void _gd_set_extra_health_multiplier(const double multiplier);
         Dictionary _gd_get_result() const;
 
         std::optional<Dictionary> builtBeing = std::nullopt;
         String name="random", factionId="", raceId="", klassId="random", bodyId="random", headId="random";
         bool controllableRace = false;
         Vector3 headScale = Vector3(1,1,1), bodyScale = Vector3(1,1,1);
-        float extraHealthMultiplier = 1;
+        double extraHealthMultiplier = 1;
         bool isValidBeing() const;
         void failAndPrint(bool& validationFailedMessageAlreadyPrinted) const;
 

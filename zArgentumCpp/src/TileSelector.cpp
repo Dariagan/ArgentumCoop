@@ -1,7 +1,7 @@
 #include "TileSelector.h"
 using namespace godot;
 
-TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const u_int seed, const char input_n_threads) try : 
+TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const std::uint_fast32_t seed, const std::uint_fast8_t input_n_threads) try : 
     TARGETS_COUNT(((Array)gdTileSelection->get("targets")).size()), N_THREADS(input_n_threads)
 {
     if (input_n_threads < 1){UtilityFunctions::printerr("TileSelector.cpp: passed input_n_threads is less than 1");return;}
@@ -22,7 +22,7 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
 
     if (gd_tile_to_place.size() < TARGETS_COUNT){UtilityFunctions::printerr("TileSelector.cpp: passed dictionary doesn't cover all needed targets for the formation");return;}
                 
-    for (u_int16_t i = 0; i < TARGETS_COUNT; i++)
+    for (std::uint_fast16_t i = 0; i < TARGETS_COUNT; i++)
     {
         mAvailableTargets[i] = ((String)(gd_targets[i])).utf8().get_data();
 
@@ -42,13 +42,13 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
             
             let group_dict_size = group_dict.keys().size(); if(group_dict_size >= WorldMatrix::NULL_TILE_UID){UtilityFunctions::printerr("TileSelector.cpp: passed dict is too big");}
 
-            std::vector<tiletype_uid> groupedTileUid(group_dict_size);
+            std::vector<TileTypeUid> groupedTileUid(group_dict_size);
             groupedTileUid.reserve(group_dict_size);
 
             std::vector<weight> groupTileUidWeight(group_dict_size);
             groupTileUidWeight.reserve(group_dict_size);
 
-            for (u_int j = 0; j < MIN(group_dict_size, WorldMatrix::NULL_TILE_UID-1); j++)
+            for (std::uint_fast32_t j = 0; j < MIN(group_dict_size, WorldMatrix::NULL_TILE_UID-1); j++)
             {
                 let optUid = argentumTileMap.findTileUid(group_dict.keys()[j]);
                 if( ! optUid.has_value()){
@@ -67,7 +67,7 @@ TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumT
 
 TileSelector::~TileSelector(){};
 
-tiletype_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, const u_char thread_i)
+TileTypeUid TileSelector::getTileUidForTarget(const char* inputTargetTofill, const std::uint_fast8_t thread_i)
 {
     let iter = std::find_if(mAvailableTargets.begin(), mAvailableTargets.end(), 
         [&](const std::string& availableTarget) {
@@ -79,9 +79,9 @@ tiletype_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, co
         let index = std::distance(mAvailableTargets.begin(), iter);
         letref variantValue = mTileUidOrGroup[index];
 
-        if(std::holds_alternative<tiletype_uid>(variantValue))
+        if(std::holds_alternative<TileTypeUid>(variantValue))
         {
-            return std::get<tiletype_uid>(variantValue);
+            return std::get<TileTypeUid>(variantValue);
         }
         auto& pair = mIdsDistributionOfGroups[index];
         return pair.first[pair.second(mRandomEngines[thread_i])];
@@ -90,8 +90,8 @@ tiletype_uid TileSelector::getTileUidForTarget(const char* inputTargetTofill, co
     return WorldMatrix::NULL_TILE_UID;
 }
 
-void TileSelector::reseedEngines(const u_int seed){
-    for(u_char thread_i = 0; thread_i < N_THREADS; thread_i++){
+void TileSelector::reseedEngines(const std::uint_fast32_t seed){
+    for(std::uint_fast8_t thread_i = 0; thread_i < N_THREADS; thread_i++){
         mRandomEngines[thread_i].seed(seed+thread_i);
     }
 }

@@ -15,7 +15,7 @@
 #include <memory>
 #include <algorithm>
 #include <execution>
-#include "typealiases.h"
+
 namespace godot 
 {//NO PONER CUERPOS DE MÉTODOS EN LOS HEADER FILES (AUNQUE ESTÉN VACÍOS). PUEDE CAUSAR PROBLEMAS DE LINKING AL COMPILAR
 class ArgentumTileMap;
@@ -27,16 +27,18 @@ public:
     FormationGenerator();
     virtual ~FormationGenerator();
     
-    static float getBorderClosenessFactor(
-        const SafeVec coords, const SafeVec SIZE, const float power = 3.3f);
+    static double getBorderClosenessFactor(
+        const SafeVec& coords, const SafeVec& SIZE, const double power = 3.);
     
     virtual void generate(ArgentumTileMap& argentumTileMap, 
-        const SafeVec origin, const SafeVec size, const Ref<Resource>& tileSelectionSet, 
+        const SafeVec& origin, const SafeVec& size, const Ref<Resource>& tileSelectionSet, 
         const unsigned int seed = 0, const Dictionary& data = Dictionary());
 protected:
     static void _bind_methods();
         
     std::unique_ptr<TileSelector> mTileSelector;
 };
+
+
 }
 #endif // __FORMATION_GENERATOR_H__

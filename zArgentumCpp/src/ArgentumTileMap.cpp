@@ -15,7 +15,7 @@ void ArgentumTileMap::generate_formation(const Ref<FormationGenerator>& formatio
     
     if (size.x < 0 || size.y < 0){
         UtilityFunctions::printerr("Negatively sized formation not allowed");return;}
-    constexpr uint16_t MIN_SIZE = 600;
+    constexpr std::uint_fast16_t MIN_SIZE = 600;
     if (size.x < MIN_SIZE || size.y < MIN_SIZE){
         UtilityFunctions::printerr("World size is too small, must be at least ",MIN_SIZE,"x",MIN_SIZE);return;}
     const bool outOfBoundsEast = origin.x + size.x > mWorldMatrixPtr->SIZE.lef;
@@ -66,7 +66,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2 global_coords, const Vecto
                     }
                 }
                 if (mWorldMatrixPtr->isNotEmptyAt(tileMapCoords))//if more than 0 tileIds at coords:
-                    for (const tiletype_uid& uid : (*mWorldMatrixPtr)[tileMapCoords])
+                    for (const TileTypeUid& uid : (*mWorldMatrixPtr)[tileMapCoords])
                         {setCell(uid, tileMapCoords);}
                 //TODO
                 //else
@@ -84,7 +84,7 @@ void ArgentumTileMap::load_tiles_around(const Vector2 global_coords, const Vecto
     unloadExcessTiles(topLeftCornerCoords, CHUNK_SIZE, being_uid);
 }
 
-void ArgentumTileMap::unloadExcessTiles(const SafeVec topLeftCornerCoords, const SafeVec CHUNK_SIZE, const int being_uid)
+void ArgentumTileMap::unloadExcessTiles(const SafeVec& topLeftCornerCoords, const SafeVec& CHUNK_SIZE, const int being_uid)
 {
     auto loadedTilesIter = mBeingLoadedTiles[being_uid].begin();
 
@@ -101,11 +101,11 @@ void ArgentumTileMap::unloadExcessTiles(const SafeVec topLeftCornerCoords, const
         else{++loadedTilesIter;}
     }
 }
-void ArgentumTileMap::decrementSharedCount(const SafeVec tileCoord)
+void ArgentumTileMap::decrementSharedCount(const SafeVec& tileCoord)
 {
     if (-- mTileSharedLoadsCount[tileCoord] <= 0)
     {
-        for (u_char layer_i = 0; layer_i < get_layers_count(); layer_i++)
+        for (std::uint_fast8_t layer_i = 0; layer_i < get_layers_count(); layer_i++)
             {erase_cell(layer_i, tileCoord);}
 
         emit_signal("tile_unloaded", (Vector2i)tileCoord);
@@ -120,7 +120,7 @@ void ArgentumTileMap::decrementSharedCount(const SafeVec tileCoord)
 #define ALTERNATIVE_ID StringName("alt_id", true)
 #define MODULO_TILING_AREA StringName("ma", true)
 
-bool ArgentumTileMap::setCell(const tiletype_uid uid, const SafeVec coords)
+bool ArgentumTileMap::setCell(const TileTypeUid uid, const SafeVec& coords)
 {
     if(uid == WorldMatrix::NULL_TILE_UID) return false;
 
@@ -180,20 +180,20 @@ void ArgentumTileMap::generate_world_matrix(const Vector2i size, const Dictionar
 }
 
 int ArgentumTileMap::get_seed(){return seed;}
-void ArgentumTileMap::set_seed(const u_int seed){this->seed=seed; srand(seed);}
+void ArgentumTileMap::set_seed(const std::uint_fast32_t seed){this->seed=seed; srand(seed);}
 
 void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_data)
 {
     if(m_tiles_data.is_empty())
     {
-        const u_int16_t TILES_COUNT = input_tiles_data.size();
+        const std::uint_fast16_t TILES_COUNT = input_tiles_data.size();
 
         if(exceedsTileLimit(TILES_COUNT)) return;
 
         m_tiles_data = input_tiles_data;
 
         mTilesUidMapping.resize(TILES_COUNT);
-        for(u_int16_t i = 0; i < TILES_COUNT; i++)
+        for(std::uint_fast16_t i = 0; i < TILES_COUNT; i++)
             {mTilesUidMapping[i] = input_tiles_data.keys()[i];}                    
     }
     else overrideTilesDataAndAddNewMappings(input_tiles_data);   
@@ -201,11 +201,11 @@ void ArgentumTileMap::replaceTilesDataProperly(const Dictionary& input_tiles_dat
 void ArgentumTileMap::overrideTilesDataAndAddNewMappings(const Dictionary& input_tiles_data)
 {
     m_tiles_data = input_tiles_data;
-    const u_int16_t NEW_TILES_COUNT = m_tiles_data.size();
+    const std::uint_fast16_t NEW_TILES_COUNT = m_tiles_data.size();
 
     if(exceedsTileLimit(NEW_TILES_COUNT)) return;
 
-    for(u_int16_t i = 0; i < input_tiles_data.size(); i++)
+    for(std::uint_fast16_t i = 0; i < input_tiles_data.size(); i++)
     {
         const auto& tile_id = input_tiles_data.keys()[i];
 
@@ -223,14 +223,14 @@ ArgentumTileMap::ArgentumTileMap(){}
 
 ArgentumTileMap::~ArgentumTileMap(){}
 
-std::optional<tiletype_uid> ArgentumTileMap::findTileUid(const StringName& stringId) const
+std::optional<TileTypeUid> ArgentumTileMap::findTileUid(const StringName& stringId) const
 {
-    for(u_int16_t i = 0; i < mTilesUidMapping.size(); i++)
+    for(std::uint_fast16_t i = 0; i < mTilesUidMapping.size(); i++)
         if(mTilesUidMapping[i] == stringId) return i;
     return std::nullopt;
 }
 
-const StringName ArgentumTileMap::getTileId(tiletype_uid uid) const
+const StringName ArgentumTileMap::getTileId(TileTypeUid uid) const
 {
     if(uid < mTilesUidMapping.size()) 
         return mTilesUidMapping[uid];
@@ -321,7 +321,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 
 //     RandomNumberGenerator rng;
 
-//     for(float triesCount = 0; triesCount < MAX_TRIES; triesCount++)
+//     for(double triesCount = 0; triesCount < MAX_TRIES; triesCount++)
 //     {
 //         const SafeVec rCoords(
 //             rng.randi_range(sv_topLeftCorner.lef, sv_bottomRightCorner.lef), 
@@ -341,7 +341,7 @@ void ArgentumTileMap::set_tiles_data(const Dictionary& input_tiles_data)
 //     return ERROR_VECTOR;
 // }
 bool ArgentumTileMap::withinChunkBounds(
-    const SafeVec loadedCoordToCheck, const SafeVec chunkTopLeftCorner, const SafeVec CHUNK_SIZE)
+    const SafeVec& loadedCoordToCheck, const SafeVec& chunkTopLeftCorner, const SafeVec& CHUNK_SIZE)
 {
     return loadedCoordToCheck.lef >= chunkTopLeftCorner.lef 
         && loadedCoordToCheck.RIGHT >= chunkTopLeftCorner.RIGHT 
@@ -351,19 +351,19 @@ bool ArgentumTileMap::withinChunkBounds(
 // GUARDAR LAS POS CON ARRAYS MODIFICADOS
 // GUARDAR EN ALGUN LUGAR LAS TILES SELECCIONADAS ALEATORIAMENTE
 void ArgentumTileMap::placeFormationTile( 
-    const SafeVec formationOrigin, const SafeVec coordsRelativeToFormationOrigin, 
-    const tiletype_uid newTile, const bool deletePreviousTiles){try
+    const SafeVec& formationOrigin, const SafeVec& coordsRelativeToFormationOrigin, 
+    const TileTypeUid newTile, const bool deletePreviousTiles){try
 {
     const SafeVec absoluteCoords = formationOrigin + coordsRelativeToFormationOrigin;
     auto& otherTilesAtPos = (*mWorldMatrixPtr)[absoluteCoords];
     
     if (deletePreviousTiles){
         otherTilesAtPos[0] = newTile;
-        for(u_char i = 1; i < WorldMatrix::MAX_TILES_PER_POS; i++)
+        for(std::uint_fast8_t i = 1; i < WorldMatrix::MAX_TILES_PER_POS; i++)
             otherTilesAtPos[i] = WorldMatrix::NULL_TILE_UID;
     }
     else
-    for(char i = 0; i < WorldMatrix::MAX_TILES_PER_POS; i++)
+    for(std::uint_fast8_t i = 0; i < WorldMatrix::MAX_TILES_PER_POS; i++)
         if(otherTilesAtPos[i] == WorldMatrix::NULL_TILE_UID){
             otherTilesAtPos[i] = newTile;      
             break;
@@ -371,7 +371,7 @@ void ArgentumTileMap::placeFormationTile(
 }
 catch(const std::exception& e){UtilityFunctions::printerr("ArgentumTileMap.cpp::placeTile() exception: ", e.what());}}
 
-void ArgentumTileMap::freeze_and_store_being(const Vector2 loc_coords, const being_uid individual_unique_id)
+void ArgentumTileMap::freeze_and_store_being(const Vector2 loc_coords, const BeingUid individual_unique_id)
 {
     //TODO ARREGLAR PARA MULTIPLAYER
     //get_multiplayer()
@@ -385,7 +385,7 @@ void ArgentumTileMap::freeze_and_store_being(const Vector2 loc_coords, const bei
     mBeingLoadedTiles.erase(individual_unique_id);
 }
 
-bool ArgentumTileMap::exceedsTileLimit(const tiletype_uid count){if (count >= WorldMatrix::NULL_TILE_UID - 1){UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");return true;}return false;}
+bool ArgentumTileMap::exceedsTileLimit(const TileTypeUid count){if (count >= WorldMatrix::NULL_TILE_UID - 1){UtilityFunctions::printerr("too many tiles (GlobalDataInterface.cpp::set_tiles())");return true;}return false;}
 
 //se pueden llamar metodos de godot de guardar desde acá, aviso
 //solo guardar los arrays modificados

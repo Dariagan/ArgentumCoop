@@ -4,36 +4,35 @@
 #include <type_traits>
 #include <limits>
 #include <vector>
-#include "typealiases.h"
 #include "SafeVector.cpp"
 
 namespace godot{
 
-typedef unsigned short int tiletype_uid;
+using TileTypeUid = std::uint16_t;
 
 template <unsigned size>
-constexpr std::array<tiletype_uid, size> initialize_uids_array_as_empty();
+constexpr std::array<TileTypeUid, size> initialize_uids_array_as_empty();
 
 class WorldMatrix
 {
 public:
     const SafeVec SIZE;
 
-    static constexpr tiletype_uid NULL_TILE_UID = std::numeric_limits<u_int16_t>::max();
+    static constexpr TileTypeUid NULL_TILE_UID = std::numeric_limits<std::uint16_t>::max();
 
-    static constexpr unsigned char MAX_TILES_PER_POS = 5;
+    static constexpr std::uint8_t MAX_TILES_PER_POS = 5;
 
-    std::array<tiletype_uid, MAX_TILES_PER_POS>& operator[](const SafeVec coords);
-    std::array<tiletype_uid, MAX_TILES_PER_POS>& at(const SafeVec coords);
-    u_char countAt(const SafeVec coords);
-    bool isEmptyAt(const SafeVec coords);
-    bool isNotEmptyAt(const SafeVec coords);
+    std::array<TileTypeUid, MAX_TILES_PER_POS>& operator[](const SafeVec& coords);
+    std::array<TileTypeUid, MAX_TILES_PER_POS>& at(const SafeVec& coords);
+    std::uint_fast8_t countAt(const SafeVec& coords);
+    bool isEmptyAt(const SafeVec& coords);
+    bool isNotEmptyAt(const SafeVec& coords);
 
-    WorldMatrix(const SafeVec size); 
+    WorldMatrix(const SafeVec& size); 
         
 private:
     
-    std::vector<std::array<tiletype_uid, MAX_TILES_PER_POS>> flattenedUidsMatrix;
+    std::vector<std::array<TileTypeUid, MAX_TILES_PER_POS>> flattenedUidsMatrix;
 
     //todo meterle la spawnweightmatrix?
     
@@ -41,9 +40,9 @@ private:
 };     
 
 template <unsigned size>
-constexpr std::array<tiletype_uid, size> initialize_uids_array_as_empty()
+constexpr std::array<TileTypeUid, size> initialize_uids_array_as_empty()
 {
-    std::array<tiletype_uid, size> ret{};
+    std::array<TileTypeUid, size> ret{};
     for (int i = 0; i < size; i++)
         ret[i] = WorldMatrix::NULL_TILE_UID;
     return ret;
