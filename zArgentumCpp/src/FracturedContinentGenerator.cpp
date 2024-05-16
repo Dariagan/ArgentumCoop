@@ -1,4 +1,4 @@
-#include "FracturedContinentGenerator.h"
+#include "FracturedContinentGenerator.hpp"
 
 using namespace godot;
 

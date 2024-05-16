@@ -1,4 +1,4 @@
-#include "FormationGenerator.h"
+#include "FormationGenerator.hpp"
 
 using namespace godot;
 

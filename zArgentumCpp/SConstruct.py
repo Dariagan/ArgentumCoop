@@ -39,7 +39,7 @@ env.Append(CPPPATH=["src/"])
 #sudo update-alternatives --install /usr/bin/x86_64-w64-mingw32-g++ x86_64-w64-mingw32-g++ /usr/bin/g++-13 100
 #sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/g++-13
 
-env.Append(CXXFLAGS=["", "-fexceptions", "-std=c++20", "-pthread", "-fPIC"])
+env.Append(CXXFLAGS=["", "-fexceptions", "-std=c++20", "-pthread", "-fPIC", "-fmodules-ts"])
 sources = Glob("src/*.cpp")
 
 if env["platform"] == "macos":

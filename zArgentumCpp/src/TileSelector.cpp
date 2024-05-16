@@ -1,4 +1,4 @@
-#include "TileSelector.h"
+#include "TileSelector.hpp"
 using namespace godot;
 
 TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const std::uint_fast32_t seed, const std::uint_fast8_t input_n_threads) try : 

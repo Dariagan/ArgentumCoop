@@ -1,10 +1,9 @@
-#include "register_types.h"
-#include "FormationGenerator.h"
-#include "FracturedContinentGenerator.h"
-#include "ArgentumTileMap.h"
-#include "BeingBuilder.h"
+#include "register_types.hpp"
+#include "FormationGenerator.hpp"
+#include "FracturedContinentGenerator.hpp"
+#include "ArgentumTileMap.hpp"
+#include "BeingBuilder.hpp"
 
-#include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/godot.hpp>

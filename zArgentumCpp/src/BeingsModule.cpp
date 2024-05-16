@@ -1,4 +1,4 @@
-#include "BeingsModule.h"
+#include "BeingsModule.hpp"
 
 using namespace godot;
 

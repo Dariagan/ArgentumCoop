@@ -2,4 +2,6 @@
 .godot/
 .vscode
 zArgentumCpp/src/ApocalypseArgentum.code-workspace
+zArgentumCpp/src/*.o
+zArgentumCpp/src/*.os
 ApocalypseArgentum.code-workspace

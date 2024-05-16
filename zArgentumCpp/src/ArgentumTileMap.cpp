@@ -1,4 +1,4 @@
-#include "ArgentumTileMap.h"
+#include "ArgentumTileMap.hpp"
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/classes/random_number_generator.hpp>

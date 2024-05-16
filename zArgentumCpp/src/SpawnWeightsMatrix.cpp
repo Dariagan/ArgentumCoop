@@ -1,4 +1,4 @@
-#include "SpawnWeightsMatrix.h"
+#include "SpawnWeightsMatrix.hpp"
 using namespace godot;
 
 const SWMAT_TYPE& SpawnWeightsMatrix::operator[] (const SafeVec& worldMatrixCoords) const
