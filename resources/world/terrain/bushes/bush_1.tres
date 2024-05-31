@@ -1,13 +1,14 @@
 [gd_resource type="Resource" script_class="Tile" load_steps=2 format=3 uid="uid://bq5pl5i5y5hk1"]
 
-[ext_resource type="Script" path="res://scripts/resources/world/tile.gd" id="1_aj51r"]
+[ext_resource type="Script" path="res://scripts/world/tile.gd" id="1_aj51r"]
 
 [resource]
 script = ExtResource("1_aj51r")
 id = "bush_1"
 layer = 2
-source_id = 7
+source_atlas = 7
 origin_position = Vector2i(0, 0)
 flipped_at_random = true
+random_scale_range = Vector4(0, 0, 0, 0)
 modulo_tiling_area = Vector2i(1, 1)
 alt_id = 0

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TileSelection" load_steps=2 format=3 uid="uid://dewua1lavi80"]
 
-[ext_resource type="Script" path="res://scripts/resources/world/tile_selection.gd" id="1_1vs1g"]
+[ext_resource type="Script" path="res://scripts/world/tile_selection.gd" id="1_1vs1g"]
 
 [resource]
 script = ExtResource("1_1vs1g")

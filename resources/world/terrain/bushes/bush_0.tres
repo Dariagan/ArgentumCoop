@@ -1,12 +1,12 @@
 [gd_resource type="Resource" script_class="Tile" load_steps=2 format=3 uid="uid://ds5n73k7dg801"]
 
-[ext_resource type="Script" path="res://scripts/resources/world/tile.gd" id="1_g6pdw"]
+[ext_resource type="Script" path="res://scripts/world/tile.gd" id="1_g6pdw"]
 
 [resource]
 script = ExtResource("1_g6pdw")
 id = "bush_0"
 layer = 2
-source_id = 6
+source_atlas = 6
 origin_position = Vector2i(0, 0)
 flipped_at_random = true
 random_scale_range = Vector4(0, 0, 0, 0)

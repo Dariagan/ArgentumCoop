@@ -1,5 +1,10 @@
 # Godot 4+ specific ignores
 .godot/
 .vscode
-zArgentumCpp/src/ApocalypseArgentum.code-workspace
+*Cpp/src/ApocalypseArgentum.code-workspace
+*Cpp/src/*.o
+*Cpp/src/*.os
+*Rust/target
+
+
 ApocalypseArgentum.code-workspace

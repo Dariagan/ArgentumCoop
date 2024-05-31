@@ -1,12 +1,12 @@
 [gd_resource type="Resource" script_class="Tile" load_steps=2 format=3 uid="uid://ci370602mwpw0"]
 
-[ext_resource type="Script" path="res://scripts/resources/world/tile.gd" id="1_ld7wy"]
+[ext_resource type="Script" path="res://scripts/world/tile.gd" id="1_ld7wy"]
 
 [resource]
 script = ExtResource("1_ld7wy")
 id = &"cave_mossy"
 layer = 2
-source_id = 3
+source_atlas = 3
 origin_position = Vector2i(0, 3)
 flipped_at_random = false
 random_scale_range = Vector4(0, 0, 0, 0)

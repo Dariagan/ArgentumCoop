@@ -20,6 +20,7 @@ func _set_scale_remotely(value: Vector3):
 		
 var _width_asimetrically_altered: bool = false
 
+#construye multiplayer tambien
 func construct(sprite_data: SpriteData, character_width_frontally_sideways_height: Vector3, vertical_offset: float = 0, vertical_offset_mult:float = 1) -> void:
 	_vertical_offset = vertical_offset
 	_vertical_offset_mult = vertical_offset_mult

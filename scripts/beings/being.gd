@@ -1,6 +1,8 @@
 extends CharacterBody2D
+
+#todo separar funciones en componentes hijos?
 class_name Being
-#para persistirlo habrá que usar packedscene para guardar las cosas custom variables q puede ser q tenga, sino habrá q iterar por cada child
+#para persistirlo habrá que usar packedscene para guardar las cosas custom children q puede ser q tenga, sino habrá q iterar por cada child
 
 var uid: int = randi_range(-9223372036854775808, 9223372036854775807)
 
@@ -26,16 +28,17 @@ func _connect_tile_map():
 	var tile_map: ArgentumTileMap = get_parent()
 	load_tiles_around_me.connect(tile_map.load_tiles_around)
 
-func construct(data: BeingReqInitData) -> void:
+#constructs for multiplayer too
+func construct(data: BeingStatePreIniter) -> void:
 	if data.sprite_body:
 		body.construct(data.sprite_body, data.body_scale)
 		if data.sprite_head:
 			head.construct(data.sprite_head, data.head_scale, data.sprite_body.head_v_offset, data.body_scale.z)
 	construct_internal_state.rpc(data.serialize())
 	
-@rpc("call_local")
+@rpc("call_local")#dejar esto
 func construct_internal_state(data: Dictionary):
-	internal_state.construct(data["state"])
+	internal_state.construct(data[BeingStatePreIniter.K.INTERNAL_STATE])
 
 var uncontrolled: bool = true
 

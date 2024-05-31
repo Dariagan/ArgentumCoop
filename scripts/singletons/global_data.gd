@@ -2,7 +2,7 @@ extends Node
 
 #region Debugging configuration
 @export var ignore_joiners_readiness_on_start: bool = true
-@export var insta_start: bool = true
+@export var insta_start: bool = false
 @export var debug: bool = true
 @export var debug_walk_mult:float = 3
 @export var noclip: bool = true
@@ -26,7 +26,9 @@ const tile_selections_directories: Array[String] =["res://resources/world/tile_s
 const klasses_directories: Array[String] = ["res://resources/beings/klasses/"]
 const tiles_directories: Array[String] = ["res://resources/world/terrain/", "res://resources/world/buildings/"]
 const spawnable_scenes_directories: Array[String] = ["res://scenes/world/terrain/", "res://scenes/world/buildings/"]
-#TODO USAR MULTIPLE RESOURCE LOADER?
+
+const beingkinds_directories: Array[String] = ["res://resources/beings/beingkinds/"]
+#TODO hacer un player mods directory
 
 var item_data: Dictionary
 
@@ -69,8 +71,11 @@ func _init() -> void:
 	tiles = _index_all_found_resources(tiles_directories)
 	tiles.make_read_only()
 	
+	beingkinds = _index_all_found_resources(beingkinds_directories, true)
+	
 	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
+#TODO CHEQUEAR COLLISION DE KEYS ENCONTRADAS ANTES DE METER AL DICT (PUSHEAR UN ERROR)
 func _index_all_found_resources(directories: Array[String], check_subfolders: bool = true, use_safe_loader: bool = false) -> Dictionary:
 	var dir_access: DirAccess
 	var table: Dictionary = {}
@@ -86,19 +91,22 @@ func _index_all_found_resources(directories: Array[String], check_subfolders: bo
 				
 				if !dir_access.current_is_dir():
 					var resource
-					
 					if not use_safe_loader:
 						resource = ResourceLoader.load(directory + file_name)
-					else:
+					else:#NO USAR SI ESTÁ EN .res/ EL DIRECTORIO, NO HACE FALTA
 						resource = SafeResourceLoader.load(directory + file_name)
 					
 					if resource && "id" in resource:
+						assert(not table.has(resource.id))
 						table[resource.id] = resource
 						print("Resource %s%s loaded" % [directory, file_name])
 					else:
 						printerr("File %s%s couldn't be loaded as a resource" % [directory, file_name])
 				elif check_subfolders:
-					table.merge(_index_all_found_resources([directory+file_name+"/"]), true)
+					var subdict: Dictionary = _index_all_found_resources([directory+file_name+"/"])
+					for key in subdict:
+						assert(not table.has(key))
+						table[key] = subdict[key]
 					
 				file_name = dir_access.get_next()
 		else:
