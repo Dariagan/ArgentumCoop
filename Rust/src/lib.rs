@@ -1,5 +1,10 @@
 use godot::prelude::*;
 
+mod argentum_tilemap;
+pub mod safevec;
+mod matrix;
+mod world_matrix;
+
 struct ArgentumExtension;
 
 
@@ -21,6 +26,10 @@ impl INode2D for Test{
     fn init(node2d: Base<Node2D>) -> Self{
         godot_print!("hello");
     Self{ node2d }
+    }
+
+    fn ready(&mut self){
+
     }
 }
 
