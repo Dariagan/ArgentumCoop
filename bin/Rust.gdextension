@@ -1,0 +1,24 @@
+[configuration]
+
+entry_symbol = "gdext_rust_init"
+compatibility_minimum = "4.3"
+reloadable = true
+
+[libraries]
+
+
+macos.debug = "res://bin/libargentum_rust.macos.template_debug.framework"
+macos.release = "res://bin/libargentum_rust.macos.template_release.framework"
+windows.debug.x86_32 = "res://bin/libargentum_rust.windows.template_debug.x86_32.dll"
+windows.release.x86_32 = "res://bin/libargentum_rust.windows.template_release.x86_32.dll"
+windows.debug.x86_64 = "res://bin/libargentum_rust.windows.template_debug.x86_64.dll"
+windows.release.x86_64 = "res://bin/libargentum_rust.windows.template_release.x86_64.dll"
+
+linux.debug.x86_64 = "res://Rust/target/debug/libargentum_rust.so"
+linux.release.x86_64 = "res://Rust/target/release/libargentum_rust.so"
+
+
+linux.debug.arm64 = "res://bin/libargentum_rust.linux.template_debug.arm64.so"
+linux.release.arm64 = "res://bin/libargentum_rust.linux.template_release.arm64.so"
+linux.debug.rv64 = "res://bin/libargentum_rust.linux.template_debug.rv64.so"
+linux.release.rv64 = "res://bin/libargentum_rust.linux.template_release.rv64.so"

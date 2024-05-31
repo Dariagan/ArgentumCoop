@@ -100,7 +100,15 @@ character_creation_scene = ExtResource("4_lphit")
 script = ExtResource("5_2eji3")
 
 [node name="ArgentumTileMap" type="ArgentumTileMap" parent="Lobby/Game"]
+_import_path = NodePath("")
 unique_name_in_owner = true
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 y_sort_enabled = true
 tile_set = ExtResource("6_67353")
 layer_1/z_index = 5
