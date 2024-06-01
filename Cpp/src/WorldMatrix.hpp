@@ -5,6 +5,7 @@
 #include <limits>
 #include <vector>
 #include "SafeVector.cpp"
+#include <cstdint>
 
 namespace godot{
 using TileTypeUid = std::uint16_t;
