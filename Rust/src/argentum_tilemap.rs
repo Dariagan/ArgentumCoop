@@ -4,7 +4,7 @@ use godot::builtin::Dictionary;
 use crate::world_matrix::WorldMatrix;
 
 
-struct State{
+struct InitializedState{
 
 }
 
@@ -13,6 +13,7 @@ struct State{
 #[class(base=TileMap)]
 struct ArgentumTileMap{
   tiles_data: Dictionary,
+
   world_matrix: WorldMatrix,
   base: Base<TileMap>,
 
@@ -28,5 +29,5 @@ impl ITileMap for ArgentumTileMap{
 
 
 impl ArgentumTileMap{
-
+    
 }
