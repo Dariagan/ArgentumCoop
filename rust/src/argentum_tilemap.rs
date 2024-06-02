@@ -1,4 +1,4 @@
-use crate::world_matrix::{TileTypeUid, WorldMatrix};
+use crate::world_matrix::*;
 use godot::builtin::Dictionary;
 use godot::engine::{ITileMap, TileMap};
 use godot::prelude::*;

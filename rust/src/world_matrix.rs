@@ -3,31 +3,7 @@ use crate::safevec::SafeVec;
 use godot::engine::TileMap;
 use godot::prelude::*;
 use std::hash::{Hash, Hasher};
-
-#[derive(Clone, PartialEq, Copy)]
-pub struct TileTypeUid(u16);
-pub const NULL_TILE: TileTypeUid = TileTypeUid(u16::MAX);
-
-impl Hash for TileTypeUid {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
-    }
-}
-
-impl Default for TileTypeUid {
-    fn default() -> Self {
-        NULL_TILE
-    }
-}
-#[derive(GodotConvert, Var, Export)]
-#[godot(via = i64)]
-pub enum TileZLevel {
-    Soil = 0,
-    Floor,
-    Stain,
-    Structure,
-    Roof,
-}
+pub use crate::tile::*;
 
 const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize;
 
@@ -40,7 +16,7 @@ impl WorldMatrix {
     pub fn new(size: SafeVec, base: Gd<TileMap>) -> Self {
         let initial_value = [TileTypeUid::default(); MAX_TILES_PER_POS];
         Self {
-            tiles: Matrix::new_with_initial_value(size, &initial_value), // Assuming Matrix::new takes a SafeVec and an initial value
+            tiles: Matrix::new_with_initial_value(size, &initial_value), 
         }
     }
     pub unsafe fn at_unchk(&self, coords: SafeVec) -> &[TileTypeUid; MAX_TILES_PER_POS as usize] {

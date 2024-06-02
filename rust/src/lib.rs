@@ -4,8 +4,8 @@ mod argentum_tilemap;
 mod formation_generator;
 mod matrix;
 pub mod safevec;
-mod world_matrix;
-mod tile;
+pub mod world_matrix;
+pub mod tile;
 
 struct ArgentumExtension;
 
