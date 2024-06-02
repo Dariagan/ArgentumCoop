@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BodySpriteData" load_steps=3 format=3 uid="uid://cms52k2dbl8ho"]
+
+[ext_resource type="SpriteFrames" uid="uid://d4jut4hh1pme0" path="res://resource_instances/beings/sprites/frames/body/pig_frames.tres" id="1_jgjwc"]
+[ext_resource type="Script" path="res://scripts/beings/sprites/body_sprite_data.gd" id="1_xuc2u"]
+
+[resource]
+script = ExtResource("1_xuc2u")
+head_v_offset = -23.0
+name = &"pig"
+id = "pig"
+frames = ExtResource("1_jgjwc")
+sex = 0
+animation_states = Array[StringName]([&"idle"])
+offset_global = Vector2(0, 0)
+offset_down = Vector2(0, 0)
+offset_up = Vector2(0, 0)
+offset_sideways = Vector2(0, 0)
+simmetrical_sideways = false
+width_frontally_sideways_height = Vector3(1, 1, 1)

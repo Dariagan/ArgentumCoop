@@ -16,7 +16,7 @@ impl WorldMatrix {
     pub fn new(size: SafeVec, base: Gd<TileMap>) -> Self {
         let initial_value = [TileTypeUid::default(); MAX_TILES_PER_POS];
         Self {
-            tiles: Matrix::new_with_initial_value(size, &initial_value), 
+            tiles: Matrix::new_with_element_value(size, &initial_value), 
         }
     }
     pub unsafe fn at_unchk(&self, coords: SafeVec) -> &[TileTypeUid; MAX_TILES_PER_POS as usize] {

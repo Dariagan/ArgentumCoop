@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Klass" load_steps=3 format=3 uid="uid://b8lgllcsn3y18"]
+
+[ext_resource type="Resource" uid="uid://bm5mlop6d50eo" path="res://resource_instances/beings/races/uncontrollable/pig.tres" id="1_jrhdh"]
+[ext_resource type="Script" path="res://scripts/beings/being_klass.gd" id="2_5fesx"]
+
+[resource]
+script = ExtResource("2_5fesx")
+id = "class_warrior"
+name = "Warrior"
+available_followers = Array[Resource("res://scripts/beings/race/uncontrollable_race.gd")]([ExtResource("1_jrhdh")])
+available_spells = Array[String]([])

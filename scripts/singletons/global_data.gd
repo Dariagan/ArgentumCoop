@@ -15,19 +15,19 @@ var default_ip_to_join: String = "localhost"
 var username: String
 
 const CPP_BUFFER_LENGTH_MINUS_ONE = 32 - 1
-const item_data_directories: Array[String] = []#["res://resources/things/items/", "res://resources/things/items/wear/body/"]
-const sprites_datas_directories: Array[String] = ["res://resources/beings/sprites/spritesdatas/"]
+const item_data_directories: Array[String] = []#["res://resource_instances/things/items/", "res://resource_instances/things/items/wear/body/"]
+const sprites_datas_directories: Array[String] = ["res://resource_instances/beings/sprites/spritesdatas/"]
 const recipes_directories: Array[String] = []
 const building_data_directories: Array[String] = []
-const controllable_races_directories: Array[String] = ["res://resources/beings/races/controllable/"]
-const uncontrollable_races_directories: Array[String] = ["res://resources/beings/races/uncontrollable/"]
-const tile_selections_directories: Array[String] =["res://resources/world/tile_selections/"]
+const controllable_races_directories: Array[String] = ["res://resource_instances/beings/races/controllable/"]
+const uncontrollable_races_directories: Array[String] = ["res://resource_instances/beings/races/uncontrollable/"]
+const tile_selections_directories: Array[String] =["res://resource_instances/tiling/tiles/tile_selections/"]
 
-const klasses_directories: Array[String] = ["res://resources/beings/klasses/"]
-const tiles_directories: Array[String] = ["res://resources/world/terrain/", "res://resources/world/buildings/"]
-const spawnable_scenes_directories: Array[String] = ["res://scenes/world/terrain/", "res://scenes/world/buildings/"]
+const klasses_directories: Array[String] = ["res://resource_instances/beings/klasses/"]
+const tiles_directories: Array[String] = ["res://resource_instances/tiling/tiles/terrain/", "res://resource_instances/tiling/tiles/buildings/"]
+const spawnable_scenes_directories: Array[String] = ["res://scenes/tiling/tiles/terrain/", "res://scenes/tiling/tiles/buildings/"]
 
-const beingkinds_directories: Array[String] = ["res://resources/beings/beingkinds/"]
+const beingkinds_directories: Array[String] = ["res://resource_instances/beings/beingkinds/"]
 #TODO hacer un player mods directory
 
 var item_data: Dictionary
@@ -50,33 +50,33 @@ var tile_selections: Dictionary
 var spawnable_scenes: Array[String]
 
 #causa error al descomentar (ya está cargado)
-#var tile_set: TileSet = preload("res://resources/world/tile_set.tres")
+#var tile_set: TileSet = preload("res://resource_instances/tiling/tiles/tile_set.tres")
 
 func _init() -> void:
 	
-	item_data = _index_all_found_resources(item_data_directories)
-	sprites_datas = _index_all_found_resources(sprites_datas_directories)
+	item_data = _index_all_found_resource_instances(item_data_directories)
+	sprites_datas = _index_all_found_resource_instances(sprites_datas_directories)
 	sprites_datas.make_read_only()
-	recipe_data = _index_all_found_resources(recipes_directories)
-	building_data = _index_all_found_resources(building_data_directories)
-	controllable_races = _index_all_found_resources(controllable_races_directories)
-	uncontrollable_races = _index_all_found_resources(uncontrollable_races_directories)
+	recipe_data = _index_all_found_resource_instances(recipes_directories)
+	building_data = _index_all_found_resource_instances(building_data_directories)
+	controllable_races = _index_all_found_resource_instances(controllable_races_directories)
+	uncontrollable_races = _index_all_found_resource_instances(uncontrollable_races_directories)
 	races.merge(uncontrollable_races, true); races.merge(controllable_races, true)
 	races.make_read_only()
 	
-	tile_selections = _index_all_found_resources(tile_selections_directories)
+	tile_selections = _index_all_found_resource_instances(tile_selections_directories)
 	tile_selections.make_read_only()
-	klasses = _index_all_found_resources(klasses_directories)
+	klasses = _index_all_found_resource_instances(klasses_directories)
 	klasses.make_read_only()
-	tiles = _index_all_found_resources(tiles_directories)
+	tiles = _index_all_found_resource_instances(tiles_directories)
 	tiles.make_read_only()
 	
-	beingkinds = _index_all_found_resources(beingkinds_directories, true)
+	beingkinds = _index_all_found_resource_instances(beingkinds_directories, true)
 	
 	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
 #TODO CHEQUEAR COLLISION DE KEYS ENCONTRADAS ANTES DE METER AL DICT (PUSHEAR UN ERROR)
-func _index_all_found_resources(directories: Array[String], check_subfolders: bool = true, use_safe_loader: bool = false) -> Dictionary:
+func _index_all_found_resource_instances(directories: Array[String], check_subfolders: bool = true, use_safe_loader: bool = false) -> Dictionary:
 	var dir_access: DirAccess
 	var table: Dictionary = {}
 	
@@ -103,7 +103,7 @@ func _index_all_found_resources(directories: Array[String], check_subfolders: bo
 					else:
 						printerr("File %s%s couldn't be loaded as a resource" % [directory, file_name])
 				elif check_subfolders:
-					var subdict: Dictionary = _index_all_found_resources([directory+file_name+"/"])
+					var subdict: Dictionary = _index_all_found_resource_instances([directory+file_name+"/"])
 					for key in subdict:
 						assert(not table.has(key))
 						table[key] = subdict[key]

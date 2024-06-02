@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://scripts/lobby.gd" id="4_vtap0"]
 [ext_resource type="Script" path="res://scripts/game.gd" id="5_2eji3"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
-[ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resources/world/tile_set.tres" id="6_67353"]
+[ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resource_instances/tiling/tile_set.tres" id="6_67353"]
 [ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
 [ext_resource type="Script" path="res://scenes/ArgentumTileMap.gd" id="7_itdl2"]
@@ -14,12 +14,12 @@
 [ext_resource type="Script" path="res://scripts/ui/uim_lobby_interface.gd" id="14_xwx6r"]
 [ext_resource type="Script" path="res://scripts/ui/uim_chat_component.gd" id="15_iym2t"]
 [ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse-7021371.jpg" id="16_cgfxl"]
-[ext_resource type="StyleBox" uid="uid://c1i3svkycn37m" path="res://resources/ui/buttonhover.tres" id="17_hbgmu"]
-[ext_resource type="StyleBox" uid="uid://e17urjuoqp4r" path="res://resources/ui/buttonpressed.tres" id="18_r6evk"]
+[ext_resource type="StyleBox" uid="uid://c1i3svkycn37m" path="res://resource_instances/ui/buttonhover.tres" id="17_hbgmu"]
+[ext_resource type="StyleBox" uid="uid://e17urjuoqp4r" path="res://resource_instances/ui/buttonpressed.tres" id="18_r6evk"]
 [ext_resource type="FontFile" uid="uid://ctrsrtkxeu85y" path="res://assets/fonts/Exocet2.ttf" id="19_i28if"]
 [ext_resource type="PackedScene" uid="uid://vxv66o5h4qwi" path="res://scenes/ui/coolborder.tscn" id="20_5ejtx"]
-[ext_resource type="LabelSettings" uid="uid://cujwfyskppm3o" path="res://resources/ui/labelsettings.tres" id="21_fu24y"]
-[ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resources/ui/lineeditname.tres" id="22_uo2mf"]
+[ext_resource type="LabelSettings" uid="uid://cujwfyskppm3o" path="res://resource_instances/ui/labelsettings.tres" id="21_fu24y"]
+[ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resource_instances/ui/lineeditname.tres" id="22_uo2mf"]
 [ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="23_m410m"]
 [ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/lobby/character_characterization.tscn" id="24_741ey"]
 
@@ -100,22 +100,14 @@ character_creation_scene = ExtResource("4_lphit")
 script = ExtResource("5_2eji3")
 
 [node name="ArgentumTileMap" type="ArgentumTileMap" parent="Lobby/Game"]
-_import_path = NodePath("")
 unique_name_in_owner = true
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
 y_sort_enabled = true
 tile_set = ExtResource("6_67353")
+layer_1/name = "Layer1"
 layer_1/z_index = 5
-layer_1/tile_data = PackedInt32Array()
+layer_2/name = "Layer2"
 layer_2/y_sort_enabled = true
 layer_2/z_index = 10
-layer_2/tile_data = PackedInt32Array()
 script = ExtResource("7_itdl2")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]

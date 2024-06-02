@@ -4,7 +4,7 @@ use gxhash::*;
 use crate::world_matrix::*;
 
 #[derive(Clone, PartialEq, Copy)]
-pub struct TileTypeUid(pub u16);
+pub enum TileTypeUid(pub u16);
 pub const NULL_TILE: TileTypeUid = TileTypeUid(u16::MAX);
 
 impl Default for TileTypeUid {fn default() -> Self {NULL_TILE}}
@@ -14,11 +14,7 @@ impl Hash for TileTypeUid {fn hash<H: Hasher>(&self, state: &mut H) {self.0.hash
 #[derive(GodotConvert, Var, Export, Clone, Copy)]
 #[godot(via = i64)]
 pub enum TileZLevel {
-    Soil = 0,
-    Floor,
-    Stain,
-    Structure,
-    Roof,
+    Soil = 0,Floor, Stain, Structure, Roof,
 }
 impl Default for TileZLevel {fn default() -> Self {Self::Soil}}
 impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}

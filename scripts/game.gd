@@ -56,4 +56,3 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		i+=1
 		
 	
-

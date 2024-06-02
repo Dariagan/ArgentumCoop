@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://vxv66o5h4qwi"]
 
-[ext_resource type="StyleBox" uid="uid://c8tf2niublngn" path="res://resources/ui/borderwhitetopleft.tres" id="1_vv2oi"]
-[ext_resource type="StyleBox" uid="uid://b82rxr6u6wk6v" path="res://resources/ui/borderblackbottomright.tres" id="2_en2xy"]
+[ext_resource type="StyleBox" uid="uid://c8tf2niublngn" path="res://resource_instances/ui/borderwhitetopleft.tres" id="1_vv2oi"]
+[ext_resource type="StyleBox" uid="uid://b82rxr6u6wk6v" path="res://resource_instances/ui/borderblackbottomright.tres" id="2_en2xy"]
 
 [node name="WhiteBorderTopLeft" type="Panel"]
 anchors_preset = 15

@@ -11,7 +11,7 @@ func _ready():
 	_setup_config()
 	
 func _setup_config():
-	self.tile_set = preload("res://resources/world/tile_set.tres")
+	self.tile_set = preload("res://resource_instances/tiling/tile_set.tres")
 	add_layer(0);add_layer(1);add_layer(2)
 	set_layer_z_index(2, 10)
 	set_layer_y_sort_enabled(2, true)

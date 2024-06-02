@@ -57,7 +57,7 @@ folder_colors={
 "res://addons/": "gray",
 "res://assets/": "teal",
 "res://bin/": "gray",
-"res://resources/": "yellow",
+"res://resource_instances/": "yellow",
 "res://scripts/": "green",
 "res://scripts/beings/": "green"
 }
