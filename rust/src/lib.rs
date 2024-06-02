@@ -1,6 +1,6 @@
 use godot::prelude::*;
 
-mod argentum_tilemap;
+mod rust_tilemap;
 mod formation_generator;
 mod matrix;
 pub mod safevec;

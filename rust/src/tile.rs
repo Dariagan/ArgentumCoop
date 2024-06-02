@@ -1,5 +1,5 @@
-use std::hash::{Hash, Hasher};
-use godot::prelude::*;
+
+use godot::prelude::*; use std::hash::{Hash, Hasher};
 
 #[derive(Clone, PartialEq, Copy)]
 pub struct TileTypeUid(pub u16);
@@ -54,20 +54,3 @@ impl Hash for Tile {
     }
 }
 
-#[derive(GodotClass)]
-#[class(tool, init, base=Resource)]
-pub struct MyResource {
-    base: Base<Resource>,
-    #[export] id: StringName,
-    #[export] attribute: i64,
-}
-impl MyResource {
-    pub fn base(&self) -> &Base<Resource> { &self.base }
-    pub fn id(&self) -> &StringName { &self.id }
-}
-impl Hash for MyResource {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_u32(self.id.hash());
-        self.attribute.hash(state);
-    }
-}

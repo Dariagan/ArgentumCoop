@@ -1,7 +1,5 @@
-use crate::matrix::Matrix;
-use crate::safevec::SafeVec;
-use godot::prelude::*;
-use std::ops::{Index, IndexMut};
+use crate::matrix::Matrix; pub use crate::safevec::SafeVec;
+use godot::prelude::*; use std::ops::{Index, IndexMut};
 pub use crate::tile::*;
 
 const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize + 1;
@@ -18,13 +16,8 @@ impl WorldMatrix {
             tiles: Matrix::new_with_element_value(size, &initial_value), 
         }
     }
-
-    pub fn at(&self, coords: SafeVec) -> Option<&TileArray> {
-        self.tiles.at(coords)
-    }
-    pub fn at_mut(&mut self, coords: SafeVec) -> Option<&mut TileArray> {
-        self.tiles.at_mut(coords)
-    }
+    pub fn at(&self, coords: SafeVec) -> Option<&TileArray> {self.tiles.at(coords)}
+    pub fn at_mut(&mut self, coords: SafeVec) -> Option<&mut TileArray> {self.tiles.at_mut(coords)}
     pub unsafe fn count_at(&self, coords: SafeVec) -> usize {
         self[coords]
             .iter()
@@ -34,14 +27,20 @@ impl WorldMatrix {
     pub unsafe fn is_empty_at_unchk(&self, coords: SafeVec) -> bool {
         self.count_at(coords) == 0
     }
-    pub unsafe fn is_not_empty_at_unchk(&self, coords: SafeVec) -> bool {
+    pub unsafe fn has_tiles_at_unchk(&self, coords: SafeVec) -> bool {
         self.count_at(coords) > 0
     }
+    pub fn is_empty_at() -> Result<bool, ()> {
+        todo!()
+    }
+    pub fn has_tiles_at() -> Result<bool, ()> {
+        todo!()
+    }
+
     pub unsafe fn overwrite_tile_at_i(&mut self, tile: TileTypeUid, coords: SafeVec, z_level: TileZLevel){
         let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
         *prev_tile = tile;
     }
-    
     pub unsafe fn place_tile_at_i(&mut self, tile: TileTypeUid, coords: SafeVec, z_level: TileZLevel) -> Result<(), String>{
         let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
         match *prev_tile {

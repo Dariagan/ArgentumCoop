@@ -188,7 +188,7 @@
 },
 "class function":{
     "scope": "rust",
-    "prefix": "fn_method",
+    "prefix": ["fn","method","func"],
     "body": [
     "${1|pub fn,fn,#[func]\nfn,#[func]\npub fn|} $2(${3|&mut self,&self,&|}) ${4|->  {,{|}\n    $0\n}" 
     ],
@@ -197,7 +197,14 @@
     "scope": "rust",
     "prefix": "var",
     "body": [
-    "#[var]"
+    "#[var${1|],(get = get_\\, set = set_)]|}"
+    ],
+},
+"getset":{
+    "scope": "rust",
+    "prefix": "getset",
+    "body": [
+    "#[var(get = get_$1, set = set_$1)]"
     ],
 },
 "export":{
@@ -242,23 +249,24 @@
     "scope": "rust",
     "prefix": "resource",
     "body": [
-    "#[derive(GodotClass)]",
-    "#[class(tool, init, base=Resource)]",
-    "pub struct ${1:MyResource} {",
-    "\tbase: Base<Resource>,",
-    "\t#[export] id: StringName,",
-    "\t#[export] ${2:attribute}: i64,",
-    "}",
-    "impl $1 {",
-    "\tpub fn base(&self) -> &Base<Resource> { &self.base }",
-    "\tpub fn id(&self) -> &StringName { &self.id }",
-    "}",
-    "impl Hash for $1 {",
-    "\tfn hash<H: Hasher>(&self, state: &mut H) {",
-    "\t\tstate.write_u32(self.id.hash());",
-    "\t\tself.$2.hash(state);",
-    "\t}",
-    "}",
+        "#[derive(GodotClass)]",
+        "#[class(tool, init, base=Resource)]",
+        "pub struct ${1:MyResource} {",
+        "\tbase: Base<Resource>,",
+        "\t#[export] id: StringName,",
+        "\t#[export] ${2:attribute}: i64,",
+        "}",
+        "impl $1 {",
+        "\tpub fn base(&self) -> &Base<Resource> { &self.base }",
+        "\tpub fn id(&self) -> &StringName { &self.id }",
+        "}",
+        "use std::hash::{Hash, Hasher};",
+        "impl Hash for $1 {",
+        "\tfn hash<H: Hasher>(&self, state: &mut H) {",
+        "\t\tstate.write_u32(self.id.hash());",
+        "\t\tself.$2.hash(state);",
+        "\t}",
+        "}",
     ],
 },
 "godot::prelude::*;":{
