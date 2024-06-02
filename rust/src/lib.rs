@@ -5,11 +5,12 @@ mod formation_generator;
 mod matrix;
 pub mod safevec;
 mod world_matrix;
+mod tile;
 
 struct ArgentumExtension;
 
 #[gdextension]
-unsafe impl ExtensionLibrary for ArgentumExtension {}
+unsafe impl ExtensionLibrary for ArgentumExtension{}
 
 use godot::engine::Node2D;
 
@@ -20,11 +21,11 @@ struct Test {
 }
 
 #[godot_api]
-impl INode2D for Test {
+impl INode2D for Test{
+
     fn init(node2d: Base<Node2D>) -> Self {
         godot_print!("hello");
         Self { node2d }
     }
-
     fn ready(&mut self) {}
 }

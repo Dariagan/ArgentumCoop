@@ -71,7 +71,6 @@ impl<T: Default + Clone> Matrix<T> {
             Some(&mut self.flattened_matrix[i])
         } else {None}
     }
-
     pub fn get_size(&self) -> SafeVec {self.size}
     pub fn get_area(&self) -> usize {self.area}
 }

@@ -5,9 +5,13 @@ edition = "2021"
 
 [dependencies]
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master"}
+gxhash = "=3.4.1"
 num = "0.4"
 ranged-num = "0.1"
 typenum = "1.17"
 
 [lib]
 crate-type = ["cdylib"]
+
+[build]
+rustflags = "-C target-feature=++aes,+sse2"

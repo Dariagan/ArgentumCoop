@@ -17,6 +17,8 @@ pub trait IFormationGenerator {
     fn place_tile();
 }
 
+
+
 pub fn get_border_closeness_factor(
     coords: &SafeVec,
     world_size: &SafeVec,
