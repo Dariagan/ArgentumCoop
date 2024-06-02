@@ -28,10 +28,10 @@ impl<T: Default + Clone> Matrix<T> {
             size, area,
         }
     }
-    pub unsafe fn at(&self, coords: SafeVec) -> Option<&T> {
+    pub fn at(&self, coords: SafeVec) -> Option<&T> {
         self.flattened_matrix.get(coords.flat_index(&self.size))
     }
-    pub unsafe fn at_mut(&mut self, coords: SafeVec) -> Option<&mut T> {
+    pub fn at_mut(&mut self, coords: SafeVec) -> Option<&mut T> {
         self.flattened_matrix.get_mut(coords.flat_index(&self.size))
     }
 }
@@ -54,7 +54,7 @@ pub struct DownScalingMatrix<T: Default + Clone> {
     area: usize,
 }
 impl<T: Default + Clone> DownScalingMatrix<T> {
-    pub fn size(&self) -> SafeVec {self.size}
+    pub fn size(&self) -> SafeVec {self.downscaled_size}
     pub fn area(&self) -> usize {self.area}
     pub fn new(size_to_downscale_from: SafeVec, downscale_factor: u8) -> Self {
         let downscale_factor = downscale_factor.max(1);
@@ -64,41 +64,40 @@ impl<T: Default + Clone> DownScalingMatrix<T> {
         }
         let downscaled_size = size_to_downscale_from / downscale_factor;
 
-        let area = size.area();
+        let area = downscaled_size.area();
         Self {
             flattened_matrix: vec![T::default(); area],
             downscaled_size, area, downscale_factor,
         }
     }
     pub fn new_with_element_value(size_to_downscale_from: SafeVec, downscale_factor: u8, element_value: &T) -> Self {
-        let area: usize = size.area();
+        let downscaled_size = size_to_downscale_from / downscale_factor;
+        let area = downscaled_size.area();
         Self {
             flattened_matrix: vec![element_value.clone(); area],
-            downscaled_size,
-            area,
-            downscale_factor,
+            downscaled_size, area, downscale_factor,
         }
     }
     pub fn at(&self, coords: SafeVec) -> Option<&T> {
         let downscaled_coords = coords / self.downscale_factor;
-        let i = downscaled_coords.flat_index(&self.size);
+        let i = downscaled_coords.flat_index(&self.downscaled_size);
         return self.flattened_matrix.get(i);
     }
     pub fn at_mut(&mut self, coords: SafeVec) -> Option<&mut T> {
         let downscaled_coords = coords / self.downscale_factor;
-        let i = downscaled_coords.flat_index(&self.size);
+        let i = downscaled_coords.flat_index(&self.downscaled_size);
         return self.flattened_matrix.get_mut(i);
     }
 }
 impl<T: Default + Clone> Index<SafeVec> for DownScalingMatrix<T> {
     type Output = T;
     fn index(&self, coords: SafeVec) -> &T {
-        unsafe{self.flattened_matrix.get_unchecked(coords.flat_index(&self.size))}
+        unsafe{self.flattened_matrix.get_unchecked(coords.flat_index(&self.downscaled_size))}
     }
 }
 impl<T: Default + Clone> IndexMut<SafeVec> for DownScalingMatrix<T> {
     fn index_mut(&mut self, coords: SafeVec) -> &mut T {
-        unsafe{self.flattened_matrix.get_unchecked_mut(coords.flat_index(&self.size))}
+        unsafe{self.flattened_matrix.get_unchecked_mut(coords.flat_index(&self.downscaled_size))}
     }
 }
 

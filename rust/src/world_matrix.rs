@@ -1,39 +1,32 @@
 use crate::matrix::Matrix;
 use crate::safevec::SafeVec;
-use godot::engine::TileMap;
 use godot::prelude::*;
-use std::hash::{Hash, Hasher};
+use std::ops::{Index, IndexMut};
 pub use crate::tile::*;
 
-const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize;
+const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize + 1;
 
-pub struct WorldMatrix {
-    tiles: Matrix<[TileTypeUid; MAX_TILES_PER_POS]>,
-}
+type TileArray = [TileTypeUid; MAX_TILES_PER_POS];
+
+pub struct WorldMatrix {tiles: Matrix<TileArray>,}
 
 impl WorldMatrix {
 
-    pub fn new(size: SafeVec, base: Gd<TileMap>) -> Self {
+    pub fn new(size: SafeVec) -> Self {
         let initial_value = [TileTypeUid::default(); MAX_TILES_PER_POS];
         Self {
             tiles: Matrix::new_with_element_value(size, &initial_value), 
         }
     }
-    pub unsafe fn at_unchk(&self, coords: SafeVec) -> &[TileTypeUid; MAX_TILES_PER_POS as usize] {
-        self.tiles.at_unchk_no_ds(coords)
-    }
-    pub unsafe fn at_unchk_mut(&mut self, coords: SafeVec) -> &mut [TileTypeUid; MAX_TILES_PER_POS] {
-        self.tiles.at_unchk_no_ds_mut(coords)
-    }
 
-    pub fn at(&self, coords: SafeVec) -> Option<&[TileTypeUid; MAX_TILES_PER_POS]> {
-        self.tiles.at_ds(coords)
+    pub fn at(&self, coords: SafeVec) -> Option<&TileArray> {
+        self.tiles.at(coords)
     }
-    pub fn at_mut(&mut self, coords: SafeVec) -> Option<&mut [TileTypeUid; MAX_TILES_PER_POS]> {
-        self.tiles.at_mut_ds(coords)
+    pub fn at_mut(&mut self, coords: SafeVec) -> Option<&mut TileArray> {
+        self.tiles.at_mut(coords)
     }
     pub unsafe fn count_at(&self, coords: SafeVec) -> usize {
-        self.at_unchk(coords)
+        self[coords]
             .iter()
             .filter(|&&uid| uid != TileTypeUid::default())
             .count()
@@ -42,15 +35,15 @@ impl WorldMatrix {
         self.count_at(coords) == 0
     }
     pub unsafe fn is_not_empty_at_unchk(&self, coords: SafeVec) -> bool {
-        !self.is_empty_at_unchk(coords)
+        self.count_at(coords) > 0
     }
     pub unsafe fn overwrite_tile_at_i(&mut self, tile: TileTypeUid, coords: SafeVec, z_level: TileZLevel){
-        let prev_tile = self.at_unchk_mut(coords).get_unchecked_mut(z_level as usize);
+        let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
         *prev_tile = tile;
     }
     
     pub unsafe fn place_tile_at_i(&mut self, tile: TileTypeUid, coords: SafeVec, z_level: TileZLevel) -> Result<(), String>{
-        let prev_tile = self.at_unchk_mut(coords).get_unchecked_mut(z_level as usize);
+        let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
         match *prev_tile {
             NULL_TILE => {*prev_tile = tile; Ok(())},
             _ => Err("A tile already exists at the specified position".to_string())
@@ -59,3 +52,14 @@ impl WorldMatrix {
 
 }
 
+impl Index<SafeVec> for WorldMatrix {
+    type Output = TileArray;
+    fn index(&self, coords: SafeVec) -> &TileArray {
+        &(self.tiles[coords])
+    }
+}
+impl IndexMut<SafeVec> for WorldMatrix {
+    fn index_mut(&mut self, coords: SafeVec) -> &mut TileArray {
+        &mut(self.tiles[coords])
+    }
+}
