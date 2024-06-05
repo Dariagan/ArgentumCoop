@@ -1,25 +1,32 @@
-use crate::{safevec::SafeVec, world_matrix::WorldMatrix};
-use godot::builtin::Dictionary;
-use godot::engine::{resource, RefCounted, Resource};
-use godot::obj::{Gd, GdRef};
+pub use crate::tile::TileSelection;
+use crate::uns_vec::UnsVec;
+pub use crate::{safe_vec::SafeVec, world_matrix::WorldMatrix};
+pub use godot::builtin::Dictionary;
+use enum_primitive_derive::Primitive;
+use godot::obj::{Base, Gd, GdRef};
+use godot::prelude::*;
+
+#[derive(GodotConvert, Var, Export, Primitive)]
+#[godot(via = i64)]
+pub enum FormGenEnum {
+    FracturedFormationGenerator = 0,
+}
+
 
 pub trait IFormationGenerator {
     fn generate(
-        &mut self,
-        world: &mut WorldMatrix,
-        origin: SafeVec,
-        size: SafeVec,
-        tile_selection_set: &GdRef<Resource>,
-        seed: u64,
-        data: &mut Dictionary,
+        world: WorldMatrix,
+        origin: UnsVec,
+        size: UnsVec,
+        tile_selection_set: Gd<TileSelection>,
+        seed: i64,
+        data: Dictionary,
     ) -> WorldMatrix;
-
-    fn place_tile();
 }
 
 pub fn get_border_closeness_factor(
-    coords: &SafeVec,
-    world_size: &SafeVec,
+    coords: &UnsVec,
+    world_size: &UnsVec,
     power: Option<f64>,
 ) -> f64 {
     let power = power.unwrap_or(3.0);
@@ -33,5 +40,9 @@ pub fn get_border_closeness_factor(
         .abs()
         .powf(power);
 
-    return horizontal_border_closeness.max(vertical_border_closeness);
+    horizontal_border_closeness.max(vertical_border_closeness)
+}
+
+pub fn place_tile(world_matrix: &mut WorldMatrix, coords_relative2_formation_origin: UnsVec){
+
 }

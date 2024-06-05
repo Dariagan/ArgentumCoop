@@ -1,17 +1,19 @@
-use crate::matrix::Matrix; pub use crate::safevec::SafeVec;
+use crate::matrix::Matrix; pub use crate::safe_vec::SafeVec;
 use godot::prelude::*; use std::ops::{Index, IndexMut};
 pub use crate::tile::*;
 
 const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize + 1;
 
-type TileArray = [TileTypeUid; MAX_TILES_PER_POS];
+type TileArray = [TileTypeNid; MAX_TILES_PER_POS];
 
 pub struct WorldMatrix {tiles: Matrix<TileArray>,}
 
 impl WorldMatrix {
 
     pub fn new(size: SafeVec) -> Self {
-        let initial_value = [TileTypeUid::default(); MAX_TILES_PER_POS];
+        let initial_value = [TileTypeNid::default(); MAX_TILES_PER_POS];
+        if size.is_any_comp_negative() {
+            panic!("attempt to build matrix with negative matrix")}
         Self {
             tiles: Matrix::new_with_element_value(size, &initial_value), 
         }
@@ -21,7 +23,7 @@ impl WorldMatrix {
     pub unsafe fn count_at(&self, coords: SafeVec) -> usize {
         self[coords]
             .iter()
-            .filter(|&&uid| uid != TileTypeUid::default())
+            .filter(|&&nid| nid != TileTypeNid::default())
             .count()
     }
     pub unsafe fn is_empty_at_unchk(&self, coords: SafeVec) -> bool {
@@ -37,11 +39,11 @@ impl WorldMatrix {
         todo!()
     }
 
-    pub unsafe fn overwrite_tile_at_i(&mut self, tile: TileTypeUid, coords: SafeVec, z_level: TileZLevel){
+    pub unsafe fn overwrite_tile_at_i(&mut self, tile: TileTypeNid, coords: SafeVec, z_level: TileZLevel){
         let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
         *prev_tile = tile;
     }
-    pub unsafe fn place_tile_at_i(&mut self, tile: TileTypeUid, coords: SafeVec, z_level: TileZLevel) -> Result<(), String>{
+    pub unsafe fn place_tile_at_i(&mut self, tile: TileTypeNid, coords: SafeVec, z_level: TileZLevel) -> Result<(), String>{
         let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
         match *prev_tile {
             NULL_TILE => {*prev_tile = tile; Ok(())},

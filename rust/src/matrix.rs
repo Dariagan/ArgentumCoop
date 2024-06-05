@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 
-pub use crate::safevec::SafeVec;
+pub use crate::safe_vec::SafeVec;
 
 pub struct Matrix<T: Default + Clone> {
     flattened_matrix: Vec<T>,
@@ -16,9 +16,11 @@ impl<T: Default + Clone> Matrix<T> {
             panic!("matrix.rs constructor error");
         }
         let area: usize = size.area();
+        let flattened_matrix = create_vec::<T>(area);
         Self {
-            flattened_matrix: vec![T::default(); area],
-            size, area,
+            flattened_matrix,
+            size,
+            area,
         }
     }
     pub fn new_with_element_value(size: SafeVec, element_value: &T) -> Self {
@@ -63,11 +65,13 @@ impl<T: Default + Clone> DownScalingMatrix<T> {
             panic!("matrix.rs downscaling constructor error");
         }
         let downscaled_size = size_to_downscale_from / downscale_factor;
-
-        let area = downscaled_size.area();
+        let area: usize = downscaled_size.area();
+        let flattened_matrix = create_vec::<T>(area);
         Self {
-            flattened_matrix: vec![T::default(); area],
-            downscaled_size, area, downscale_factor,
+            downscale_factor,
+            flattened_matrix,
+            downscaled_size,
+            area,
         }
     }
     pub fn new_with_element_value(size_to_downscale_from: SafeVec, downscale_factor: u8, element_value: &T) -> Self {
@@ -101,4 +105,9 @@ impl<T: Default + Clone> IndexMut<SafeVec> for DownScalingMatrix<T> {
     }
 }
 
-
+fn create_vec<T: Default>(area: usize) -> Vec<T> {
+    let mut flattened_matrix: Vec<T> = Vec::new();
+    flattened_matrix.reserve_exact(area);
+    flattened_matrix.resize_with(area, T::default);
+    flattened_matrix
+}

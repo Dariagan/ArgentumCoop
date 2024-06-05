@@ -3,29 +3,31 @@ use godot::prelude::*;
 mod rust_tilemap;
 mod formation_generator;
 mod matrix;
-pub mod safevec;
+pub mod safe_vec;
+pub mod uns_vec;
 pub mod world_matrix;
 pub mod tile;
+pub mod fractured_formation_generator;
 
 struct ArgentumExtension;
 
 #[gdextension]
 unsafe impl ExtensionLibrary for ArgentumExtension{}
 
-use godot::engine::Node2D;
+use godot::engine::Node;
 
 #[derive(GodotClass)]
-#[class(base=Node2D)]
+#[class(base=Node)]
 struct Test {
-    node2d: Base<Node2D>,
+    node: Base<Node>,
 }
 
 #[godot_api]
-impl INode2D for Test{
+impl INode for Test{
 
-    fn init(node2d: Base<Node2D>) -> Self {
-        godot_print!("hello");
-        Self { node2d }
+    fn init(node: Base<Node>) -> Self {
+        godot_print!("Rust module loaded");
+        Self { node }
     }
     fn ready(&mut self) {}
 }

@@ -42,9 +42,10 @@ private:
     inline double getBeachness(SafeVec coords) const;
     void placeDungeonEntrances(ArgentumTileMap& argentumTileMap, const std::uint_fast8_t nDungeonsToPlace);
     inline void resetState();                                        //add to the left of cave
-    enum Target { beach,  lake,  cont,  tree,  bush,  ocean,  cave_0,  cave_1,  cave_2, N_TARGETS}; static constexpr std::array<const char*, N_TARGETS>
-        TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
-    
+    enum Target { beach,  lake,  cont,  tree,  bush,  ocean,  cave_0,  cave_1,  cave_2, N_TARGETS}; 
+    static constexpr std::array<const char*, N_TARGETS> TARGETS={"beach","lake","cont","tree","bush","ocean","cave_0","cave_1","cave_2"};//DON'T FORGET TO ADD ANY MISSING ENUM LITERALS
+        //en vez de esto, hacer que sea un array inicializado de uids, después pasarselo a algún lugar que lo rellene.
+        //desp el for-for simplemente usa el uid que haya sido rellenado en la correspondiente i (Target enum val)
 
     static constexpr std::uint_fast8_t N_CAVES = Target::N_TARGETS - Target::cave_0;   
     

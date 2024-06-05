@@ -25,7 +25,7 @@ func _process(_delta):
 func generate_world():
 	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y >500)
 	
-	generate_world_matrix(WORLD_SIZE, GlobalData.tiles)
+	generate_world_matrix(WORLD_SIZE, GlobalData.tiles_data)
 	
 	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
 	generate_formation(fcg, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections["temperate"], 3333, {})

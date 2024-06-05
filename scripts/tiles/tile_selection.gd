@@ -7,4 +7,6 @@ class_name TileSelection
 
 #TODO SUBSTRINGEAR CADA TILE DEL GROUP
 @export var grouped_prob_weighted_tiles: Array[Dictionary]
+
+
 #ES MUCHO MÁS FÁCIL EDITAR EL RECURSO DESDE UN TEXT EDITOR SOBRE EL .TRES

@@ -1,7 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 .vscode
-*cpp/godot-cpp
+*cpp/godot-cpp/*
 *cpp/src/ApocalypseArgentum.code-workspace
 *cpp/src/*.o
 *cpp/src/*.os

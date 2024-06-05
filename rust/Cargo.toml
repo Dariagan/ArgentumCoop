@@ -9,6 +9,8 @@ gxhash = "=3.4.1"
 #num = "0.4"
 #ranged-num = "0.1"
 #typenum = "1.17"
+enum-primitive-derive = "*"
+num-traits = "*"
 
 [lib]
 crate-type = ["cdylib"]

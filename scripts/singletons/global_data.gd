@@ -43,7 +43,7 @@ var uncontrollable_races: Dictionary
 var klasses: Dictionary
 var beingkinds: Dictionary
 
-var tiles: Dictionary
+var tiles_data: Dictionary
 
 var tile_selections: Dictionary
 
@@ -68,8 +68,8 @@ func _init() -> void:
 	tile_selections.make_read_only()
 	klasses = _index_all_found_resource_instances(klasses_directories)
 	klasses.make_read_only()
-	tiles = _index_all_found_resource_instances(tiles_directories)
-	tiles.make_read_only()
+	tiles_data = _index_all_found_resource_instances(tiles_directories)
+	tiles_data.make_read_only()
 	
 	beingkinds = _index_all_found_resource_instances(beingkinds_directories, true)
 	
@@ -97,7 +97,7 @@ func _index_all_found_resource_instances(directories: Array[String], check_subfo
 						resource = SafeResourceLoader.load(directory + file_name)
 					
 					if resource && "id" in resource:
-						assert(not table.has(resource.id))
+						assert(not table.has(resource.id))#check if resource with same id already loaded
 						table[resource.id] = resource
 						print("Resource %s%s loaded" % [directory, file_name])
 					else:
