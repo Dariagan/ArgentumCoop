@@ -1,5 +1,3 @@
-use core::panic;
-
 use crate::formation_generator::{FormGenEnum, IFormationGenerator};
 use crate::fractured_formation_generator::FracturedFormationGenerator;
 use crate::uns_vec::UnsVec;
@@ -37,7 +35,16 @@ impl ITileMap for RustTileMap {
 impl RustTileMap {
     #[func]
     fn generate_world_matrix(&mut self, size: Vector2i, tiles: Array<Gd<Tile>>) {
-        self.tile_nid_mapping.extend(tiles.iter_shared());
+        
+        assert!(tiles.len() < NULL_TILE.0 as usize);
+        
+        self.tile_nid_mapping.extend(tiles.iter_shared()
+            .enumerate() 
+            .map(|(i, mut tile)| {
+                tile.bind_mut().nid = Some(TileTypeNid{0: i as u16}); 
+                tile
+            })
+        );
 
         self.world_matrix = Some(WorldMatrix::new(size.into()));     
     }

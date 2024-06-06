@@ -1,5 +1,7 @@
 
-use godot::{meta::{ArrayElement, GodotType}, prelude::*}; use std::hash::{Hash, Hasher};
+use godot::{register::GodotClass, prelude::*}; use std::hash::{Hash, Hasher};
+
+use crate::formation_generator::NidOrNidDistribution;
 
 #[derive(Clone, PartialEq, Copy)]
 pub struct TileTypeNid(pub u16);
@@ -30,7 +32,7 @@ pub struct Tile {
     #[export] random_scale_range: Vector4,// tal vez es mejor volver a los bushes y trees escenas para poder hacer esto
     #[export] flipped_at_random: bool,
     
-    pub assigned_nid: TileTypeNid,
+    pub nid: Option<TileTypeNid>,
 }
 impl Tile {
     pub fn base(&self) -> &Base<Resource> { &self.base }
@@ -60,10 +62,94 @@ pub struct TileSelection {
     base: Base<Resource>,
     #[export] id: StringName,
     #[export] targets: Array<StringName>,
-    #[export] tile_to_place: Array<StringName>,
+    #[export] use_distribution: Array<bool>,
+    #[export] tiles: Array<Gd<Tile>>,
+    #[export] tiles_distributions: Array<Gd<TileDistribution>>,
+
 }
+#[godot_api]
 impl TileSelection {
     pub fn id(&self) -> &StringName { &self.id }
     pub fn targets(&self) -> &Array<StringName> {&self.targets}
-    pub fn tiles_to_place(&self) -> &Array<StringName> {&self.tile_to_place}
+    
+    pub fn use_distribution(&self) -> &Array<bool>{&self.use_distribution}
+    pub fn tiles(&self) -> &Array<Gd<Tile>> {&self.tiles}
+    pub fn tiles_distributions(&self) -> &Array<Gd<TileDistribution>> {&self.tiles_distributions}
+
+    
+
+    #[func]
+    pub fn is_valid(&self) -> bool {
+        self.tiles_distributions().len() == self.targets().len()
+    }
 }
+
+#[derive(GodotClass)]
+#[class(tool, init, base=Resource)]
+pub struct TileDistribution {
+    base: Base<Resource>,
+    #[export] id: StringName,
+    #[export] tiles: Array<Gd<Tile>>,
+    #[export] weights: Array<i64>,
+
+}
+#[godot_api]
+impl TileDistribution {
+    pub fn base(&self) -> &Base<Resource> { &self.base }
+    pub fn id(&self) -> &StringName { &self.id }
+
+    #[func]
+    pub fn is_valid(&self) -> bool {
+        ! self.tiles.is_empty()
+        && self.tiles.len() == self.weights.len() 
+        && self.tiles.iter_shared().all(|tile| tile.bind().nid.is_some())
+        && self.weights.iter_shared().all(|x| x >= 0) 
+    }
+}
+#[derive(Debug)]
+pub enum TileDistributionError {
+    InvalidLength,
+    NegativeWeight,
+    MissingNid
+}
+impl std::fmt::Display for TileDistributionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TileDistributionError::InvalidLength => write!(f, "Tiles and weights arrays must have the same length and contain at least one element."),
+            TileDistributionError::NegativeWeight => write!(f, "Weights array contains negative values."),
+            TileDistributionError::MissingNid => write!(f, "Nid is missing for a tile(s)"),
+        }
+    }
+}
+impl TryInto<NidOrNidDistribution> for TileDistribution {
+    type Error = TileDistributionError;
+    
+    fn try_into(self) -> Result<NidOrNidDistribution, Self::Error> {
+        if self.tiles.is_empty() || self.tiles.len() != self.weights.len() {
+            return Err(TileDistributionError::InvalidLength);
+        }
+        if self.weights.iter_shared().any(|x| x < 0) {
+            return Err(TileDistributionError::NegativeWeight);
+        }
+        if self.tiles.iter_shared().any(|tile| tile.bind().nid.is_none()){
+            return Err(TileDistributionError::MissingNid);
+        }
+        unsafe{
+        if self.tiles.len() == 1 {
+            Ok(NidOrNidDistribution::Nid(self.tiles.get(0).unwrap_unchecked().bind().nid.unwrap_unchecked()))
+        }
+        else{
+            let mut distribution = Vec::new();
+            distribution.reserve_exact(self.tiles.len());
+
+            for it in self.tiles.iter_shared().zip(self.weights.iter_shared()){
+                let (tile, weight) = it;
+                distribution.push((tile.bind().nid.unwrap_unchecked(), weight));
+            }
+
+            Ok(NidOrNidDistribution::Distribution(distribution))
+        }
+        }
+    }
+}
+

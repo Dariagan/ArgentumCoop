@@ -47,10 +47,6 @@ impl<T: Default + Clone> IndexMut<SafeVec> for Matrix<T> {
     fn index_mut(&mut self, coords: SafeVec) -> &mut T {
         unsafe{self.flattened_matrix.get_unchecked_mut(coords.flat_index(&self.size))}
     }
-
-    fn split_16(){
-        
-    }
 }
 
 pub struct DownScalingMatrix<T: Default + Clone> {

@@ -96,6 +96,13 @@ func _index_all_found_resource_instances(directories: Array[String], check_subfo
 					else:#NO USAR SI ESTÁ EN .res/ EL DIRECTORIO, NO HACE FALTA
 						resource = SafeResourceLoader.load(directory + file_name)
 					
+					if resource.has_method("is_valid") && ! resource.is_valid():
+						if resource.id:
+							printerr("%s doesn't meet specified validation condition, not loaded"%[resource.id])
+						else:
+							printerr("a resource without id doesn't meet specified validation condition, not loaded")
+						resource = null
+					
 					if resource && "id" in resource:
 						assert(not table.has(resource.id))#check if resource with same id already loaded
 						table[resource.id] = resource
