@@ -1,5 +1,6 @@
-pub use crate::tile::TileSelection;
+pub use crate::tiling::TileSelection;
 use crate::uns_vec::UnsVec;
+use crate::world_matrix::TileTypeNid;
 pub use crate::{safe_vec::SafeVec, world_matrix::WorldMatrix};
 pub use godot::builtin::Dictionary;
 use enum_primitive_derive::Primitive;
@@ -44,5 +45,10 @@ pub fn get_border_closeness_factor(
 }
 
 pub fn place_tile(world_matrix: &mut WorldMatrix, coords_relative2_formation_origin: UnsVec){
+
+}
+
+pub fn fill_targets(nids_arr: &mut[TileTypeNid], target_names: &[&str], tile_selection: Gd<TileSelection>){
+    assert_eq!(nids_arr.len(), target_names.len())
 
 }

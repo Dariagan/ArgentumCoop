@@ -6,13 +6,17 @@ mod matrix;
 pub mod safe_vec;
 pub mod uns_vec;
 pub mod world_matrix;
-pub mod tile;
+pub mod tiling;
 pub mod fractured_formation_generator;
 
 struct ArgentumExtension;
 
 #[gdextension]
 unsafe impl ExtensionLibrary for ArgentumExtension{}
+
+extern crate strum; // 0.10.0
+#[macro_use]
+extern crate strum_macros; // 0.10.0
 
 use godot::engine::Node;
 

@@ -11,6 +11,8 @@ gxhash = "=3.4.1"
 #typenum = "1.17"
 enum-primitive-derive = "*"
 num-traits = "*"
+strum = "0.26"
+strum_macros = "0.26"
 
 [lib]
 crate-type = ["cdylib"]

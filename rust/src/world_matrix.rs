@@ -1,6 +1,6 @@
 use crate::matrix::Matrix; pub use crate::safe_vec::SafeVec;
 use godot::prelude::*; use std::ops::{Index, IndexMut};
-pub use crate::tile::*;
+pub use crate::tiling::*;
 
 const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize + 1;
 
