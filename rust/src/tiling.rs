@@ -62,10 +62,10 @@ pub struct TileSelection {
     base: Base<Resource>,
     #[export] id: StringName,
     #[export] targets: Array<StringName>,
-    #[export] use_distribution: Array<bool>,
+    #[export] use_distribution: Array<bool>,//false:then Tile, true: then TileDistribution
     #[export] tiles: Array<Gd<Tile>>,
     #[export] tiles_distributions: Array<Gd<TileDistribution>>,
-
+    current_index: usize,
 }
 #[godot_api]
 impl TileSelection {
@@ -76,14 +76,32 @@ impl TileSelection {
     pub fn tiles(&self) -> &Array<Gd<Tile>> {&self.tiles}
     pub fn tiles_distributions(&self) -> &Array<Gd<TileDistribution>> {&self.tiles_distributions}
 
-    
-
     #[func]
     pub fn is_valid(&self) -> bool {
         self.tiles_distributions().len() == self.targets().len()
     }
 }
+pub struct GdTileSelectionWrap(pub Gd<TileSelection>);
 
+impl Iterator for GdTileSelectionWrap {
+    type Item = NidOrNidDistribution;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut val = self.0.bind_mut();
+        if val.current_index >= val.use_distribution.len() {
+            return None;
+        }
+
+        let result = if val.use_distribution.get(val.current_index).is_some_and(|x| x) {
+            val.tiles_distributions.at(val.current_index).try_into()
+        } else {
+            val.tiles.at(val.current_index).try_into()
+        };
+
+        val.current_index += 1;
+        Some(result.unwrap())
+    }
+}
 #[derive(GodotClass)]
 #[class(tool, init, base=Resource)]
 pub struct TileDistribution {
@@ -121,28 +139,30 @@ impl std::fmt::Display for TileDistributionError {
         }
     }
 }
-impl TryInto<NidOrNidDistribution> for TileDistribution {
+
+impl TryFrom<Gd<TileDistribution>> for NidOrNidDistribution {
     type Error = TileDistributionError;
     
-    fn try_into(self) -> Result<NidOrNidDistribution, Self::Error> {
-        if self.tiles.is_empty() || self.tiles.len() != self.weights.len() {
+    fn try_from(value: Gd<TileDistribution>) -> Result<NidOrNidDistribution, Self::Error> {
+        let value = value.bind();
+        if value.tiles.is_empty() || value.tiles.len() != value.weights.len() {
             return Err(TileDistributionError::InvalidLength);
         }
-        if self.weights.iter_shared().any(|x| x < 0) {
+        if value.weights.iter_shared().any(|x| x < 0) {
             return Err(TileDistributionError::NegativeWeight);
         }
-        if self.tiles.iter_shared().any(|tile| tile.bind().nid.is_none()){
+        if value.tiles.iter_shared().any(|tile| tile.bind().nid.is_none()){
             return Err(TileDistributionError::MissingNid);
         }
         unsafe{
-        if self.tiles.len() == 1 {
-            Ok(NidOrNidDistribution::Nid(self.tiles.get(0).unwrap_unchecked().bind().nid.unwrap_unchecked()))
+        if value.tiles.len() == 1 {
+            Ok(NidOrNidDistribution::Nid(value.tiles.get(0).unwrap_unchecked().bind().nid.unwrap_unchecked()))
         }
         else{
             let mut distribution = Vec::new();
-            distribution.reserve_exact(self.tiles.len());
+            distribution.reserve_exact(value.tiles.len());
 
-            for it in self.tiles.iter_shared().zip(self.weights.iter_shared()){
+            for it in value.tiles.iter_shared().zip(value.weights.iter_shared()){
                 let (tile, weight) = it;
                 distribution.push((tile.bind().nid.unwrap_unchecked(), weight));
             }
@@ -151,5 +171,18 @@ impl TryInto<NidOrNidDistribution> for TileDistribution {
         }
         }
     }
+    
 }
 
+impl TryFrom<Gd<Tile>> for NidOrNidDistribution {
+    type Error = TileDistributionError;
+    fn try_from(value: Gd<Tile>) -> Result<NidOrNidDistribution, TileDistributionError> {
+
+        match value.bind().nid{
+            Some(nid) => Ok(NidOrNidDistribution::Nid(nid)),
+            None => Err(TileDistributionError::MissingNid),
+        }
+    }
+    
+    
+}
