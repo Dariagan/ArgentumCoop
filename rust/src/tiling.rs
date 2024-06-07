@@ -65,7 +65,7 @@ pub struct TileSelection {
     #[export] use_distribution: Array<bool>,//false:then Tile, true: then TileDistribution
     #[export] tiles: Array<Gd<Tile>>,
     #[export] tiles_distributions: Array<Gd<TileDistribution>>,
-    current_index: usize,
+    
 }
 #[godot_api]
 impl TileSelection {
@@ -81,24 +81,33 @@ impl TileSelection {
         self.tiles_distributions().len() == self.targets().len()
     }
 }
-pub struct GdTileSelectionWrap(pub Gd<TileSelection>);
 
-impl Iterator for GdTileSelectionWrap {
+pub struct GdTileSelectionIterator{
+    tile_selection: Gd<TileSelection>, current_index: usize
+}
+
+impl GdTileSelectionIterator{
+    pub fn new(tile_selection: Gd<TileSelection>) -> Self {
+        Self{tile_selection, current_index: 0}
+    }
+}
+
+impl Iterator for GdTileSelectionIterator {
     type Item = NidOrNidDistribution;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut val = self.0.bind_mut();
-        if val.current_index >= val.use_distribution.len() {
+        let val = self.tile_selection.bind();
+        if self.current_index >= val.use_distribution.len() {
             return None;
         }
 
-        let result = if val.use_distribution.get(val.current_index).is_some_and(|x| x) {
-            val.tiles_distributions.at(val.current_index).try_into()
+        let result = if val.use_distribution.get(self.current_index).is_some_and(|x| x) {
+            val.tiles_distributions.at(self.current_index).try_into()
         } else {
-            val.tiles.at(val.current_index).try_into()
+            val.tiles.at(self.current_index).try_into()
         };
 
-        val.current_index += 1;
+        self.current_index += 1;
         Some(result.unwrap())
     }
 }
