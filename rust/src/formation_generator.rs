@@ -1,7 +1,9 @@
+use std::thread::current;
+
 pub use crate::tiling::TileSelection;
 use crate::uns_vec::UnsVec;
 use crate::world_matrix::*;
-pub use crate::{safe_vec::SafeVec, world_matrix::WorldMatrix};
+pub use crate::{world_matrix::WorldMatrix};
 pub use godot::builtin::Dictionary;
 use enum_primitive_derive::Primitive;
 use godot::obj::{Base, Gd, GdRef};
@@ -20,7 +22,7 @@ pub trait IFormationGenerator {
         origin: UnsVec,
         size: UnsVec,
         tile_selection: Gd<TileSelection>,
-        seed: i64,
+        seed: i32,
         data: Dictionary,
     ) -> WorldMatrix;
 }
@@ -68,4 +70,69 @@ pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relat
     todo!()
     //llamar señal o algo
 }
+//UnsVec is a Vec2D whose components are lef(x) and right(y)
+struct FormationCoordsIterator{
 
+    current: UnsVec,
+    limits: (u32, u32),
+}
+
+impl FormationCoordsIterator{
+
+    pub fn new(size: UnsVec, thread_i: u32, n_threads: u32) -> Self {
+        let horizontal_range: UnsVec = UnsVec { 
+            lef: (thread_i*size.lef)/n_threads, 
+            right: (thread_i*size.right)/n_threads
+        };
+        Self{
+            current: UnsVec {lef: horizontal_range.lef, right: 0}, 
+            limits: (horizontal_range.right, size.right)
+        }
+    }
+}
+//creo que estos ifs lo hacen más lento que un for loop crudo, va a haber que hacer un benchmark comparativo
+impl Iterator for FormationCoordsIterator{
+    type Item = UnsVec;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        
+        if self.current.lef >= self.limits.0 {
+            return None;
+        }
+        let result = self.current.clone();
+
+        if self.current.right + 1 >= self.limits.1 {
+            self.current.lef += 1;
+            self.current.right = 0;
+        } else {
+            self.current.right += 1;
+        }
+
+        Some(result)
+    }
+}
+
+macro_rules! spawn_threads {
+    ($N_THREADS:expr, $coords:expr, $size:expr, $body:block) => {{
+        let mut threads: [Option<JoinHandle<()>>; $N_THREADS] = Default::default();
+
+        for thread_i in 0..$N_THREADS {
+            threads[thread_i] = Some(thread::spawn(move || {
+                let hori_range = (
+                    (thread_i * $size.lef as usize / $N_THREADS) as u32,
+                    ((thread_i + 1) * $size.lef as usize / $N_THREADS) as u32,
+                );
+                for macro_coords in (hori_range.0..hori_range.1)
+                    .zip(0..$size.lef)
+                    .map(UnsVec::from) {
+                        let coords = macro_coords;
+                        $body
+                    }
+            }));
+        }
+        threads
+    }};
+}
+
+
+pub(crate) use spawn_threads;  

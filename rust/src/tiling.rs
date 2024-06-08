@@ -1,7 +1,5 @@
-
 use godot::{register::GodotClass, prelude::*};
 use rand_distr::{Distribution, WeightedAliasIndex}; use std::hash::{Hash, Hasher};
-use strum::{EnumCount}; use strum_macros::{EnumCount as EnumCountMacro};
 use rand::prelude::*;
 
 #[derive(Clone, PartialEq, Copy)]
@@ -55,9 +53,6 @@ impl Tile {
         true
     }
 }
-
-
-
 
 impl Hash for Tile {
     fn hash<H: Hasher>(&self, state: &mut H) {
@@ -195,13 +190,11 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
             let sampler = WeightedAliasIndex::new(gd_tile_dist.weights.iter_shared().collect()).unwrap();
             choices.reserve_exact(gd_tile_dist.tiles.len());
 
-            
             for tile in gd_tile_dist.tiles.iter_shared(){
                 choices.push((tile.bind().nid.unwrap_unchecked(), tile.bind().z_level.unwrap()));
             }
 
             Ok(NidOrDist::Dist(DiscreteDistribution::new(choices, sampler)))
-            
         }
     }
     
@@ -235,7 +228,6 @@ impl DiscreteDistribution{
         }
     }
 }
-
 
 pub enum NidOrDist{
     Nid((TileTypeNid, TileZLevel)),

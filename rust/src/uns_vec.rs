@@ -155,6 +155,12 @@ impl fmt::Display for UnsVec {
     }
 }
 
+impl From<(u32, u32)> for UnsVec {
+    fn from(value: (u32, u32)) -> Self {
+        Self { lef: value.0, right: value.1 }
+    }
+}
+
 impl TryFrom<Vector2i> for UnsVec {
     type Error = &'static str;
     fn try_from(godot_vector: Vector2i) -> Result<Self, Self::Error>{
