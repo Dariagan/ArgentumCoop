@@ -177,6 +177,11 @@ impl Into<Vector2i> for UnsVec {
         Vector2i { x: self.lef as i32, y: self.right as i32}
     }
 }
+impl Into<Vector2> for UnsVec {
+    fn into(self) -> Vector2 {
+        Vector2 { x: self.lef as f32, y: self.right as f32}
+    }
+}
 impl Into<String> for UnsVec {
     fn into(self) -> String {
         format!("({}, {})", self.lef, self.right)

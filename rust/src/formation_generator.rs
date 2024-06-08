@@ -112,27 +112,43 @@ impl Iterator for FormationCoordsIterator{
     }
 }
 
-macro_rules! spawn_threads {
-    ($N_THREADS:expr, $coords:expr, $size:expr, $body:block) => {{
-        let mut threads: [Option<JoinHandle<()>>; $N_THREADS] = Default::default();
 
-        for thread_i in 0..$N_THREADS {
-            threads[thread_i] = Some(thread::spawn(move || {
-                let hori_range = (
-                    (thread_i * $size.lef as usize / $N_THREADS) as u32,
-                    ((thread_i + 1) * $size.lef as usize / $N_THREADS) as u32,
-                );
-                for macro_coords in (hori_range.0..hori_range.1)
-                    .zip(0..$size.lef)
-                    .map(UnsVec::from) {
-                        let coords = macro_coords;
-                        $body
-                    }
-            }));
+pub struct SendPtr<T>(pub *const T);
+unsafe impl<T> Send for SendPtr<T> where T: Send {}
+unsafe impl<T> Sync for SendPtr<T> where T: Sync {}
+
+impl<T> Clone for SendPtr<T> {
+    fn clone(&self) -> Self {
+        SendPtr(self.0)
+    }
+}
+impl<T> Copy for SendPtr<T> {}
+struct SendMutPtr<T>(*mut T);
+unsafe impl<T> Send for SendMutPtr<T> where T: Send {}
+unsafe impl<T> Sync for SendMutPtr<T> where T: Sync {}
+
+impl<T> Clone for SendMutPtr<T> {
+    fn clone(&self) -> Self {
+        SendMutPtr(self.0)
+    }
+}
+impl<T> Copy for SendMutPtr<T> {}
+macro_rules! make_ptr {
+    ($ref:expr) => {
+        SendPtr {
+            0: $ref as *const _,
         }
-        threads
-    }};
+    };
 }
 
 
-pub(crate) use spawn_threads;  
+macro_rules! make_mut_ptr {
+    ($ref:expr) => {
+        SendMutPtr {
+            0: $ref as *mut _,
+        }
+    };
+}
+
+pub(crate) use make_ptr;  
+pub(crate) use make_mut_ptr;  

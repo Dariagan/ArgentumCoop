@@ -15,6 +15,10 @@ strum = "0.26"
 strum_macros = "0.26"
 rand = "*"
 rand_distr = "*"
+noise = "0.9"
 [lib]
 crate-type = ["cdylib"]
 
+[dependencies.fastnoise-lite]
+version = "*"
+features = ["f64"]
