@@ -46,14 +46,13 @@ impl RustTileMap {
             })
         );
 
-        self.world_matrix = Some(WorldMatrix::new(size.into()));     
+        self.world_matrix = Some(WorldMatrix::new(size.try_into().unwrap()));     
     }
     #[func]
     fn generate_formation(&mut self, formation: i64, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i64, data: Dictionary) {
         let formation = FormGenEnum::from_i64(formation).unwrap();
-        let origin = UnsVec::try_from(origin).unwrap(); let size = UnsVec::try_from(size).unwrap(); 
+        let (origin, size) = (UnsVec::try_from(origin).unwrap(), UnsVec::try_from(size).unwrap()); 
         
-
         self.world_matrix = Some(
             match formation {
                 FormGenEnum::FracturedFormationGenerator => {

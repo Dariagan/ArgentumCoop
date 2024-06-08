@@ -13,7 +13,8 @@ enum-primitive-derive = "*"
 num-traits = "*"
 strum = "0.26"
 strum_macros = "0.26"
-
+rand = "*"
+rand_distr = "*"
 [lib]
 crate-type = ["cdylib"]
 

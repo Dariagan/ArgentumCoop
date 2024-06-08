@@ -1,6 +1,6 @@
 use godot::{builtin::Dictionary, obj::Gd};
 use strum_macros::{EnumString}; use strum::{EnumCount, VariantNames}; use strum_macros::{EnumCount as EnumCountMacro};
-use crate::{formation_generator::{fill_targets, IFormationGenerator, NidOrNidDistribution, TileSelection}, uns_vec::UnsVec, world_matrix::{TileDistribution, TileTypeNid, WorldMatrix}};
+use crate::{formation_generator::{IFormationGenerator, TileSelection}, uns_vec::UnsVec, world_matrix::{NidOrDist, WorldMatrix}};
 
 pub struct FracturedFormationGenerator{}
 
@@ -15,12 +15,9 @@ impl IFormationGenerator for FracturedFormationGenerator {
         tile_selection: Gd<TileSelection>, seed: i64, data: Dictionary,
     ) -> WorldMatrix{
 
-        let mut nids_mapped_to_targets: [NidOrNidDistribution; Target::COUNT] = Default::default();
-        fill_targets(&mut nids_mapped_to_targets, Target::VARIANTS, tile_selection);
+        let mut nids_mapped_to_targets: [NidOrDist; Target::COUNT] = Default::default();
+        crate::tiling::fill_targets(&mut nids_mapped_to_targets, Target::VARIANTS, tile_selection);
         todo!()
 
     }
-    
-
-
 }
