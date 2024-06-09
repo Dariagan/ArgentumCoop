@@ -10,6 +10,10 @@ pub struct WorldMatrix {tiles: Matrix<TileArray>,}
 
 impl WorldMatrix {
 
+    pub fn size(&self) -> UnsVec{
+        self.tiles.size()
+    }
+
     pub fn new(size: UnsVec) -> Self {
         let initial_value = [TileTypeNid::default(); MAX_TILES_PER_POS];
         Self {

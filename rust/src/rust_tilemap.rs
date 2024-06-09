@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use crate::formation_generator::{FormGenEnum, IFormationGenerator};
 use crate::fractured_formation_generator::FracturedFormationGenerator;
 use crate::uns_vec::UnsVec;
@@ -49,16 +51,36 @@ impl RustTileMap {
         self.world_matrix = Some(WorldMatrix::new(size.try_into().unwrap()));     
     }
     #[func]
-    fn generate_formation(&mut self, formation: i64, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) {
+    fn generate_formation(&mut self, formation: i64, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
         let formation = FormGenEnum::from_i64(formation).unwrap();
         let (origin, size) = (UnsVec::try_from(origin).unwrap(), UnsVec::try_from(size).unwrap()); 
+
+        const MIN_SIZE: u32 = 100;
+        if size.lef < MIN_SIZE || size.right < MIN_SIZE{
+            godot_error!("formation size is too small, must be at least {MIN_SIZE}X{MIN_SIZE}");
+            return false;
+        }
+        if origin.lef + size.lef > self.world_matrix.as_ref().unwrap().size().lef{
+            godot_error!("formation would go out of world bounds eastward");
+            return false;
+        }
+        if origin.right + size.right > self.world_matrix.as_ref().unwrap().size().right{
+            godot_error!("formation would go out of world bounds southward");
+            return false;
+        }
         self.world_matrix = Some(
             match formation {
                 FormGenEnum::FracturedFormationGenerator => {
                     FracturedFormationGenerator::generate(
                     self.world_matrix.take().unwrap(), origin, size, tile_selection, seed, data)
             }
-        })
+        });
+        true
+    }
+
+    #[func]
+    fn load_tiles_around(&self) {
+        
     }
    
 }

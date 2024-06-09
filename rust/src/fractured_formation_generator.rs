@@ -18,8 +18,6 @@ pub struct FracturedFormationGenerator{}
 #[strum(serialize_all = "snake_case")]
 enum Target{ Beach = 0, Lake, Cont, Tree, Bush, Ocean, Cave0, Cave1, Cave2}
 
-
-
 impl IFormationGenerator for FracturedFormationGenerator {
     fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
         tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary,
