@@ -1,5 +1,6 @@
 use std::thread::current;
 
+use crate::safe_vec::SafeVec;
 pub use crate::tiling::TileSelection;
 use crate::uns_vec::UnsVec;
 use crate::world_matrix::*;
@@ -43,14 +44,64 @@ pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relat
     todo!()
     //llamar señal o algo
 }
-struct FormationCoordsIterator{
+
+pub struct CenteredIterator{
+    current: SafeVec,
+    limits: (i32, i32),
+}
+impl CenteredIterator{
+
+    pub fn new(size: UnsVec) -> Self {
+        Self{
+            current: SafeVec {lef: -((size.lef/2) as i32), right: -((size.right/2) as i32)}, 
+            limits: ((size.lef/2) as i32, (size.right/2) as i32)
+        }
+    }
+}
+//creo que estos ifs lo hacen más lento que un for loop crudo, va a haber que hacer un benchmark comparativo
+impl Iterator for CenteredIterator{
+    type Item = SafeVec;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        
+        if self.current.lef >= self.limits.0 {
+            return None;
+        }
+        let result = self.current.clone();
+
+        if self.current.right + 1 >= self.limits.1 {
+            self.current.lef += 1;
+            self.current.right = 0;
+        } else {
+            self.current.right += 1;
+        }
+
+        Some(result)
+    }
+}
+
+pub struct SizeIterator{
     current: UnsVec,
     limits: (u32, u32),
 }
 
-impl FormationCoordsIterator{
+impl SizeIterator{
 
-    pub fn new(size: UnsVec, thread_i: u32, n_threads: u32) -> Self {
+    pub fn mono_thread(size: UnsVec) -> Self {
+        Self{
+            current: UnsVec {lef: 0, right: 0}, 
+            limits: (size.lef, size.right)
+        }
+    }
+
+    pub fn iterate_centered(size: UnsVec) -> Self {
+        Self{
+            current: UnsVec {lef: 0, right: 0}, 
+            limits: (size.lef, size.right)
+        }
+    }
+
+    pub fn for_thread(size: UnsVec, thread_i: u32, n_threads: u32) -> Self {
         let horizontal_range: UnsVec = UnsVec { 
             lef: (thread_i*size.lef)/n_threads, 
             right: (thread_i*size.right)/n_threads
@@ -62,7 +113,7 @@ impl FormationCoordsIterator{
     }
 }
 //creo que estos ifs lo hacen más lento que un for loop crudo, va a haber que hacer un benchmark comparativo
-impl Iterator for FormationCoordsIterator{
+impl Iterator for SizeIterator{
     type Item = UnsVec;
 
     fn next(&mut self) -> Option<Self::Item> {

@@ -5,6 +5,8 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 
 use godot::builtin::{Vector2, Vector2i};
 
+use crate::uns_vec::UnsVec;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SafeVec {
   pub lef: i32,
@@ -21,6 +23,8 @@ impl SafeVec {
   pub fn compare_lef(&self, other: &Self) -> Ordering {self.lef.cmp(&other.lef)}
   pub fn compare_right(&self, other: &Self) -> Ordering {self.right.cmp(&other.right)}
   pub fn is_strictly_smaller_than(&self, other: &Self) -> bool {self.lef < other.lef && self.right < other.right}
+  pub fn is_strictly_smaller_than_unsvec(&self, other: UnsVec) -> bool {self.lef < other.lef as i32 && self.right < other.right as i32}
+
   pub fn is_strictly_bigger_than(&self, other: &Self) -> bool {self.lef > other.lef && self.right > other.right}
   pub fn is_any_comp_negative(&self) -> bool {self.lef < 0 || self.right < 0}
   pub fn is_non_negative(&self) -> bool {self.lef >= 0 && self.right >= 0}

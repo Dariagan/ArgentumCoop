@@ -1,8 +1,9 @@
 use std::borrow::Borrow;
 
-use crate::formation_generator::{FormGenEnum, IFormationGenerator};
+use crate::formation_generator::{CenteredIterator, FormGenEnum, IFormationGenerator, SizeIterator};
 use crate::fractured_formation_generator::FracturedFormationGenerator;
-use crate::uns_vec::UnsVec;
+use crate::safe_vec::SafeVec;
+use crate::uns_vec::{UnsVec, ZERO};
 use crate::{formation_generator, world_matrix::*};
 use godot::builtin::Dictionary;
 use godot::engine::{ITileMap, TileMap};
@@ -19,7 +20,7 @@ struct RustTileMap {
     tile_nid_mapping: Array<Gd<Tile>>,
     world_matrix: Option<WorldMatrix>,
     base: Base<TileMap>,
-    
+    world_size: UnsVec,
 }
 #[godot_api]
 impl ITileMap for RustTileMap {
@@ -28,7 +29,8 @@ impl ITileMap for RustTileMap {
             base,
             seed: 0,
             world_matrix: None,
-            tile_nid_mapping: Array::new()
+            tile_nid_mapping: Array::new(),
+            world_size: ZERO
         }
     }
 }
@@ -47,8 +49,10 @@ impl RustTileMap {
                 tile
             })
         );
+        let size: UnsVec = size.try_into().unwrap();
 
-        self.world_matrix = Some(WorldMatrix::new(size.try_into().unwrap()));     
+        self.world_matrix = Some(WorldMatrix::new(size));     
+        self.world_size = size
     }
     #[func]
     fn generate_formation(&mut self, formation: i64, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
@@ -56,7 +60,7 @@ impl RustTileMap {
         let (origin, size) = (UnsVec::try_from(origin).unwrap(), UnsVec::try_from(size).unwrap()); 
 
         const MIN_SIZE: u32 = 100;
-        if size.lef < MIN_SIZE || size.right < MIN_SIZE{
+        if size.all_bigger_than_min(MIN_SIZE).is_err(){
             godot_error!("formation size is too small, must be at least {MIN_SIZE}X{MIN_SIZE}");
             return false;
         }
@@ -79,8 +83,19 @@ impl RustTileMap {
     }
 
     #[func]
-    fn load_tiles_around(&self) {
+    fn load_tiles_around(&self, local_coords: Vector2, chunk_size: Vector2i, being_nid: i64) {
+        let chunk_size: UnsVec = UnsVec::try_from(chunk_size).unwrap().all_bigger_than_min(10).unwrap();
         
+        let being_coords: SafeVec = self.base().local_to_map(local_coords).try_into().unwrap(); let local_coords = ();
+
+        CenteredIterator::new(chunk_size)
+            .map(|chunk_coord| chunk_coord + being_coords)
+            .filter(|coord| coord.is_non_negative() && coord.is_strictly_smaller_than_unsvec(self.world_size))
+            .for_each(|coord|{
+                
+            
+        })
+
     }
    
 }
