@@ -49,35 +49,35 @@ void ArgentumTileMap::gLoadTilesAround(const Vector2 global_coords, const Vector
     for (int y = -CHUNK_SIZE.y/2; y <= CHUNK_SIZE.y/2; y++) 
     {
         const SafeVec tileMapCoords(beingCoords.lef + x, beingCoords.RIGHT + y);
-        if (tileMapCoords.isNonNegative() && tileMapCoords.isStrictlySmallerThan(mWorldMatrixPtr->SIZE))
+        if (!(tileMapCoords.isNonNegative() && tileMapCoords.isStrictlySmallerThan(mWorldMatrixPtr->SIZE)))
+        continue;
+        
+        if (mTileSharedLoadsCount.count(tileMapCoords) == 0)
         {
-            if (mTileSharedLoadsCount.count(tileMapCoords) == 0)
+            mTileSharedLoadsCount.insert({tileMapCoords, 1});
+
+            if (mBeingsModule->mFrozenBeings.count(tileMapCoords))
             {
-                mTileSharedLoadsCount.insert({tileMapCoords, 1});
+                auto& tileFrozenBeings = mBeingsModule->mFrozenBeings[tileMapCoords];
 
-                if (mBeingsModule->mFrozenBeings.count(tileMapCoords))
-                {
-                    auto& tileFrozenBeings = mBeingsModule->mFrozenBeings[tileMapCoords];
-
-                    for (auto it = tileFrozenBeings.begin(); it != tileFrozenBeings.end(); it = tileFrozenBeings.erase(it)){
-                        const Vector2 global_coords = it->first;
-                        const int individual_unique_id = it->second;
-                        emit_signal("being_unfrozen", global_coords, individual_unique_id);
-                    }
+                for (auto it = tileFrozenBeings.begin(); it != tileFrozenBeings.end(); it = tileFrozenBeings.erase(it)){
+                    const Vector2 global_coords = it->first;
+                    const int individual_unique_id = it->second;
+                    emit_signal("being_unfrozen", global_coords, individual_unique_id);
                 }
-                if (mWorldMatrixPtr->isNotEmptyAt(tileMapCoords))//if more than 0 tileIds at coords:
-                    for (const TileTypeUid& uid : (*mWorldMatrixPtr)[tileMapCoords])
-                        {setCell(uid, tileMapCoords);}
-                //TODO
-                //else
-                  //  {setCell("ocean_water", tileMapCoords);}
             }
-            else if (mBeingLoadedTiles[being_uid].count(tileMapCoords) == 0)
-            {
-               mTileSharedLoadsCount[tileMapCoords] += 1;
-            }
-            mBeingLoadedTiles[being_uid].insert(tileMapCoords);
+            if (mWorldMatrixPtr->isNotEmptyAt(tileMapCoords))//if more than 0 tileIds at coords:
+                for (const TileTypeUid& uid : (*mWorldMatrixPtr)[tileMapCoords])
+                    {setCell(uid, tileMapCoords);}
+            //TODO
+            //else
+                //  {setCell("ocean_water", tileMapCoords);}
         }
+        else if (mBeingLoadedTiles[being_uid].count(tileMapCoords) == 0)
+        {
+            mTileSharedLoadsCount[tileMapCoords] += 1;
+        }
+        mBeingLoadedTiles[being_uid].insert(tileMapCoords);
     }
     const SafeVec topLeftCornerCoords = beingCoords - SafeVec(CHUNK_SIZE.x/2, CHUNK_SIZE.y/2);
 
@@ -128,7 +128,7 @@ bool ArgentumTileMap::setCell(const TileTypeUid uid, const SafeVec& coords)
     StringName TILE_ID = getTileId(uid);
     try{tileData = mCppTilesData.at(TILE_ID);}
     catch(const std::out_of_range& e)
-    {UtilityFunctions::printerr(TILE_ID, " not found in cppTilesData (at ArgentumTileMap.cpp::", __func__);
+    {UtilityFunctions::printerr(TILE_ID, " not found in cppTilesData (at ArgentumTileMap.cpp::", __func__,")");
      return false;
     }
 

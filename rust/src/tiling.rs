@@ -10,7 +10,7 @@ impl Default for TileTypeNid {fn default() -> Self {NULL_TILE}}
 impl Hash for TileTypeNid {fn hash<H: Hasher>(&self, state: &mut H) {self.0.hash(state);}}
 
 #[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug)]
-#[godot(via = i64)]
+#[godot(via = i32)]
 pub enum TileZLevel {
     Bottom = 0, Floor, Stain, Structure, Roof,
 }
@@ -23,10 +23,10 @@ pub struct Tile {
     base: Base<Resource>,
     #[export] id: StringName,
     #[export] layer: TileZLevel,
-    #[export] source_atlas: i64,
+    #[export] source_atlas: i32,
     #[export] origin_position: Vector2i,
     #[export] modulo_tiling_area: Vector2i,
-    #[export] alternative_id: i64,
+    #[export] alternative_id: i32,
     #[export] random_scale_range: Vector4,// tal vez es mejor volver a los bushes y trees escenas para poder hacer esto
     #[export] flipped_at_random: bool,
     
@@ -39,10 +39,10 @@ impl Tile {
     pub fn id(&self) -> &StringName { &self.id }
     #[func]
     fn layer(&self) -> TileZLevel { self.layer }
-    pub fn source_atlas(&self) -> i64 { self.source_atlas }
+    pub fn source_atlas(&self) -> i32 { self.source_atlas }
     pub fn origin_position(&self) -> Vector2i { self.origin_position }
     pub fn modulo_tiling_area(&self) -> Vector2i { self.modulo_tiling_area }
-    pub fn alternative_id(&self) -> i64 { self.alternative_id }
+    pub fn alternative_id(&self) -> i32 { self.alternative_id }
     pub fn random_scale_range(&self) -> Vector4 { self.random_scale_range }
     pub fn flipped_at_random(&self) -> bool { self.flipped_at_random }
 
@@ -125,7 +125,7 @@ pub struct TileDistribution {
     base: Base<Resource>,
     #[export] id: StringName,
     #[export] tiles: Array<Gd<Tile>>,
-    #[export] weights: Array<i64>,
+    #[export] weights: Array<i32>,
 
 }
 #[godot_api]
@@ -216,10 +216,10 @@ impl TryFrom<Gd<Tile>> for NidOrDist {
 
 pub struct DiscreteDistribution{
     choices: Vec<(TileTypeNid, TileZLevel)>,
-    sampler: WeightedAliasIndex<i64>,
+    sampler: WeightedAliasIndex<i32>,
 }
 impl DiscreteDistribution{
-    pub fn new(choices: Vec<(TileTypeNid, TileZLevel)>, sampler: WeightedAliasIndex<i64>,) -> Self {
+    pub fn new(choices: Vec<(TileTypeNid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,) -> Self {
         Self {choices, sampler}
     }
     pub fn sample(&self) -> (TileTypeNid, TileZLevel){

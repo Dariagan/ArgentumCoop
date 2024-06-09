@@ -43,6 +43,8 @@ impl IFormationGenerator for FracturedFormationGenerator {
         peninsuler.set_fractal_gain(Some(0.56));
         let peninsuler: SendPtr<FastNoiseLite> = make_ptr!(&peninsuler);
 
+        //let arcednoisexample: std::sync::Arc<FastNoiseLite> = FastNoiseLite::new().into();
+
         const BIG_LAKER_CUTOFF:f32 = 0.33;
         let mut big_laker=FastNoiseLite::new();big_laker.noise_type=NoiseType::ValueCubic;big_laker.seed=seed+2;
         let big_laker: SendPtr<FastNoiseLite> = make_ptr!(&big_laker);

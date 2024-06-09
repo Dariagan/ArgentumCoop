@@ -5,6 +5,8 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 
 use godot::builtin::{Vector2, Vector2i};
 
+use crate::safe_vec::SafeVec;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct UnsVec {
   pub lef: u32,
@@ -169,7 +171,11 @@ impl From<(u32, u32)> for UnsVec {
         Self { lef: value.0, right: value.1 }
     }
 }
-
+impl From<SafeVec> for UnsVec {
+    fn from(safe_vec: SafeVec) -> UnsVec{
+        UnsVec { lef: safe_vec.lef as u32, right: safe_vec.right as u32 }
+    }
+}
 impl TryFrom<Vector2i> for UnsVec {
     type Error = &'static str;
     fn try_from(godot_vector: Vector2i) -> Result<Self, Self::Error>{

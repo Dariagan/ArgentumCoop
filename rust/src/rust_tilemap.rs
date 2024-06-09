@@ -91,13 +91,27 @@ impl RustTileMap {
         CenteredIterator::new(chunk_size)
             .map(|chunk_coord| chunk_coord + being_coords)
             .filter(|coord| coord.is_non_negative() && coord.is_strictly_smaller_than_unsvec(self.world_size))
-            .for_each(|coord|{
-                
+            .map(Into::into)
+            .for_each(|matrix_coord: UnsVec|{
+
             
-        })
+            })
 
     }
-   
+
+    fn set_cell(&mut self, nid: TileTypeNid, coords: UnsVec) {
+        let tile: Gd<Tile> = self.get_tile_nid_mapping().at(nid.0 as usize);
+
+        let atlas_origin_position = tile.clone().bind().get_origin_position();
+        let modulo_tiling_area = tile.clone().bind().modulo_tiling_area();
+        let atlas_origin_position = Vector2i::new(atlas_origin_position.x/modulo_tiling_area.x, atlas_origin_position.y/modulo_tiling_area.y);
+
+        self.base_mut().set_cell_ex(tile.clone().bind().z_level.unwrap() as i32, coords.into())
+            .source_id(tile.clone().bind().source_atlas())
+            .atlas_coords(atlas_origin_position)
+            .alternative_tile(tile.clone().bind().get_alternative_id())
+            .done()
+    }
 }
 
 fn exceeds_tile_limit(arr: &VariantArray) -> Result<(),()> {
