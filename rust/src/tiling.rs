@@ -12,9 +12,9 @@ impl Hash for TileTypeNid {fn hash<H: Hasher>(&self, state: &mut H) {self.0.hash
 #[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug)]
 #[godot(via = i64)]
 pub enum TileZLevel {
-    Soil = 0, Floor, Stain, Structure, Roof,
+    Bottom = 0, Floor, Stain, Structure, Roof,
 }
-impl Default for TileZLevel {fn default() -> Self {Self::Soil}}
+impl Default for TileZLevel {fn default() -> Self {Self::Bottom}}
 impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
 
 #[derive(GodotClass)]
@@ -235,6 +235,15 @@ pub enum NidOrDist{
 }
 impl Default for NidOrDist{fn default() -> Self {Self::Nid((TileTypeNid::default(), TileZLevel::default()))}}
 
+impl NidOrDist{
+    pub fn get_a_nid(&self) -> (TileTypeNid, TileZLevel){
+        match self {
+            NidOrDist::Nid(x) => *x,
+            NidOrDist::Dist(dist) => dist.sample(),
+        }
+    }
+}
+
 
 pub fn fill_targets(nids_arr: &mut[NidOrDist], target_names: &[&str], tile_selection: Gd<TileSelection>){
     assert_eq!(nids_arr.len(), target_names.len());
@@ -244,6 +253,8 @@ pub fn fill_targets(nids_arr: &mut[NidOrDist], target_names: &[&str], tile_selec
             let (nid_or_distribution, target) = it;
 
             if let Some(target_i) = target_names.into_iter().position(|name: &&str| *name == target.to_string().as_str()) {
+                
+                
                 unsafe{
                     *nids_arr.get_unchecked_mut(target_i) = nid_or_distribution
                 }
