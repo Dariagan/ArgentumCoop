@@ -1,14 +1,13 @@
-use std::borrow::{Borrow, BorrowMut};
-use std::mem::{self, MaybeUninit};
+use std::borrow::{BorrowMut};
+use std::mem::{MaybeUninit};
 use std::thread::{self, JoinHandle};
 
 use fastnoise_lite::{FastNoiseLite, NoiseType};
 use godot::{builtin::Dictionary};
 
 use godot::prelude::*;
-use strum_macros::{EnumString}; use strum::{EnumCount, VariantNames}; use strum_macros::{EnumCount as EnumCountMacro};
-use crate::{formation_generator::*, world_matrix};
-use crate::uns_vec;
+use strum::{EnumCount, VariantNames}; use strum_macros::{EnumCount as EnumCountMacro};
+use crate::{formation_generator::*};
 use crate::world_matrix::*;
 use crate::{formation_generator::{IFormationGenerator, TileSelection}, uns_vec::UnsVec, world_matrix::{NidOrDist, WorldMatrix}};
 
@@ -69,7 +68,7 @@ impl IFormationGenerator for FracturedFormationGenerator {
 
         for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
             
-            let hori_range = ((thread_i*size.lef as usize/N_THREADS) as u32, (thread_i*size.lef as usize/N_THREADS) as u32);
+            let hori_range = ((thread_i*size.lef as usize/N_THREADS) as u32, ((thread_i+1)*size.lef as usize/N_THREADS) as u32);
             for rel_coords in (hori_range.0..hori_range.1).zip(0..size.right).map(UnsVec::from) {
 
                 let tiles_2b_placed: MaybeUninit::<[(TileTypeNid, TileZLevel); TileZLevel::COUNT]> = MaybeUninit::<[(TileTypeNid, TileZLevel); TileZLevel::COUNT]>::uninit();

@@ -1,6 +1,6 @@
 use std::borrow::Borrow;
 
-use crate::formation_generator::{CenteredIterator, FormGenEnum, IFormationGenerator, SizeIterator};
+use crate::formation_generator::{FormGenEnum, IFormationGenerator, };
 use crate::fractured_formation_generator::FracturedFormationGenerator;
 use crate::safe_vec::SafeVec;
 use crate::uns_vec::{UnsVec, ZERO};
@@ -83,30 +83,33 @@ impl RustTileMap {
     }
 
     #[func]
-    fn load_tiles_around(&self, local_coords: Vector2, chunk_size: Vector2i, being_nid: i64) {
-        let chunk_size: UnsVec = UnsVec::try_from(chunk_size).unwrap().all_bigger_than_min(10).unwrap();
+    fn load_tiles_around(&mut self, _local_coords: Vector2, chunk_size: Vector2i, being_nid: i64) {
+        let chunk_size = UnsVec::try_from(chunk_size).unwrap().all_bigger_than_min(10).unwrap();
         
-        let being_coords: SafeVec = self.base().local_to_map(local_coords).try_into().unwrap(); let local_coords = ();
+        let being_coords: SafeVec = self.base().local_to_map(_local_coords).into(); let _local_coords = ();
 
-        CenteredIterator::new(chunk_size)
-            .map(|chunk_coord| chunk_coord + being_coords)
-            .filter(|coord| coord.is_non_negative() && coord.is_strictly_smaller_than_unsvec(self.world_size))
-            .map(Into::into)
-            .for_each(|matrix_coord: UnsVec|{
+        let world_size = self.world_size;
+        for chunk_coord in chunk_size.centered_iter()
+            .map(|vec| vec + being_coords)
+            .filter(|vec| vec.is_non_negative())
+            .map(|vec|unsafe{UnsVec::try_from(vec).unwrap_unchecked()})
+            .filter(|vec| vec.is_strictly_smaller_than(world_size))
+        {
+            let tiles = self.world_matrix.as_ref().unwrap()[chunk_coord];
 
-            
-            })
+            tiles.iter().for_each(|nid| self.set_cell(*nid, chunk_coord))
+        }
 
     }
 
-    fn set_cell(&mut self, nid: TileTypeNid, coords: UnsVec) {
+    fn set_cell(&mut self, nid: TileTypeNid, matrix_coord: UnsVec) {
         let tile: Gd<Tile> = self.get_tile_nid_mapping().at(nid.0 as usize);
 
         let atlas_origin_position = tile.clone().bind().get_origin_position();
         let modulo_tiling_area = tile.clone().bind().modulo_tiling_area();
-        let atlas_origin_position = Vector2i::new(atlas_origin_position.x/modulo_tiling_area.x, atlas_origin_position.y/modulo_tiling_area.y);
+        let atlas_origin_position = Vector2i::new(atlas_origin_position.x%modulo_tiling_area.x, atlas_origin_position.y%modulo_tiling_area.y);
 
-        self.base_mut().set_cell_ex(tile.clone().bind().z_level.unwrap() as i32, coords.into())
+        self.base_mut().set_cell_ex(tile.clone().bind().z_level.unwrap() as i32, matrix_coord.into())
             .source_id(tile.clone().bind().source_atlas())
             .atlas_coords(atlas_origin_position)
             .alternative_tile(tile.clone().bind().get_alternative_id())

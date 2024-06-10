@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Range, Sub, SubAssign};
 
 use godot::builtin::{Vector2, Vector2i};
 
@@ -23,7 +23,7 @@ impl UnsVec {
   pub fn sum_right(&self, j: u32) -> Self {UnsVec {lef: self.lef, right: self.right + j,}}
   pub fn compare_lef(&self, other: &Self) -> Ordering {self.lef.cmp(&other.lef)}
   pub fn compare_right(&self, other: &Self) -> Ordering {self.right.cmp(&other.right)}
-  pub fn is_strictly_smaller_than(&self, other: &Self) -> bool {self.lef < other.lef && self.right < other.right}
+  pub fn is_strictly_smaller_than(&self, other: Self) -> bool {self.lef < other.lef && self.right < other.right}
   pub fn is_strictly_bigger_than(&self, other: &Self) -> bool {self.lef > other.lef && self.right > other.right}
   pub fn flat_index(&self, size: &UnsVec) -> usize{(self.lef*size.lef + self.right) as usize}
   pub fn length(&self) -> f64 {self.distance_to(&UnsVec { lef: 0, right: 0 })}
@@ -41,6 +41,12 @@ impl UnsVec {
   }
   pub fn distance_squared_to(&self, other: &Self) -> usize {
     ((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as usize
+  }
+
+  pub fn centered_iter(&self) -> impl Iterator<Item = SafeVec> {
+    (-(self.lef as i32)/2..self.lef as i32/2)
+        .zip(-(self.right as i32)/2..self.right as i32/2)
+        .map(SafeVec::from)
   }
 }
 
@@ -202,3 +208,4 @@ impl Into<String> for UnsVec {
         format!("({}, {})", self.lef, self.right)
     }
 }
+

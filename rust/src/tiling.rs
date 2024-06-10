@@ -125,7 +125,7 @@ pub struct TileDistribution {
     base: Base<Resource>,
     #[export] id: StringName,
     #[export] tiles: Array<Gd<Tile>>,
-    #[export] weights: Array<i32>,
+    #[export] weights: PackedInt32Array,
 
 }
 #[godot_api]
@@ -138,7 +138,7 @@ impl TileDistribution {
         ! self.tiles.is_empty()
         && self.tiles.len() == self.weights.len() 
         //&& self.tiles.iter_shared().all(|tile| tile.bind().layer >= 0 && tile.bind().layer < TileZLevel::COUNT)
-        && self.weights.iter_shared().all(|x| x >= 0) 
+        && self.weights.as_slice().iter().all(|x| *x >= 0) 
     }
 }
 #[derive(Debug)]
@@ -175,7 +175,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         if gd_tile_dist.tiles.is_empty() || gd_tile_dist.tiles.len() != gd_tile_dist.weights.len() {
             return Err(TileDistributionError::InvalidLength);
         }
-        if gd_tile_dist.weights.iter_shared().any(|x| x < 0) {
+        if gd_tile_dist.weights.as_slice().iter().any(|x| *x < 0) {
             return Err(TileDistributionError::NegativeWeight);
         }
         if gd_tile_dist.tiles.iter_shared().any(|tile| tile.bind().nid.is_none()){
@@ -187,7 +187,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         
         unsafe{
             let mut choices: Vec<(TileTypeNid, TileZLevel)> = Vec::new();
-            let sampler = WeightedAliasIndex::new(gd_tile_dist.weights.iter_shared().collect()).unwrap();
+            let sampler = WeightedAliasIndex::new(gd_tile_dist.weights.as_slice().to_vec()).unwrap();
             choices.reserve_exact(gd_tile_dist.tiles.len());
 
             for tile in gd_tile_dist.tiles.iter_shared(){

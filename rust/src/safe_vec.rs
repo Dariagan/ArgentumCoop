@@ -24,7 +24,13 @@ impl SafeVec {
   pub fn compare_right(&self, other: &Self) -> Ordering {self.right.cmp(&other.right)}
   pub fn is_strictly_smaller_than(&self, other: &Self) -> bool {self.lef < other.lef && self.right < other.right}
   pub fn is_strictly_smaller_than_unsvec(&self, other: UnsVec) -> bool {self.lef < other.lef as i32 && self.right < other.right as i32}
-
+  pub fn all_bigger_than_min(&self, min: i32) -> Result<Self, String> {
+    if self.lef >= min && self.right >= min {
+      Ok(*self)
+    } else {
+      Err(format!("One or both values are less than the minimum value of {}", min))
+    }
+  }
   pub fn is_strictly_bigger_than(&self, other: &Self) -> bool {self.lef > other.lef && self.right > other.right}
   pub fn is_any_comp_negative(&self) -> bool {self.lef < 0 || self.right < 0}
   pub fn is_non_negative(&self) -> bool {self.lef >= 0 && self.right >= 0}
@@ -37,6 +43,12 @@ impl SafeVec {
   }
   pub fn distance_squared_to(&self, other: &Self) -> usize {
     ((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as usize
+  }
+
+  fn centered_iter(&self) -> impl Iterator<Item = SafeVec> {
+    (-(self.lef)/2..self.lef/2)
+        .zip(-(self.right)/2..self.right/2)
+        .map(SafeVec::from)
   }
 }
 
@@ -184,5 +196,15 @@ impl Into<Vector2i> for SafeVec {
 impl Into<String> for SafeVec {
     fn into(self) -> String {
         format!("({}, {})", self.lef, self.right)
+    }
+}
+impl From<(i32, i32)> for SafeVec {
+    fn from(value: (i32, i32)) -> Self {
+        Self { lef: value.0, right: value.1 }
+    }
+}
+impl From<(u32, u32)> for SafeVec {
+    fn from(value: (u32, u32)) -> Self {
+        Self { lef: value.0 as i32, right: value.1 as i32}
     }
 }
