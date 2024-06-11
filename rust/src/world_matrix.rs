@@ -5,7 +5,7 @@ pub use crate::tiling::*;
 
 const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize + 1;
 
-type TileArray = [TileTypeNid; MAX_TILES_PER_POS];
+type TileArray = [TileUnid; MAX_TILES_PER_POS];
 
 pub struct WorldMatrix {tiles: Matrix<TileArray>,}
 
@@ -16,7 +16,7 @@ impl WorldMatrix {
     }
 
     pub fn new(size: UnsVec) -> Self {
-        let initial_value = [TileTypeNid::default(); MAX_TILES_PER_POS];
+        let initial_value = [TileUnid::default(); MAX_TILES_PER_POS];
         Self {
             tiles: Matrix::new_with_element_value(size, &initial_value), 
         }
@@ -26,7 +26,7 @@ impl WorldMatrix {
     pub unsafe fn count_at(&self, coords: UnsVec) -> usize {
         self[coords]
             .iter()
-            .filter(|&&nid| nid != TileTypeNid::default())
+            .filter(|&&nid| nid != TileUnid::default())
             .count()
     }
     pub unsafe fn is_empty_at_unchk(&self, coords: UnsVec) -> bool {
@@ -42,11 +42,11 @@ impl WorldMatrix {
         todo!()
     }
 
-    pub unsafe fn overwrite_tile(&mut self, tile: TileTypeNid, coords: UnsVec, z_level: TileZLevel){
+    pub unsafe fn overwrite_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel){
         let prev_tile = self.at_mut(coords).expect("TODO CAMBIAR POR CORCHETES").get_unchecked_mut(z_level as usize);
         *prev_tile = tile;
     }
-    pub unsafe fn place_tile(&mut self, tile: TileTypeNid, coords: UnsVec, z_level: TileZLevel) -> Result<(), String>{
+    pub unsafe fn place_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel) -> Result<(), String>{
         let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
         match *prev_tile {
             NULL_TILE => {*prev_tile = tile; Ok(())},

@@ -1,0 +1,13 @@
+[gd_resource type="TileSelection" load_steps=7 format=3 uid="uid://caatdrn8yqx56"]
+
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/soil/beach_sand.tres" id="1_bk0b5"]
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/soil/lake_water.tres" id="2_tqfri"]
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/soil/grass.tres" id="3_i1axd"]
+[ext_resource type="Tile" uid="uid://y30ul0b2mcws" path="res://resource_instances/tiling/tiles/terrain/trees/temperate/tree_temp_0.tres" id="4_tiekw"]
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/bushes/bush_0.tres" id="5_urw3e"]
+[ext_resource type="Tile" uid="uid://ci370602mwpw0" path="res://resource_instances/tiling/tiles/buildings/dungeons/cave_mossy.tres" id="6_gep5r"]
+
+[resource]
+id = &"temperate"
+targets = Array[StringName]([&"beach", &"lake", &"cont", &"tree", &"bush", &"ocean", &"cave0", &"cave1"])
+tiles = Array[Tile]([ExtResource("1_bk0b5"), ExtResource("2_tqfri"), ExtResource("3_i1axd"), ExtResource("4_tiekw"), ExtResource("5_urw3e"), ExtResource("6_gep5r"), ExtResource("6_gep5r"), ExtResource("6_gep5r")])

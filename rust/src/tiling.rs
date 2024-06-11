@@ -1,19 +1,21 @@
 use godot::{register::GodotClass, prelude::*};
-use rand_distr::{Distribution, WeightedAliasIndex}; use std::hash::{Hash, Hasher};
+use rand_distr::{Distribution, WeightedAliasIndex}; use std::fmt;
+use std::hash::{Hash, Hasher};
 use rand::prelude::*;
 
 #[derive(Clone, PartialEq, Copy)]
-pub struct TileTypeNid(pub u16);
-pub const NULL_TILE: TileTypeNid = TileTypeNid(u16::MAX);
+pub struct TileUnid(pub u16);
+pub const NULL_TILE: TileUnid = TileUnid(u16::MAX);
 
-impl Default for TileTypeNid {fn default() -> Self {NULL_TILE}}
-impl Hash for TileTypeNid {fn hash<H: Hasher>(&self, state: &mut H) {self.0.hash(state);}}
+impl Default for TileUnid {fn default() -> Self {NULL_TILE}}
+impl Hash for TileUnid {fn hash<H: Hasher>(&self, state: &mut H) {self.0.hash(state);}}
 
-#[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug)]
+#[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display)]
 #[godot(via = i32)]
 pub enum TileZLevel {
     Bottom = 0, Floor, Stain, Structure, Roof,
 }
+
 impl Default for TileZLevel {fn default() -> Self {Self::Bottom}}
 impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
 
@@ -31,7 +33,7 @@ pub struct Tile {
     #[export] flipped_at_random: bool,
     
     pub z_level: Option<TileZLevel>,
-    pub nid: Option<TileTypeNid>,
+    pub nid: Option<TileUnid>,
 }
 #[godot_api]
 impl Tile {
@@ -54,15 +56,21 @@ impl Tile {
     }
 }
 
-impl Hash for Tile {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.layer.hash(state);
-        self.source_atlas.hash(state);
-        self.origin_position.hash(state);
-        self.modulo_tiling_area.hash(state);
-        self.alternative_id.hash(state);
+impl fmt::Display for TileUnid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "tunid{}", self.0)
     }
 }
+
+// impl Hash for Tile {
+//     fn hash<H: Hasher>(&self, state: &mut H) {
+//         self.layer.hash(state);
+//         self.source_atlas.hash(state);
+//         self.origin_position.hash(state);
+//         self.modulo_tiling_area.hash(state);
+//         self.alternative_id.hash(state);
+//     }
+// }
 
 #[derive(GodotClass)]
 #[class(tool, init, base=Resource)]
@@ -130,7 +138,6 @@ pub struct TileDistribution {
     #[export] id: StringName,
     #[export] tiles: Array<Gd<Tile>>,
     #[export] weights: PackedInt32Array,
-
 }
 #[godot_api]
 impl TileDistribution {
@@ -172,7 +179,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         let gd_tile_dist = value.bind();
 
         if gd_tile_dist.tiles.len() == 1 {unsafe{
-            let tile = gd_tile_dist.tiles.get(0).expect("couldn't get first tile");
+            let tile = gd_tile_dist.tiles.get(0).unwrap_unchecked();
             return Ok(NidOrDist::Nid((tile.clone().bind().nid.expect("nid not assigned to tile"), tile.clone().bind().z_level.expect("hola"))));
         }}
 
@@ -190,7 +197,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         }
         
         unsafe{
-            let mut choices: Vec<(TileTypeNid, TileZLevel)> = Vec::new();
+            let mut choices: Vec<(TileUnid, TileZLevel)> = Vec::new();
             let sampler = WeightedAliasIndex::new(gd_tile_dist.weights.as_slice().to_vec()).expect("couldn't create WeightedAliasIndex");
             choices.reserve_exact(gd_tile_dist.tiles.len());
 
@@ -219,28 +226,28 @@ impl TryFrom<Gd<Tile>> for NidOrDist {
 }
 
 pub struct DiscreteDistribution{
-    choices: Vec<(TileTypeNid, TileZLevel)>,
+    choices: Vec<(TileUnid, TileZLevel)>,
     sampler: WeightedAliasIndex<i32>,
 }
 impl DiscreteDistribution{
-    pub fn new(choices: Vec<(TileTypeNid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,) -> Self {
+    pub fn new(choices: Vec<(TileUnid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,) -> Self {
         Self {choices, sampler}
     }
-    pub fn sample(&self) -> (TileTypeNid, TileZLevel){
+    pub fn sample(&self) -> (TileUnid, TileZLevel){
         unsafe{
-            self.choices.get(self.sampler.sample(&mut thread_rng())).expect("couldn't sample").clone()
+            self.choices.get_unchecked(self.sampler.sample(&mut thread_rng())).clone()
         }
     }
 }
 
 pub enum NidOrDist{
-    Nid((TileTypeNid, TileZLevel)),
+    Nid((TileUnid, TileZLevel)),
     Dist(DiscreteDistribution)
 }
-impl Default for NidOrDist{fn default() -> Self {Self::Nid((TileTypeNid::default(), TileZLevel::default()))}}
+impl Default for NidOrDist{fn default() -> Self {Self::Nid((TileUnid::default(), TileZLevel::default()))}}
 
 impl NidOrDist{
-    pub fn get_a_nid(&self) -> (TileTypeNid, TileZLevel){
+    pub fn get_a_nid(&self) -> (TileUnid, TileZLevel){
         match self {
             NidOrDist::Nid(x) => *x,
             NidOrDist::Dist(dist) => dist.sample(),
@@ -250,10 +257,13 @@ impl NidOrDist{
 
 
 pub fn fill_targets(nids_arr: &mut[NidOrDist], target_names: &[&str], tile_selection: Gd<TileSelection>){
-    assert_eq!(nids_arr.len(), target_names.len());
+    assert_eq!(nids_arr.len(), target_names.len(), "nids arr not equal in length with target_names");
+    if target_names.len() > tile_selection.bind().targets().len() {
+        godot_error!("tile selection id={} doesn't provide for all targets", tile_selection.bind().id)
+    }
 
     GdTileSelectionIterator::new(tile_selection.clone()).zip(tile_selection.bind().targets().iter_shared())
-        .for_each(|it| {
+        .for_each(|it: (NidOrDist, StringName)| {
             let (nid_or_distribution, target) = it;
 
             if let Some(target_i) = target_names.into_iter().position(|name: &&str| *name == target.to_string().as_str()) {

@@ -45,7 +45,7 @@ impl RustTileMap {
         self.tile_nid_mapping.extend(tiles.iter_shared()
             .enumerate() 
             .map(|(i, mut tile)| {
-                tile.bind_mut().nid = Some(TileTypeNid{0: i as u16}); 
+                tile.bind_mut().nid = Some(TileUnid{0: i as u16}); 
                 tile
             })
         );
@@ -111,7 +111,7 @@ impl RustTileMap {
 
     }
 
-    fn set_cell(&mut self, nid: TileTypeNid, matrix_coord: UnsVec) {
+    fn set_cell(&mut self, nid: TileUnid, matrix_coord: UnsVec) {
         let tile: Gd<Tile> = self.get_tile_nid_mapping().get(nid.0 as usize).expect(format!("tile mapped to nid={} not found", nid.0).as_str());
 
         let atlas_origin_position = tile.clone().bind().get_origin_position();

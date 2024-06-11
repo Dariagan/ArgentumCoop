@@ -30,7 +30,7 @@ pub trait IFormationGenerator {
 }
 
 
-pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), (nid, z_level) : (TileTypeNid, TileZLevel), instantiation_data: Option<Dictionary>){
+pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), (nid, z_level) : (TileUnid, TileZLevel), instantiation_data: Option<Dictionary>){
     unsafe{
         world.drf().overwrite_tile(nid, origin+relative, z_level);
         
@@ -51,9 +51,8 @@ pub fn is_continental(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, s
 #[inline]
 pub fn get_continentness(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
     let bff = crate::formation_generator::get_border_farness_factor(rel_coords, size, power);
-    let asd = get_noise_value(continenter, rel_coords+offset.unwrap_or_default()) * bff;
-    godot_print!("noise: {asd}");
-    get_noise_value(continenter, rel_coords) * bff
+    let val = bff *get_noise_value(continenter, rel_coords + offset.unwrap_or_default());
+    val
 }
 #[inline]
 pub fn nv_surpasses_cutoff(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec, cutoff: f32) -> bool{

@@ -30,7 +30,7 @@ func generate_world():
 	generate_world_matrix(WORLD_SIZE, tiles)
 	
 	
-	generate_formation(0, Vector2i.ZERO, Vector2i(1000, 1000), GlobalData.tile_selections[&"selection_temperate"], 0, {})
+	generate_formation(0, Vector2i.ZERO, Vector2i(1000, 1000), GlobalData.tile_selections[&"temperate"], 0, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
