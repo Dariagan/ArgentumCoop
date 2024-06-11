@@ -1,7 +1,9 @@
 use godot::{register::GodotClass, prelude::*};
-use rand_distr::{Distribution, WeightedAliasIndex}; use std::fmt;
+use rand_distr::{Distribution, WeightedAliasIndex}; use std::fmt::{self, format};
 use std::hash::{Hash, Hasher};
 use rand::prelude::*;
+
+use crate::uns_vec::UnsVec;
 
 #[derive(Clone, PartialEq, Copy)]
 pub struct TileUnid(pub u16);
@@ -20,11 +22,11 @@ impl Default for TileZLevel {fn default() -> Self {Self::Bottom}}
 impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
 
 #[derive(GodotClass)]
-#[class(init, tool, base=Resource)]
+#[class(tool, base=Resource)]
 pub struct Tile {
     base: Base<Resource>,
     #[export] id: StringName,
-    #[export] layer: TileZLevel,
+    #[export] z_level: TileZLevel,
     #[export] source_atlas: i32,
     #[export] origin_position: Vector2i,
     #[export] modulo_tiling_area: Vector2i,
@@ -32,15 +34,13 @@ pub struct Tile {
     #[export] random_scale_range: Vector4,// tal vez es mejor volver a los bushes y trees escenas para poder hacer esto
     #[export] flipped_at_random: bool,
     
-    pub z_level: Option<TileZLevel>,
     pub nid: Option<TileUnid>,
 }
 #[godot_api]
 impl Tile {
     pub fn base(&self) -> &Base<Resource> { &self.base }
     pub fn id(&self) -> &StringName { &self.id }
-    #[func]
-    fn layer(&self) -> TileZLevel { self.layer }
+    pub fn z_level(&self) -> TileZLevel { self.z_level }
     pub fn source_atlas(&self) -> i32 { self.source_atlas }
     pub fn origin_position(&self) -> Vector2i { self.origin_position }
     pub fn modulo_tiling_area(&self) -> Vector2i { self.modulo_tiling_area }
@@ -50,11 +50,21 @@ impl Tile {
 
     #[func]
     fn is_valid(&mut self) -> bool {
-        
-        self.z_level = Some(self.layer);
+        let modulo_tiling_area: UnsVec = self.modulo_tiling_area.try_into().expect(format!("modulo tiling area for Tile id={} must be bigger or equal than (1,1)", self.id()).as_str());
+        modulo_tiling_area.all_bigger_than_min(1).expect(format!("modulo tiling area for Tile id={} must be bigger or equal than (1,1)", self.id()).as_str());
+        unsafe{assert!(self.id != StringName::try_from("").unwrap_unchecked(), "id not assigned for Tile id={}", self.id())}
+
         true
     }
 }
+#[godot_api]
+impl IResource for Tile{
+    fn init(base: Base<Resource>) -> Self {
+        Self {base, id: StringName::try_from("").expect("stringn"), z_level: TileZLevel::Bottom, source_atlas: -1, origin_position: Vector2i{x: 0, y: 0}, modulo_tiling_area: Vector2i{x: 1, y: 1}, 
+        alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, nid: None }
+    }
+}
+
 
 impl fmt::Display for TileUnid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -73,7 +83,7 @@ impl fmt::Display for TileUnid {
 // }
 
 #[derive(GodotClass)]
-#[class(tool, init, base=Resource)]
+#[class(init, tool, base=Resource)]
 pub struct TileSelection {
     base: Base<Resource>,
     #[export] id: StringName,
@@ -81,7 +91,6 @@ pub struct TileSelection {
     #[export] use_distribution: Array<bool>,//false:then Tile, true: then TileDistribution
     #[export] tiles: Array<Gd<Tile>>,
     #[export] tiles_distributions: Array<Gd<TileDistribution>>,
-    
 }
 #[godot_api]
 impl TileSelection {
@@ -99,6 +108,27 @@ impl TileSelection {
         self.tiles_distributions().len() == self.use_distribution().len()
     }
 }
+//TODO HACERLE UN INIT CON UNA ID MALA PLACEHOLDER ASÍ SE PUEDE VALIDAR^^^
+
+#[derive(GodotClass)]
+#[class(base=Node2D)]
+struct MyClass{
+    base: Base<Node2D>,
+    foo_bar: i64,
+}
+
+#[godot_api]
+impl INode2D for MyClass {
+    fn init(base: Base<Node2D>) -> Self {
+        Self {base, foo_bar: 32}
+    }
+}
+
+#[godot_api]
+impl MyClass {
+    
+}
+
 
 pub struct GdTileSelectionIterator{
     tile_selection: Gd<TileSelection>, current_index: usize
@@ -157,7 +187,6 @@ pub enum TileDistributionError {
     InvalidLength,//TODO add tile or distribution id to each error-variant (to find culprit more easily)
     NegativeWeight,
     MissingNid,
-    MissingZLevel,
     MissingBoth,
 }
 impl std::fmt::Display for TileDistributionError {
@@ -166,7 +195,6 @@ impl std::fmt::Display for TileDistributionError {
             TileDistributionError::InvalidLength => write!(f, "Tiles and weights arrays must have the same length and contain at least one element."),
             TileDistributionError::NegativeWeight => write!(f, "Weights array contains negative values."),
             TileDistributionError::MissingNid => write!(f, "nid is missing for a tile(s)"),
-            TileDistributionError::MissingZLevel => write!(f, "z-level is missing for a tile(s)"),
             TileDistributionError::MissingBoth => write!(f, "both nid and z-level are missing for a tile(s)"),
         }
     }
@@ -180,7 +208,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
 
         if gd_tile_dist.tiles.len() == 1 {unsafe{
             let tile = gd_tile_dist.tiles.get(0).unwrap_unchecked();
-            return Ok(NidOrDist::Nid((tile.clone().bind().nid.expect("nid not assigned to tile"), tile.clone().bind().z_level.expect("hola"))));
+            return Ok(NidOrDist::Nid((tile.clone().bind().nid.expect("nid not assigned to tile"), tile.clone().bind().z_level)));
         }}
 
         if gd_tile_dist.tiles.is_empty() || gd_tile_dist.tiles.len() != gd_tile_dist.weights.len() {
@@ -192,9 +220,6 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         if gd_tile_dist.tiles.iter_shared().any(|tile| tile.bind().nid.is_none()){
             return Err(TileDistributionError::MissingNid);
         }
-        if gd_tile_dist.tiles.iter_shared().any(|tile| tile.bind().z_level.is_none()){
-            return Err(TileDistributionError::MissingZLevel);
-        }
         
         unsafe{
             let mut choices: Vec<(TileUnid, TileZLevel)> = Vec::new();
@@ -202,7 +227,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
             choices.reserve_exact(gd_tile_dist.tiles.len());
 
             for tile in gd_tile_dist.tiles.iter_shared(){
-                choices.push((tile.bind().nid.expect("nid not assigned to tile"), tile.bind().z_level.expect("hola")));
+                choices.push((tile.bind().nid.expect("nid not assigned to tile"), tile.bind().z_level));
             }
 
             Ok(NidOrDist::Dist(DiscreteDistribution::new(choices, sampler)))
@@ -217,10 +242,8 @@ impl TryFrom<Gd<Tile>> for NidOrDist {
 
         let (nid, z_level) = (value.bind().nid, value.bind().z_level);
         match (nid, z_level){
-            (Some(nid), Some(z_level)) => Ok(NidOrDist::Nid((nid, z_level))),
-            (None, Some(_)) => Err(TileDistributionError::MissingNid),
-            (Some(_), None) => Err(TileDistributionError::MissingZLevel),
-            _ => Err(TileDistributionError::MissingBoth),
+            (Some(nid),z_level) => Ok(NidOrDist::Nid((nid, z_level))),
+            (None, _) => Err(TileDistributionError::MissingNid),
         }
     }
 }
@@ -258,9 +281,7 @@ impl NidOrDist{
 
 pub fn fill_targets(nids_arr: &mut[NidOrDist], target_names: &[&str], tile_selection: Gd<TileSelection>){
     assert_eq!(nids_arr.len(), target_names.len(), "nids arr not equal in length with target_names");
-    if target_names.len() > tile_selection.bind().targets().len() {
-        godot_error!("tile selection id={} doesn't provide for all targets", tile_selection.bind().id)
-    }
+    assert!(target_names.len() <= tile_selection.bind().targets().len(), "TileSelection(id={} len={}) doesn't provide for all target_names(len={})", tile_selection.bind().id, tile_selection.bind().targets().len(), target_names.len());
 
     GdTileSelectionIterator::new(tile_selection.clone()).zip(tile_selection.bind().targets().iter_shared())
         .for_each(|it: (NidOrDist, StringName)| {

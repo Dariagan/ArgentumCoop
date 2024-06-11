@@ -43,6 +43,9 @@ impl UnsVec {
     ((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as usize
   }
 
+  pub fn size_iter(&self) -> impl Iterator<Item = UnsVec> {
+    (0..self.lef).zip(0..self.right).map(UnsVec::from)
+  }
   pub fn centered_iter(&self) -> impl Iterator<Item = SafeVec> {
     (-(self.lef as i32)/2..self.lef as i32/2)
         .zip(-(self.right as i32)/2..self.right as i32/2)
@@ -174,7 +177,7 @@ impl Hash for UnsVec {
 }
 impl fmt::Display for UnsVec {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {})", self.lef, self.right)
+        write!(f, "UV({}, {})", self.lef, self.right)
     }
 }
 

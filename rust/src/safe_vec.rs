@@ -195,7 +195,7 @@ impl Into<Vector2i> for SafeVec {
 }
 impl Into<String> for SafeVec {
     fn into(self) -> String {
-        format!("({}, {})", self.lef, self.right)
+        format!("SV({}, {})", self.lef, self.right)
     }
 }
 impl From<(i32, i32)> for SafeVec {

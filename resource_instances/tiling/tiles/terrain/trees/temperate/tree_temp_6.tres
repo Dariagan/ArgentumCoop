@@ -1,8 +1,0 @@
-[gd_resource type="Tile" format=3 uid="uid://1616iif4ylut"]
-
-[resource]
-id = &"tree_temp_6"
-layer = 2
-source_atlas = 4
-origin_position = Vector2i(49, 0)
-modulo_tiling_area = Vector2i(1, 1)

@@ -1,13 +1,13 @@
 use crate::matrix::Matrix; pub use crate::uns_vec::UnsVec;
 use godot::prelude::*;
-use rand::seq::index; use std::{collections::hash_set::Iter, ops::{Index, IndexMut}};
+use rand::{seq::index, thread_rng, Rng}; use std::{collections::hash_set::Iter, ops::{Index, IndexMut}};
 pub use crate::tiling::*;
 
 const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize + 1;
 
-type TileArray = [TileUnid; MAX_TILES_PER_POS];
+pub type TileUnidArray = [TileUnid; MAX_TILES_PER_POS];
 
-pub struct WorldMatrix {tiles: Matrix<TileArray>,}
+pub struct WorldMatrix {tiles: Matrix<TileUnidArray>,}
 
 impl WorldMatrix {
 
@@ -21,8 +21,12 @@ impl WorldMatrix {
             tiles: Matrix::new_with_element_value(size, &initial_value), 
         }
     }
-    pub fn at(&self, coords: UnsVec) -> Option<&TileArray> {self.tiles.at(coords)}
-    pub fn at_mut(&mut self, coords: UnsVec) -> Option<&mut TileArray> {self.tiles.at_mut(coords)}
+    pub fn non_null_tiles_at_unchk(&self, coords: UnsVec) -> impl Iterator<Item = &TileUnid> {
+        self.index(coords).iter().filter(move |&&unid| unid != TileUnid::default())
+    }
+
+    pub fn at(&self, coords: UnsVec) -> Option<&TileUnidArray> {self.tiles.at(coords)}
+    pub fn at_mut(&mut self, coords: UnsVec) -> Option<&mut TileUnidArray> {self.tiles.at_mut(coords)}
     pub unsafe fn count_at(&self, coords: UnsVec) -> usize {
         self[coords]
             .iter()
@@ -44,7 +48,11 @@ impl WorldMatrix {
 
     pub unsafe fn overwrite_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel){
         let prev_tile = self.at_mut(coords).expect("TODO CAMBIAR POR CORCHETES").get_unchecked_mut(z_level as usize);
+        // if thread_rng().gen_range(0..20) == 1 {
+        //     godot_print!("overwriting at {coords}, z_level{z_level}, prev: {prev_tile}")
+        // }
         *prev_tile = tile;
+        
     }
     pub unsafe fn place_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel) -> Result<(), String>{
         let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
@@ -57,13 +65,13 @@ impl WorldMatrix {
 }
 
 impl Index<UnsVec> for WorldMatrix {
-    type Output = TileArray;
-    fn index(&self, coords: UnsVec) -> &TileArray {
+    type Output = TileUnidArray;
+    fn index(&self, coords: UnsVec) -> &TileUnidArray {
         &(self.tiles[coords])
     }
 }
 impl IndexMut<UnsVec> for WorldMatrix {
-    fn index_mut(&mut self, coords: UnsVec) -> &mut TileArray {
+    fn index_mut(&mut self, coords: UnsVec) -> &mut TileUnidArray {
         &mut(self.tiles[coords])
     }
 }

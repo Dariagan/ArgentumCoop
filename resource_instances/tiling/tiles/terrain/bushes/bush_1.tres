@@ -1,8 +1,0 @@
-[gd_resource type="Tile" format=3 uid="uid://bbx8v2uao8fod"]
-
-[resource]
-id = &"bush_1"
-layer = 2
-source_atlas = 7
-modulo_tiling_area = Vector2i(1, 1)
-flipped_at_random = true

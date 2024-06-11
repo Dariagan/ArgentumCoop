@@ -1,7 +1,6 @@
-[gd_resource type="Tile" format=3 uid="uid://bbx8v2uao8fod"]
+[gd_resource type="Tile" format=3 uid="uid://raf4v5nr45ia"]
 
 [resource]
-id = &"ocean_water"
+id = &"ocean"
 source_atlas = 2
 origin_position = Vector2i(0, 4)
-modulo_tiling_area = Vector2i(1, 1)

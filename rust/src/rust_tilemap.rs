@@ -101,14 +101,15 @@ impl RustTileMap {
         for chunk_coord in chunk_size.centered_iter()
             .map(|vec| vec + being_coords)
             .filter(|vec| vec.is_non_negative())
-            .map(|vec|unsafe{UnsVec::try_from(vec).unwrap_unchecked()})
+            .map(|vec|unsafe{UnsVec::try_from(vec).expect("asd")})
             .filter(|vec| vec.is_strictly_smaller_than(world_size))
         {
-            let tiles = self.world_matrix.as_ref().expect("hola")[chunk_coord];
+            let tiles = self.world_matrix.as_ref().expect("no ta la matrix")[chunk_coord];
 
-            tiles.iter().for_each(|nid| self.set_cell(*nid, chunk_coord))
+            let filter = tiles.iter().map(|&unid| {godot_print!("unid ahi: {unid}"); unid}).filter(|&unid| unid != TileUnid::default());
+
+            filter.for_each(|nid| {self.set_cell(nid, chunk_coord); godot_print!("set {nid}")})
         }
-
     }
 
     fn set_cell(&mut self, nid: TileUnid, matrix_coord: UnsVec) {
@@ -118,7 +119,7 @@ impl RustTileMap {
         let modulo_tiling_area = tile.clone().bind().modulo_tiling_area();
         let atlas_origin_position = Vector2i::new(atlas_origin_position.x%modulo_tiling_area.x, atlas_origin_position.y%modulo_tiling_area.y);
 
-        self.base_mut().set_cell_ex(tile.clone().bind().z_level.expect("hola") as i32, matrix_coord.into())
+        self.base_mut().set_cell_ex(tile.clone().bind().z_level() as i32, matrix_coord.into())
             .source_id(tile.clone().bind().source_atlas())
             .atlas_coords(atlas_origin_position)
             .alternative_tile(tile.clone().bind().get_alternative_id())

@@ -1,7 +1,0 @@
-[gd_resource type="Tile" format=3 uid="uid://bbx8v2uao8fod"]
-
-[resource]
-id = &"lake_water"
-source_atlas = 2
-origin_position = Vector2i(8, 0)
-modulo_tiling_area = Vector2i(4, 4)
