@@ -99,7 +99,7 @@ character_creation_scene = ExtResource("4_lphit")
 [node name="Game" type="Node" parent="Lobby"]
 script = ExtResource("5_2eji3")
 
-[node name="ArgentumTileMap" type="ArgentumTileMap" parent="Lobby/Game"]
+[node name="ArgentumTileMap" type="RustTileMap" parent="Lobby/Game"]
 unique_name_in_owner = true
 y_sort_enabled = true
 tile_set = ExtResource("6_67353")

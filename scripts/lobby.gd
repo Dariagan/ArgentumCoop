@@ -191,5 +191,3 @@ func _update_characterization_for_everyone(characterization_key: String, value =
 	else:
 		_characters_spawn_data[sender_i].erase(characterization_key)
 #endregion
-
-

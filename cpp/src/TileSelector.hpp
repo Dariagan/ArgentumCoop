@@ -1,6 +1,6 @@
 #ifndef __TILE_SELECTOR_H__
 #define __TILE_SELECTOR_H__
-#include "ArgentumTileMap.hpp"
+#include "CppArgentumTileMap.hpp"
 #include "WorldMatrix.hpp"
 #include "rust.hpp"
 #include <godot_cpp/classes/resource.hpp>
@@ -20,11 +20,11 @@
 #include <variant>
 namespace godot
 {   
-class ArgentumTileMap; 
+class CppArgentumTileMap; 
 class TileSelector
 {
 public:
-    TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const std::uint_fast32_t seed, const std::uint_fast8_t N_THREADS);
+    TileSelector(const Ref<Resource>& gdTileSelection, const CppArgentumTileMap& argentumTileMap, const std::uint_fast32_t seed, const std::uint_fast8_t N_THREADS);
     ~TileSelector();
 
     //⚠️ argument "thread_i" must be within 0 and N_THREADS-1 ⚠️

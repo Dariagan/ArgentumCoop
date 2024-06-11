@@ -7,7 +7,7 @@ pub mod safe_vec;
 pub mod uns_vec;
 pub mod world_matrix;
 pub mod tiling;
-pub mod fractured_formation_generator;
+pub mod fractured_continent_generator;
 
 struct ArgentumExtension;
 

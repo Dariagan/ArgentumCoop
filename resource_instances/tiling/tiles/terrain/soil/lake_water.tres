@@ -2,10 +2,6 @@
 
 [resource]
 id = &"lake_water"
-layer = 0
 source_atlas = 2
 origin_position = Vector2i(8, 0)
-flipped_at_random = false
-random_scale_range = Vector4(0, 0, 0, 0)
 modulo_tiling_area = Vector2i(4, 4)
-alt_id = 0

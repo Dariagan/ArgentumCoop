@@ -1,6 +1,6 @@
 #ifndef BEINGS_MODULE_H
 #define BEINGS_MODULE_H
-#include "ArgentumTileMap.hpp"
+#include "CppArgentumTileMap.hpp"
 #include "BeingBuilder.hpp"
 #include "SpawnWeightsMatrix.hpp"
 #include "matrix.hpp"
@@ -21,7 +21,7 @@
 namespace godot {
 
 class SpawnWeightsMatrix;
-class ArgentumTileMap;
+class CppArgentumTileMap;
 class BeingsModule
 {
 public:
@@ -34,13 +34,13 @@ public:
     void birthBeingOfKind(const Vector2i coords, const BeingKindId& being_kind_id);
     void birthBeingOfKind(const Vector2i tl_tile_map_coords, const Vector2i br_tile_map_coords, const BeingKindId& being_kind_id);
     
-    BeingsModule(ArgentumTileMap* argentumTileMap, const SafeVec& size); 
+    BeingsModule(CppArgentumTileMap* argentumTileMap, const SafeVec& size); 
     ~BeingsModule();
     std::unordered_map<SafeVec, std::vector<std::pair<Vector2, BeingUid>>, SafeVec::hash> mFrozenBeings;
 
 private:
     std::unique_ptr<SpawnWeightsMatrix> mSpawnWeightsMatrix;
-    ArgentumTileMap* mArgentumTileMap;
+    CppArgentumTileMap* mArgentumTileMap;
     static constexpr std::uint_fast8_t MACROSCOPIC_SPAWNING_CHUNK_SIZE = 15;
     static constexpr std::uint_fast16_t BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK = 200;
 

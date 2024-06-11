@@ -1,22 +1,16 @@
-[gd_resource type="Resource" script_class="TileSelection" load_steps=2 format=3 uid="uid://dewua1lavi80"]
+[gd_resource type="TileSelection" load_steps=8 format=3 uid="uid://b5wi3ypuj0ob6"]
 
-[ext_resource type="Script" path="res://scripts/tiles/tile_selection.gd" id="1_1vs1g"]
+[ext_resource type="TileDistribution" uid="uid://djcewxyc3ht7c" path="res://resource_instances/tiling/tile_selections/weighted_groups/trees.tres" id="1_h6f23"]
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/soil/beach_sand.tres" id="1_lr6hn"]
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/soil/lake_water.tres" id="2_txvld"]
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/soil/grass.tres" id="3_0x7iw"]
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/bushes/bush_0.tres" id="4_br1b2"]
+[ext_resource type="Tile" uid="uid://bbx8v2uao8fod" path="res://resource_instances/tiling/tiles/terrain/soil/ocean_water.tres" id="5_cvw5x"]
+[ext_resource type="Tile" uid="uid://ci370602mwpw0" path="res://resource_instances/tiling/tiles/buildings/dungeons/cave_mossy.tres" id="6_swpx7"]
 
 [resource]
-script = ExtResource("1_1vs1g")
-id = &"temperate"
-targets = Array[String](["tree", "bush", "cont", "ocean", "lake", "beach", "cave_0", "cave_1", "cave_2"])
-tile_to_place = Array[String](["_temperate_trees", "_bushes", "grass", "ocean_water", "lake_water", "beach_sand", "cave_mossy", "cave_mossy", "cave_mossy"])
-grouped_prob_weighted_tiles = Array[Dictionary]([{
-"tree_temp_0": 10,
-"tree_temp_1": 10,
-"tree_temp_2": 10,
-"tree_temp_3": 10,
-"tree_temp_4": 10,
-"tree_temp_5": 10,
-"tree_temp_6": 10,
-"tree_temp_7": 10
-}, {
-"bush_0": 10,
-"bush_1": 10
-}, {}, {}, {}])
+id = &"selection_temperate"
+targets = Array[StringName]([&"beach", &"lake", &"cont", &"tree", &"bush", &"ocean", &"cave0", &"cave1", &"cave2"])
+use_distribution = Array[bool]([false, false, false, true])
+tiles = Array[Tile]([ExtResource("1_lr6hn"), ExtResource("2_txvld"), ExtResource("3_0x7iw"), null, ExtResource("4_br1b2"), ExtResource("5_cvw5x"), ExtResource("6_swpx7"), ExtResource("6_swpx7"), ExtResource("6_swpx7")])
+tiles_distributions = Array[TileDistribution]([null, null, null, ExtResource("1_h6f23")])

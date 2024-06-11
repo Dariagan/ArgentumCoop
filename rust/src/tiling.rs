@@ -86,37 +86,41 @@ impl TileSelection {
 
     #[func]
     pub fn is_valid(&self) -> bool {
-        self.tiles_distributions().len() == self.targets().len()
+        self.targets.len() >= self.tiles_distributions().len() &&
+        self.targets.len() >= self.tiles().len() &&
+        self.tiles_distributions().len() == self.use_distribution().len()
     }
 }
 
 pub struct GdTileSelectionIterator{
     tile_selection: Gd<TileSelection>, current_index: usize
 }
-
 impl GdTileSelectionIterator{
     pub fn new(tile_selection: Gd<TileSelection>) -> Self {
         Self{tile_selection, current_index: 0}
     }
 }
-
 impl Iterator for GdTileSelectionIterator {
     type Item = NidOrDist;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let val = self.tile_selection.bind();
-        if self.current_index >= val.use_distribution.len() {
+        let tile_selection = self.tile_selection.bind();
+        if self.current_index >= tile_selection.targets().len() {
             return None;
         }
-
-        let result = if val.use_distribution.get(self.current_index).is_some_and(|x| x) {
-            val.tiles_distributions.at(self.current_index).try_into()
+        unsafe{
+        let result = if tile_selection.use_distribution.get(self.current_index).is_some_and(|x| x) {
+            tile_selection.tiles_distributions.get(self.current_index)
+                .expect(format!("No tile distribution available for target \"{}\" (i={}) in TileSelection with id={}", tile_selection.targets().get(self.current_index).unwrap_unchecked(), self.current_index, self.tile_selection.bind().id()).as_str())
+                .try_into()
         } else {
-            val.tiles.at(self.current_index).try_into()
+            tile_selection.tiles.get(self.current_index)
+                .expect(format!("No tile available for target \"{}\"(i={}) in TileSelection with id={}", tile_selection.targets().get(self.current_index).unwrap_unchecked(), self.current_index, self.tile_selection.bind().id()).as_str())
+                .try_into()
         };
-
         self.current_index += 1;
         Some(result.unwrap())
+        }
     }
 }
 #[derive(GodotClass)]
@@ -168,8 +172,8 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         let gd_tile_dist = value.bind();
 
         if gd_tile_dist.tiles.len() == 1 {unsafe{
-            let tile = gd_tile_dist.tiles.get(0).unwrap_unchecked();
-            return Ok(NidOrDist::Nid((tile.clone().bind().nid.unwrap_unchecked(), tile.clone().bind().z_level.unwrap())));
+            let tile = gd_tile_dist.tiles.get(0).expect("couldn't get first tile");
+            return Ok(NidOrDist::Nid((tile.clone().bind().nid.expect("nid not assigned to tile"), tile.clone().bind().z_level.expect("hola"))));
         }}
 
         if gd_tile_dist.tiles.is_empty() || gd_tile_dist.tiles.len() != gd_tile_dist.weights.len() {
@@ -187,11 +191,11 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         
         unsafe{
             let mut choices: Vec<(TileTypeNid, TileZLevel)> = Vec::new();
-            let sampler = WeightedAliasIndex::new(gd_tile_dist.weights.as_slice().to_vec()).unwrap();
+            let sampler = WeightedAliasIndex::new(gd_tile_dist.weights.as_slice().to_vec()).expect("couldn't create WeightedAliasIndex");
             choices.reserve_exact(gd_tile_dist.tiles.len());
 
             for tile in gd_tile_dist.tiles.iter_shared(){
-                choices.push((tile.bind().nid.unwrap_unchecked(), tile.bind().z_level.unwrap()));
+                choices.push((tile.bind().nid.expect("nid not assigned to tile"), tile.bind().z_level.expect("hola")));
             }
 
             Ok(NidOrDist::Dist(DiscreteDistribution::new(choices, sampler)))
@@ -224,7 +228,7 @@ impl DiscreteDistribution{
     }
     pub fn sample(&self) -> (TileTypeNid, TileZLevel){
         unsafe{
-            self.choices.get_unchecked(self.sampler.sample(&mut thread_rng())).clone()
+            self.choices.get(self.sampler.sample(&mut thread_rng())).expect("couldn't sample").clone()
         }
     }
 }
@@ -253,10 +257,8 @@ pub fn fill_targets(nids_arr: &mut[NidOrDist], target_names: &[&str], tile_selec
             let (nid_or_distribution, target) = it;
 
             if let Some(target_i) = target_names.into_iter().position(|name: &&str| *name == target.to_string().as_str()) {
-                
-                
                 unsafe{
-                    *nids_arr.get_unchecked_mut(target_i) = nid_or_distribution
+                    *nids_arr.get_mut(target_i).expect("err fill_targets") = nid_or_distribution
                 }
             }
             else {godot_script_error!("target {} not found: ", target);}

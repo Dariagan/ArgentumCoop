@@ -1,9 +1,9 @@
-extends ArgentumTileMap
+extends RustTileMap
 class_name GdTileMap
 
 var _beings: Dictionary # key(str): individual unique id. value: Being Scene. el multiplayerspawner se encarga del sync
 var tiles_states: Dictionary # key: posx_posy_zi (vec3, no un string). value: state object
-const WORLD_SIZE: Vector2i = Vector2i(5000, 5000)
+const WORLD_SIZE: Vector2i = Vector2i(1000, 1000)
 
 # IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
@@ -25,10 +25,12 @@ func _process(_delta):
 func generate_world():
 	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y >500)
 	
-	generate_world_matrix(WORLD_SIZE, GlobalData.tiles_data)
+	var tiles: Array[Tile] = []
+	tiles.append_array(GlobalData.tiles_data.values())
+	generate_world_matrix(WORLD_SIZE, tiles)
 	
-	var fcg: FracturedContinentGenerator = FracturedContinentGenerator.new()
-	generate_formation(fcg, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections["temperate"], 3333, {})
+	
+	generate_formation(0, Vector2i.ZERO, Vector2i(1000, 1000), GlobalData.tile_selections[&"selection_temperate"], 0, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
@@ -66,7 +68,7 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 	else:
 		_beings[being.uid] = being.serialize() # no sé si hacer esto o guardar packedscene del being
 		being.queue_free()
-		freeze_and_store_being(local_to_map(loc_coords), being.uid)
+		#freeze_and_store_being(local_to_map(loc_coords), being.uid)
 		return null
 
 func birth_beingkind_at_snapped(beingkind_id: StringName, faction: StringName, map_coords: Vector2i) -> Being:

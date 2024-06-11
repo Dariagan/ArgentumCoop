@@ -1,7 +1,7 @@
 use std::borrow::Borrow;
 
 use crate::formation_generator::{FormGenEnum, IFormationGenerator, };
-use crate::fractured_formation_generator::FracturedFormationGenerator;
+use crate::fractured_continent_generator::FracturedContinentGenerator;
 use crate::safe_vec::SafeVec;
 use crate::uns_vec::{UnsVec, ZERO};
 use crate::{formation_generator, world_matrix::*};
@@ -49,34 +49,43 @@ impl RustTileMap {
                 tile
             })
         );
-        let size: UnsVec = size.try_into().unwrap();
+        let size: UnsVec = size.try_into().expect("passed arg size: Vector2i is negative");
+
+        const MIN_SIZE: u32 = 500;
+        if size.all_bigger_than_min(MIN_SIZE).is_err(){
+            godot_error!("world size is too small, must be at least {MIN_SIZE}X{MIN_SIZE}");
+        }
 
         self.world_matrix = Some(WorldMatrix::new(size));     
         self.world_size = size
     }
     #[func]
     fn generate_formation(&mut self, formation: i64, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
-        let formation = FormGenEnum::from_i64(formation).unwrap();
-        let (origin, size) = (UnsVec::try_from(origin).unwrap(), UnsVec::try_from(size).unwrap()); 
+        let formation: FormGenEnum = FormGenEnum::from_i64(formation).expect("hola");
+        let (origin, size) = 
+            (UnsVec::try_from(origin).expect("passed arg origin: Vector2i is negative"), 
+            UnsVec::try_from(size).expect("passed arg size: Vector2i is negative")); 
 
         const MIN_SIZE: u32 = 100;
         if size.all_bigger_than_min(MIN_SIZE).is_err(){
             godot_error!("formation size is too small, must be at least {MIN_SIZE}X{MIN_SIZE}");
             return false;
         }
-        if origin.lef + size.lef > self.world_matrix.as_ref().unwrap().size().lef{
+        if origin.lef + size.lef > self.world_matrix.as_ref().expect("world matrix was not generated before formation").size().lef{
             godot_error!("formation would go out of world bounds eastward");
             return false;
         }
-        if origin.right + size.right > self.world_matrix.as_ref().unwrap().size().right{
-            godot_error!("formation would go out of world bounds southward");
-            return false;
+        unsafe{
+            if origin.right + size.right > self.world_matrix.as_ref().unwrap_unchecked().size().right{
+                godot_error!("formation would go out of world bounds southward");
+                return false;
+            }
         }
         self.world_matrix = Some(
             match formation {
-                FormGenEnum::FracturedFormationGenerator => {
-                    FracturedFormationGenerator::generate(
-                    self.world_matrix.take().unwrap(), origin, size, tile_selection, seed, data)
+                FormGenEnum::FracturedContinentGenerator => {
+                    FracturedContinentGenerator::generate(
+                    self.world_matrix.take().expect("world matrix not present when attempting to generate"), origin, size, tile_selection, seed, data)
             }
         });
         true
@@ -84,7 +93,7 @@ impl RustTileMap {
 
     #[func]
     fn load_tiles_around(&mut self, _local_coords: Vector2, chunk_size: Vector2i, being_nid: i64) {
-        let chunk_size = UnsVec::try_from(chunk_size).unwrap().all_bigger_than_min(10).unwrap();
+        let chunk_size = UnsVec::try_from(chunk_size).expect("arg chunk_size is negative").all_bigger_than_min(10).expect("chunk size is smaller than minimum 10");
         
         let being_coords: SafeVec = self.base().local_to_map(_local_coords).into(); let _local_coords = ();
 
@@ -95,7 +104,7 @@ impl RustTileMap {
             .map(|vec|unsafe{UnsVec::try_from(vec).unwrap_unchecked()})
             .filter(|vec| vec.is_strictly_smaller_than(world_size))
         {
-            let tiles = self.world_matrix.as_ref().unwrap()[chunk_coord];
+            let tiles = self.world_matrix.as_ref().expect("hola")[chunk_coord];
 
             tiles.iter().for_each(|nid| self.set_cell(*nid, chunk_coord))
         }
@@ -103,13 +112,13 @@ impl RustTileMap {
     }
 
     fn set_cell(&mut self, nid: TileTypeNid, matrix_coord: UnsVec) {
-        let tile: Gd<Tile> = self.get_tile_nid_mapping().at(nid.0 as usize);
+        let tile: Gd<Tile> = self.get_tile_nid_mapping().get(nid.0 as usize).expect(format!("tile mapped to nid={} not found", nid.0).as_str());
 
         let atlas_origin_position = tile.clone().bind().get_origin_position();
         let modulo_tiling_area = tile.clone().bind().modulo_tiling_area();
         let atlas_origin_position = Vector2i::new(atlas_origin_position.x%modulo_tiling_area.x, atlas_origin_position.y%modulo_tiling_area.y);
 
-        self.base_mut().set_cell_ex(tile.clone().bind().z_level.unwrap() as i32, matrix_coord.into())
+        self.base_mut().set_cell_ex(tile.clone().bind().z_level.expect("hola") as i32, matrix_coord.into())
             .source_id(tile.clone().bind().source_atlas())
             .atlas_coords(atlas_origin_position)
             .alternative_tile(tile.clone().bind().get_alternative_id())

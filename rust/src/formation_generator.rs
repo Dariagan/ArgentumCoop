@@ -14,7 +14,7 @@ use godot::prelude::*;
 #[derive(GodotConvert, Var, Export, Primitive)]
 #[godot(via = i64)]
 pub enum FormGenEnum {
-    FracturedFormationGenerator = 0,
+    FracturedContinentGenerator = 0,
 }
 
 
@@ -41,7 +41,7 @@ pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, rel
 }
 
 pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relative): (UnsVec, UnsVec), nid: NidOrDist, instantiation_data: Dictionary){
-    todo!()
+    todo!("no termine generate statful")
     //llamar señal o algo
 }
 
