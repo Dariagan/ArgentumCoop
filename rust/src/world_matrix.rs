@@ -43,7 +43,7 @@ impl WorldMatrix {
     }
 
     pub unsafe fn overwrite_tile(&mut self, tile: TileTypeNid, coords: UnsVec, z_level: TileZLevel){
-        let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
+        let prev_tile = self.at_mut(coords).expect("TODO CAMBIAR POR CORCHETES").get_unchecked_mut(z_level as usize);
         *prev_tile = tile;
     }
     pub unsafe fn place_tile(&mut self, tile: TileTypeNid, coords: UnsVec, z_level: TileZLevel) -> Result<(), String>{

@@ -30,7 +30,6 @@ pub trait IFormationGenerator {
 }
 
 
-
 pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), (nid, z_level) : (TileTypeNid, TileZLevel), instantiation_data: Option<Dictionary>){
     unsafe{
         world.drf().overwrite_tile(nid, origin+relative, z_level);
@@ -46,8 +45,15 @@ pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relat
 }
 
 #[inline]
-pub fn is_continental(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, size: UnsVec, continenter_cutoff: f32, power: Option<f32>) -> bool {
-    get_continentness(continenter, rel_coords, size, power) > continenter_cutoff
+pub fn is_continental(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, size: UnsVec, continenter_cutoff: f32, power: Option<f32>, offset: Option<UnsVec>) -> bool {
+    get_continentness(continenter, rel_coords, size, power, offset) > continenter_cutoff
+}
+#[inline]
+pub fn get_continentness(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
+    let bff = crate::formation_generator::get_border_farness_factor(rel_coords, size, power);
+    let asd = get_noise_value(continenter, rel_coords+offset.unwrap_or_default()) * bff;
+    godot_print!("noise: {asd}");
+    get_noise_value(continenter, rel_coords) * bff
 }
 #[inline]
 pub fn nv_surpasses_cutoff(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec, cutoff: f32) -> bool{
@@ -56,11 +62,6 @@ pub fn nv_surpasses_cutoff(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: 
 #[inline]
 pub fn get_noise_value(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec) -> f32 {
     unsafe{(&*fast_noise_lite.0).get_noise_2d(rel_coords.lef as f64, rel_coords.right as f64)}
-}
-#[inline]
-pub fn get_continentness(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, size: UnsVec, power: Option<f32>) -> f32 {
-    let bff = crate::formation_generator::get_border_farness_factor(rel_coords, size, power);
-    get_noise_value(continenter, rel_coords) * bff
 }
 pub fn get_border_farness_factor(
     rel_coords: UnsVec,
@@ -77,7 +78,6 @@ pub fn get_border_farness_factor(
         / (world_size.right as f32 / 2.0))
         .abs()
         .powf(power);
-
     1.0 - horizontal_border_closeness.max(vertical_border_closeness)
 }
 

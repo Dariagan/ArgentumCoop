@@ -50,6 +50,12 @@ impl UnsVec {
   }
 }
 
+impl Default for UnsVec {
+    fn default() -> Self {
+        UnsVec{lef:0, right:0}
+    }
+  }
+
 impl Add for UnsVec {
   type Output = UnsVec;
   fn add(self, other: UnsVec) -> UnsVec {
