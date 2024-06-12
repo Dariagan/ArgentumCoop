@@ -20,8 +20,7 @@ use strum_macros::EnumIter;
 #[godot(via = i32)]
 pub enum TileZLevel {Bottom = 0, Floor, Stain, Structure, Roof,}
 
-impl Default for TileZLevel {fn default() -> Self {Self::Bottom}}
-impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
+impl Default for TileZLevel {fn default() -> Self {Self::Bottom}} impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
 
 #[derive(GodotClass)]
 #[class(tool, base=Resource)]
@@ -225,12 +224,8 @@ pub struct DiscreteDistribution{
     sampler: WeightedAliasIndex<i32>,
 }
 impl DiscreteDistribution{
-    pub fn new(choices: Vec<(TileUnid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,) -> Self {
-        Self {choices, sampler}
-    }
-    pub fn sample(&self, rng: &mut Lcg128Xsl64) -> (TileUnid, TileZLevel){//TODO FIX (QUE TOME UNA SEED, SINO HAY DESYNC) 
-        unsafe{self.choices.get_unchecked(self.sampler.sample(rng)).clone()}
-    }
+    pub fn new(choices: Vec<(TileUnid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,) -> Self {Self {choices, sampler}}
+    pub fn sample(&self, rng: &mut Lcg128Xsl64) -> (TileUnid, TileZLevel){unsafe{self.choices.get_unchecked(self.sampler.sample(rng)).clone()}}
 }
 pub enum NidOrDist{
     Nid((TileUnid, TileZLevel)), Dist(DiscreteDistribution)

@@ -39,18 +39,12 @@ pub fn overwrite_all_tiles_at_coord(mut world: SendMutPtr<WorldMatrix>, (origin,
             
             world.drf().overwrite_tile(unid, origin+relative, z_level);
         }
-        
-        return;
-        
     }
 }
 
 pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), (unid, z_level) : (TileUnid, TileZLevel), instantiation_data: Option<Dictionary>){
     unsafe{
         world.drf().overwrite_tile(unid, origin+relative, z_level);
-        
-        return;
-        
     }
 }
 
@@ -59,10 +53,7 @@ pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relat
     //llamar señal o algo
 }
 
-#[inline]
-pub fn is_continental(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, size: UnsVec, continenter_cutoff: f32, power: Option<f32>, offset: Option<UnsVec>) -> bool {
-    get_continentness(continenter, rel_coords, size, power, offset) > continenter_cutoff
-}
+
 #[inline]
 pub fn get_continentness(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
     let bff = crate::formation_generator::get_border_farness_factor(rel_coords, size, power);
@@ -70,10 +61,14 @@ pub fn get_continentness(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec
     val
 }
 #[inline]
-pub fn nv_surpasses_cutoff(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec, cutoff: f32) ->(f32, bool){
+pub fn noise_surpasses_cutoff(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec, cutoff: f32) ->(f32, bool){
     let nv = get_noise_value(fast_noise_lite, rel_coords);
     (nv, nv > cutoff)
 }
+#[inline]
+pub fn val_surpasses_cutoff(val: f32, cutoff: f32) ->(f32, bool){(val, val > cutoff)}
+
+
 #[inline]
 pub fn get_noise_value(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec) -> f32 {
     unsafe{(&*fast_noise_lite.0).get_noise_2d(rel_coords.lef as f64, rel_coords.right as f64)}
@@ -96,3 +91,14 @@ pub fn get_border_farness_factor(
     1.0 - horizontal_border_closeness.max(vertical_border_closeness)
 }
 
+#[derive(Clone, Copy)]
+pub struct SharedNoise{pub ns_ptr: SendPtr<FastNoiseLite>}
+
+impl SharedNoise {
+    pub fn new(fast_noise_lite: &FastNoiseLite) -> Self {
+        Self { ns_ptr: make_ptr!(fast_noise_lite) }
+    }
+    pub fn get_noise_2d(&self, rel_coords: UnsVec) -> f32 {
+        unsafe{(&*self.ns_ptr.0).get_noise_2d(rel_coords.lef as f64, rel_coords.right as f64)}
+    }
+}

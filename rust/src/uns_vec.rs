@@ -29,11 +29,7 @@ impl UnsVec {
   pub fn length(&self) -> f64 {self.distance_to(&UnsVec { lef: 0, right: 0 })}
   pub fn area(&self) -> usize {(self.lef * self.right) as usize}
   pub fn all_bigger_than_min(&self, min: u32) -> Result<Self, &str> {
-    if self.lef >= min && self.right >= min {
-      Ok(*self)
-    } else {
-      Err("all bigger than min")
-    }
+    if self.lef >= min && self.right >= min {Ok(*self)} else {Err("all bigger than min")}
   }
   pub fn mod_uns(&self, modder: UnsVec) -> UnsVec {UnsVec{lef: self.lef%modder.lef, right: self.right%modder.right}}
 
@@ -49,8 +45,7 @@ impl Default for UnsVec {
     fn default() -> Self {
         UnsVec{lef:0, right:0}
     }
-  }
-
+}
 impl Add for UnsVec {
   type Output = UnsVec;
   fn add(self, other: UnsVec) -> UnsVec {
@@ -75,8 +70,6 @@ impl Sub for UnsVec {
     }
   }
 }
-
-
 impl SubAssign for UnsVec {
   fn sub_assign(&mut self, other: UnsVec) {
     self.lef -= other.lef;
@@ -113,7 +106,6 @@ impl DivAssign for UnsVec {
     self.right /= other.right;
   }
 }
-
 macro_rules! impl_operations_for_UnsVec {
   ($($t:ty),*) => {
     $(
@@ -174,7 +166,6 @@ impl fmt::Display for UnsVec {
         write!(f, "UV({}, {})", self.lef, self.right)
     }
 }
-
 impl From<(u32, u32)> for UnsVec {
     fn from(value: (u32, u32)) -> Self {
         Self { lef: value.0, right: value.1 }

@@ -20,10 +20,10 @@ impl<T: Default + Clone> Matrix<T> {
             area,
         }
     }
-    pub fn new_with_element_value(size: UnsVec, element_value: &T) -> Self {
+    pub fn new_with_element_value(size: UnsVec, element_value: T) -> Self {
         let area: usize = size.area();
         Self {
-            flattened_matrix: vec![element_value.clone(); area],
+            flattened_matrix: vec![element_value; area],
             size, area,
         }
     }

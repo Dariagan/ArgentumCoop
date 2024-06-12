@@ -4,8 +4,24 @@ use rand::{seq::index, thread_rng, Rng}; use std::{collections::hash_set::Iter, 
 pub use crate::tiling::*;
 
 const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize + 1;
+#[derive(Default, Clone, Copy)]
+pub struct TileUnidArray{
+    pub arr: [TileUnid; MAX_TILES_PER_POS]
+}
+impl TileUnidArray {
+    #[inline]
+    pub fn iter(&self) -> std::slice::Iter<'_, TileUnid> {
+        self.arr.iter()
+    }
+    
 
-pub type TileUnidArray = [TileUnid; MAX_TILES_PER_POS];
+    #[inline]
+    pub fn assign_unid_unchecked(&mut self, (unid, z_level): (TileUnid, TileZLevel)){
+        unsafe{*self.arr.get_unchecked_mut(z_level as usize) = unid;}
+    }
+}
+
+
 
 pub struct WorldMatrix {tiles: Matrix<TileUnidArray>,}
 
@@ -16,9 +32,8 @@ impl WorldMatrix {
     }
 
     pub fn new(size: UnsVec) -> Self {
-        let initial_value = [TileUnid::default(); MAX_TILES_PER_POS];
         Self {
-            tiles: Matrix::new_with_element_value(size, &initial_value), 
+            tiles: Matrix::new_with_element_value(size, TileUnidArray::default()), 
         }
     }
     pub fn non_null_tiles_at_unchk(&self, coords: UnsVec) -> impl Iterator<Item = &TileUnid> {
@@ -47,11 +62,11 @@ impl WorldMatrix {
     }
 
     pub unsafe fn overwrite_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel){
-        let prev_tile = self.at_mut(coords).expect("TODO CAMBIAR POR CORCHETES").get_unchecked_mut(z_level as usize);
+        let prev_tile = self.at_mut(coords).expect("TODO CAMBIAR POR CORCHETES").arr.get_unchecked_mut(z_level as usize);
         *prev_tile = tile;
     }
     pub unsafe fn place_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel) -> Result<(), String>{
-        let prev_tile = self[coords].get_unchecked_mut(z_level as usize);
+        let prev_tile = self[coords].arr.get_unchecked_mut(z_level as usize);
         match *prev_tile {
             NULL_TILE => {*prev_tile = tile; Ok(())},
             _ => Err("A tile already exists at the specified position".to_string())
