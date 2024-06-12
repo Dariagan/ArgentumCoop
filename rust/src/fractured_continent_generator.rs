@@ -28,10 +28,6 @@ impl IFormationGenerator for FracturedContinentGenerator {
         let mut nidordist_mapped_to_targets: [NidOrDist; Target::COUNT] = Default::default();
         crate::tiling::fill_targets(&mut nidordist_mapped_to_targets, Target::VARIANTS, tile_selection);
 
-        for nid in nidordist_mapped_to_targets.iter(){
-            let asd = nid.get_a_nid().0;
-            godot_print!("{asd}");
-        }
         let nids_mapped_to_targets: SendPtr<[NidOrDist; Target::COUNT]> = make_ptr!(&nidordist_mapped_to_targets);
         
         //https://github.com/Auburn/FastNoiseLite/tree/master/Rust
@@ -90,64 +86,54 @@ impl IFormationGenerator for FracturedContinentGenerator {
         let mut threads: [Option<JoinHandle<()>>; N_THREADS] = Default::default();
 
         let hori_range = (((0*size.lef as usize)/N_THREADS) as u32, (((0+1)*size.lef as usize)/N_THREADS) as u32);
-        for rel_coords in (hori_range.0..hori_range.1).zip(0..size.right).map(UnsVec::from) {
+
+        for rel_coords in (hori_range.0..hori_range.1).flat_map(|i| (0..size.right).map(move |j| UnsVec::from((i,j)))){
 
             let mut tiles_2b_placed: [(TileUnid, TileZLevel); TileZLevel::COUNT] = Default::default();
             
             let continenter=continenter;let peninsuler=peninsuler;let big_laker=big_laker;let small_laker=small_laker;let big_beacher=big_beacher;let small_beacher=small_beacher;let forester=forester;
             let continental = is_continental(continenter, rel_coords, size, continenter_cutoff, None, Some(continenter_sampling_offset));
-
+    
             let peninsuler_caved = nv_surpasses_cutoff(peninsuler, rel_coords, PENINSULER_CUTOFF);
-
+    
             if continental && peninsuler_caved{
-                *tiles_2b_placed.get_mut(TileZLevel::Bottom as usize).expect("volver unchkecke") = nids_mapped_to_targets.drf().get(Target::Cont as usize).expect("volver get_unchek").get_a_nid();
+                *tiles_2b_placed.get_unchecked_mut(TileZLevel::Bottom as usize) = nids_mapped_to_targets.drf().get_unchecked(Target::Cont as usize).get_a_nid();
             }
             else {
-                *tiles_2b_placed.get_mut(TileZLevel::Bottom as usize).expect("volver unchke22cke") = nids_mapped_to_targets.drf().get(Target::Ocean as usize).expect("volver get_uncheeke").get_a_nid();
+                *tiles_2b_placed.get_unchecked_mut(TileZLevel::Bottom as usize) = nids_mapped_to_targets.drf().get_unchecked(Target::Ocean as usize).get_a_nid();
             }
-            let asd: String = format!("{}", (*tiles_2b_placed.get(0).unwrap()).0.0);
-            let gg: bool = continental && peninsuler_caved;
-            if thread_rng().gen_range(0..10) == 1 {
-
-                godot_print!("{rel_coords}, {gg}, {asd}");
-            }
+       
             overwrite_formation_tile(world_ptr, (origin, rel_coords), *tiles_2b_placed.get_unchecked(0), None)
-            
         }
 
-        // for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
+        for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
+            let hori_range = (((thread_i*size.lef as usize)/N_THREADS) as u32, (((thread_i+1)*size.lef as usize)/N_THREADS) as u32);
+            for rel_coords in (hori_range.0..hori_range.1).flat_map(|i| (0..size.right).map(move |j| UnsVec::from((i,j)))){
             
-        //     let hori_range = (((thread_i*size.lef as usize)/N_THREADS) as u32, (((thread_i+1)*size.lef as usize)/N_THREADS) as u32);
-        //     for rel_coords in (hori_range.0..hori_range.1).zip(0..size.right).map(UnsVec::from) {
-
-        //         let tiles_2b_placed: MaybeUninit::<[(TileTypeNid, TileZLevel); TileZLevel::COUNT]> = MaybeUninit::<[(TileTypeNid, TileZLevel); TileZLevel::COUNT]>::uninit();
+                let tiles_2b_placed: MaybeUninit::<[(TileUnid, TileZLevel); TileZLevel::COUNT]> = MaybeUninit::<[(TileUnid, TileZLevel); TileZLevel::COUNT]>::uninit();
                 
-        //         let continenter=continenter;let peninsuler=peninsuler;let big_laker=big_laker;let small_laker=small_laker;let big_beacher=big_beacher;let small_beacher=small_beacher;let forester=forester;
-        //         let continental = is_continental(continenter, rel_coords, size, continenter_cutoff, None);
+                let continenter=continenter;let peninsuler=peninsuler;let big_laker=big_laker;let small_laker=small_laker;let big_beacher=big_beacher;let small_beacher=small_beacher;let forester=forester;
+                let continental = is_continental(continenter, rel_coords, size, continenter_cutoff, None, Some(continenter_sampling_offset));
 
-        //         let peninsuler_caved = nv_surpasses_cutoff(peninsuler, rel_coords, PENINSULER_CUTOFF);
+                let peninsuler_caved = nv_surpasses_cutoff(peninsuler, rel_coords, PENINSULER_CUTOFF);
 
-        //         if continental && peninsuler_caved{
-        //             *tiles_2b_placed.assume_init().get_mut(TileZLevel::Bottom as usize).expect("volver unchkecke") = nids_mapped_to_targets.drf().get(Target::Cont as usize).expect("fdsfd").get_a_nid();
-        //         }
-        //         else {
-        //             *tiles_2b_placed.assume_init().get_mut(TileZLevel::Bottom as usize).expect("volver unchke22cke") = nids_mapped_to_targets.drf().get(Target::Ocean as usize).expect("99fjfj9").get_a_nid();
-        //         }
-        //         let asd = format!("{}", (*tiles_2b_placed.assume_init().get_unchecked(0)).0.0);
-        //         if thread_rng().gen_range(0..100) == 1 {
-
-        //             godot_print!("{asd}");
-        //         }
-        //         overwrite_formation_tile(world_ptr, (origin, rel_coords), *tiles_2b_placed.assume_init().get_unchecked(0), None)
+                if continental && peninsuler_caved{
+                    *tiles_2b_placed.assume_init().get_unchecked_mut(TileZLevel::Bottom as usize) = nids_mapped_to_targets.drf().get_unchecked(Target::Cont as usize).get_a_nid();
+                }
+                else {
+                    *tiles_2b_placed.assume_init().get_unchecked_mut(TileZLevel::Bottom as usize) = nids_mapped_to_targets.drf().get_unchecked(Target::Ocean as usize).get_a_nid();
+                }
+  
+                overwrite_formation_tile(world_ptr, (origin, rel_coords), *tiles_2b_placed.assume_init().get_unchecked(0), None)
                 
-        //     }
-        // }))}  
+            }
+        }))}  
         
-        // for thread in threads {
-        //     if let Some(thread) = thread{
-        //         let _ = thread.join();
-        //     }
-        // }
+        for thread in threads {
+            if let Some(thread) = thread{
+                let _ = thread.join();
+            }
+        }
         world
         
     }}

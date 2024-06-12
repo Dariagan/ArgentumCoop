@@ -15,7 +15,7 @@ var uid: int = randi_range(-9223372036854775808, 9223372036854775807)
 
 @onready var internal_state: BeingInternalState = $InternalState
 
-signal load_tiles_around_me(cords: Vector2, chunk_size: Vector2i, uid: int)
+signal load_tiles_around_me(coords: Vector2, chunk_size: Vector2i, uid: int)
 
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body
 @onready var head: AnimatedBodyPortion = $BodyHolder/Head
@@ -153,7 +153,7 @@ func _update_direction_axis_by_input(delta: float) -> void:
 	distance_moved_since_load += distance_moved
 	
 	if distance_moved_since_load > 500:
-		load_tiles_around_me.emit(position, Vector2i(195, 120), uid)
+		load_tiles_around_me.emit(position, Vector2i(192, 120), uid)#195, 120
 		distance_moved_since_load = 0
 		
 func apply_friction(amount: float, delta: float):

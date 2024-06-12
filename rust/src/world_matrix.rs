@@ -30,7 +30,7 @@ impl WorldMatrix {
     pub unsafe fn count_at(&self, coords: UnsVec) -> usize {
         self[coords]
             .iter()
-            .filter(|&&nid| nid != TileUnid::default())
+            .filter(|&&unid| unid != TileUnid::default())
             .count()
     }
     pub unsafe fn is_empty_at_unchk(&self, coords: UnsVec) -> bool {
@@ -48,11 +48,7 @@ impl WorldMatrix {
 
     pub unsafe fn overwrite_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel){
         let prev_tile = self.at_mut(coords).expect("TODO CAMBIAR POR CORCHETES").get_unchecked_mut(z_level as usize);
-        // if thread_rng().gen_range(0..20) == 1 {
-        //     godot_print!("overwriting at {coords}, z_level{z_level}, prev: {prev_tile}")
-        // }
         *prev_tile = tile;
-        
     }
     pub unsafe fn place_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel) -> Result<(), String>{
         let prev_tile = self[coords].get_unchecked_mut(z_level as usize);

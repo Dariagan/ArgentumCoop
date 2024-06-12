@@ -30,16 +30,16 @@ pub trait IFormationGenerator {
 }
 
 
-pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), (nid, z_level) : (TileUnid, TileZLevel), instantiation_data: Option<Dictionary>){
+pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), (unid, z_level) : (TileUnid, TileZLevel), instantiation_data: Option<Dictionary>){
     unsafe{
-        world.drf().overwrite_tile(nid, origin+relative, z_level);
+        world.drf().overwrite_tile(unid, origin+relative, z_level);
         
         return;
         
     }
 }
 
-pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relative): (UnsVec, UnsVec), nid: NidOrDist, instantiation_data: Dictionary){
+pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relative): (UnsVec, UnsVec), unid: NidOrDist, instantiation_data: Dictionary){
     todo!("no termine generate statful")
     //llamar señal o algo
 }

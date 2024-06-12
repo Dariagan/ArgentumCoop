@@ -34,7 +34,7 @@ pub struct Tile {
     #[export] random_scale_range: Vector4,// tal vez es mejor volver a los bushes y trees escenas para poder hacer esto
     #[export] flipped_at_random: bool,
     
-    pub nid: Option<TileUnid>,
+    pub unid: Option<TileUnid>,
 }
 #[godot_api]
 impl Tile {
@@ -52,7 +52,7 @@ impl Tile {
     fn is_valid(&mut self) -> bool {
         let modulo_tiling_area: UnsVec = self.modulo_tiling_area.try_into().expect(format!("modulo tiling area for Tile id={} must be bigger or equal than (1,1)", self.id()).as_str());
         modulo_tiling_area.all_bigger_than_min(1).expect(format!("modulo tiling area for Tile id={} must be bigger or equal than (1,1)", self.id()).as_str());
-        unsafe{assert!(self.id != StringName::try_from("").unwrap_unchecked(), "id not assigned for Tile id={}", self.id())}
+        unsafe{assert!(self.id != StringName::try_from("").unwrap(), "id not assigned for Tile id={}", self.id())}
 
         true
     }
@@ -61,7 +61,7 @@ impl Tile {
 impl IResource for Tile{
     fn init(base: Base<Resource>) -> Self {
         Self {base, id: StringName::try_from("").expect("stringn"), z_level: TileZLevel::Bottom, source_atlas: -1, origin_position: Vector2i{x: 0, y: 0}, modulo_tiling_area: Vector2i{x: 1, y: 1}, 
-        alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, nid: None }
+        alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, unid: None }
     }
 }
 
@@ -194,8 +194,8 @@ impl std::fmt::Display for TileDistributionError {
         match self {
             TileDistributionError::InvalidLength => write!(f, "Tiles and weights arrays must have the same length and contain at least one element."),
             TileDistributionError::NegativeWeight => write!(f, "Weights array contains negative values."),
-            TileDistributionError::MissingNid => write!(f, "nid is missing for a tile(s)"),
-            TileDistributionError::MissingBoth => write!(f, "both nid and z-level are missing for a tile(s)"),
+            TileDistributionError::MissingNid => write!(f, "unid is missing for a tile(s)"),
+            TileDistributionError::MissingBoth => write!(f, "both unid and z-level are missing for a tile(s)"),
         }
     }
 }
@@ -208,7 +208,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
 
         if gd_tile_dist.tiles.len() == 1 {unsafe{
             let tile = gd_tile_dist.tiles.get(0).unwrap_unchecked();
-            return Ok(NidOrDist::Nid((tile.clone().bind().nid.expect("nid not assigned to tile"), tile.clone().bind().z_level)));
+            return Ok(NidOrDist::Nid((tile.clone().bind().unid.expect("unid not assigned to tile"), tile.clone().bind().z_level)));
         }}
 
         if gd_tile_dist.tiles.is_empty() || gd_tile_dist.tiles.len() != gd_tile_dist.weights.len() {
@@ -217,7 +217,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         if gd_tile_dist.weights.as_slice().iter().any(|x| *x < 0) {
             return Err(TileDistributionError::NegativeWeight);
         }
-        if gd_tile_dist.tiles.iter_shared().any(|tile| tile.bind().nid.is_none()){
+        if gd_tile_dist.tiles.iter_shared().any(|tile| tile.bind().unid.is_none()){
             return Err(TileDistributionError::MissingNid);
         }
         
@@ -227,7 +227,7 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
             choices.reserve_exact(gd_tile_dist.tiles.len());
 
             for tile in gd_tile_dist.tiles.iter_shared(){
-                choices.push((tile.bind().nid.expect("nid not assigned to tile"), tile.bind().z_level));
+                choices.push((tile.bind().unid.expect("unid not assigned to tile"), tile.bind().z_level));
             }
 
             Ok(NidOrDist::Dist(DiscreteDistribution::new(choices, sampler)))
@@ -240,9 +240,9 @@ impl TryFrom<Gd<Tile>> for NidOrDist {
     type Error = TileDistributionError;
     fn try_from(value: Gd<Tile>) -> Result<NidOrDist, TileDistributionError> {
 
-        let (nid, z_level) = (value.bind().nid, value.bind().z_level);
-        match (nid, z_level){
-            (Some(nid),z_level) => Ok(NidOrDist::Nid((nid, z_level))),
+        let (unid, z_level) = (value.bind().unid, value.bind().z_level);
+        match (unid, z_level){
+            (Some(unid),z_level) => Ok(NidOrDist::Nid((unid, z_level))),
             (None, _) => Err(TileDistributionError::MissingNid),
         }
     }

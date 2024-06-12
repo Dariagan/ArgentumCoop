@@ -4,7 +4,7 @@ use crate::formation_generator::{FormGenEnum, IFormationGenerator, };
 use crate::fractured_continent_generator::FracturedContinentGenerator;
 use crate::safe_vec::SafeVec;
 use crate::uns_vec::{UnsVec, ZERO};
-use crate::{formation_generator, world_matrix::*};
+use crate::{formation_generator, world_matrix::{self, *}};
 use godot::builtin::Dictionary;
 use godot::engine::{ITileMap, TileMap};
 use godot::global::print;
@@ -45,7 +45,7 @@ impl RustTileMap {
         self.tile_nid_mapping.extend(tiles.iter_shared()
             .enumerate() 
             .map(|(i, mut tile)| {
-                tile.bind_mut().nid = Some(TileUnid{0: i as u16}); 
+                tile.bind_mut().unid = Some(TileUnid{0: i as u16}); 
                 tile
             })
         );
@@ -93,36 +93,39 @@ impl RustTileMap {
 
     #[func]
     fn load_tiles_around(&mut self, _local_coords: Vector2, chunk_size: Vector2i, being_nid: i64) {
-        let chunk_size = UnsVec::try_from(chunk_size).expect("arg chunk_size is negative").all_bigger_than_min(10).expect("chunk size is smaller than minimum 10");
+        let chunk_size = SafeVec::from(chunk_size).all_bigger_than_min(10).expect("chunk size is smaller than minimum 10");
         
         let being_coords: SafeVec = self.base().local_to_map(_local_coords).into(); let _local_coords = ();
 
         let world_size = self.world_size;
-        for chunk_coord in chunk_size.centered_iter()
-            .map(|vec| vec + being_coords)
+
+        
+        for chunk_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))
+            .map(|vec| SafeVec::from(vec) + being_coords)
             .filter(|vec| vec.is_non_negative())
-            .map(|vec|unsafe{UnsVec::try_from(vec).expect("asd")})
-            .filter(|vec| vec.is_strictly_smaller_than(world_size))
-        {
-            let tiles = self.world_matrix.as_ref().expect("no ta la matrix")[chunk_coord];
+            .map(|vec|unsafe{UnsVec::try_from(vec).unwrap_unchecked()})
+            .filter(|vec| vec.is_strictly_smaller_than(world_size)){
+                unsafe{
+                    let tiles = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];//ojo con esto mientras se genera
+                    
+                    let filter = tiles.iter().filter(|&&unid| unid != TileUnid::default());
 
-            let filter = tiles.iter().map(|&unid| {godot_print!("unid ahi: {unid}"); unid}).filter(|&unid| unid != TileUnid::default());
-
-            filter.for_each(|nid| {self.set_cell(nid, chunk_coord); godot_print!("set {nid}")})
-        }
+                    filter.for_each(|&unid| self.set_cell(unid, chunk_coord))
+                }
+            }
     }
 
-    fn set_cell(&mut self, nid: TileUnid, matrix_coord: UnsVec) {
-        let tile: Gd<Tile> = self.get_tile_nid_mapping().get(nid.0 as usize).expect(format!("tile mapped to nid={} not found", nid.0).as_str());
+    fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) {
+        let tile: Gd<Tile> = self.get_tile_nid_mapping().get(unid.0 as usize).expect("tile mapped to unid= not found");
 
-        let atlas_origin_position = tile.clone().bind().get_origin_position();
-        let modulo_tiling_area = tile.clone().bind().modulo_tiling_area();
+        //TODO PASAR TODA LA DATA ESTA PARA QUE SE CARGUE DIRECTAMENTE EN RUST Y NO HAYA QUE ACCEDER A Gd<Tile>
+        let atlas_origin_position = tile.bind().origin_position();
+        let modulo_tiling_area = tile.bind().modulo_tiling_area();
         let atlas_origin_position = Vector2i::new(atlas_origin_position.x%modulo_tiling_area.x, atlas_origin_position.y%modulo_tiling_area.y);
-
         self.base_mut().set_cell_ex(tile.clone().bind().z_level() as i32, matrix_coord.into())
             .source_id(tile.clone().bind().source_atlas())
             .atlas_coords(atlas_origin_position)
-            .alternative_tile(tile.clone().bind().get_alternative_id())
+            .alternative_tile(tile.clone().bind().alternative_id())
             .done()
     }
 }
