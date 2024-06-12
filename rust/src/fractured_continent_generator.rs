@@ -57,13 +57,13 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
         }
     }let continenter_offset: UnsVec = continenter_sampling_offset;
 
-    let continenter: SendPtr<FastNoiseLite> = make_ptr!(&continenter);
+    let continenter = SharedNoise::new(&continenter);
 
     const PENINSULER_CUTOFF: f32 = -0.1;
     let mut peninsuler=FastNoiseLite::with_seed(seed+1);peninsuler.noise_type=NoiseType::OpenSimplex2;
     peninsuler.set_fractal_gain(Some(0.56));
     peninsuler.frequency = 5.9/f32::powf(size.length() as f32, 0.995);
-    let peninsuler: SendPtr<FastNoiseLite> = make_ptr!(&peninsuler);
+    let peninsuler = SharedNoise::new(&peninsuler);
 
     //let arcednoisexample: std::sync::Arc<FastNoiseLite> = FastNoiseLite::new().into();
 

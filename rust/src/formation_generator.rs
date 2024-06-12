@@ -55,13 +55,13 @@ pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relat
 
 
 #[inline]
-pub fn get_continentness(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
+pub fn get_continentness(continenter: SharedNoise, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
     let bff = crate::formation_generator::get_border_farness_factor(rel_coords, size, power);
     let val = bff *get_noise_value(continenter, rel_coords + offset.unwrap_or_default());
     val
 }
 #[inline]
-pub fn noise_surpasses_cutoff(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec, cutoff: f32) ->(f32, bool){
+pub fn noise_surpasses_cutoff(fast_noise_lite: SharedNoise, rel_coords: UnsVec, cutoff: f32) ->(f32, bool){
     let nv = get_noise_value(fast_noise_lite, rel_coords);
     (nv, nv > cutoff)
 }
@@ -70,8 +70,7 @@ pub fn val_surpasses_cutoff(val: f32, cutoff: f32) ->(f32, bool){(val, val > cut
 
 
 #[inline]
-pub fn get_noise_value(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec) -> f32 {
-    unsafe{(&*fast_noise_lite.0).get_noise_2d(rel_coords.lef as f64, rel_coords.right as f64)}
+pub fn get_noise_value(fast_noise_lite: SharedNoise, rel_coords: UnsVec) -> f32 {fast_noise_lite.get_noise_2d(rel_coords)
 }
 pub fn get_border_farness_factor(
     rel_coords: UnsVec,
