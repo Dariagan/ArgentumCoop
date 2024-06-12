@@ -11,6 +11,11 @@ pub use godot::builtin::Dictionary;
 use enum_primitive_derive::Primitive;
 use godot::obj::{Base, Gd, GdRef};
 use godot::prelude::*;
+pub use rand_seeder::{Seeder};
+pub use rand_pcg::Pcg64;
+use strum::EnumCount;
+use strum::IntoEnumIterator;
+
 
 #[derive(GodotConvert, Var, Export, Primitive, Debug)]
 #[godot(via = i64)]
@@ -27,6 +32,17 @@ pub trait IFormationGenerator {
         seed: i32,
         data: Dictionary,
     ) -> WorldMatrix;
+}
+pub fn overwrite_all_tiles_at_coord(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), unids: &TileUnidArray, instantiation_data: Option<Dictionary>){
+    unsafe{
+        for (&unid, z_level) in unids.iter().zip(TileZLevel::iter()) {
+            
+            world.drf().overwrite_tile(unid, origin+relative, z_level);
+        }
+        
+        return;
+        
+    }
 }
 
 pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), (unid, z_level) : (TileUnid, TileZLevel), instantiation_data: Option<Dictionary>){
@@ -54,8 +70,9 @@ pub fn get_continentness(continenter: SendPtr<FastNoiseLite>, rel_coords: UnsVec
     val
 }
 #[inline]
-pub fn nv_surpasses_cutoff(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec, cutoff: f32) -> bool{
-    get_noise_value(fast_noise_lite, rel_coords) > cutoff
+pub fn nv_surpasses_cutoff(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec, cutoff: f32) ->(f32, bool){
+    let nv = get_noise_value(fast_noise_lite, rel_coords);
+    (nv, nv > cutoff)
 }
 #[inline]
 pub fn get_noise_value(fast_noise_lite: SendPtr<FastNoiseLite>, rel_coords: UnsVec) -> f32 {

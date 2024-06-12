@@ -1,5 +1,6 @@
 use godot::{register::GodotClass, prelude::*};
-use rand_distr::{Distribution, WeightedAliasIndex}; use std::fmt::{self, format};
+use rand_distr::{Distribution, WeightedAliasIndex};
+use rand_pcg::Lcg128Xsl64; use std::fmt::{self, format};
 use std::hash::{Hash, Hasher};
 use rand::prelude::*;
 
@@ -12,7 +13,10 @@ pub const NULL_TILE: TileUnid = TileUnid(u16::MAX);
 impl Default for TileUnid {fn default() -> Self {NULL_TILE}}
 impl Hash for TileUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u16(self.0);}}
 
-#[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display)]
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+
+#[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter)]
 #[godot(via = i32)]
 pub enum TileZLevel {Bottom = 0, Floor, Stain, Structure, Roof,}
 
@@ -224,18 +228,18 @@ impl DiscreteDistribution{
     pub fn new(choices: Vec<(TileUnid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,) -> Self {
         Self {choices, sampler}
     }
-    pub fn sample(&self) -> (TileUnid, TileZLevel){
-        unsafe{self.choices.get_unchecked(self.sampler.sample(&mut thread_rng())).clone()}
+    pub fn sample(&self, rng: &mut Lcg128Xsl64) -> (TileUnid, TileZLevel){//TODO FIX (QUE TOME UNA SEED, SINO HAY DESYNC) 
+        unsafe{self.choices.get_unchecked(self.sampler.sample(rng)).clone()}
     }
 }
 pub enum NidOrDist{
     Nid((TileUnid, TileZLevel)), Dist(DiscreteDistribution)
 }
 impl NidOrDist{
-    pub fn get_a_nid(&self) -> (TileUnid, TileZLevel){
+    pub fn get_a_nid(&self, rng: &mut Lcg128Xsl64) -> (TileUnid, TileZLevel){
         match self {
             NidOrDist::Nid(x) => *x,
-            NidOrDist::Dist(dist) => dist.sample(),
+            NidOrDist::Dist(dist) => dist.sample(rng),
         }
     }
 }

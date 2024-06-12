@@ -16,6 +16,8 @@ strum_macros = "0.26"
 rand = "*"
 rand_distr = "*"
 noise = "0.9"
+rand_seeder = "*"
+rand_pcg = "*"
 [lib]
 crate-type = ["cdylib"]
 
