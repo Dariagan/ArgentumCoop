@@ -11,12 +11,11 @@ use enum_primitive_derive::Primitive;
 use godot::obj::{Base, Gd, GdRef};
 use godot::prelude::*;
 
-#[derive(GodotConvert, Var, Export, Primitive)]
+#[derive(GodotConvert, Var, Export, Primitive, Debug)]
 #[godot(via = i64)]
 pub enum FormGenEnum {
     FracturedContinentGenerator = 0,
 }
-
 
 pub trait IFormationGenerator {
     fn generate(
@@ -28,7 +27,6 @@ pub trait IFormationGenerator {
         data: Dictionary,
     ) -> WorldMatrix;
 }
-
 
 pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), (unid, z_level) : (TileUnid, TileZLevel), instantiation_data: Option<Dictionary>){
     unsafe{
@@ -110,8 +108,6 @@ macro_rules! make_mut_ptr {
         }
     };
 }pub(crate) use make_mut_ptr;  
-
-
 
 pub trait DerefPtr {
     type Target;

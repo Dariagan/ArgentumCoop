@@ -48,6 +48,7 @@ impl Tile {
     pub fn random_scale_range(&self) -> Vector4 { self.random_scale_range }
     pub fn flipped_at_random(&self) -> bool { self.flipped_at_random }
 
+
     #[func]
     fn is_valid(&mut self) -> bool {
         let modulo_tiling_area: UnsVec = self.modulo_tiling_area.try_into().expect(format!("modulo tiling area for Tile id={} must be bigger or equal than (1,1)", self.id()).as_str());
@@ -57,6 +58,8 @@ impl Tile {
         true
     }
 }
+
+
 #[godot_api]
 impl IResource for Tile{
     fn init(base: Base<Resource>) -> Self {
@@ -64,12 +67,23 @@ impl IResource for Tile{
         alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, unid: None }
     }
 }
-
-
 impl fmt::Display for TileUnid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "tunid{}", self.0)
     }
+}
+
+impl Into<TileDto> for Gd<Tile> {
+    fn into(self) -> TileDto {TileDto { z_level: self.bind().z_level(), source_atlas: self.bind().source_atlas(), origin_position: self.bind().origin_position(), modulo_tiling_area: self.bind().modulo_tiling_area(), alternative_id: self.bind().alternative_id(), random_scale_range: self.bind().random_scale_range(), flipped_at_random: self.bind().flipped_at_random() }}
+}
+pub struct TileDto{
+    pub z_level: TileZLevel,
+    pub source_atlas: i32,
+    pub origin_position: Vector2i,
+    pub modulo_tiling_area: Vector2i,
+    pub alternative_id: i32,
+    pub random_scale_range: Vector4,
+    pub flipped_at_random: bool,
 }
 
 // impl Hash for Tile {
@@ -109,26 +123,6 @@ impl TileSelection {
     }
 }
 //TODO HACERLE UN INIT CON UNA ID MALA PLACEHOLDER ASÍ SE PUEDE VALIDAR^^^
-
-#[derive(GodotClass)]
-#[class(base=Node2D)]
-struct MyClass{
-    base: Base<Node2D>,
-    foo_bar: i64,
-}
-
-#[godot_api]
-impl INode2D for MyClass {
-    fn init(base: Base<Node2D>) -> Self {
-        Self {base, foo_bar: 32}
-    }
-}
-
-#[godot_api]
-impl MyClass {
-    
-}
-
 
 pub struct GdTileSelectionIterator{
     tile_selection: Gd<TileSelection>, current_index: usize

@@ -16,8 +16,7 @@ use num_traits::FromPrimitive;
 struct RustTileMap {
     #[var]
     seed: i64,
-    #[var]
-    tile_nid_mapping: Array<Gd<Tile>>,
+    tile_nid_mapping: Vec<TileDto>,
     world_matrix: Option<WorldMatrix>,
     base: Base<TileMap>,
     world_size: UnsVec,
@@ -29,7 +28,7 @@ impl ITileMap for RustTileMap {
             base,
             seed: 0,
             world_matrix: None,
-            tile_nid_mapping: Array::new(),
+            tile_nid_mapping: Vec::new(),
             world_size: ZERO
         }
     }
@@ -46,7 +45,7 @@ impl RustTileMap {
             .enumerate() 
             .map(|(i, mut tile)| {
                 tile.bind_mut().unid = Some(TileUnid{0: i as u16}); 
-                tile
+                tile.into()
             })
         );
         let size: UnsVec = size.try_into().expect("passed arg size: Vector2i is negative");
@@ -60,8 +59,7 @@ impl RustTileMap {
         self.world_size = size
     }
     #[func]
-    fn generate_formation(&mut self, formation: i64, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
-        let formation: FormGenEnum = FormGenEnum::from_i64(formation).expect("hola");
+    fn generate_formation(&mut self, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
         let (origin, size) = 
             (UnsVec::try_from(origin).expect("passed arg origin: Vector2i is negative"), 
             UnsVec::try_from(size).expect("passed arg size: Vector2i is negative")); 
@@ -109,25 +107,30 @@ impl RustTileMap {
                     //TODO NO HACER SET CELL SI LA TILE YA ESTÁ CARGADA (CAUSA LAG, HACERLO COMO EN C++)
                     let tiles = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];//ojo con esto mientras se genera
                     
-                    let filter = tiles.iter().filter(|&&unid| unid != TileUnid::default());
+                    let non_null_tiles = tiles.iter().filter(|&&unid| unid != TileUnid::default());
 
-                    filter.for_each(|&unid| self.set_cell(unid, chunk_coord))
+                    non_null_tiles.for_each(|&unid| self.set_cell(unid, chunk_coord))
                 }
             }
     }
 
     fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) {
-        let tile: Gd<Tile> = self.get_tile_nid_mapping().get(unid.0 as usize).expect("tile mapped to unid= not found");
-
+        let tile: *const TileDto = self.tile_nid_mapping().get(unid.0 as usize).expect("tile mapped to unid= not found");
+        //ESTO ES MUY SLOW, ES UN SHARED POINTER Y DENTRO DE ESTO HAY MUCHO REF COUNTING, USAR UN DTO LOCAL
+        unsafe{
         //TODO PASAR TODA LA DATA ESTA PARA QUE SE CARGUE DIRECTAMENTE EN RUST Y NO HAYA QUE ACCEDER A Gd<Tile>
-        let atlas_origin_position = tile.bind().origin_position();
-        let modulo_tiling_area = tile.bind().modulo_tiling_area();
+        let atlas_origin_position = (*tile).origin_position;
+        let modulo_tiling_area = (*tile).modulo_tiling_area;
         let atlas_origin_position = Vector2i::new(atlas_origin_position.x%modulo_tiling_area.x, atlas_origin_position.y%modulo_tiling_area.y);
-        self.base_mut().set_cell_ex(tile.clone().bind().z_level() as i32, matrix_coord.into())
-            .source_id(tile.clone().bind().source_atlas())
+        self.base_mut().set_cell_ex((*tile).z_level as i32, matrix_coord.into())
+            .source_id((*tile).source_atlas)
             .atlas_coords(atlas_origin_position)
-            .alternative_tile(tile.clone().bind().alternative_id())
+            .alternative_tile((*tile).alternative_id)
             .done()
+    }}
+
+    pub fn tile_nid_mapping(&self) -> &Vec<TileDto> {
+        &self.tile_nid_mapping
     }
 }
 
