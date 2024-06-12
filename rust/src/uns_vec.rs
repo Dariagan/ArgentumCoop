@@ -28,13 +28,14 @@ impl UnsVec {
   pub fn flat_index(&self, size: &UnsVec) -> usize{(self.lef*size.lef + self.right) as usize}
   pub fn length(&self) -> f64 {self.distance_to(&UnsVec { lef: 0, right: 0 })}
   pub fn area(&self) -> usize {(self.lef * self.right) as usize}
-  pub fn all_bigger_than_min(&self, min: u32) -> Result<Self, String> {
+  pub fn all_bigger_than_min(&self, min: u32) -> Result<Self, &str> {
     if self.lef >= min && self.right >= min {
       Ok(*self)
     } else {
-      Err(format!("One or both values are less than the minimum value of {}", min))
+      Err("all bigger than min")
     }
   }
+  pub fn mod_uns(&self, modder: UnsVec) -> UnsVec {UnsVec{lef: self.lef%modder.lef, right: self.right%modder.right}}
 
   pub fn distance_to(&self, other: &Self) -> f64 {
     (((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as f64).sqrt()
@@ -74,6 +75,8 @@ impl Sub for UnsVec {
     }
   }
 }
+
+
 impl SubAssign for UnsVec {
   fn sub_assign(&mut self, other: UnsVec) {
     self.lef -= other.lef;

@@ -116,22 +116,19 @@ impl RustTileMap {
 
     fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) {
         let tile: *const TileDto = self.tile_nid_mapping().get(unid.0 as usize).expect("tile mapped to unid= not found");
-        //ESTO ES MUY SLOW, ES UN SHARED POINTER Y DENTRO DE ESTO HAY MUCHO REF COUNTING, USAR UN DTO LOCAL
         unsafe{
-        //TODO PASAR TODA LA DATA ESTA PARA QUE SE CARGUE DIRECTAMENTE EN RUST Y NO HAYA QUE ACCEDER A Gd<Tile>
         let atlas_origin_position = (*tile).origin_position;
         let modulo_tiling_area = (*tile).modulo_tiling_area;
+        let atlas_origin_position_offset = matrix_coord.mod_uns(modulo_tiling_area.try_into().unwrap_unchecked()); 
         let atlas_origin_position = Vector2i::new(atlas_origin_position.x%modulo_tiling_area.x, atlas_origin_position.y%modulo_tiling_area.y);
         self.base_mut().set_cell_ex((*tile).z_level as i32, matrix_coord.into())
             .source_id((*tile).source_atlas)
-            .atlas_coords(atlas_origin_position)
+            .atlas_coords(atlas_origin_position + atlas_origin_position_offset.into())
             .alternative_tile((*tile).alternative_id)
             .done()
     }}
 
-    pub fn tile_nid_mapping(&self) -> &Vec<TileDto> {
-        &self.tile_nid_mapping
-    }
+    pub fn tile_nid_mapping(&self) -> &Vec<TileDto> {&self.tile_nid_mapping}
 }
 
 fn exceeds_tile_limit(arr: &VariantArray) -> Result<(),()> {

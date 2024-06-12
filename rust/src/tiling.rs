@@ -3,20 +3,18 @@ use rand_distr::{Distribution, WeightedAliasIndex}; use std::fmt::{self, format}
 use std::hash::{Hash, Hasher};
 use rand::prelude::*;
 
-use crate::uns_vec::UnsVec;
+pub use crate::uns_vec::UnsVec;
 
 #[derive(Clone, PartialEq, Copy)]
 pub struct TileUnid(pub u16);
 pub const NULL_TILE: TileUnid = TileUnid(u16::MAX);
 
 impl Default for TileUnid {fn default() -> Self {NULL_TILE}}
-impl Hash for TileUnid {fn hash<H: Hasher>(&self, state: &mut H) {self.0.hash(state);}}
+impl Hash for TileUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u16(self.0);}}
 
 #[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display)]
 #[godot(via = i32)]
-pub enum TileZLevel {
-    Bottom = 0, Floor, Stain, Structure, Roof,
-}
+pub enum TileZLevel {Bottom = 0, Floor, Stain, Structure, Roof,}
 
 impl Default for TileZLevel {fn default() -> Self {Self::Bottom}}
 impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
@@ -48,7 +46,6 @@ impl Tile {
     pub fn random_scale_range(&self) -> Vector4 { self.random_scale_range }
     pub fn flipped_at_random(&self) -> bool { self.flipped_at_random }
 
-
     #[func]
     fn is_valid(&mut self) -> bool {
         let modulo_tiling_area: UnsVec = self.modulo_tiling_area.try_into().expect(format!("modulo tiling area for Tile id={} must be bigger or equal than (1,1)", self.id()).as_str());
@@ -58,8 +55,6 @@ impl Tile {
         true
     }
 }
-
-
 #[godot_api]
 impl IResource for Tile{
     fn init(base: Base<Resource>) -> Self {
@@ -72,10 +67,7 @@ impl fmt::Display for TileUnid {
         write!(f, "tunid{}", self.0)
     }
 }
-
-impl Into<TileDto> for Gd<Tile> {
-    fn into(self) -> TileDto {TileDto { z_level: self.bind().z_level(), source_atlas: self.bind().source_atlas(), origin_position: self.bind().origin_position(), modulo_tiling_area: self.bind().modulo_tiling_area(), alternative_id: self.bind().alternative_id(), random_scale_range: self.bind().random_scale_range(), flipped_at_random: self.bind().flipped_at_random() }}
-}
+impl Into<TileDto> for Gd<Tile> {fn into(self) -> TileDto {TileDto { z_level: self.bind().z_level(), source_atlas: self.bind().source_atlas(), origin_position: self.bind().origin_position(), modulo_tiling_area: self.bind().modulo_tiling_area(), alternative_id: self.bind().alternative_id(), random_scale_range: self.bind().random_scale_range(), flipped_at_random: self.bind().flipped_at_random() }}}
 pub struct TileDto{
     pub z_level: TileZLevel,
     pub source_atlas: i32,
@@ -85,16 +77,6 @@ pub struct TileDto{
     pub random_scale_range: Vector4,
     pub flipped_at_random: bool,
 }
-
-// impl Hash for Tile {
-//     fn hash<H: Hasher>(&self, state: &mut H) {
-//         self.layer.hash(state);
-//         self.source_atlas.hash(state);
-//         self.origin_position.hash(state);
-//         self.modulo_tiling_area.hash(state);
-//         self.alternative_id.hash(state);
-//     }
-// }
 
 #[derive(GodotClass)]
 #[class(init, tool, base=Resource)]
@@ -167,7 +149,6 @@ pub struct TileDistribution {
 impl TileDistribution {
     pub fn base(&self) -> &Base<Resource> { &self.base }
     pub fn id(&self) -> &StringName { &self.id }
-
     #[func]
     pub fn is_valid(&self) -> bool {
         ! self.tiles.is_empty()
@@ -177,12 +158,7 @@ impl TileDistribution {
     }
 }
 #[derive(Debug)]
-pub enum TileDistributionError {
-    InvalidLength,//TODO add tile or distribution id to each error-variant (to find culprit more easily)
-    NegativeWeight,
-    MissingNid,
-    MissingBoth,
-}
+pub enum TileDistributionError {InvalidLength, NegativeWeight, MissingNid, MissingBoth,}//TODO add tile or distribution id to each error-variant (to find culprit more easily)
 impl std::fmt::Display for TileDistributionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -204,7 +180,6 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
             let tile = gd_tile_dist.tiles.get(0).unwrap_unchecked();
             return Ok(NidOrDist::Nid((tile.clone().bind().unid.expect("unid not assigned to tile"), tile.clone().bind().z_level)));
         }}
-
         if gd_tile_dist.tiles.is_empty() || gd_tile_dist.tiles.len() != gd_tile_dist.weights.len() {
             return Err(TileDistributionError::InvalidLength);
         }
@@ -214,7 +189,6 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
         if gd_tile_dist.tiles.iter_shared().any(|tile| tile.bind().unid.is_none()){
             return Err(TileDistributionError::MissingNid);
         }
-        
         unsafe{
             let mut choices: Vec<(TileUnid, TileZLevel)> = Vec::new();
             let sampler = WeightedAliasIndex::new(gd_tile_dist.weights.as_slice().to_vec()).expect("couldn't create WeightedAliasIndex");
@@ -251,18 +225,12 @@ impl DiscreteDistribution{
         Self {choices, sampler}
     }
     pub fn sample(&self) -> (TileUnid, TileZLevel){
-        unsafe{
-            self.choices.get_unchecked(self.sampler.sample(&mut thread_rng())).clone()
-        }
+        unsafe{self.choices.get_unchecked(self.sampler.sample(&mut thread_rng())).clone()}
     }
 }
-
 pub enum NidOrDist{
-    Nid((TileUnid, TileZLevel)),
-    Dist(DiscreteDistribution)
+    Nid((TileUnid, TileZLevel)), Dist(DiscreteDistribution)
 }
-impl Default for NidOrDist{fn default() -> Self {Self::Nid((TileUnid::default(), TileZLevel::default()))}}
-
 impl NidOrDist{
     pub fn get_a_nid(&self) -> (TileUnid, TileZLevel){
         match self {
@@ -271,7 +239,7 @@ impl NidOrDist{
         }
     }
 }
-
+impl Default for NidOrDist{fn default() -> Self {Self::Nid((TileUnid::default(), TileZLevel::default()))}}
 
 pub fn fill_targets(nids_arr: &mut[NidOrDist], target_names: &[&str], tile_selection: Gd<TileSelection>){
     assert_eq!(nids_arr.len(), target_names.len(), "nids arr not equal in length with target_names");

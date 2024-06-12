@@ -3,3 +3,4 @@
 [resource]
 id = &"grass"
 source_atlas = 0
+modulo_tiling_area = Vector2i(32, 32)

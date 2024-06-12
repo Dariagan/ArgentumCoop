@@ -21,6 +21,7 @@ func _setup_config():
 func _process(_delta):
 	pass
 
+
 @rpc("call_local")
 func generate_world():
 	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y >500)
@@ -28,7 +29,6 @@ func generate_world():
 	var tiles: Array[Tile] = []
 	tiles.append_array(GlobalData.tiles_data.values())
 	generate_world_matrix(WORLD_SIZE, tiles)
-	
 	
 	generate_formation(0, Vector2i.ZERO, Vector2i(5000, 5000), GlobalData.tile_selections[&"temperate"], 0, {})
 	
