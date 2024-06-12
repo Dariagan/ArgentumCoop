@@ -20,8 +20,6 @@ motion_mode = 1
 slide_on_ceiling = false
 platform_on_leave = 2
 script = ExtResource("1_qp2au")
-acceleration = null
-friction = null
 
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(0, -5)

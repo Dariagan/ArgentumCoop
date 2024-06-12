@@ -99,13 +99,14 @@ impl RustTileMap {
 
         let world_size = self.world_size;
 
-        
+        //comparar vs for loops comúnes nesteados
         for chunk_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))
             .map(|vec| SafeVec::from(vec) + being_coords)
             .filter(|vec| vec.is_non_negative())
             .map(|vec|unsafe{UnsVec::try_from(vec).unwrap_unchecked()})
             .filter(|vec| vec.is_strictly_smaller_than(world_size)){
                 unsafe{
+                    //TODO NO HACER SET CELL SI LA TILE YA ESTÁ CARGADA (CAUSA LAG, HACERLO COMO EN C++)
                     let tiles = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];//ojo con esto mientras se genera
                     
                     let filter = tiles.iter().filter(|&&unid| unid != TileUnid::default());

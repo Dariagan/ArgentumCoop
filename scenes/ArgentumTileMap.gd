@@ -3,7 +3,7 @@ class_name GdTileMap
 
 var _beings: Dictionary # key(str): individual unique id. value: Being Scene. el multiplayerspawner se encarga del sync
 var tiles_states: Dictionary # key: posx_posy_zi (vec3, no un string). value: state object
-const WORLD_SIZE: Vector2i = Vector2i(1000, 1000)
+const WORLD_SIZE: Vector2i = Vector2i(5000, 5000)
 
 # IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
@@ -30,7 +30,7 @@ func generate_world():
 	generate_world_matrix(WORLD_SIZE, tiles)
 	
 	
-	generate_formation(0, Vector2i.ZERO, Vector2i(1000, 1000), GlobalData.tile_selections[&"temperate"], 0, {})
+	generate_formation(0, Vector2i.ZERO, Vector2i(5000, 5000), GlobalData.tile_selections[&"temperate"], 0, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
