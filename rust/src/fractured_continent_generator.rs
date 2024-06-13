@@ -115,7 +115,7 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
                 tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Beach as usize).get_a_nid(rng))
             }
             else {//TODO HACER UN MATCH STATEMENT
-                let away_from_coast = continentness > continenter_cutoff+0.01 && peninsulerness > continenter_cutoff+0.27;
+                let away_from_coast = continentness > continenter_cutoff+0.01 && peninsulerness > PENINSULER_CUTOFF+0.27;
 
                 let lake = is_lake(rel_coords, (big_laker, BIG_LAKER_CUTOFF), (small_laker, SMALL_LAKER_CUTOFF), beachness);
 

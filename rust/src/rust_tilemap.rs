@@ -121,7 +121,6 @@ impl RustTileMap {
         let atlas_origin_position = (*tile).origin_position;
         let modulo_tiling_area = (*tile).modulo_tiling_area;
         let atlas_origin_position_offset = matrix_coord.mod_uns(modulo_tiling_area.try_into().unwrap_unchecked()); 
-        let atlas_origin_position = Vector2i::new(atlas_origin_position.x, atlas_origin_position.y);
         self.base_mut().set_cell_ex((*tile).z_level as i32, matrix_coord.into())
             .source_id((*tile).source_atlas)
             .atlas_coords(atlas_origin_position + atlas_origin_position_offset.into())
