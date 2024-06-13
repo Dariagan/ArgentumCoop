@@ -35,10 +35,10 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
     
     let world_ptr: SendMutPtr<WorldMatrix> = make_mut_ptr!(world.borrow_mut());
     
-    let mut nidordist_mapped_to_targets: [NidOrDist; Target::COUNT] = Default::default();
-    crate::tiling::fill_targets(&mut nidordist_mapped_to_targets, Target::VARIANTS, tile_selection);
+    let mut unidordist_mapped2targets: [UnidOrDist; Target::COUNT] = Default::default();
+    crate::tiling::fill_targets(&mut unidordist_mapped2targets, Target::VARIANTS, tile_selection);
 
-    let nids_mapped_to_targets: SendPtr<[NidOrDist; Target::COUNT]> = make_ptr!(&nidordist_mapped_to_targets);
+    let unidordist_mapped2targets: SendPtr<[UnidOrDist; Target::COUNT]> = make_ptr!(&unidordist_mapped2targets);
     //TODO hacer esto un struct ^
     
     //https://github.com/Auburn/FastNoiseLite/tree/master/Rust
@@ -64,8 +64,6 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
     peninsuler.set_fractal_gain(Some(0.56));
     peninsuler.frequency = 5.9/f32::powf(size.length() as f32, 0.995);
     let peninsuler = SharedNoise::new(&peninsuler);
-
-    //let arcednoisexample: std::sync::Arc<FastNoiseLite> = FastNoiseLite::new().into();
 
     const BIG_LAKER_CUTOFF: f32 = 0.33;
     let mut big_laker=FastNoiseLite::with_seed(seed+2);big_laker.noise_type=NoiseType::ValueCubic;
@@ -110,15 +108,27 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
 
         let rng: &mut Lcg128Xsl64 = rngs.drf().get_unchecked_mut(thread_i);
         if continental && peninsuler_caved{
-            tiles_2b_placed.assign_unid_unchecked(nids_mapped_to_targets.drf().get_unchecked(Target::Cont as usize).get_a_nid(rng));
+            tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Cont as usize).get_a_nid(rng));
 
             let (beachness, beach) = val_surpasses_cutoff(get_beachness(rel_coords, big_beacher, small_beacher, (continentness, continenter_cutoff), (peninsulerness, PENINSULER_CUTOFF)), BEACHER_CUTOFF);
             if beach {
-                
+                tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Beach as usize).get_a_nid(rng))
+            }
+            else {//TODO HACER UN MATCH STATEMENT
+                let away_from_coast = continentness > continenter_cutoff+0.01 && peninsulerness > continenter_cutoff+0.27;
+
+                let lake = is_lake(rel_coords, (big_laker, BIG_LAKER_CUTOFF), (small_laker, SMALL_LAKER_CUTOFF), beachness);
+
+                if lake && away_from_coast{
+                    tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Lake as usize).get_a_nid(rng))
+                }
+                else {
+
+                }
             }
         }
         else {
-            tiles_2b_placed.assign_unid_unchecked(nids_mapped_to_targets.drf().get_unchecked(Target::Ocean as usize).get_a_nid(rng));
+            tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Ocean as usize).get_a_nid(rng));
 
         }
 
@@ -136,4 +146,10 @@ pub fn get_beachness(rel_coords: UnsVec, big_beacher: SharedNoise, small_beacher
     (continentness, continental_cutoff): (f32, f32), (peninsulerness, peninsuler_cutoff): (f32, f32)) -> f32 {unsafe{
     (0.72 + big_beacher.get_noise_2d(rel_coords)/2.3 - f32::powf(continentness-continental_cutoff,0.6))
     .max(0.8 + small_beacher.get_noise_2d(rel_coords)/2.3 - f32::powf(peninsulerness-peninsuler_cutoff,0.45))
+}}
+
+#[inline]
+pub fn is_lake(rel_coords: UnsVec, (big_laker, big_laker_cutoff): (SharedNoise, f32), (small_laker, small_laker_cutoff): (SharedNoise, f32), 
+    beachness: f32) -> bool {unsafe{
+    ((small_laker.get_noise_2d(rel_coords)+1.0)*0.65 - beachness > small_laker_cutoff) || (((big_laker.get_noise_2d(rel_coords) + 1.0)*0.65) - beachness > big_laker_cutoff)
 }}

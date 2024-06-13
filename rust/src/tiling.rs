@@ -118,7 +118,7 @@ impl GdTileSelectionIterator{
     }
 }
 impl Iterator for GdTileSelectionIterator {
-    type Item = NidOrDist;
+    type Item = UnidOrDist;
 
     fn next(&mut self) -> Option<Self::Item> {
         let tile_selection = self.tile_selection.bind();
@@ -173,15 +173,15 @@ impl std::fmt::Display for TileDistributionError {
     }
 }
 
-impl TryFrom<Gd<TileDistribution>> for NidOrDist {
+impl TryFrom<Gd<TileDistribution>> for UnidOrDist {
     type Error = TileDistributionError;
     
-    fn try_from(value: Gd<TileDistribution>) -> Result<NidOrDist, Self::Error> {
+    fn try_from(value: Gd<TileDistribution>) -> Result<UnidOrDist, Self::Error> {
         let gd_tile_dist = value.bind();
 
         if gd_tile_dist.tiles.len() == 1 {unsafe{
             let tile = gd_tile_dist.tiles.get(0).unwrap_unchecked();
-            return Ok(NidOrDist::Nid((tile.clone().bind().unid.expect("unid not assigned to tile"), tile.clone().bind().z_level)));
+            return Ok(UnidOrDist::Nid((tile.clone().bind().unid.expect("unid not assigned to tile"), tile.clone().bind().z_level)));
         }}
         if gd_tile_dist.tiles.is_empty() || gd_tile_dist.tiles.len() != gd_tile_dist.weights.len() {
             return Err(TileDistributionError::InvalidLength);
@@ -201,19 +201,19 @@ impl TryFrom<Gd<TileDistribution>> for NidOrDist {
                 choices.push((tile.bind().unid.expect("unid not assigned to tile"), tile.bind().z_level));
             }
 
-            Ok(NidOrDist::Dist(DiscreteDistribution::new(choices, sampler)))
+            Ok(UnidOrDist::Dist(DiscreteDistribution::new(choices, sampler)))
         }
     }
     
 }
 
-impl TryFrom<Gd<Tile>> for NidOrDist {
+impl TryFrom<Gd<Tile>> for UnidOrDist {
     type Error = TileDistributionError;
-    fn try_from(value: Gd<Tile>) -> Result<NidOrDist, TileDistributionError> {
+    fn try_from(value: Gd<Tile>) -> Result<UnidOrDist, TileDistributionError> {
 
         let (unid, z_level) = (value.bind().unid, value.bind().z_level);
         match (unid, z_level){
-            (Some(unid),z_level) => Ok(NidOrDist::Nid((unid, z_level))),
+            (Some(unid),z_level) => Ok(UnidOrDist::Nid((unid, z_level))),
             (None, _) => Err(TileDistributionError::MissingNid),
         }
     }
@@ -227,25 +227,25 @@ impl DiscreteDistribution{
     pub fn new(choices: Vec<(TileUnid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,) -> Self {Self {choices, sampler}}
     pub fn sample(&self, rng: &mut Lcg128Xsl64) -> (TileUnid, TileZLevel){unsafe{self.choices.get_unchecked(self.sampler.sample(rng)).clone()}}
 }
-pub enum NidOrDist{
+pub enum UnidOrDist{
     Nid((TileUnid, TileZLevel)), Dist(DiscreteDistribution)
 }
-impl NidOrDist{
+impl UnidOrDist{
     pub fn get_a_nid(&self, rng: &mut Lcg128Xsl64) -> (TileUnid, TileZLevel){
         match self {
-            NidOrDist::Nid(x) => *x,
-            NidOrDist::Dist(dist) => dist.sample(rng),
+            UnidOrDist::Nid(x) => *x,
+            UnidOrDist::Dist(dist) => dist.sample(rng),
         }
     }
 }
-impl Default for NidOrDist{fn default() -> Self {Self::Nid((TileUnid::default(), TileZLevel::default()))}}
+impl Default for UnidOrDist{fn default() -> Self {Self::Nid((TileUnid::default(), TileZLevel::default()))}}
 
-pub fn fill_targets(nids_arr: &mut[NidOrDist], target_names: &[&str], tile_selection: Gd<TileSelection>){
+pub fn fill_targets(nids_arr: &mut[UnidOrDist], target_names: &[&str], tile_selection: Gd<TileSelection>){
     assert_eq!(nids_arr.len(), target_names.len(), "nids arr not equal in length with target_names");
     assert!(target_names.len() <= tile_selection.bind().targets().len(), "TileSelection(id={} len={}) doesn't provide for all target_names(len={})", tile_selection.bind().id, tile_selection.bind().targets().len(), target_names.len());
 
     GdTileSelectionIterator::new(tile_selection.clone()).zip(tile_selection.bind().targets().iter_shared())
-        .for_each(|it: (NidOrDist, StringName)| {
+        .for_each(|it: (UnidOrDist, StringName)| {
             let (nid_or_distribution, target) = it;
 
             if let Some(target_i) = target_names.into_iter().position(|name: &&str| *name == target.to_string().as_str()) {

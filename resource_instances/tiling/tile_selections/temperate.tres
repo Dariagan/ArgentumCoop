@@ -1,9 +1,11 @@
-[gd_resource type="TileSelection" load_steps=3 format=3 uid="uid://caatdrn8yqx56"]
+[gd_resource type="TileSelection" load_steps=5 format=3 uid="uid://caatdrn8yqx56"]
 
 [ext_resource type="Tile" uid="uid://raf4v5nr45ia" path="res://resource_instances/tiling/tiles/terrain/soil/ocean_water.tres" id="1_hsqui"]
+[ext_resource type="Tile" uid="uid://5ek7hgr41e3t" path="res://resource_instances/tiling/tiles/terrain/soil/beach.tres" id="1_tyfox"]
+[ext_resource type="Tile" uid="uid://c8hdu43xe6m36" path="res://resource_instances/tiling/tiles/terrain/soil/lake.tres" id="2_ml8ut"]
 [ext_resource type="Tile" uid="uid://dsj3n5ytfej0r" path="res://resource_instances/tiling/tiles/terrain/soil/grass.tres" id="2_v32se"]
 
 [resource]
 id = &"temperate"
 targets = Array[StringName]([&"beach", &"lake", &"cont", &"tree", &"bush", &"ocean", &"cave0", &"cave1", &"cave2"])
-tiles = Array[Tile]([ExtResource("1_hsqui"), ExtResource("2_v32se"), ExtResource("2_v32se"), ExtResource("1_hsqui"), ExtResource("1_hsqui"), ExtResource("1_hsqui"), ExtResource("1_hsqui"), ExtResource("2_v32se"), ExtResource("1_hsqui")])
+tiles = Array[Tile]([ExtResource("1_tyfox"), ExtResource("2_ml8ut"), ExtResource("2_v32se"), ExtResource("1_hsqui"), ExtResource("1_hsqui"), ExtResource("1_hsqui"), ExtResource("1_hsqui"), ExtResource("2_v32se"), ExtResource("1_hsqui")])

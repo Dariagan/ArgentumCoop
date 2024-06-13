@@ -48,7 +48,7 @@ pub fn overwrite_formation_tile(mut world: SendMutPtr<WorldMatrix>, (origin, rel
     }
 }
 
-pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relative): (UnsVec, UnsVec), unid: NidOrDist, instantiation_data: Dictionary){
+pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relative): (UnsVec, UnsVec), unid: UnidOrDist, instantiation_data: Dictionary){
     todo!("no termine generate statful")
     //llamar señal o algo
 }
@@ -94,9 +94,11 @@ pub fn get_border_farness_factor(
 pub struct SharedNoise{pub ns_ptr: SendPtr<FastNoiseLite>}
 
 impl SharedNoise {
+    #[inline]
     pub fn new(fast_noise_lite: &FastNoiseLite) -> Self {
         Self { ns_ptr: make_ptr!(fast_noise_lite) }
     }
+    #[inline]
     pub fn get_noise_2d(&self, rel_coords: UnsVec) -> f32 {
         unsafe{(&*self.ns_ptr.0).get_noise_2d(rel_coords.lef as f64, rel_coords.right as f64)}
     }
