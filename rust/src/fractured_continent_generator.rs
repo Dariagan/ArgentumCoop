@@ -44,6 +44,8 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
     //https://github.com/Auburn/FastNoiseLite/tree/master/Rust
     //https://github.com/Razaekel/noise-rs/tree/4fea5f6156bd0b142495a99fe1995502bfe473d6
 
+    //https://auburn.github.io/FastNoiseLite/ para mirar noise maps con slider
+
     let continenter_cutoff: f32 = 0.61*f32::powf((size.length()/1600.0) as f32,0.05);
     const PENINSULER_CUTOFF: f32 = -0.1;
     const BIG_LAKER_CUTOFF: f32 = 0.33;
@@ -68,16 +70,28 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
     forester.frequency = 1.6/size.length_f32().powf(0.995);
     
     continenter.set_fractal_type(Some(FractalType::FBm));
-    continenter.set_fractal_lacunarity(Some(2.8));continenter.set_fractal_weighted_strength(Some(0.5));
-
     peninsuler.set_fractal_type(Some(FractalType::FBm));
-    peninsuler.set_fractal_gain(Some(0.56));
-
+    big_laker.set_fractal_type(Some(FractalType::FBm));
+    small_laker.set_fractal_type(Some(FractalType::FBm));
     big_beacher.set_fractal_type(Some(FractalType::FBm));
-
     small_beacher.set_fractal_type(Some(FractalType::FBm));
+    forester.set_fractal_type(Some(FractalType::FBm));
+    
+    continenter.set_fractal_octaves(Some(5));
+    peninsuler.set_fractal_octaves(Some(5));
+    big_beacher.set_fractal_octaves(Some(5));
     small_beacher.set_fractal_octaves(Some(3));
-    forester.set_fractal_lacunarity(Some(3.0));forester.set_fractal_gain(Some(0.77));
+    big_laker.set_fractal_octaves(Some(5));
+    small_laker.set_fractal_octaves(Some(5));
+    forester.set_fractal_octaves(Some(5));
+
+    continenter.set_fractal_lacunarity(Some(2.8));
+    forester.set_fractal_lacunarity(Some(3.0));
+
+    continenter.set_fractal_weighted_strength(Some(0.5));
+    
+    peninsuler.set_fractal_gain(Some(0.56));    
+    forester.set_fractal_gain(Some(0.77));
     
     godot_print!("con_co:{continenter_cutoff} con_freq:{} pen_freq:{} blakf:{} slakf:{} bbfreq:{} sbfreq:{}", 
         continenter.frequency, peninsuler.frequency, big_laker.frequency, small_laker.frequency, big_beacher.frequency, small_beacher.frequency);
