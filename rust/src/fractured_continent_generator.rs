@@ -47,7 +47,7 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
     let continenter_cutoff: f32 = 0.61*f32::powf((size.length()/1600.0) as f32,0.05);
     let mut continenter=FastNoiseLite::new();continenter.noise_type=NoiseType::OpenSimplex2;
     continenter.set_fractal_lacunarity(Some(2.8));continenter.set_fractal_weighted_strength(Some(0.5));
-    continenter.frequency = 0.15/f32::powf(size.length() as f32, 0.995);
+    continenter.frequency = 0.15/(size.length() as f32).powf(0.995);
 
     let mut continenter_sampling_offset: UnsVec = UnsVec { lef: 0, right: 0 };
     {
@@ -62,32 +62,32 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
     const PENINSULER_CUTOFF: f32 = -0.1;
     let mut peninsuler=FastNoiseLite::with_seed(seed+1);peninsuler.noise_type=NoiseType::OpenSimplex2;
     peninsuler.set_fractal_gain(Some(0.56));
-    peninsuler.frequency = 5.9/f32::powf(size.length() as f32, 0.995);
+    peninsuler.frequency = 5.9/size.lengthf32().powf(0.995);
     let peninsuler = SharedNoise::new(&peninsuler);
 
     const BIG_LAKER_CUTOFF: f32 = 0.33;
     let mut big_laker=FastNoiseLite::with_seed(seed+2);big_laker.noise_type=NoiseType::ValueCubic;
-    big_laker.frequency = 40.0/f32::powf(size.length() as f32, 0.995);
+    big_laker.frequency = 40.0/size.lengthf32().powf(0.995);
     let big_laker = SharedNoise::new(&big_laker);
     const SMALL_LAKER_CUTOFF: f32 = 0.25; 
     let mut small_laker=FastNoiseLite::with_seed(seed+3);small_laker.noise_type=NoiseType::ValueCubic;
-    small_laker.frequency = 80.0/f32::powf(size.length() as f32, 0.995);
+    small_laker.frequency = 80.0/size.lengthf32().powf(0.995);
     let small_laker = SharedNoise::new(&small_laker);
 
     const BEACHER_CUTOFF: f32 = 0.8; 
     let mut big_beacher=FastNoiseLite::with_seed(seed+4);big_beacher.noise_type=NoiseType::OpenSimplex2S;
-    big_beacher.frequency = 4.3/f32::powf(size.length() as f32, 0.995);
+    big_beacher.frequency = 4.3/size.lengthf32().powf(0.995);
     let big_beacher = SharedNoise::new(&big_beacher);
 
     let mut small_beacher=FastNoiseLite::with_seed(seed+5);small_beacher.noise_type=NoiseType::OpenSimplex2S;
     small_beacher.set_fractal_octaves(Some(3));
-    small_beacher.frequency = 8.0/f32::powf(size.length() as f32, 0.995);
+    small_beacher.frequency = 8.0/size.lengthf32().powf(0.995);
     let small_beacher = SharedNoise::new(&small_beacher);
 
     const FORESTER_CUTOFF: f32 = 4.3; 
     let mut forester=FastNoiseLite::with_seed(seed+6);forester.noise_type=NoiseType::OpenSimplex2;
     forester.set_fractal_lacunarity(Some(3.0));forester.set_fractal_gain(Some(0.77));
-    forester.frequency = 1.6/f32::powf(size.length() as f32, 0.995);
+    forester.frequency = 1.6/size.lengthf32().powf(0.995);
     let forester = SharedNoise::new(&forester);
 
     const N_THREADS: usize = 4;
@@ -108,7 +108,6 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
 
         let rng: &mut Lcg128Xsl64 = rngs.drf().get_unchecked_mut(thread_i);
         if continental && peninsuler_caved{
-            tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Cont as usize).get_a_nid(rng));
 
             let (beachness, beach) = val_surpasses_cutoff(get_beachness(rel_coords, big_beacher, small_beacher, (continentness, continenter_cutoff), (peninsulerness, PENINSULER_CUTOFF)), BEACHER_CUTOFF);
             if beach {
@@ -123,6 +122,7 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
                     tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Lake as usize).get_a_nid(rng))
                 }
                 else {
+                    tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Cont as usize).get_a_nid(rng));
 
                 }
             }
@@ -153,3 +153,7 @@ pub fn is_lake(rel_coords: UnsVec, (big_laker, big_laker_cutoff): (SharedNoise, 
     beachness: f32) -> bool {unsafe{
     ((small_laker.get_noise_2d(rel_coords)+1.0)*0.65 - beachness > small_laker_cutoff) || (((big_laker.get_noise_2d(rel_coords) + 1.0)*0.65) - beachness > big_laker_cutoff)
 }}
+
+pub fn place_dungeon_entrances() {
+    
+}
