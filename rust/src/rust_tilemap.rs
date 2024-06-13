@@ -80,6 +80,8 @@ impl RustTileMap {
                 return false;
             }
         }
+        use std::time::Instant;
+        let now = Instant::now();
         self.world_matrix = Some(
             match formation {
                 FormGenEnum::FracturedContinentGenerator => {
@@ -87,6 +89,8 @@ impl RustTileMap {
                     self.world_matrix.take().expect("world matrix not present when attempting to generate"), origin, size, tile_selection, seed, data)
             }
         });
+        let elapsed = now.elapsed();
+        godot_print!("rust time: {:.2?}", elapsed);
         true
     }
 

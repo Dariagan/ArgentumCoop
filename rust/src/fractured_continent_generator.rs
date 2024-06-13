@@ -1,7 +1,7 @@
 use std::borrow::{BorrowMut};
 use std::thread::{self, JoinHandle};
 
-use fastnoise_lite::{FastNoiseLite, NoiseType};
+use fastnoise_lite::{FastNoiseLite, FractalType, NoiseType};
 use godot::{builtin::Dictionary};
 
 use godot::prelude::*;
@@ -45,52 +45,60 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
     //https://github.com/Razaekel/noise-rs/tree/4fea5f6156bd0b142495a99fe1995502bfe473d6
 
     let continenter_cutoff: f32 = 0.61*f32::powf((size.length()/1600.0) as f32,0.05);
-    let mut continenter=FastNoiseLite::new();continenter.noise_type=NoiseType::OpenSimplex2;
+    const PENINSULER_CUTOFF: f32 = -0.1;
+    const BIG_LAKER_CUTOFF: f32 = 0.33;
+    const SMALL_LAKER_CUTOFF: f32 = 0.25; 
+    const BEACHER_CUTOFF: f32 = 0.8; 
+    const FORESTER_CUTOFF: f32 = 4.3; 
+    
+    let mut continenter=FastNoiseLite::with_seed(seed);continenter.noise_type=NoiseType::OpenSimplex2;
+    let mut peninsuler=FastNoiseLite::with_seed(seed+1);peninsuler.noise_type=NoiseType::OpenSimplex2;
+    let mut big_laker=FastNoiseLite::with_seed(seed+2);big_laker.noise_type=NoiseType::ValueCubic;
+    let mut small_laker=FastNoiseLite::with_seed(seed+3);small_laker.noise_type=NoiseType::ValueCubic;
+    let mut big_beacher=FastNoiseLite::with_seed(seed+4);big_beacher.noise_type=NoiseType::OpenSimplex2S;
+    let mut small_beacher=FastNoiseLite::with_seed(seed+5);small_beacher.noise_type=NoiseType::OpenSimplex2S;
+    let mut forester=FastNoiseLite::with_seed(seed+6);forester.noise_type=NoiseType::OpenSimplex2;
+    
+    continenter.frequency = 0.15/size.length_f32().powf(0.995);
+    peninsuler.frequency = 5.0/size.length_f32().powf(0.995);
+    big_laker.frequency = 40.0/size.length_f32().powf(0.995);
+    small_laker.frequency = 80.0/size.length_f32().powf(0.995);
+    big_beacher.frequency = 4.3/size.length_f32().powf(0.995);
+    small_beacher.frequency = 8.0/size.length_f32().powf(0.995);
+    forester.frequency = 1.6/size.length_f32().powf(0.995);
+    
+    continenter.set_fractal_type(Some(FractalType::FBm));
     continenter.set_fractal_lacunarity(Some(2.8));continenter.set_fractal_weighted_strength(Some(0.5));
-    continenter.frequency = 0.15/(size.length() as f32).powf(0.995);
 
-    let mut continenter_sampling_offset: UnsVec = UnsVec { lef: 0, right: 0 };
+    peninsuler.set_fractal_type(Some(FractalType::FBm));
+    peninsuler.set_fractal_gain(Some(0.56));
+
+    big_beacher.set_fractal_type(Some(FractalType::FBm));
+
+    small_beacher.set_fractal_type(Some(FractalType::FBm));
+    small_beacher.set_fractal_octaves(Some(3));
+    forester.set_fractal_lacunarity(Some(3.0));forester.set_fractal_gain(Some(0.77));
+    
+    godot_print!("con_co:{continenter_cutoff} con_freq:{} pen_freq:{} blakf:{} slakf:{} bbfreq:{} sbfreq:{}", 
+        continenter.frequency, peninsuler.frequency, big_laker.frequency, small_laker.frequency, big_beacher.frequency, small_beacher.frequency);
+
+    let mut continenter_offset: UnsVec = UnsVec { lef: 0, right: 0 };
     {
-        let center: UnsVec = (origin + size)/2;
-        while continenter.get_noise_2d((center+continenter_sampling_offset).lef as f64, (center+continenter_sampling_offset).right as f64) < continenter_cutoff + 0.13{
-            continenter_sampling_offset += UnsVec{lef:3, right:3}
+        let center: UnsVec = origin + size/2;
+        while continenter.get_noise_2d((center+continenter_offset).lef as f64, (center+continenter_offset).right as f64) < continenter_cutoff + 0.13{
+            continenter_offset += UnsVec{lef:3, right:3}
         }
-    }let continenter_offset: UnsVec = continenter_sampling_offset;
+    }let continenter_offset: UnsVec = continenter_offset;
 
     let continenter = SharedNoise::new(&continenter);
-
-    const PENINSULER_CUTOFF: f32 = -0.1;
-    let mut peninsuler=FastNoiseLite::with_seed(seed+1);peninsuler.noise_type=NoiseType::OpenSimplex2;
-    peninsuler.set_fractal_gain(Some(0.56));
-    peninsuler.frequency = 5.9/size.lengthf32().powf(0.995);
     let peninsuler = SharedNoise::new(&peninsuler);
-
-    const BIG_LAKER_CUTOFF: f32 = 0.33;
-    let mut big_laker=FastNoiseLite::with_seed(seed+2);big_laker.noise_type=NoiseType::ValueCubic;
-    big_laker.frequency = 40.0/size.lengthf32().powf(0.995);
     let big_laker = SharedNoise::new(&big_laker);
-    const SMALL_LAKER_CUTOFF: f32 = 0.25; 
-    let mut small_laker=FastNoiseLite::with_seed(seed+3);small_laker.noise_type=NoiseType::ValueCubic;
-    small_laker.frequency = 80.0/size.lengthf32().powf(0.995);
     let small_laker = SharedNoise::new(&small_laker);
-
-    const BEACHER_CUTOFF: f32 = 0.8; 
-    let mut big_beacher=FastNoiseLite::with_seed(seed+4);big_beacher.noise_type=NoiseType::OpenSimplex2S;
-    big_beacher.frequency = 4.3/size.lengthf32().powf(0.995);
     let big_beacher = SharedNoise::new(&big_beacher);
-
-    let mut small_beacher=FastNoiseLite::with_seed(seed+5);small_beacher.noise_type=NoiseType::OpenSimplex2S;
-    small_beacher.set_fractal_octaves(Some(3));
-    small_beacher.frequency = 8.0/size.lengthf32().powf(0.995);
     let small_beacher = SharedNoise::new(&small_beacher);
-
-    const FORESTER_CUTOFF: f32 = 4.3; 
-    let mut forester=FastNoiseLite::with_seed(seed+6);forester.noise_type=NoiseType::OpenSimplex2;
-    forester.set_fractal_lacunarity(Some(3.0));forester.set_fractal_gain(Some(0.77));
-    forester.frequency = 1.6/size.lengthf32().powf(0.995);
     let forester = SharedNoise::new(&forester);
 
-    const N_THREADS: usize = 4;
+    const N_THREADS: usize = 16;
     let mut threads: [Option<JoinHandle<()>>; N_THREADS] = Default::default();
     let mut rngs: [Pcg64; N_THREADS] = core::array::from_fn(|i| Seeder::from(seed+i as i32).make_rng());
     let mut rngs: SendMutPtr<[Pcg64; N_THREADS]> = make_mut_ptr!(&mut rngs);
@@ -99,7 +107,7 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
     let hori_range = (((thread_i*size.lef as usize)/N_THREADS) as u32, (((thread_i+1)*size.lef as usize)/N_THREADS) as u32);
     for rel_coords in (hori_range.0..hori_range.1).flat_map(|i| (0..size.right).map(move |j| UnsVec::from((i,j)))){
     
-        let mut tiles_2b_placed: TileUnidArray = Default::default();//hacer TileUnidArray un struct real y agregarle un método fácil para meterle un TileUnid y TileZlevel
+        let mut tiles_2b_placed: TileUnidArray = Default::default();
         let continenter=continenter;let peninsuler=peninsuler;let big_laker=big_laker;let small_laker=small_laker;let big_beacher=big_beacher;let small_beacher=small_beacher;let forester=forester;
         
         let (continentness, continental): (f32, bool) = val_surpasses_cutoff(get_continentness(continenter, rel_coords, size, None, Some(continenter_offset)), continenter_cutoff);
@@ -144,14 +152,15 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
 #[inline]
 pub fn get_beachness(rel_coords: UnsVec, big_beacher: SharedNoise, small_beacher: SharedNoise, 
     (continentness, continental_cutoff): (f32, f32), (peninsulerness, peninsuler_cutoff): (f32, f32)) -> f32 {unsafe{
-    (0.72 + big_beacher.get_noise_2d(rel_coords)/2.3 - f32::powf(continentness-continental_cutoff,0.6))
-    .max(0.8 + small_beacher.get_noise_2d(rel_coords)/2.3 - f32::powf(peninsulerness-peninsuler_cutoff,0.45))
+    (0.72 + big_beacher.get_noise_2d(rel_coords)/2.3 - (continentness-continental_cutoff).powf(0.6))
+    .max(0.8 + small_beacher.get_noise_2d(rel_coords)/2.3 - (peninsulerness-peninsuler_cutoff).powf(0.45))
 }}
 
 #[inline]
 pub fn is_lake(rel_coords: UnsVec, (big_laker, big_laker_cutoff): (SharedNoise, f32), (small_laker, small_laker_cutoff): (SharedNoise, f32), 
     beachness: f32) -> bool {unsafe{
-    ((small_laker.get_noise_2d(rel_coords)+1.0)*0.65 - beachness > small_laker_cutoff) || (((big_laker.get_noise_2d(rel_coords) + 1.0)*0.65) - beachness > big_laker_cutoff)
+    ((small_laker.get_noise_2d(rel_coords)+1.0) * 0.65 - beachness > small_laker_cutoff) 
+    || (((big_laker.get_noise_2d(rel_coords)+1.0) * 0.65) - beachness > big_laker_cutoff)
 }}
 
 pub fn place_dungeon_entrances() {

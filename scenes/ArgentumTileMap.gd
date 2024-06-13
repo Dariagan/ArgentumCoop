@@ -29,8 +29,6 @@ func generate_world():
 	var tiles: Array[Tile] = []
 	tiles.append_array(GlobalData.tiles_data.values())
 	
-		
-	
 	generate_world_matrix(WORLD_SIZE, tiles)
 	
 	generate_formation(0, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections[&"temperate"], 0, {})
