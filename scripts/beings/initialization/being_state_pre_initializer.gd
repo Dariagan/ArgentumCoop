@@ -4,7 +4,9 @@ class_name BeingStatePreIniter
 #se diferencia de un beingkind en q el beingkind puede incluir rangos de aleatoriedad/sets weighteados configurables para ciertos atributos/variables
 #dentro de ahí, (money, possible loot, health, possible names). y en beingkind no se especifica la faction. en esto sí, para saber en cual meter al being
 #
-#esto contiene solo valores deterministas para el spawning de un individuo específico(excepto por la randomización de la cara y cuerpo si no se especifican)
+#esto devuelve solo valores absolutamente especificos y deterministas para el
+# spawning de un individuo específico con caracteristicas especificadas
+# (excepto por la randomización de la cara y cuerpo si no se especifican)
 
 var name: String 
 var head_scale: Vector3 = Vector3.ONE
@@ -20,7 +22,7 @@ var extra_health_multiplier: float = 1
 var internal_state: BeingInternalState
 
 #only the key literals
-const K: Dictionary = { 
+const KCONS: Dictionary = { 
 	NAME = &"name",
 	SEX = &"sex",
 	RACE = &"race",
@@ -48,49 +50,49 @@ func construct(being_birth_dict: Dictionary) -> void:
 	var beingkind: BeingKind 
 	#endregion
 	var result
-	result = handle_key(K.NAME, being_birth_dict)
+	result = handle_key(KCONS.NAME, being_birth_dict)
 	if result: name = result; result = null
 	
-	result = handle_key(K.EXTRA_HEALTH_MULTI, being_birth_dict)
+	result = handle_key(KCONS.EXTRA_HEALTH_MULTI, being_birth_dict)
 	if result: extra_health_multiplier = result; result = null
 		
 	#result = handle_key("level", being_birth_dict)
 	#if result: level = result; result = null
 		
-	var race_id: StringName = being_birth_dict[K.RACE]
+	var race_id: StringName = being_birth_dict[KCONS.RACE]
 	
 	if race_id == &"controllable_random":
-		being_birth_dict[K.RACE] = &"random"
-		race = handle_key(K.RACE, being_birth_dict, GlobalData.controllable_races)
+		being_birth_dict[KCONS.RACE] = &"random"
+		race = handle_key(KCONS.RACE, being_birth_dict, GlobalData.controllable_races)
 	elif race_id == &"uncontrollable_random":
-		being_birth_dict[K.RACE] = &"random"
-		race = handle_key(K.RACE, being_birth_dict, GlobalData.uncontrollable_races)	
+		being_birth_dict[KCONS.RACE] = &"random"
+		race = handle_key(KCONS.RACE, being_birth_dict, GlobalData.uncontrollable_races)	
 	elif GlobalData.races[race_id] is ControllableRace:
-		race = handle_key(K.RACE, being_birth_dict, GlobalData.controllable_races)
+		race = handle_key(KCONS.RACE, being_birth_dict, GlobalData.controllable_races)
 	elif GlobalData.races[race_id] is UncontrollableRace:
-		race = handle_key(K.RACE, being_birth_dict, GlobalData.uncontrollable_races)
+		race = handle_key(KCONS.RACE, being_birth_dict, GlobalData.uncontrollable_races)
 	else:
 		push_error("not a valid race id")
 		
-	klass = handle_key(K.KLASS, being_birth_dict, GlobalData.klasses)
+	klass = handle_key(KCONS.KLASS, being_birth_dict, GlobalData.klasses)
 	
-	faction = handle_key(K.FACTION, being_birth_dict, GameData.factions)
+	faction = handle_key(KCONS.FACTION, being_birth_dict, GameData.factions)
 		
-	if being_birth_dict.has(K.FOLLOWERS):
+	if being_birth_dict.has(KCONS.FOLLOWERS):
 		# BUG, ARREGLAR. DICE  AHÍ. HAY Q ARREGLAR ETO
-		followers = GlobalData.klasses[being_birth_dict[K.FOLLOWERS]]
+		followers = GlobalData.klasses[being_birth_dict[KCONS.FOLLOWERS]]
 			
-	sprite_head = handle_key(K.HEAD, being_birth_dict, race.head_sprites_datas)
+	sprite_head = handle_key(KCONS.HEAD, being_birth_dict, race.head_sprites_datas)
 			
-	sprite_body = handle_key(K.BODY, being_birth_dict, race.body_sprites_datas) as BodySpriteData
+	sprite_body = handle_key(KCONS.BODY, being_birth_dict, race.body_sprites_datas) as BodySpriteData
 	
-	result = handle_key(K.HEAD_SCALE, being_birth_dict)
+	result = handle_key(KCONS.HEAD_SCALE, being_birth_dict)
 	if result: head_scale = result; result = null
 	
-	result = handle_key(K.BODY_SCALE, being_birth_dict)
+	result = handle_key(KCONS.BODY_SCALE, being_birth_dict)
 	if result: body_scale = result; result = null
 	
-	var sex_value = being_birth_dict[K.SEX]
+	var sex_value = being_birth_dict[KCONS.SEX]
 	
 	if sex_value is StringName or sex_value == Enums.Sex.ANY:
 		var sex_probs: Dictionary = {
@@ -103,28 +105,32 @@ func construct(being_birth_dict: Dictionary) -> void:
 	else:
 		push_error("invalid type for \"sex\" entry in birth dict")
 		
-	if being_birth_dict.has(K.BEINGKIND):
-		beingkind = handle_key(K.BEINGKIND, being_birth_dict, GlobalData.beingkinds)
+	if being_birth_dict.has(KCONS.BEINGKIND):
+		beingkind = handle_key(KCONS.BEINGKIND, being_birth_dict, GlobalData.beingkinds)
 
+	assert(sex && race && faction)
 	internal_state = BeingInternalState.new()
-	internal_state.construct_locally(sex, race, faction, null, klass, beingkind)
+	internal_state.construct_for_posterior_serialization(sex, race, faction, null, klass, beingkind)
 
 # TODO
 func construct_from_serialized(serialized_being_spawn_data: Dictionary) -> void:
 	pass
+	
+func serialize_being_internal_state() -> Dictionary:
+	return internal_state.serialize()
 
 func serialize() -> Dictionary:
 	var dict: Dictionary = {
-		K.NAME: name,
-		K.HEAD_SCALE: head_scale,
-		K.BODY_SCALE: body_scale,
-		K.HEAD: sprite_head.id,
-		K.BODY: sprite_body.id,
-		K.INTERNAL_STATE: internal_state.serialize(),
-		K.EXTRA_HEALTH_MULTI: extra_health_multiplier,
+		KCONS.NAME: name,
+		KCONS.HEAD_SCALE: head_scale,
+		KCONS.BODY_SCALE: body_scale,
+		KCONS.HEAD: sprite_head.id,
+		KCONS.BODY: sprite_body.id,
+		KCONS.INTERNAL_STATE: internal_state.serialize(),
+		KCONS.EXTRA_HEALTH_MULTI: extra_health_multiplier,
 		#extra_stats_multiplier,
 	}
-	#dict[K.FOLLOWERS] = get_array_of_ids(followers)
+	#dict[KCONS.FOLLOWERS] = get_array_of_ids(followers)
 	return dict
 
 #NO IMPLEMENTAR ESTA FUNCIÓN, PERO IMPLEMENTAR LA IDEA DE CARGAR STARTER CHARACTERS ASÍ NO PERDÉS TIEMPO RE-CREÁNDOLOS EN CADA LOBBY
@@ -152,7 +158,7 @@ func handle_key(key: StringName, being_birth_dict: Dictionary, data_structure = 
 		else: 
 			return being_birth_dict[key]
 	else:
-		print("key %s not found" % key)
+		push_warning("key %s not found" % key)
 
 func get_random(list_for_random: Array):
 	if list_for_random.size() > 0: return list_for_random[randi() % list_for_random.size()]

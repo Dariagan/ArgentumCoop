@@ -23,8 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="23_m410m"]
 [ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/lobby/character_characterization.tscn" id="24_741ey"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_ooptl"]
-metadata/_preview_in_3d_space_ = true
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_qkist"]
 
 [sub_resource type="PackedScene" id="PackedScene_63sr3"]
 _bundled = {
@@ -112,7 +111,7 @@ layer_2/name = "Layer2"
 layer_2/y_sort_enabled = true
 layer_2/z_index = 10
 script = ExtResource("7_itdl2")
-noise = SubResource("FastNoiseLite_ooptl")
+noise = SubResource("FastNoiseLite_qkist")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")

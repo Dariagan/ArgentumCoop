@@ -1,0 +1,5 @@
+[gd_resource type="Tile" format=3 uid="uid://b64q5xnhvrfu2"]
+
+[resource]
+z_level = 3
+source_atlas = 7

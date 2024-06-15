@@ -4,48 +4,48 @@ class_name BeingInternalState
 #para agregar más funcionalidad/estado, addchildear nodos hijos de estado
 # VA A HABER Q VER COMO SYNCEAR EN MP
 
-var carried_weight: int = 0
-var faction: Faction
+var _carried_weight: int = 0
+var _faction: Faction
 
-var sex: Enums.Sex
-var race: BasicRace #mover estos dos a una clase Characterization guardada en otro lado?
-var klass: Klass = null #mover estos dos a una clase Characterization guardada en otro lado?
+var _sex: Enums.Sex
+var _race: BasicRace #mover estos dos a una clase Characterization guardada en otro lado?
+var _klass: Klass = null #mover estos dos a una clase Characterization guardada en otro lado?
 
-var body: HarmableBody #contains health state for each body part
-var inventory: InventoryData = null# TODO USAR EL PLUGIN INVENTORYSYSTEM?
+var _body: HarmableBody #contains health state for each _body part
+var _inventory: InventoryData = null# TODO USAR EL PLUGIN INVENTORYSYSTEM?
 var skills_data = null
 
-var beingkind: BeingKind = null
+var _beingkind: BeingKind = null
 
 #necesario para que funciona  serialize()
-func construct_locally(sex: Enums.Sex, race:BasicRace, faction: Faction, body: HarmableBody, klass: Klass, beingkind: BeingKind):
-	self.sex = sex; self.race = race; self.faction = faction; self.body = body; self.klass= klass; self.beingkind = beingkind
+func construct_for_posterior_serialization(sex: Enums.Sex, race: BasicRace, faction: Faction, body: HarmableBody, klass: Klass, beingkind: BeingKind):
+	self._sex = sex; self._race = race; self._faction = faction; self._body = body; self._klass= klass; self._beingkind = beingkind
 
-# to be called only from RPC
-func construct(data: Dictionary) -> void:
-	sex = data["sex"]
+@rpc("call_local")
+func construct_from_seri(serialized_self: Dictionary) -> void:
+	_sex = serialized_self[BeingStatePreIniter.KCONS.SEX]
 	
-	faction = GameData.factions[data["faction"]]
-	#body = HarmableBody.new(data["body"])
+	_faction = GameData.factions[serialized_self[BeingStatePreIniter.KCONS.FACTION]]
+	#_body = HarmableBody.new(serialized_self["_body"])
 	
-	race = GlobalData.races[data["race"]]
-	if race is ControllableRace:
-		klass = GlobalData.klasses[data["klass"]]
+	_race = GlobalData.races[serialized_self[BeingStatePreIniter.KCONS.RACE]]
+	if _race is ControllableRace:
+		_klass = GlobalData.klasses[serialized_self[BeingStatePreIniter.KCONS.KLASS]]
 
 func get_max_speed() -> float:
-	var max_speed: float =  7 * race.combat_multipliers.speed 
-	if klass:
-		max_speed *= klass.combat_multipliers.speed
+	var max_speed: float =  7 * _race.combat_multipliers.speed 
+	if _klass:
+		max_speed *= _klass.combat_multipliers.speed
 	return max_speed
 
 func serialize() -> Dictionary:
-	assert(sex and race and faction)
+	assert(_sex and _race and _faction)
 	var data: Dictionary =  {
-		BeingStatePreIniter.K.SEX: sex,
-		BeingStatePreIniter.K.RACE: race.id,
-		#"body": body.serialize(),
-		BeingStatePreIniter.K.FACTION: faction.instance_id,
+		BeingStatePreIniter.KCONS.SEX: _sex,
+		BeingStatePreIniter.KCONS.RACE: _race.id,
+		#"_body": _body.serialize(),
+		BeingStatePreIniter.KCONS.FACTION: _faction.instance_id,
 		"inv": {}#.serialize()
 	}
-	if klass: data["klass"] = klass.id
+	if _klass: data[BeingStatePreIniter.KCONS.KLASS] = _klass.id
 	return data

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BeingKind" load_steps=2 format=3 uid="uid://bhd0ufukmdxnm"]
 
-[ext_resource type="Script" path="res://scripts/beings/initialization/beingkind.gd" id="1_161fn"]
+[ext_resource type="Script" path="res://scripts/beings/initialization/being_kind.gd" id="1_161fn"]
 
 [resource]
 script = ExtResource("1_161fn")

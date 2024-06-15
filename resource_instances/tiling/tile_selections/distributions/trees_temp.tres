@@ -11,3 +11,4 @@
 
 [resource]
 tiles = Array[Tile]([ExtResource("1_5qi7r"), ExtResource("2_4m2wt"), ExtResource("3_kyuhy"), ExtResource("4_l1xll"), ExtResource("5_78ubh"), ExtResource("6_jkx08"), ExtResource("7_x60vg"), ExtResource("8_r1wh3")])
+weights = PackedInt32Array(0, 0, 0, 0, 0, 0, 0, 0)

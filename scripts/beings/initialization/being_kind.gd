@@ -2,7 +2,7 @@ extends Resource
 ## akin to PawnKind in Rimworld
 class_name BeingKind
 
-@export var id: StringName = ""
+var id: StringName
 
 @export var race_id: StringName
 @export var klass_id: StringName = &"random"
@@ -34,7 +34,7 @@ class_name BeingKind
 #TODO hacer sets de tiles whitelisted comúnes para reutilizar
 @export var whitelisted_tiles_for_spawning: Dictionary = {}
 
-func serialize_rand_instance() -> Dictionary:
+func _instantiate_being_birth_dict() -> Dictionary:
 	assert(id and race_id)
 	
 	if GlobalData.controllable_races.has(race_id):
@@ -57,21 +57,23 @@ func serialize_rand_instance() -> Dictionary:
 	var b_scale: float = randf_range(body_scale_range.x, body_scale_range.y)
 	
 	var being_birth_dict: Dictionary = {
-		BeingStatePreIniter.K.NAME: WeightedChoice.pick(names_distribution),
-		BeingStatePreIniter.K.EXTRA_HEALTH_MULTI: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
-		BeingStatePreIniter.K.RACE: race_id,
-		BeingStatePreIniter.K.SEX: sex,
-		BeingStatePreIniter.K.KLASS: klass_id,
-		BeingStatePreIniter.K.HEAD: &"random" if not heads_distribution else WeightedChoice.pick(heads_distribution),
-		BeingStatePreIniter.K.BODY: &"random" if not bodies_distribution else WeightedChoice.pick(bodies_distribution),
-		BeingStatePreIniter.K.HEAD_SCALE: Vector3(h_scale, h_scale, h_scale),
-		BeingStatePreIniter.K.BODY_SCALE: Vector3(b_scale, b_scale, b_scale),
-		#BeingStatePreIniter.K.EQUIPMENT: null,
-		BeingStatePreIniter.K.BEINGKIND: id, 
+		BeingStatePreIniter.KCONS.NAME: WeightedChoice.pick(names_distribution),
+		BeingStatePreIniter.KCONS.EXTRA_HEALTH_MULTI: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
+		BeingStatePreIniter.KCONS.RACE: race_id,
+		BeingStatePreIniter.KCONS.SEX: sex,
+		BeingStatePreIniter.KCONS.KLASS: klass_id,
+		BeingStatePreIniter.KCONS.HEAD: &"random" if not heads_distribution else WeightedChoice.pick(heads_distribution),
+		BeingStatePreIniter.KCONS.BODY: &"random" if not bodies_distribution else WeightedChoice.pick(bodies_distribution),
+		BeingStatePreIniter.KCONS.HEAD_SCALE: Vector3(h_scale, h_scale, h_scale),
+		BeingStatePreIniter.KCONS.BODY_SCALE: Vector3(b_scale, b_scale, b_scale),
+		#BeingStatePreIniter.KCONS.EQUIPMENT: null,
+		BeingStatePreIniter.KCONS.BEINGKIND: id, 
 	}
 	return being_birth_dict
 
-func instantiate() -> BeingStatePreIniter:
+func instantiate(faction: StringName) -> BeingStatePreIniter:
 	var being_pre_init = BeingStatePreIniter.new()
-	being_pre_init.construct(serialize_rand_instance())
+	var birth_dict: Dictionary = _instantiate_being_birth_dict();
+	birth_dict[BeingStatePreIniter.KCONS.FACTION] = faction
+	being_pre_init.construct(birth_dict)
 	return being_pre_init;

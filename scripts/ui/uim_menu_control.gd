@@ -42,5 +42,3 @@ func _return_from_lobby_to_menu() -> void:
 func _on_lobby_removed_from_lobby(_kicked: bool) -> void:
 	_return_from_lobby_to_menu()
 # for joiner
-
-

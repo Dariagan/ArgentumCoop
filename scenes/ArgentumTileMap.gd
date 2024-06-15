@@ -1,11 +1,11 @@
 extends RustTileMap
 class_name GdTileMap
 
-@export var noise: FastNoiseLite
-
 var _beings: Dictionary # key(str): individual unique id. value: Being Scene. el multiplayerspawner se encarga del sync
 var tiles_states: Dictionary # key: posx_posy_zi (vec3, no un string). value: state object
-const WORLD_SIZE: Vector2i = Vector2i(5000, 5000)
+const WORLD_SIZE: Vector2i = Vector2i(10000, 10000)
+
+@export var noise: FastNoiseLite
 
 # IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
@@ -80,13 +80,7 @@ func birth_beingkind_at(beingkind_id: StringName, faction: StringName, loc_coord
 	assert(GlobalData.beingkinds.has(beingkind_id))
 	var beingkind: BeingKind = GlobalData.beingkinds[beingkind_id]
 	
-	var being_pre_init = BeingStatePreIniter.new()
-	var birth_dict: Dictionary = beingkind.serialize_rand_instance()
-	birth_dict[BeingStatePreIniter.K.FACTION] = faction
-	
-	being_pre_init.construct(birth_dict)
-	
-	return birth_being_at(being_pre_init, loc_coords)
+	return birth_being_at(beingkind.instantiate(faction), loc_coords)
 #endregion SPAWNING
 
 	

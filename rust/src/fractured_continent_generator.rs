@@ -148,8 +148,8 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
         else {
           tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Cont as usize).get_unid(rng));
 
-          if ! (beachness < BEACHER_CUTOFF - 0.05) {
-            let good_roll = rng.gen::<f32>()%4.0 + forester.get_noise_2d(rel_coords)*1.4 > FORESTER_CUTOFF;
+          if beachness < BEACHER_CUTOFF - 0.05 {
+            let good_roll = rng.gen_range(0.0..=4.0) + forester.get_noise_2d(rel_coords)*1.4 > FORESTER_CUTOFF;
             let rogue_tree = rng.gen_bool(1.0/1000.0);
 
             let place_tree = (good_roll || rogue_tree) && clear_of(trees, rel_coords, 3, false);
@@ -158,10 +158,11 @@ fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
               trees.insert(rel_coords);
               tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Tree as usize).get_unid(rng));
             }
-          }
-          else if rng.gen_bool(1.0/400.0) && clear_of(&bushes, rel_coords, 1, false){
-            bushes.insert(rel_coords);
-            tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Bush as usize).get_unid(rng));
+            
+            else if rng.gen_bool(1.0/400.0) && clear_of(&bushes, rel_coords, 1, false){
+              bushes.insert(rel_coords);
+              tiles_2b_placed.assign_unid_unchecked(unidordist_mapped2targets.drf().get_unchecked(Target::Bush as usize).get_unid(rng));
+            }
           }
         }
       }

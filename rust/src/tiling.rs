@@ -199,7 +199,7 @@ impl TryFrom<Gd<TileDistribution>> for UnidOrDist {
     if gd_tile_dist.weights.len() > gd_tile_dist.tiles.len() {
       return Err(TileDistributionError::MoreWeightsThanTiles{id: gd_tile_dist.id().clone()});
     }
-    if gd_tile_dist.weights.as_slice().iter().all(|&w| w <= 0) {
+    if gd_tile_dist.weights.is_empty() || gd_tile_dist.weights.as_slice().iter().all(|&w| w <= 0) {
       godot_warn!("TileDistributon id={}: None of the weights has a strictly positive value, setting all values to 1", gd_tile_dist.id());
       let tiles_len: usize = gd_tile_dist.tiles.len();
       let ori_weights_len = gd_tile_dist.weights.len();

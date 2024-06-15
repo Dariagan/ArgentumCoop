@@ -1,6 +1,5 @@
 [gd_resource type="Tile" format=3 uid="uid://5ek7hgr41e3t"]
 
 [resource]
-id = &"beach"
 source_atlas = 1
 modulo_tiling_area = Vector2i(4, 4)

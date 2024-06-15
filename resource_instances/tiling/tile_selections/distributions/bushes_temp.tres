@@ -1,0 +1,8 @@
+[gd_resource type="TileDistribution" load_steps=3 format=3 uid="uid://0n8xl1bnolyu"]
+
+[ext_resource type="Tile" uid="uid://dsbbwxolqljg4" path="res://resource_instances/tiling/tiles/structures/bushes/bush0.tres" id="1_xma2u"]
+[ext_resource type="Tile" uid="uid://b64q5xnhvrfu2" path="res://resource_instances/tiling/tiles/structures/bushes/bush1.tres" id="2_qr0cw"]
+
+[resource]
+tiles = Array[Tile]([ExtResource("1_xma2u"), ExtResource("2_qr0cw")])
+weights = PackedInt32Array(1, 1)
