@@ -1,7 +1,8 @@
 extends Resource
 class_name BasicRace
 
-@export var name: StringName = &" "
+var id: StringName
+@export var name: String = " "
 @export var icon: Texture2D
 
 @export var default_being_names: Array[StringName] = []
@@ -49,5 +50,3 @@ class_name BasicRace
 # value = 1 -> 100% of pawns are male 0 _> all pawns are female
 
 @export_range(0, 1) var males_ratio: float = 0.5
-
-

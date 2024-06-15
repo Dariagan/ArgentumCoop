@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_161fn")
 id = "basic_warrior"
-race_id = "controllable_human"
-klass_id = "random"
+race_id = &"human"
+klass_id = &"random"
 bodies_distribution = {}
 heads_distribution = {}
 sex = 0

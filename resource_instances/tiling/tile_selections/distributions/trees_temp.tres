@@ -1,0 +1,13 @@
+[gd_resource type="TileDistribution" load_steps=9 format=3 uid="uid://ddmptjvj0bxgo"]
+
+[ext_resource type="Tile" uid="uid://diriqgluyucyn" path="res://resource_instances/tiling/tiles/structures/trees/temperate/tree_temp0.tres" id="1_5qi7r"]
+[ext_resource type="Tile" uid="uid://dclune6eplqit" path="res://resource_instances/tiling/tiles/structures/trees/temperate/tree_temp1.tres" id="2_4m2wt"]
+[ext_resource type="Tile" uid="uid://c5jv3qwprtgtd" path="res://resource_instances/tiling/tiles/structures/trees/temperate/tree_temp2.tres" id="3_kyuhy"]
+[ext_resource type="Tile" uid="uid://cdanqso8go1bl" path="res://resource_instances/tiling/tiles/structures/trees/temperate/tree_temp3.tres" id="4_l1xll"]
+[ext_resource type="Tile" uid="uid://cdmn8uv43er1c" path="res://resource_instances/tiling/tiles/structures/trees/temperate/tree_temp4.tres" id="5_78ubh"]
+[ext_resource type="Tile" uid="uid://dwf2de1namxib" path="res://resource_instances/tiling/tiles/structures/trees/temperate/tree_temp5.tres" id="6_jkx08"]
+[ext_resource type="Tile" uid="uid://b0icxesd0aep4" path="res://resource_instances/tiling/tiles/structures/trees/temperate/tree_temp6.tres" id="7_x60vg"]
+[ext_resource type="Tile" uid="uid://w0617v6wvib6" path="res://resource_instances/tiling/tiles/structures/trees/temperate/tree_temp7.tres" id="8_r1wh3"]
+
+[resource]
+tiles = Array[Tile]([ExtResource("1_5qi7r"), ExtResource("2_4m2wt"), ExtResource("3_kyuhy"), ExtResource("4_l1xll"), ExtResource("5_78ubh"), ExtResource("6_jkx08"), ExtResource("7_x60vg"), ExtResource("8_r1wh3")])

@@ -1,11 +1,11 @@
 extends Resource
-## Defines a specific Being initialization
+## akin to PawnKind in Rimworld
 class_name BeingKind
 
 @export var id: StringName = ""
 
-@export var race_id: String
-@export var klass_id: String = "random"
+@export var race_id: StringName
+@export var klass_id: StringName = &"random"
 
 #meter los spritesdatas directamente?
 @export var bodies_distribution: Dictionary
@@ -17,7 +17,7 @@ class_name BeingKind
 @export var head_scale_range: Vector2 = Vector2.ONE
 @export var body_scale_range: Vector2 = Vector2.ONE
 
-@export var names_distribution: Dictionary = {"placeholder": 1}
+@export var names_distribution: Dictionary = {"placeholder_name": 1}
 @export var equipment_distribution: Dictionary
 @export var loot_distribution: Dictionary
 @export var raid_unit_cost: int = 100
@@ -36,9 +36,9 @@ class_name BeingKind
 
 func serialize_rand_instance() -> Dictionary:
 	assert(id and race_id)
-	if race_id.begins_with("controllable"):
-		assert(GlobalData.controllable_races.has(race_id))
-		if klass_id != "random":
+	
+	if GlobalData.controllable_races.has(race_id):
+		if klass_id != &"random":
 			assert(GlobalData.klasses.has(klass_id))
 	else:
 		assert(GlobalData.uncontrollable_races.has(race_id))
@@ -62,8 +62,8 @@ func serialize_rand_instance() -> Dictionary:
 		BeingStatePreIniter.K.RACE: race_id,
 		BeingStatePreIniter.K.SEX: sex,
 		BeingStatePreIniter.K.KLASS: klass_id,
-		BeingStatePreIniter.K.HEAD: "random" if not heads_distribution else WeightedChoice.pick(heads_distribution),
-		BeingStatePreIniter.K.BODY: "random" if not bodies_distribution else WeightedChoice.pick(bodies_distribution),
+		BeingStatePreIniter.K.HEAD: &"random" if not heads_distribution else WeightedChoice.pick(heads_distribution),
+		BeingStatePreIniter.K.BODY: &"random" if not bodies_distribution else WeightedChoice.pick(bodies_distribution),
 		BeingStatePreIniter.K.HEAD_SCALE: Vector3(h_scale, h_scale, h_scale),
 		BeingStatePreIniter.K.BODY_SCALE: Vector3(b_scale, b_scale, b_scale),
 		#BeingStatePreIniter.K.EQUIPMENT: null,

@@ -30,17 +30,17 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		if not player_start_data.has(BeingStatePreIniter.K.NAME):
 			player_start_data[BeingStatePreIniter.K.NAME] = "nameless_player%d"%i
 		if not player_start_data.has(BeingStatePreIniter.K.RACE):
-			player_start_data[BeingStatePreIniter.K.RACE] = "controllable_random"
+			player_start_data[BeingStatePreIniter.K.RACE] = &"controllable_random"
 		if not player_start_data.has(BeingStatePreIniter.K.KLASS):
-			player_start_data[BeingStatePreIniter.K.KLASS] = "random"
+			player_start_data[BeingStatePreIniter.K.KLASS] = &"random"
 		if not player_start_data.has(BeingStatePreIniter.K.SEX):
-			player_start_data[BeingStatePreIniter.K.SEX] = "random"
+			player_start_data[BeingStatePreIniter.K.SEX] = &"random"
 		if not player_start_data.has(BeingStatePreIniter.K.HEAD):
-			player_start_data[BeingStatePreIniter.K.HEAD] = "random"
+			player_start_data[BeingStatePreIniter.K.HEAD] = &"random"
 		if not player_start_data.has(BeingStatePreIniter.K.BODY):
-			player_start_data[BeingStatePreIniter.K.BODY] = "random"
+			player_start_data[BeingStatePreIniter.K.BODY] = &"random"
 		
-		player_start_data[BeingStatePreIniter.K.FACTION] = "player"	
+		player_start_data[BeingStatePreIniter.K.FACTION] = &"player"	
 		
 		#extra health para los protagonists
 		player_start_data[BeingStatePreIniter.K.EXTRA_HEALTH_MULTI] = 2	

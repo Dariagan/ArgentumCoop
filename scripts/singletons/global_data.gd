@@ -24,8 +24,8 @@ const uncontrollable_races_directories: Array[String] = ["res://resource_instanc
 const tile_selections_directories: Array[String] =["res://resource_instances/tiling/tile_selections/"]
 
 const klasses_directories: Array[String] = ["res://resource_instances/beings/klasses/"]
-const tiles_directories: Array[String] = ["res://resource_instances/tiling/tiles/terrain/", "res://resource_instances/tiling/tiles/buildings/"]
-const spawnable_scenes_directories: Array[String] = ["res://scenes/tiling/tiles/terrain/", "res://scenes/tiling/tiles/buildings/"]
+const tiles_directories: Array[String] = ["res://resource_instances/tiling/tiles/terrain/", "res://resource_instances/tiling/tiles/structures/"]
+const spawnable_scenes_directories: Array[String] = ["res://scenes/tiles/"]
 
 const beingkinds_directories: Array[String] = ["res://resource_instances/beings/beingkinds/"]
 #TODO hacer un player mods directory
@@ -73,7 +73,7 @@ func _init() -> void:
 	
 	beingkinds = _index_all_found_resource_instances(beingkinds_directories, true)
 	
-	spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
+	#spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
 #TODO CHEQUEAR COLLISION DE KEYS ENCONTRADAS ANTES DE METER AL DICT (PUSHEAR UN ERROR)
 func _index_all_found_resource_instances(directories: Array[String], check_subfolders: bool, use_safe_loader: bool = false) -> Dictionary:
@@ -88,7 +88,6 @@ func _index_all_found_resource_instances(directories: Array[String], check_subfo
 			var file_name = dir_access.get_next()
 			
 			while file_name != "":
-				
 				if !dir_access.current_is_dir():
 					var resource
 					if not use_safe_loader:
@@ -96,19 +95,23 @@ func _index_all_found_resource_instances(directories: Array[String], check_subfo
 					else:#NO USAR SI ESTÁ EN .res/ EL DIRECTORIO, NO HACE FALTA
 						resource = SafeResourceLoader.load(directory + file_name)
 					
-					if resource.has_method("is_valid") && ! resource.is_valid():
-						if resource.id:
-							printerr("%s doesn't meet specified validation condition, not loaded"%[resource.id])
-						else:
-							printerr("a resource without id doesn't meet specified validation condition, not loaded")
-						resource = null
+					if file_name == &"temperate":
+						print()
 					
-					if resource && "id" in resource:
-						assert(not table.has(resource.id))#check if resource with same id already loaded
+					if resource:
+						resource.id = StringName(file_name.trim_suffix(".tres"))						
+						if table.has(resource.id):
+							push_warning("a resource with id=%s is already present in target dict"%[resource.id])
+							resource = null
+					if resource:
+						if resource.has_method("validate") && not resource.validate():
+							printerr("resource %s doesn't meet its validation condition"%[file_name])
+							resource = null
+					if resource:
 						table[resource.id] = resource
-						print("Resource %s%s loaded" % [directory, file_name])
 					else:
-						printerr("File %s%s couldn't be loaded as a resource" % [directory, file_name])
+						printerr("%s%s was NOT added into its target dictionary" % [directory, file_name])
+					
 				elif check_subfolders:
 					var subdict: Dictionary = _index_all_found_resource_instances([directory+file_name+"/"], true)
 					for key in subdict:

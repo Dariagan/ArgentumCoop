@@ -19,6 +19,7 @@ var extra_health_multiplier: float = 1
 
 var internal_state: BeingInternalState
 
+#only the key literals
 const K: Dictionary = { 
 	NAME = &"name",
 	SEX = &"sex",
@@ -56,10 +57,17 @@ func construct(being_birth_dict: Dictionary) -> void:
 	#result = handle_key("level", being_birth_dict)
 	#if result: level = result; result = null
 		
-	var race_id: String = being_birth_dict[K.RACE]
-	if race_id.begins_with("controllable"):
+	var race_id: StringName = being_birth_dict[K.RACE]
+	
+	if race_id == &"controllable_random":
+		being_birth_dict[K.RACE] = &"random"
 		race = handle_key(K.RACE, being_birth_dict, GlobalData.controllable_races)
-	elif race_id.begins_with("controllable"):
+	elif race_id == &"uncontrollable_random":
+		being_birth_dict[K.RACE] = &"random"
+		race = handle_key(K.RACE, being_birth_dict, GlobalData.uncontrollable_races)	
+	elif GlobalData.races[race_id] is ControllableRace:
+		race = handle_key(K.RACE, being_birth_dict, GlobalData.controllable_races)
+	elif GlobalData.races[race_id] is UncontrollableRace:
 		race = handle_key(K.RACE, being_birth_dict, GlobalData.uncontrollable_races)
 	else:
 		push_error("not a valid race id")
@@ -84,7 +92,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 	
 	var sex_value = being_birth_dict[K.SEX]
 	
-	if sex_value is String or sex_value == Enums.Sex.ANY:
+	if sex_value is StringName or sex_value == Enums.Sex.ANY:
 		var sex_probs: Dictionary = {
 			Enums.Sex.MALE: race.males_ratio,
 			Enums.Sex.FEMALE: 1 - race.males_ratio
@@ -129,10 +137,10 @@ func get_array_of_ids(array_of_objects: Array) ->  Array:
 		array_ids.push_back(o.id)
 	return array_ids
 
-func handle_key(key: String, being_birth_dict: Dictionary, data_structure = null):
+func handle_key(key: StringName, being_birth_dict: Dictionary, data_structure = null):
 	if being_birth_dict.has(key):
 		if data_structure is Dictionary and data_structure.keys().size() > 0:
-			if not (being_birth_dict[key] as String).ends_with("random"):
+			if being_birth_dict[key] != &"random":
 				return data_structure[being_birth_dict[key]]
 			else:
 				return get_random(data_structure.values())
@@ -148,4 +156,3 @@ func handle_key(key: String, being_birth_dict: Dictionary, data_structure = null
 
 func get_random(list_for_random: Array):
 	if list_for_random.size() > 0: return list_for_random[randi() % list_for_random.size()]
-

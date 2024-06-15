@@ -25,11 +25,11 @@ impl SafeVec {
   pub fn is_strictly_smaller_than(&self, other: &Self) -> bool {self.lef < other.lef && self.right < other.right}
   pub fn is_strictly_smaller_than_unsvec(&self, other: UnsVec) -> bool {self.lef < other.lef as i32 && self.right < other.right as i32}
   pub fn all_bigger_than_min(&self, min: i32) -> Result<Self, String> {
-    if self.lef >= min && self.right >= min {
-      Ok(*self)
-    } else {
-      Err(format!("One or both values are less than the minimum value of {}", min))
-    }
+  if self.lef >= min && self.right >= min {
+    Ok(*self)
+  } else {
+    Err(format!("One or both values are less than the minimum value of {}", min))
+  }
   }
   pub fn is_strictly_bigger_than(&self, other: &Self) -> bool {self.lef > other.lef && self.right > other.right}
   pub fn is_any_comp_negative(&self) -> bool {self.lef < 0 || self.right < 0}
@@ -39,172 +39,172 @@ impl SafeVec {
   pub fn length(&self) -> f64 {self.distance_to(&SafeVec { lef: 0, right: 0 })}
   pub fn area(&self) -> usize {(self.lef * self.right).unsigned_abs() as usize}
   pub fn distance_to(&self, other: &Self) -> f64 {
-    (((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as f64).sqrt()
+  (((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as f64).sqrt()
   }
   pub fn distance_squared_to(&self, other: &Self) -> usize {
-    ((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as usize
+  ((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as usize
   }
 
   fn centered_iter(&self) -> impl Iterator<Item = SafeVec> {
-    (-(self.lef)/2..self.lef/2)
-        .zip(-(self.right)/2..self.right/2)
-        .map(SafeVec::from)
+  (-(self.lef)/2..self.lef/2)
+    .zip(-(self.right)/2..self.right/2)
+    .map(SafeVec::from)
   }
 }
 
 impl Add for SafeVec {
   type Output = SafeVec;
   fn add(self, other: SafeVec) -> SafeVec {
-    SafeVec {
-      lef: self.lef + other.lef,
-      right: self.right + other.right,
-    }
+  SafeVec {
+    lef: self.lef + other.lef,
+    right: self.right + other.right,
+  }
   }
 }
 impl AddAssign for SafeVec {
   fn add_assign(&mut self, other: SafeVec) {
-    self.lef += other.lef;
-    self.right += other.right;
+  self.lef += other.lef;
+  self.right += other.right;
   }
 }
 impl Sub for SafeVec {
   type Output = SafeVec;
   fn sub(self, other: SafeVec) -> SafeVec {
-    SafeVec {
-      lef: self.lef - other.lef,
-      right: self.right - other.right,
-    }
+  SafeVec {
+    lef: self.lef - other.lef,
+    right: self.right - other.right,
+  }
   }
 }
 impl SubAssign for SafeVec {
   fn sub_assign(&mut self, other: SafeVec) {
-    self.lef -= other.lef;
-    self.right -= other.right;
+  self.lef -= other.lef;
+  self.right -= other.right;
   }
 }
 impl Mul for SafeVec {
   type Output = SafeVec;
   fn mul(self, other: SafeVec) -> SafeVec {
-    SafeVec {
-      lef: self.lef * other.lef,
-      right: self.right * other.right,
-    }
+  SafeVec {
+    lef: self.lef * other.lef,
+    right: self.right * other.right,
+  }
   }
 }
 impl MulAssign for SafeVec {
   fn mul_assign(&mut self, other: SafeVec) {
-    self.lef *= other.lef;
-    self.right *= other.right;
+  self.lef *= other.lef;
+  self.right *= other.right;
   }
 }
 impl Div for SafeVec {
   type Output = SafeVec;
   fn div(self, other: SafeVec) -> SafeVec {
-    SafeVec {
-      lef: self.lef / other.lef,
-      right: self.right / other.right,
-    }
+  SafeVec {
+    lef: self.lef / other.lef,
+    right: self.right / other.right,
+  }
   }
 }
 impl DivAssign for SafeVec {
   fn div_assign(&mut self, other: SafeVec) {
-    self.lef /= other.lef;
-    self.right /= other.right;
+  self.lef /= other.lef;
+  self.right /= other.right;
   }
 }
 
 macro_rules! impl_operations_for_safevec {
   ($($t:ty),*) => {
-    $(
-        impl Mul<$t> for SafeVec {
-        type Output = SafeVec;
-        fn mul(self, number: $t) -> SafeVec {
-            SafeVec {
-                lef: (self.lef as f64 * number as f64) as i32,
-                right: (self.right as f64 * number as f64) as i32,
-            }
-        }
-        }
-        impl MulAssign<$t> for SafeVec {
-        fn mul_assign(&mut self, number: $t) {
-            self.lef = (self.lef as f64 * number as f64) as i32;
-            self.right = (self.right as f64 * number as f64) as i32;
-        }
-        }
-        impl Div<$t> for SafeVec {
-        type Output = SafeVec;
-        fn div(self, number: $t) -> SafeVec {
-            SafeVec {
-                lef: self.lef / number as i32,
-                right: self.right / number as i32,
-            }
-        }
-        }
-        impl DivAssign<$t> for SafeVec {
-            fn div_assign(&mut self, number: $t) {
-                self.lef /= number as i32;
-                self.right /= number as i32;
-            }
-        }
-    )*
+  $(
+    impl Mul<$t> for SafeVec {
+    type Output = SafeVec;
+    fn mul(self, number: $t) -> SafeVec {
+      SafeVec {
+        lef: (self.lef as f64 * number as f64) as i32,
+        right: (self.right as f64 * number as f64) as i32,
+      }
+    }
+    }
+    impl MulAssign<$t> for SafeVec {
+    fn mul_assign(&mut self, number: $t) {
+      self.lef = (self.lef as f64 * number as f64) as i32;
+      self.right = (self.right as f64 * number as f64) as i32;
+    }
+    }
+    impl Div<$t> for SafeVec {
+    type Output = SafeVec;
+    fn div(self, number: $t) -> SafeVec {
+      SafeVec {
+        lef: self.lef / number as i32,
+        right: self.right / number as i32,
+      }
+    }
+    }
+    impl DivAssign<$t> for SafeVec {
+      fn div_assign(&mut self, number: $t) {
+        self.lef /= number as i32;
+        self.right /= number as i32;
+      }
+    }
+  )*
   }
 }
 impl_operations_for_safevec!(i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize);
 impl Neg for SafeVec {
-    type Output = SafeVec;
-    fn neg(self) -> SafeVec {
-        SafeVec {
-            lef: -self.lef,
-            right: -self.right,
-        }
+  type Output = SafeVec;
+  fn neg(self) -> SafeVec {
+    SafeVec {
+      lef: -self.lef,
+      right: -self.right,
     }
+  }
 }
 impl PartialOrd for SafeVec {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
+  fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+    Some(self.cmp(other))
+  }
 }
 impl Ord for SafeVec {
-    fn cmp(&self, other: &Self) -> Ordering {
-      match self.lef.cmp(&other.lef) {
-        Ordering::Equal => self.right.cmp(&other.right),
-        other => other,
-      }
+  fn cmp(&self, other: &Self) -> Ordering {
+    match self.lef.cmp(&other.lef) {
+    Ordering::Equal => self.right.cmp(&other.right),
+    other => other,
     }
+  }
 }
 impl Hash for SafeVec {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_i32(self.lef*31 + self.right)
-    }
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    state.write_i32(self.lef*31 + self.right)
+  }
 }
 impl fmt::Display for SafeVec {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {})", self.lef, self.right)
-    }
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "({}, {})", self.lef, self.right)
+  }
 }
 
 impl From<Vector2i> for SafeVec {
-    fn from(godot_vector: Vector2i) -> Self {
-        SafeVec { lef: godot_vector.x, right: godot_vector.y}
-    }
+  fn from(godot_vector: Vector2i) -> Self {
+    SafeVec { lef: godot_vector.x, right: godot_vector.y}
+  }
 }
 impl Into<Vector2i> for SafeVec {
-    fn into(self) -> Vector2i {
-        Vector2i { x: self.lef, y: self.right }
-    }
+  fn into(self) -> Vector2i {
+    Vector2i { x: self.lef, y: self.right }
+  }
 }
 impl Into<String> for SafeVec {
-    fn into(self) -> String {
-        format!("SV({}, {})", self.lef, self.right)
-    }
+  fn into(self) -> String {
+    format!("SV({}, {})", self.lef, self.right)
+  }
 }
 impl From<(i32, i32)> for SafeVec {
-    fn from(value: (i32, i32)) -> Self {
-        Self { lef: value.0, right: value.1 }
-    }
+  fn from(value: (i32, i32)) -> Self {
+    Self { lef: value.0, right: value.1 }
+  }
 }
 impl From<(u32, u32)> for SafeVec {
-    fn from(value: (u32, u32)) -> Self {
-        Self { lef: value.0 as i32, right: value.1 as i32}
-    }
+  fn from(value: (u32, u32)) -> Self {
+    Self { lef: value.0 as i32, right: value.1 as i32}
+  }
 }

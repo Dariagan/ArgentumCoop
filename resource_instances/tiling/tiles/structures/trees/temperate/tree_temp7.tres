@@ -1,0 +1,7 @@
+[gd_resource type="Tile" format=3 uid="uid://w0617v6wvib6"]
+
+[resource]
+id = &"tree_temp7"
+z_level = 3
+source_atlas = 4
+origin_position = Vector2i(56, 0)
