@@ -22,7 +22,7 @@ var extra_health_multiplier: float = 1
 var internal_state: BeingInternalState
 
 #only the key literals
-const KCONS: Dictionary = { 
+const KEYS: Dictionary = { 
 	NAME = &"name",
 	SEX = &"sex",
 	RACE = &"race",
@@ -42,7 +42,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 	assert(being_birth_dict != null && being_birth_dict != {})
 	
 	#region are constructed inside internal_state
-	var sex: Enums.Sex
+	var sex: Constants.Sex
 	var race: BasicRace
 	var klass: Klass
 	var faction: Faction
@@ -50,63 +50,63 @@ func construct(being_birth_dict: Dictionary) -> void:
 	var beingkind: BeingKind 
 	#endregion
 	var result
-	result = handle_key(KCONS.NAME, being_birth_dict)
+	result = handle_key(KEYS.NAME, being_birth_dict)
 	if result: name = result; result = null
 	
-	result = handle_key(KCONS.EXTRA_HEALTH_MULTI, being_birth_dict)
+	result = handle_key(KEYS.EXTRA_HEALTH_MULTI, being_birth_dict)
 	if result: extra_health_multiplier = result; result = null
 		
 	#result = handle_key("level", being_birth_dict)
 	#if result: level = result; result = null
 		
-	var race_id: StringName = being_birth_dict[KCONS.RACE]
+	var race_id: StringName = being_birth_dict[KEYS.RACE]
 	
 	if race_id == &"controllable_random":
-		being_birth_dict[KCONS.RACE] = &"random"
-		race = handle_key(KCONS.RACE, being_birth_dict, GlobalData.controllable_races)
+		being_birth_dict[KEYS.RACE] = &"random"
+		race = handle_key(KEYS.RACE, being_birth_dict, GlobalData.controllable_races)
 	elif race_id == &"uncontrollable_random":
-		being_birth_dict[KCONS.RACE] = &"random"
-		race = handle_key(KCONS.RACE, being_birth_dict, GlobalData.uncontrollable_races)	
+		being_birth_dict[KEYS.RACE] = &"random"
+		race = handle_key(KEYS.RACE, being_birth_dict, GlobalData.uncontrollable_races)	
 	elif GlobalData.races[race_id] is ControllableRace:
-		race = handle_key(KCONS.RACE, being_birth_dict, GlobalData.controllable_races)
+		race = handle_key(KEYS.RACE, being_birth_dict, GlobalData.controllable_races)
 	elif GlobalData.races[race_id] is UncontrollableRace:
-		race = handle_key(KCONS.RACE, being_birth_dict, GlobalData.uncontrollable_races)
+		race = handle_key(KEYS.RACE, being_birth_dict, GlobalData.uncontrollable_races)
 	else:
 		push_error("not a valid race id")
 		
-	klass = handle_key(KCONS.KLASS, being_birth_dict, GlobalData.klasses)
+	klass = handle_key(KEYS.KLASS, being_birth_dict, GlobalData.klasses)
 	
-	faction = handle_key(KCONS.FACTION, being_birth_dict, GameData.factions)
+	faction = handle_key(KEYS.FACTION, being_birth_dict, GameData.factions)
 		
-	if being_birth_dict.has(KCONS.FOLLOWERS):
+	if being_birth_dict.has(KEYS.FOLLOWERS):
 		# BUG, ARREGLAR. DICE  AHÍ. HAY Q ARREGLAR ETO
-		followers = GlobalData.klasses[being_birth_dict[KCONS.FOLLOWERS]]
+		followers = GlobalData.klasses[being_birth_dict[KEYS.FOLLOWERS]]
 			
-	sprite_head = handle_key(KCONS.HEAD, being_birth_dict, race.head_sprites_datas)
+	sprite_head = handle_key(KEYS.HEAD, being_birth_dict, race.head_sprites_datas)
 			
-	sprite_body = handle_key(KCONS.BODY, being_birth_dict, race.body_sprites_datas) as BodySpriteData
+	sprite_body = handle_key(KEYS.BODY, being_birth_dict, race.body_sprites_datas) as BodySpriteData
 	
-	result = handle_key(KCONS.HEAD_SCALE, being_birth_dict)
+	result = handle_key(KEYS.HEAD_SCALE, being_birth_dict)
 	if result: head_scale = result; result = null
 	
-	result = handle_key(KCONS.BODY_SCALE, being_birth_dict)
+	result = handle_key(KEYS.BODY_SCALE, being_birth_dict)
 	if result: body_scale = result; result = null
 	
-	var sex_value = being_birth_dict[KCONS.SEX]
+	var sex_value = being_birth_dict[KEYS.SEX]
 	
-	if sex_value is StringName or sex_value == Enums.Sex.ANY:
+	if sex_value is StringName or sex_value == Constants.Sex.ANY:
 		var sex_probs: Dictionary = {
-			Enums.Sex.MALE: race.males_ratio,
-			Enums.Sex.FEMALE: 1 - race.males_ratio
+			Constants.Sex.MALE: race.males_ratio,
+			Constants.Sex.FEMALE: 1 - race.males_ratio
 		}
 		sex = WeightedChoice.pick(sex_probs)
-	elif sex_value is Enums.Sex:
+	elif sex_value is Constants.Sex:
 		sex = sex_value
 	else:
 		push_error("invalid type for \"sex\" entry in birth dict")
 		
-	if being_birth_dict.has(KCONS.BEINGKIND):
-		beingkind = handle_key(KCONS.BEINGKIND, being_birth_dict, GlobalData.beingkinds)
+	if being_birth_dict.has(KEYS.BEINGKIND):
+		beingkind = handle_key(KEYS.BEINGKIND, being_birth_dict, GlobalData.beingkinds)
 
 	assert(sex && race && faction)
 	internal_state = BeingInternalState.new()
@@ -121,16 +121,16 @@ func serialize_being_internal_state() -> Dictionary:
 
 func serialize() -> Dictionary:
 	var dict: Dictionary = {
-		KCONS.NAME: name,
-		KCONS.HEAD_SCALE: head_scale,
-		KCONS.BODY_SCALE: body_scale,
-		KCONS.HEAD: sprite_head.id,
-		KCONS.BODY: sprite_body.id,
-		KCONS.INTERNAL_STATE: internal_state.serialize(),
-		KCONS.EXTRA_HEALTH_MULTI: extra_health_multiplier,
+		KEYS.NAME: name,
+		KEYS.HEAD_SCALE: head_scale,
+		KEYS.BODY_SCALE: body_scale,
+		KEYS.HEAD: sprite_head.id,
+		KEYS.BODY: sprite_body.id,
+		KEYS.INTERNAL_STATE: internal_state.serialize(),
+		KEYS.EXTRA_HEALTH_MULTI: extra_health_multiplier,
 		#extra_stats_multiplier,
 	}
-	#dict[KCONS.FOLLOWERS] = get_array_of_ids(followers)
+	#dict[KEYS.FOLLOWERS] = get_array_of_ids(followers)
 	return dict
 
 #NO IMPLEMENTAR ESTA FUNCIÓN, PERO IMPLEMENTAR LA IDEA DE CARGAR STARTER CHARACTERS ASÍ NO PERDÉS TIEMPO RE-CREÁNDOLOS EN CADA LOBBY

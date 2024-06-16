@@ -54,7 +54,7 @@ pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relat
 
 
 #[inline]
-pub fn get_continentness(continenter: SharedNoise, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
+pub fn calc_continentness(continenter: SharedNoise, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
   let bff = crate::formation_generator::get_border_farness_factor(rel_coords, size, power);
   let val = bff * continenter.get_noise_2d(rel_coords + offset.unwrap_or_default());
   val
@@ -67,7 +67,7 @@ pub fn noise_surpasses_cutoff(fast_noise_lite: SharedNoise, rel_coords: UnsVec, 
 pub fn val_surpasses_cutoff(val: f32, cutoff: f32) ->(f32, bool){(val, val > cutoff)}
 
 pub fn get_border_farness_factor(rel_coords: UnsVec, world_size: UnsVec, power: Option<f32>) -> f32 {
-  let power = power.unwrap_or(2.5);
+  let power = power.unwrap_or(3.0);
 
   let horizontal_border_closeness: f32 = ((rel_coords.lef as f32 - world_size.lef as f32/2.0)/(world_size.lef as f32/2.0)).abs().powf(power);
   let vertical_border_closeness: f32 = ((rel_coords.right as f32 - world_size.right as f32/2.0)/(world_size.right as f32/2.0)).abs().powf(power);

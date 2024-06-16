@@ -8,7 +8,7 @@ class_name SpriteData
 
 @export var frames: SpriteFrames
 
-@export var sex: Enums.Sex = Enums.Sex.ANY
+@export var sex: Constants.Sex = Constants.Sex.ANY
 @export var animation_states: Array[StringName] = [&"idle"]
 
 @export var offset_global: Vector2 = Vector2.ZERO

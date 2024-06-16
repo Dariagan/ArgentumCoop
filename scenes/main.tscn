@@ -24,6 +24,7 @@
 [ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/lobby/character_characterization.tscn" id="24_741ey"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_qkist"]
+noise_type = 0
 
 [sub_resource type="PackedScene" id="PackedScene_63sr3"]
 _bundled = {

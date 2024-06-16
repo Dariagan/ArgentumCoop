@@ -7,6 +7,7 @@ pub struct Matrix<T: Default + Clone> {
   size: UnsVec,
   area: usize,
 }
+#[allow(dead_code)]
 impl<T: Default + Clone> Matrix<T> {
   pub fn size(&self) -> UnsVec {self.size}
   pub fn area(&self) -> usize {self.area}
@@ -45,13 +46,13 @@ impl<T: Default + Clone> IndexMut<UnsVec> for Matrix<T> {
     unsafe{self.flattened_matrix.get_unchecked_mut(coords.flat_index(&self.size))}
   }
 }
-
 pub struct DownScalingMatrix<T: Default + Clone> {
   downscale_factor: u8,
   flattened_matrix: Vec<T>,
   downscaled_size: UnsVec,
   area: usize,
 }
+#[allow(dead_code)]
 impl<T: Default + Clone> DownScalingMatrix<T> {
   pub fn size(&self) -> UnsVec {self.downscaled_size}
   pub fn area(&self) -> usize {self.area}

@@ -11,7 +11,7 @@ var id: StringName
 @export var bodies_distribution: Dictionary
 @export var heads_distribution: Dictionary
 
-@export var sex: Enums.Sex = Enums.Sex.ANY
+@export var sex: Constants.Sex = Constants.Sex.ANY
 
 @export var extra_health_multiplier_range: Vector2 = Vector2.ONE
 @export var head_scale_range: Vector2 = Vector2.ONE
@@ -57,23 +57,23 @@ func _instantiate_being_birth_dict() -> Dictionary:
 	var b_scale: float = randf_range(body_scale_range.x, body_scale_range.y)
 	
 	var being_birth_dict: Dictionary = {
-		BeingStatePreIniter.KCONS.NAME: WeightedChoice.pick(names_distribution),
-		BeingStatePreIniter.KCONS.EXTRA_HEALTH_MULTI: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
-		BeingStatePreIniter.KCONS.RACE: race_id,
-		BeingStatePreIniter.KCONS.SEX: sex,
-		BeingStatePreIniter.KCONS.KLASS: klass_id,
-		BeingStatePreIniter.KCONS.HEAD: &"random" if not heads_distribution else WeightedChoice.pick(heads_distribution),
-		BeingStatePreIniter.KCONS.BODY: &"random" if not bodies_distribution else WeightedChoice.pick(bodies_distribution),
-		BeingStatePreIniter.KCONS.HEAD_SCALE: Vector3(h_scale, h_scale, h_scale),
-		BeingStatePreIniter.KCONS.BODY_SCALE: Vector3(b_scale, b_scale, b_scale),
-		#BeingStatePreIniter.KCONS.EQUIPMENT: null,
-		BeingStatePreIniter.KCONS.BEINGKIND: id, 
+		Constants.KEYS.NAME: WeightedChoice.pick(names_distribution),
+		Constants.KEYS.EXTRA_HEALTH_MULTI: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
+		Constants.KEYS.RACE: race_id,
+		Constants.KEYS.SEX: sex,
+		Constants.KEYS.KLASS: klass_id,
+		Constants.KEYS.HEAD: &"random" if not heads_distribution else WeightedChoice.pick(heads_distribution),
+		Constants.KEYS.BODY: &"random" if not bodies_distribution else WeightedChoice.pick(bodies_distribution),
+		Constants.KEYS.HEAD_SCALE: Vector3(h_scale, h_scale, h_scale),
+		Constants.KEYS.BODY_SCALE: Vector3(b_scale, b_scale, b_scale),
+		#Constants.KEYS.EQUIPMENT: null,
+		Constants.KEYS.BEINGKIND: id, 
 	}
 	return being_birth_dict
 
 func instantiate(faction: StringName) -> BeingStatePreIniter:
 	var being_pre_init = BeingStatePreIniter.new()
 	var birth_dict: Dictionary = _instantiate_being_birth_dict();
-	birth_dict[BeingStatePreIniter.KCONS.FACTION] = faction
+	birth_dict[Constants.KEYS.FACTION] = faction
 	being_pre_init.construct(birth_dict)
 	return being_pre_init;

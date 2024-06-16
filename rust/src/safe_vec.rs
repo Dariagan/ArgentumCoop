@@ -12,7 +12,7 @@ pub struct SafeVec {
   pub lef: i32,
   pub right: i32,
 }
-
+#[allow(dead_code)]
 impl SafeVec {
   pub fn new(lef: i32, right: i32) -> Self {SafeVec { lef, right }}
 
@@ -22,7 +22,7 @@ impl SafeVec {
   pub fn sum_right(&self, j: i32) -> Self {SafeVec {lef: self.lef, right: self.right + j,}}
   pub fn compare_lef(&self, other: &Self) -> Ordering {self.lef.cmp(&other.lef)}
   pub fn compare_right(&self, other: &Self) -> Ordering {self.right.cmp(&other.right)}
-  pub fn is_strictly_smaller_than(&self, other: &Self) -> bool {self.lef < other.lef && self.right < other.right}
+  pub fn is_strictly_smaller_than(&self, other: Self) -> bool {self.lef < other.lef && self.right < other.right}
   pub fn is_strictly_smaller_than_unsvec(&self, other: UnsVec) -> bool {self.lef < other.lef as i32 && self.right < other.right as i32}
   pub fn all_bigger_than_min(&self, min: i32) -> Result<Self, String> {
   if self.lef >= min && self.right >= min {
@@ -31,6 +31,7 @@ impl SafeVec {
     Err(format!("One or both values are less than the minimum value of {}", min))
   }
   }
+  pub fn is_equal_or_bigger_than(&self, other: Self) -> bool {self.lef >= other.lef && self.right >= other.right}
   pub fn is_strictly_bigger_than(&self, other: &Self) -> bool {self.lef > other.lef && self.right > other.right}
   pub fn is_any_comp_negative(&self) -> bool {self.lef < 0 || self.right < 0}
   pub fn is_non_negative(&self) -> bool {self.lef >= 0 && self.right >= 0}
@@ -206,5 +207,10 @@ impl From<(i32, i32)> for SafeVec {
 impl From<(u32, u32)> for SafeVec {
   fn from(value: (u32, u32)) -> Self {
     Self { lef: value.0 as i32, right: value.1 as i32}
+  }
+}
+impl From<UnsVec> for SafeVec {
+  fn from(value: UnsVec) -> Self {
+    Self { lef: value.lef as i32, right: value.right as i32}
   }
 }

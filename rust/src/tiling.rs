@@ -74,11 +74,7 @@ impl IResource for Tile{
     alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, unid: None }
   }
 }
-impl fmt::Display for TileUnid {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "tunid{}", self.0)
-  }
-}//alt+z
+impl fmt::Display for TileUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Tunid{}", self.0)}}//alt+z
 impl Into<TileDto> for Gd<Tile> {fn into(self) -> TileDto {let gd_tile = self.bind(); TileDto { z_level: gd_tile.z_level(), source_atlas: gd_tile.source_atlas(), origin_position: gd_tile.origin_position(), modulo_tiling_area: gd_tile.modulo_tiling_area(), alternative_id: gd_tile.alternative_id(), random_scale_range: gd_tile.random_scale_range(), flipped_at_random: gd_tile.flipped_at_random() }}}
 pub struct TileDto{
   pub z_level: TileZLevel,

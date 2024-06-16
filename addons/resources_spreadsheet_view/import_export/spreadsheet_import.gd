@@ -197,7 +197,7 @@ func generate_script(entries, has_classname = true) -> GDScript:
 #	else:
 	source = "extends Resource\r\n\r\n"
 	
-	# Enums
+	# Constants
 	uniques = get_uniques(entries)
 	for i in prop_types.size():
 		if prop_types[i] == PropType.ENUM:

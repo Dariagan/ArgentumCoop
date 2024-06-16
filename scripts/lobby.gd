@@ -159,32 +159,32 @@ func _receive_player_username(username: String) -> void:
 
 #region Character creation synchronization
 func _on_name_selected(new_name: String):
-	if new_name: _update_characterization_for_everyone.rpc("name", new_name)
-	else: _update_characterization_for_everyone.rpc("name")
+	if new_name: _update_characterization_for_everyone.rpc(Constants.KEYS.NAME, new_name)
+	else: _update_characterization_for_everyone.rpc(Constants.KEYS.NAME)
 func _on_race_selected(race: ControllableRace):
-	if race: _update_characterization_for_everyone.rpc("race", race.id)
-	else: _update_characterization_for_everyone.rpc("race")
-func _on_sex_selected(sex: Enums.Sex):
-	if sex > 0: _update_characterization_for_everyone.rpc("sex", sex)
-	else: _update_characterization_for_everyone.rpc("sex")
+	if race: _update_characterization_for_everyone.rpc(Constants.KEYS.RACE, race.id)
+	else: _update_characterization_for_everyone.rpc(Constants.KEYS.RACE)
+func _on_sex_selected(sex: Constants.Sex):
+	if sex > 0: _update_characterization_for_everyone.rpc(Constants.KEYS.SEX, sex)
+	else: _update_characterization_for_everyone.rpc(Constants.KEYS.SEX)
 	
 func _on_head_selected(head : SpriteData):
 	if head: 
-		_update_characterization_for_everyone.rpc("head", head.id)
+		_update_characterization_for_everyone.rpc(Constants.KEYS.HEAD, head.id)
 	else: 
-		_update_characterization_for_everyone.rpc("head")
+		_update_characterization_for_everyone.rpc(Constants.KEYS.HEAD)
 	
 func _on_class_selected(klass: Klass):
-	if klass: _update_characterization_for_everyone.rpc("klass", klass.id)
-	else: _update_characterization_for_everyone.rpc("klass")
+	if klass: _update_characterization_for_everyone.rpc(Constants.KEYS.KLASS, klass.id)
+	else: _update_characterization_for_everyone.rpc(Constants.KEYS.KLASS)
 func _on_follower_selected(follower: UncontrollableRace):
-	if follower: _update_characterization_for_everyone.rpc("follower", [follower.id])
-	else: _update_characterization_for_everyone.rpc("follower")
+	if follower: _update_characterization_for_everyone.rpc(Constants.KEYS.FOLLOWERS, [follower.id])
+	else: _update_characterization_for_everyone.rpc(Constants.KEYS.FOLLOWERS)
 func _on_body_scale_changed(new_scale: Vector3):
-	_update_characterization_for_everyone.rpc("body_scale", new_scale)
+	_update_characterization_for_everyone.rpc(Constants.KEYS.BODY_SCALE, new_scale)
 	
 @rpc("call_local", "any_peer")
-func _update_characterization_for_everyone(characterization_key: String, value = null): 
+func _update_characterization_for_everyone(characterization_key: StringName, value = null): 
 	var sender_i: int = _peers.find(multiplayer.get_remote_sender_id())
 	if value != null:
 		_characters_spawn_data[sender_i][characterization_key] = value

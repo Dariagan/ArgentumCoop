@@ -36,7 +36,7 @@ var id: StringName
 @export var diets: Array[Diet] = []
 
 @export_category("Abilities")
-@export var can_walk_on: Array[Enums.TerrainType] = [Enums.TerrainType.LAND]
+@export var can_walk_on: Array[Constants.TerrainType] = [Constants.TerrainType.LAND]
 @export var can_vent: bool = false
 @export var can_climb: bool = false#hacer int de nivel 0-10?
 

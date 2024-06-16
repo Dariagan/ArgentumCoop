@@ -14,6 +14,7 @@ pub struct UnsVec {
 }
 pub const ZERO: UnsVec = UnsVec{lef:0,right:0};
 
+#[allow(dead_code)]
 impl UnsVec {
   pub fn new(lef: u32, right: u32) -> Self {UnsVec { lef, right }}
 
@@ -25,6 +26,7 @@ impl UnsVec {
   pub fn compare_right(&self, other: &Self) -> Ordering {self.right.cmp(&other.right)}
   pub fn is_strictly_smaller_than(&self, other: Self) -> bool {self.lef < other.lef && self.right < other.right}
   pub fn is_strictly_bigger_than(&self, other: &Self) -> bool {self.lef > other.lef && self.right > other.right}
+  pub fn is_bigger_or_equal_than(&self, other: Self) -> bool {self.lef >= other.lef && self.right >= other.right}
   pub fn flat_index(&self, size: &UnsVec) -> usize{(self.lef*size.lef + self.right) as usize}
   pub fn length(&self) -> f64 {self.distance_to(&UnsVec { lef: 0, right: 0 })}
   pub fn length_f32(&self) -> f32 {self.distance_to(&UnsVec { lef: 0, right: 0 }) as f32}
@@ -35,6 +37,13 @@ impl UnsVec {
   }
   pub fn mod_unsv(&self, modder: UnsVec) -> UnsVec {UnsVec{lef: self.lef%modder.lef, right: self.right%modder.right}}
   pub fn mod_u32(&self, val: u32) -> UnsVec {UnsVec{lef: self.lef%val, right: self.right%val}}
+
+  pub fn within_bounds_centered(&self, checked: SafeVec) -> bool{
+    let top_left: SafeVec = SafeVec::from(*self)/2.neg();
+    let bottom_right: SafeVec = SafeVec::from(*self)/2;
+    let checked: SafeVec = checked.into();
+    checked.is_equal_or_bigger_than(top_left) && checked.is_strictly_smaller_than(bottom_right)
+  }
 
 
   pub fn distance_to(&self, other: &Self) -> f64 {

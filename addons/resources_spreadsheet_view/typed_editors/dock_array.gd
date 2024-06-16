@@ -24,7 +24,7 @@ func try_edit_value(value, type, property_hint) -> bool:
 		return false
 
 	if sheet.column_hint_strings[sheet.get_selected_column()][0].begins_with("2/2:"):
-		# For enums, prefer the specialized dock.
+		# For Constants, prefer the specialized dock.
 		return false
 
 	_stored_type = type

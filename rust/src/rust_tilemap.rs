@@ -1,16 +1,16 @@
-use std::borrow::Borrow;
 
 use crate::formation_generator::{FormGenEnum, IFormationGenerator, };
 use crate::fractured_continent_generator::FracturedContinentGenerator;
 use crate::safe_vec::SafeVec;
 use crate::uns_vec::{UnsVec, ZERO};
-use crate::{formation_generator, world_matrix::{self, *}};
+use crate::world_matrix::*;
 use godot::builtin::Dictionary;
 use godot::engine::{ITileMap, TileMap};
-use godot::global::print;
 use godot::prelude::*;
-use num_traits::FromPrimitive;
-use rand::{thread_rng, Rng};
+use gxhash::{HashMap, HashSet, HashSetExt as _};
+use std::borrow::Borrow;
+use std::fmt;
+use std::hash::{Hash, Hasher};
 
 #[derive(GodotClass)]
 #[class(base=TileMap)]
@@ -21,6 +21,10 @@ struct RustTileMap {
   world_matrix: Option<WorldMatrix>,
   base: Base<TileMap>,
   world_size: UnsVec,
+  //don't remove an entry directly
+  being_loaded_tiles_map: HashMap<BeingUnid, HashSet<UnsVec>>,
+  //don't reduce this directly
+  tile_shared_loads_count: HashMap<UnsVec, i64>,
 }
 #[godot_api]
 impl ITileMap for RustTileMap {
@@ -30,11 +34,12 @@ impl ITileMap for RustTileMap {
       seed: 0,
       world_matrix: None,
       tile_nid_mapping: Vec::new(),
-      world_size: ZERO
+      world_size: ZERO,
+      being_loaded_tiles_map: Default::default(),
+      tile_shared_loads_count: Default::default()
     }
   }
 }
-
 #[godot_api]
 impl RustTileMap {
   #[func]
@@ -95,28 +100,81 @@ impl RustTileMap {
   }
 
   #[func]
-  fn load_tiles_around(&mut self, _local_coords: Vector2, chunk_size: Vector2i, being_nid: i64) {
+  fn load_tiles_around(&mut self, _local_coords: Vector2, chunk_size: Vector2i, being_unid: i64) {
+
     let chunk_size = SafeVec::from(chunk_size).all_bigger_than_min(10).expect("chunk size is smaller than minimum 10");
+    let being_unid = BeingUnid(being_unid);
     
     let being_coords: SafeVec = self.base().local_to_map(_local_coords).into(); let _local_coords = ();
 
     let world_size = self.world_size;
 
-    //comparar vs for loops comúnes nesteados
     for chunk_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))
       .map(|vec| SafeVec::from(vec) + being_coords)
       .filter(|vec| vec.is_non_negative())
       .map(|vec|unsafe{UnsVec::try_from(vec).unwrap_unchecked()})
-      .filter(|vec| vec.is_strictly_smaller_than(world_size)){
-        unsafe{
-          //TODO NO HACER SET CELL SI LA TILE YA ESTÁ CARGADA (CAUSA LAG, HACERLO COMO EN C++)
-          let tiles = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];//ojo con esto mientras se genera
+      .filter(|vec| vec.is_strictly_smaller_than(world_size)){unsafe{
+        if ! self.tile_shared_loads_count.contains_key(&chunk_coord) {
           
-          let non_null_tiles = tiles.iter().filter(|&&unid| unid != TileUnid::default());
+          self.tile_shared_loads_count.insert(chunk_coord, 1);
 
-          non_null_tiles.for_each(|&unid| self.set_cell(unid, chunk_coord))
+          let tiles = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];
+          tiles.iter().filter(|&&unid| unid != NULL_TILE).for_each(|&unid| self.set_cell(unid, chunk_coord));
+        } 
+        else if !self.being_loaded_tiles_map.get(&being_unid).map_or(false, |set| set.contains(&chunk_coord)) {
+            *self.tile_shared_loads_count.get_mut(&chunk_coord).unwrap_unchecked() += 1;
         }
+        self.being_loaded_tiles_map.entry(being_unid).or_insert_with(|| HashSet::with_capacity(chunk_size.area()*3/2)).insert(chunk_coord);
+          
+      }}
+    self.unload_excess_tiles(being_coords, chunk_size.into(), being_unid);
+  }
+  //todo fix hay algo mal
+
+  #[func]
+  fn untrack_being(&mut self, being_unid: i64) {unsafe{
+    let self_ptr: *mut Self = self as *mut _;
+    let being_unid = &BeingUnid(being_unid);
+    if let Some(this_being_loaded_tiles_set) = self.being_loaded_tiles_map.get(being_unid){
+      for &tile_coord in this_being_loaded_tiles_set {
+        (*self_ptr).decrement_shared_loads_count(tile_coord);
       }
+      (*self_ptr).being_loaded_tiles_map.remove(being_unid);
+    }
+    else {godot_error!("{being_unid} specified to untrack not found");}
+  }}
+  
+  fn unload_excess_tiles(&mut self, being_coords: SafeVec, chunk_size: UnsVec, being_unid: BeingUnid) {
+    unsafe {
+      let self_ptr: *mut Self = self as *mut _;
+
+      let loaded_tiles = self.being_loaded_tiles_map.get_mut(&being_unid).unwrap_unchecked();
+
+      loaded_tiles.retain(|&tile_coord| {
+          let keep: bool = chunk_size.within_bounds_centered(SafeVec::from(tile_coord) - being_coords);
+          
+          if keep == false {(*self_ptr).decrement_shared_loads_count(tile_coord);}
+          keep
+      });
+    }
+  }
+  #[signal]
+  pub fn tile_unloaded(coords: Vector2i);
+
+  fn decrement_shared_loads_count(&mut self, tile_coord: UnsVec) {
+    if let Some(count) = self.tile_shared_loads_count.get_mut(tile_coord.borrow()) {
+      if *count > 0 {*count -= 1;}
+      
+      if *count == 0 {
+          for layer_i in 0..self.base().get_layers_count() {
+              self.base_mut().erase_cell(layer_i, tile_coord.into());
+          }
+          self.tile_shared_loads_count.remove(tile_coord.borrow());
+          let tile_coord: Vector2i = tile_coord.into();
+          let tile_coord: [Variant; 1] = [tile_coord.to_variant()];
+          self.base_mut().emit_signal("tile_unloaded".into(), &tile_coord);
+      }
+    }
   }
 
   fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) {
@@ -139,3 +197,8 @@ fn exceeds_tile_limit(arr: &VariantArray) -> Result<(),()> {
   if arr.len() >= NULL_TILE.0 as usize {Ok(())} 
   else {Err(())}
 }
+
+#[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
+struct BeingUnid(i64);
+impl Hash for BeingUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i64(self.0);}}
+impl fmt::Display for BeingUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bunid{}", self.0)}}

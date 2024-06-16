@@ -27,23 +27,23 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 	var i: int = 0
 	for player_start_data: Dictionary in players_start_data:
 		
-		if not player_start_data.has(BeingStatePreIniter.KCONS.NAME):
-			player_start_data[BeingStatePreIniter.KCONS.NAME] = "nameless_player%d"%i
-		if not player_start_data.has(BeingStatePreIniter.KCONS.RACE):
-			player_start_data[BeingStatePreIniter.KCONS.RACE] = &"controllable_random"
-		if not player_start_data.has(BeingStatePreIniter.KCONS.KLASS):
-			player_start_data[BeingStatePreIniter.KCONS.KLASS] = &"random"
-		if not player_start_data.has(BeingStatePreIniter.KCONS.SEX):
-			player_start_data[BeingStatePreIniter.KCONS.SEX] = &"random"
-		if not player_start_data.has(BeingStatePreIniter.KCONS.HEAD):
-			player_start_data[BeingStatePreIniter.KCONS.HEAD] = &"random"
-		if not player_start_data.has(BeingStatePreIniter.KCONS.BODY):
-			player_start_data[BeingStatePreIniter.KCONS.BODY] = &"random"
+		if not player_start_data.has(Constants.KEYS.NAME):
+			player_start_data[Constants.KEYS.NAME] = "nameless_player%d"%i
+		if not player_start_data.has(Constants.KEYS.RACE):
+			player_start_data[Constants.KEYS.RACE] = &"controllable_random"
+		if not player_start_data.has(Constants.KEYS.KLASS):
+			player_start_data[Constants.KEYS.KLASS] = &"random"
+		if not player_start_data.has(Constants.KEYS.SEX):
+			player_start_data[Constants.KEYS.SEX] = &"random"
+		if not player_start_data.has(Constants.KEYS.HEAD):
+			player_start_data[Constants.KEYS.HEAD] = &"random"
+		if not player_start_data.has(Constants.KEYS.BODY):
+			player_start_data[Constants.KEYS.BODY] = &"random"
 		
-		player_start_data[BeingStatePreIniter.KCONS.FACTION] = &"player"	
+		player_start_data[Constants.KEYS.FACTION] = &"player"	
 		
 		#extra health para los protagonists
-		player_start_data[BeingStatePreIniter.KCONS.EXTRA_HEALTH_MULTI] = 2	
+		player_start_data[Constants.KEYS.EXTRA_HEALTH_MULTI] = 2	
 		
 		var player_being_preinit_data = BeingStatePreIniter.new()
 		player_being_preinit_data.construct(player_start_data)
