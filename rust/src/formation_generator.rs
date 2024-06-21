@@ -67,7 +67,7 @@ pub fn noise_surpasses_cutoff(fast_noise_lite: SharedNoise, rel_coords: UnsVec, 
 pub fn val_surpasses_cutoff(val: f32, cutoff: f32) ->(f32, bool){(val, val > cutoff)}
 
 pub fn get_border_farness_factor(rel_coords: UnsVec, world_size: UnsVec, power: Option<f32>) -> f32 {
-  let power = power.unwrap_or(3.0);
+  let power = power.unwrap_or(10.0);
 
   let horizontal_border_closeness: f32 = ((rel_coords.lef as f32 - world_size.lef as f32/2.0)/(world_size.lef as f32/2.0)).abs().powf(power);
   let vertical_border_closeness: f32 = ((rel_coords.right as f32 - world_size.right as f32/2.0)/(world_size.right as f32/2.0)).abs().powf(power);
@@ -90,6 +90,6 @@ impl SharedNoise {
   pub fn new(fast_noise_lite: &FastNoiseLite) -> Self {Self { ns_ptr: make_ptr!(fast_noise_lite) }}
   #[inline]
   pub fn get_noise_2d(&self, rel_coords: UnsVec) -> f32 {
-    unsafe{(&*self.ns_ptr.0).get_noise_2d(rel_coords.lef as f64, rel_coords.right as f64)}
+    unsafe{(&*self.ns_ptr.0).get_noise_2d(rel_coords.lef as f64, rel_coords.right as f64) + 1.0}
   }
 }

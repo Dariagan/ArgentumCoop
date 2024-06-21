@@ -1,7 +1,7 @@
 extends Node
 # PONER EN LA GUI ARRIBA A LA DERECHA DAYS SURVIVED: X, EN FUENTE DIABLESCA
 
-@onready var tile_map: GdTileMap = $ArgentumTileMap
+@onready var tile_map: GdTileMap = $GdTileMap
 
 func _ready() -> void:
 	if GlobalData.insta_start:

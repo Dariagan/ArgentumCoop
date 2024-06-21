@@ -3,9 +3,7 @@ class_name GdTileMap
 
 var _beings: Dictionary # key(str): individual unique id. value: Being Scene. el multiplayerspawner se encarga del sync
 var tiles_states: Dictionary # key: posx_posy_zi (vec3, no un string). value: state object
-const WORLD_SIZE: Vector2i = Vector2i(10000, 10000)
-
-@export var noise: FastNoiseLite
+const WORLD_SIZE: Vector2i = Vector2i(2000, 2000)
 
 # IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
@@ -84,3 +82,7 @@ func birth_beingkind_at(beingkind_id: StringName, faction: StringName, loc_coord
 #endregion SPAWNING
 
 	
+
+
+func _on_tile_unloaded(coords):
+	pass

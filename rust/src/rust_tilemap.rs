@@ -158,8 +158,7 @@ impl RustTileMap {
       });
     }
   }
-  #[signal]
-  pub fn tile_unloaded(coords: Vector2i);
+  #[signal] pub fn tile_unloaded(coords: Vector2i);
 
   fn decrement_shared_loads_count(&mut self, tile_coord: UnsVec) {
     if let Some(count) = self.tile_shared_loads_count.get_mut(tile_coord.borrow()) {

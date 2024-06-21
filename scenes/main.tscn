@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=31 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -9,7 +9,7 @@
 [ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resource_instances/tiling/tile_set.tres" id="6_67353"]
 [ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
-[ext_resource type="Script" path="res://scenes/ArgentumTileMap.gd" id="7_itdl2"]
+[ext_resource type="Script" path="res://scripts/gd_tile_map.gd" id="7_itdl2"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="Script" path="res://scripts/ui/uim_lobby_interface.gd" id="14_xwx6r"]
 [ext_resource type="Script" path="res://scripts/ui/uim_chat_component.gd" id="15_iym2t"]
@@ -22,9 +22,6 @@
 [ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resource_instances/ui/lineeditname.tres" id="22_uo2mf"]
 [ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="23_m410m"]
 [ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/lobby/character_characterization.tscn" id="24_741ey"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_qkist"]
-noise_type = 0
 
 [sub_resource type="PackedScene" id="PackedScene_63sr3"]
 _bundled = {
@@ -102,7 +99,7 @@ character_creation_scene = ExtResource("4_lphit")
 [node name="Game" type="Node" parent="Lobby"]
 script = ExtResource("5_2eji3")
 
-[node name="ArgentumTileMap" type="RustTileMap" parent="Lobby/Game"]
+[node name="GdTileMap" type="RustTileMap" parent="Lobby/Game"]
 unique_name_in_owner = true
 y_sort_enabled = true
 tile_set = ExtResource("6_67353")
@@ -112,14 +109,13 @@ layer_2/name = "Layer2"
 layer_2/y_sort_enabled = true
 layer_2/z_index = 10
 script = ExtResource("7_itdl2")
-noise = SubResource("FastNoiseLite_qkist")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby/Game"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
-spawn_path = NodePath("../ArgentumTileMap")
+spawn_path = NodePath("../GdTileMap")
 script = ExtResource("6_r3dut")
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Lobby/Game"]
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="Lobby/Game"]
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 
@@ -160,6 +156,7 @@ lobby_interface_scene = SubResource("PackedScene_6d4ka")
 layout_mode = 2
 
 [connection signal="removed_from_lobby" from="Lobby" to="Canvas/MenuControl" method="_on_lobby_removed_from_lobby"]
+[connection signal="tile_unloaded" from="Lobby/Game/GdTileMap" to="Lobby/Game/GdTileMap" method="_on_tile_unloaded"]
 [connection signal="lobby_started" from="Canvas/MenuControl" to="Lobby" method="_on_menu_control_lobby_started"]
 [connection signal="host_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_host_pressed"]
 [connection signal="join_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_join_pressed"]

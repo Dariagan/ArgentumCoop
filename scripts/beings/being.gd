@@ -94,7 +94,7 @@ func _update_distance_moved() -> void:
 	distance_moved = position.distance_to(_previous_position)
 	_previous_position = position
 	
-func _update_body_state() -> void:
+func _update_body_state() -> void: 	
 	if distance_moved > 1:
 		_adjust_speed_scale.rpc(distance_moved, 1)
 		_change_body_state.rpc(BodyState.JOG)

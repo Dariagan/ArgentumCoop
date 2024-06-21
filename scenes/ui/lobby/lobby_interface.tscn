@@ -107,7 +107,6 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 
 [node name="WriteMsgBox" type="TextEdit" parent="ChatLobbyContainer/VBoxContainer/HBoxContainer3"]
-clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 caret_blink = true
@@ -193,14 +192,14 @@ anchor_right = 0.7
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.721569, 0.713726, 0.435294, 1)
-theme_override_colors/font_placeholder_color = Color(0.721569, 0.713726, 0.435294, 1)
 theme_override_colors/caret_color = Color(0.733333, 0.501961, 0.298039, 1)
+theme_override_colors/font_placeholder_color = Color(0.721569, 0.713726, 0.435294, 1)
+theme_override_colors/font_color = Color(0.721569, 0.713726, 0.435294, 1)
 theme_override_fonts/font = ExtResource("4_n6a85")
 theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = ExtResource("6_nuk4o")
 theme_override_styles/focus = ExtResource("6_nuk4o")
 theme_override_styles/read_only = ExtResource("6_nuk4o")
+theme_override_styles/normal = ExtResource("6_nuk4o")
 placeholder_text = "Name"
 alignment = 1
 max_length = 28
