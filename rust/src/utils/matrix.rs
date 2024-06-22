@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 
-pub use crate::uns_vec::UnsVec;
+pub use crate::utils::uns_vec::UnsVec;
 
 pub struct Matrix<T: Default + Clone> {
   flattened_matrix: Vec<T>,

@@ -58,7 +58,7 @@ func _instantiate_being_birth_dict() -> Dictionary:
 	
 	var being_birth_dict: Dictionary = {
 		Constants.KEYS.NAME: WeightedChoice.pick(names_distribution),
-		Constants.KEYS.EXTRA_HEALTH_MULTI: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
+		Constants.KEYS.HEALTH_MULTIP: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
 		Constants.KEYS.RACE: race_id,
 		Constants.KEYS.SEX: sex,
 		Constants.KEYS.KLASS: klass_id,

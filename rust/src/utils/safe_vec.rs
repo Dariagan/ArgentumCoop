@@ -5,7 +5,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 
 use godot::builtin::{Vector2, Vector2i};
 
-use crate::uns_vec::UnsVec;
+use crate::utils::uns_vec::UnsVec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SafeVec {

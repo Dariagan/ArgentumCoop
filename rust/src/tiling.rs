@@ -2,20 +2,17 @@ use godot::{register::GodotClass, prelude::*};
 use rand_distr::{Distribution, WeightedAliasIndex};
 use rand_pcg::Lcg128Xsl64; use std::fmt::{self, format};
 use std::hash::{Hash, Hasher};
-use rand::prelude::*;
 
-pub use crate::uns_vec::UnsVec;
+pub use crate::utils::uns_vec::UnsVec;
 
 #[derive(Clone, PartialEq, Copy, Debug)]
 pub struct TileUnid(pub u16);
-pub const NULL_TILE: TileUnid = TileUnid(u16::MAX);
-
-impl Default for TileUnid {fn default() -> Self {NULL_TILE}}
+impl TileUnid{pub const NULL: TileUnid = TileUnid(u16::MAX);}
+impl Default for TileUnid {fn default() -> Self {TileUnid::NULL}}
 impl Hash for TileUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u16(self.0);}}
+impl fmt::Display for TileUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Tunid{}", self.0)}}//alt+z
 
-use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-
 #[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter)]
 #[godot(via = i32)]
 pub enum TileZLevel {Soil = 0, Floor, Stain, Structure, Roof,}
@@ -64,8 +61,7 @@ impl Tile {
         return false;
     }
     true
-}
-
+  }
 }
 #[godot_api]
 impl IResource for Tile{
@@ -74,7 +70,6 @@ impl IResource for Tile{
     alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, unid: None }
   }
 }
-impl fmt::Display for TileUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Tunid{}", self.0)}}//alt+z
 impl Into<TileDto> for Gd<Tile> {fn into(self) -> TileDto {let gd_tile = self.bind(); TileDto { z_level: gd_tile.z_level(), source_atlas: gd_tile.source_atlas(), origin_position: gd_tile.origin_position(), modulo_tiling_area: gd_tile.modulo_tiling_area(), alternative_id: gd_tile.alternative_id(), random_scale_range: gd_tile.random_scale_range(), flipped_at_random: gd_tile.flipped_at_random() }}}
 pub struct TileDto{
   pub z_level: TileZLevel,
@@ -154,6 +149,7 @@ pub struct TileDistribution {
   #[export] weights: PackedInt32Array,
 }
 #[godot_api]
+#[allow(dead_code)]
 impl TileDistribution {
   pub fn base(&self) -> &Base<Resource> { &self.base }
   pub fn id(&self) -> &StringName { &self.id }
@@ -247,7 +243,6 @@ impl TryFrom<Gd<Tile>> for UnidOrDist {
     }
   }
 }
-
 pub struct DiscreteDistribution{
   choices: Vec<(TileUnid, TileZLevel)>,
   sampler: WeightedAliasIndex<i32>,
@@ -279,9 +274,7 @@ pub fn fill_targets(nids_arr: &mut[UnidOrDist], target_names: &[&str], arg_tile_
       let (nid_or_distribution, target) = it;
 
       if let Some(target_i) = target_names.into_iter().position(|name: &&str| *name == target.to_string().as_str()) {
-        unsafe{
-          *nids_arr.get_unchecked_mut(target_i) = nid_or_distribution
-        }
+        unsafe{*nids_arr.get_unchecked_mut(target_i) = nid_or_distribution}
       }
       else {panic!("target {} not found: ", target);}
     })

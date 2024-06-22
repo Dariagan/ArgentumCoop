@@ -43,7 +43,7 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		player_start_data[Constants.KEYS.FACTION] = &"player"	
 		
 		#extra health para los protagonists
-		player_start_data[Constants.KEYS.EXTRA_HEALTH_MULTI] = 2	
+		player_start_data[Constants.KEYS.HEALTH_MULTIP] = 2	
 		
 		var player_being_preinit_data = BeingStatePreIniter.new()
 		player_being_preinit_data.construct(player_start_data)

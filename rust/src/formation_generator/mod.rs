@@ -1,25 +1,54 @@
+mod fractured_continent_generator;
 
-pub use crate::tiling::TileSelection;
-use crate::uns_vec::UnsVec;
-use crate::utils::*;
-use crate::world_matrix::*;
-pub use crate::{world_matrix::WorldMatrix};
-use fastnoise_lite::FastNoiseLite;
 pub use godot::builtin::Dictionary;
+pub use rust_tilemap::world_matrix::*;
+
+use crate::rust_tilemap;
+use crate::utils::raw_pointers::*;
+use crate::utils::uns_vec::UnsVec;
+use fastnoise_lite::*;
+use std::thread::{self, JoinHandle};
+use rand_seeder::Seeder;
+use rand_pcg::Pcg64;
+use rand_pcg::Lcg128Xsl64;
+use rand::Rng;
+use strum::{EnumCount, VariantNames};
 use enum_primitive_derive::Primitive;
 use godot::obj::{Base, Gd, GdRef};
 use godot::prelude::*;
 use gxhash::HashSet;
-pub use rand_seeder::{Seeder};
-pub use rand_pcg::Pcg64;
-use strum::EnumCount;
+
 use strum::IntoEnumIterator;
 
-
-#[derive(GodotConvert, Var, Export, Primitive, Debug)]
+use fractured_continent_generator::*;
+#[derive(GodotConvert, Var, Export, Primitive, Debug, strum_macros::VariantNames, EnumCount, Display)]
+#[strum(serialize_all = "PascalCase")]
 #[godot(via = i64)]
 pub enum FormGenEnum {
   FracturedContinentGenerator = 0,
+}
+
+pub fn generate(world_matrix: WorldMatrix, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> WorldMatrix{
+
+  let (origin, size) = 
+      (UnsVec::try_from(origin).expect("({} at {}, {}): passed arg origin: Vector2i is negative"), 
+      UnsVec::try_from(size).expect("({} at {}, {}): passed arg size: Vector2i is negative")); 
+
+  const MIN_SIZE: u32 = 100;
+  if size.all_bigger_than_min(MIN_SIZE).is_err(){
+    panic!("({formation} origin:{origin} size:{size}): formation size is too small, must be at least {MIN_SIZE}X{MIN_SIZE}");
+  }
+  if origin.lef + size.lef > world_matrix.size().lef{
+    panic!("({formation} origin:{origin} size:{size}): formation would go out of world bounds eastward");
+  }
+  if origin.right + size.right > world_matrix.size().right{
+    panic!("({formation} origin:{origin} size:{size}): formation would go out of world bounds southward");
+  }
+  match formation {
+    FormGenEnum::FracturedContinentGenerator => {
+      FracturedContinentGenerator::generate(world_matrix, origin, size, tile_selection, seed, data)
+    }
+  }
 }
 
 pub trait IFormationGenerator {
@@ -55,7 +84,7 @@ pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relat
 
 #[inline]
 pub fn calc_continentness(continenter: SharedNoise, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
-  let bff = crate::formation_generator::get_border_farness_factor(rel_coords, size, power);
+  let bff = get_border_farness_factor(rel_coords, size, power);
   let val = bff * continenter.get_noise_2d(rel_coords + offset.unwrap_or_default());
   val
 }

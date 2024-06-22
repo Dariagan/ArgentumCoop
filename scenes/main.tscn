@@ -103,6 +103,7 @@ script = ExtResource("5_2eji3")
 unique_name_in_owner = true
 y_sort_enabled = true
 tile_set = ExtResource("6_67353")
+rendering_quadrant_size = 128
 layer_1/name = "Layer1"
 layer_1/z_index = 5
 layer_2/name = "Layer2"

@@ -5,17 +5,17 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Range, Sub, 
 
 use godot::builtin::{Vector2, Vector2i};
 
-use crate::safe_vec::SafeVec;
+use crate::utils::safe_vec::SafeVec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct UnsVec {
   pub lef: u32,
   pub right: u32,
 }
-pub const ZERO: UnsVec = UnsVec{lef:0,right:0};
 
 #[allow(dead_code)]
 impl UnsVec {
+  pub const ZERO: UnsVec = UnsVec{lef:0,right:0};
   pub fn new(lef: u32, right: u32) -> Self {UnsVec { lef, right }}
 
   pub fn add_assign_lef(&mut self, other: &Self) {self.lef += other.lef;}

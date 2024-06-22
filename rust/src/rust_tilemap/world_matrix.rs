@@ -1,47 +1,27 @@
-use crate::matrix::Matrix; pub use crate::uns_vec::UnsVec;
-use godot::prelude::*;
-use rand::{seq::index, thread_rng, Rng}; use std::{collections::hash_set::Iter, ops::{Index, IndexMut}};
+use strum::EnumCount;
+
+use crate::utils::matrix::Matrix; 
+use std::ops::{Index, IndexMut};
 pub use crate::tiling::*;
 
-const MAX_TILES_PER_POS: usize = TileZLevel::Roof as usize + 1;
-#[derive(Default, Clone, Copy)]
-pub struct TileUnidArray{
-  pub arr: [TileUnid; MAX_TILES_PER_POS]
-}
-impl TileUnidArray {
-  #[inline]
-  pub fn iter(&self) -> std::slice::Iter<'_, TileUnid> {
-    self.arr.iter()
-  }
-  
-
-  #[inline]
-  pub fn assign_unid_unchecked(&mut self, (unid, z_level): (TileUnid, TileZLevel)){
-    unsafe{*self.arr.get_unchecked_mut(z_level as usize) = unid;}
-  }
-}
-
-
-
-pub struct WorldMatrix {tiles: Matrix<TileUnidArray>,}
-
+pub struct WorldMatrix {matrix: Matrix<TileUnidArray>,}
 impl WorldMatrix {
 
   pub fn size(&self) -> UnsVec{
-    self.tiles.size()
+    self.matrix.size()
   }
 
   pub fn new(size: UnsVec) -> Self {
     Self {
-      tiles: Matrix::new_with_element_value(size, TileUnidArray::default()), 
+      matrix: Matrix::new_with_element_value(size, TileUnidArray::default()), 
     }
   }
   pub fn non_null_tiles_at_unchk(&self, coords: UnsVec) -> impl Iterator<Item = &TileUnid> {
     self.index(coords).iter().filter(move |&&unid| unid != TileUnid::default())
   }
 
-  pub fn at(&self, coords: UnsVec) -> Option<&TileUnidArray> {self.tiles.at(coords)}
-  pub fn at_mut(&mut self, coords: UnsVec) -> Option<&mut TileUnidArray> {self.tiles.at_mut(coords)}
+  pub fn at(&self, coords: UnsVec) -> Option<&TileUnidArray> {self.matrix.at(coords)}
+  pub fn at_mut(&mut self, coords: UnsVec) -> Option<&mut TileUnidArray> {self.matrix.at_mut(coords)}
   pub unsafe fn count_at(&self, coords: UnsVec) -> usize {
     self[coords]
       .iter()
@@ -68,7 +48,7 @@ impl WorldMatrix {
   pub unsafe fn place_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel) -> Result<(), String>{
     let prev_tile = self[coords].arr.get_unchecked_mut(z_level as usize);
     match *prev_tile {
-      NULL_TILE => {*prev_tile = tile; Ok(())},
+      TileUnid::NULL => {*prev_tile = tile; Ok(())},
       _ => Err("A tile already exists at the specified position".to_string())
     }
   }
@@ -78,11 +58,26 @@ impl WorldMatrix {
 impl Index<UnsVec> for WorldMatrix {
   type Output = TileUnidArray;
   fn index(&self, coords: UnsVec) -> &TileUnidArray {
-    &(self.tiles[coords])
+    &(self.matrix[coords])
   }
 }
 impl IndexMut<UnsVec> for WorldMatrix {
   fn index_mut(&mut self, coords: UnsVec) -> &mut TileUnidArray {
-    &mut(self.tiles[coords])
+    &mut(self.matrix[coords])
+  }
+}
+
+#[derive(Default, Clone, Copy)]
+pub struct TileUnidArray{
+  pub arr: [TileUnid; TileZLevel::Roof as usize +1]
+}
+impl TileUnidArray {
+  #[inline]
+  pub fn iter(&self) -> std::slice::Iter<'_, TileUnid> {
+    self.arr.iter()
+  }
+  #[inline]
+  pub fn assign_unid(&mut self, (unid, z_level): (TileUnid, TileZLevel)){
+    unsafe{*self.arr.get_unchecked_mut(z_level as usize) = unid;}
   }
 }
