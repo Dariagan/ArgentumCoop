@@ -71,7 +71,7 @@ impl RustTileMap {
   fn generate_formation(&mut self, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
     
     let now = std::time::Instant::now();
-    generate(self.world_matrix.as_mut().unwrap(), formation, origin, size, tile_selection, seed, data);
+    generate(self.world_matrix.as_mut().expect("world matrix needs to be generated before formation (call generate_world_matrix first)"), formation, origin, size, tile_selection, seed, data);
     godot_print!("time taken to generate: {:.2?}", now.elapsed());
     true
   }

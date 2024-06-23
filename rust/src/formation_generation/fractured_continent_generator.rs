@@ -15,7 +15,7 @@ enum Target{ Beach = 0, Lake, Cont, Tree, Bush, Ocean, Cave0, Cave1, Cave2}
 const BIG_LAKER_CUTOFF: f32 = 1.23;
 const SMALL_LAKER_CUTOFF: f32 = 1.15; 
 const BEACHER_CUTOFF: f32 = 1.; 
-const FORESTER_CUTOFF: f32 = 5.5; 
+const FORESTER_CUTOFF: f32 = 5.4; 
 
 //TODO LO Q SE TOQUE EN EL GAMEPLAY DEBE SER GUARDADO EN UN DICT(INCLUSO LO DESTRUIDO)
 impl IFormationGenerator for FracturedContinentGenerator {
@@ -23,7 +23,7 @@ fn generate(world: &mut WorldMatrix, origin: UnsVec, size: UnsVec,
 tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary,
 ) {unsafe{
 //NOTA: SI ES MUY ALTO SE QUEDA INFINITAMENTE EN EL WHILE DE ABAJO
-CONTINENTER_CUTOFF = 1.72*f32::powf(size.length_f32()/1000.0, 0.05);
+CONTINENTER_CUTOFF = 1.77;
 
 let world_ptr: SendMutPtr<WorldMatrix> = make_mut_ptr!(world.borrow_mut());
 
@@ -46,13 +46,13 @@ let mut big_laker: FastNoiseLite=FastNoiseLite::with_seed(seed+2);big_laker.nois
 let mut small_laker: FastNoiseLite=FastNoiseLite::with_seed(seed+3);small_laker.noise_type=NoiseType::ValueCubic;
 let mut forester: FastNoiseLite=FastNoiseLite::with_seed(seed+6);forester.noise_type=NoiseType::OpenSimplex2;
 
-continenter.frequency = 0.24/size.length_f32().powf(0.995);
-peninsuler.frequency = 4.0/size.length_f32().powf(0.995);
+continenter.frequency = 0.15/size.length_f32().powf(0.995);
+peninsuler.frequency = 3.4/size.length_f32().powf(0.995);
 big_beacher.frequency = 3.44/size.length_f32().powf(0.995);
 small_beacher.frequency = 6.4/size.length_f32().powf(0.995);
 big_laker.frequency = 32.0/size.length_f32().powf(0.995);
 small_laker.frequency = 64.0/size.length_f32().powf(0.995);
-forester.frequency = 0.9/size.length_f32().powf(0.995);
+forester.frequency = 0.6/size.length_f32().powf(0.995);
 
 continenter.set_fractal_type(Some(FractalType::FBm)); continenter.set_fractal_octaves(Some(5));
 peninsuler.set_fractal_type(Some(FractalType::FBm)); peninsuler.set_fractal_octaves(Some(5));
@@ -82,12 +82,12 @@ let forester = SharedNoise::new(&forester);
 let mut continenter_offset: UnsVec = UnsVec { lef: 0, right: 0 };
 {
   let center: UnsVec = origin + size/2;//se traba acá
-  while continenter.get_noise_2d(center + continenter_offset) < CONTINENTER_CUTOFF + 0.07 {
+  while continenter.get_noise_2d(center + continenter_offset) < CONTINENTER_CUTOFF +0.01 {
     continenter_offset += UnsVec{lef:3, right:3}
   }
 }let continenter_offset: UnsVec = continenter_offset;
 
-const N_THREADS: usize = 1;
+const N_THREADS: usize = 16;
 let mut threads: [Option<JoinHandle<()>>; N_THREADS] = Default::default();
 let mut rngs: [Pcg64; N_THREADS] = core::array::from_fn(|i| Seeder::from(seed+i as i32).make_rng());
 let mut rngs: SendMutPtr<[Pcg64; N_THREADS]> = make_mut_ptr!(&mut rngs);
