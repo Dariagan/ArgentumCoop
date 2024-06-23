@@ -13,14 +13,15 @@ var cursor_line = 0
 var cursor_column = 0	
 
 func _ready() -> void:
-	chat_text_edit.connect("gui_input", _on_input_event)
+	chat_text_edit.gui_input.connect(_on_input_event)
 	
-func _on_input_event(event):
-	if event is InputEventKey and input_enabled:
-		var key_event = event as InputEventKey 
-		if key_event.keycode == KEY_ENTER and key_event.pressed and !key_event.echo:
-			get_viewport().set_input_as_handled()
-			add_chat_message.rpc(chat_text_edit.text.strip_edges(), GlobalData.username)
+
+
+func _on_input_event(event: InputEvent):
+	if event is InputEventKey and input_enabled and event.keycode == KEY_ENTER\
+		and event.pressed and not event.echo:
+		get_viewport().set_input_as_handled()
+		add_chat_message.rpc(chat_text_edit.text.strip_edges(), GlobalData.username)
 			
 @rpc("any_peer", "call_local")
 func add_chat_message(new_text : String, sender: String) -> void:

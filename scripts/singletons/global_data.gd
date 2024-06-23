@@ -2,7 +2,7 @@ extends Node
 
 #region Debugging configuration
 @export var ignore_joiners_readiness_on_start: bool = true
-@export var insta_start: bool = true
+@export var insta_start: bool = false
 @export var debug: bool = true
 @export var debug_walk_mult:float = 3
 @export var noclip: bool = true
@@ -89,28 +89,29 @@ func _index_all_found_resource_instances(directories: Array[String], check_subfo
 			
 			while file_name != "":
 				if !dir_access.current_is_dir():
-					var resource
-					if not use_safe_loader:
-						resource = ResourceLoader.load(directory + file_name)
-					else:#NO USAR SI ESTÁ EN .res/ EL DIRECTORIO, NO HACE FALTA
-						resource = SafeResourceLoader.load(directory + file_name)
-					
-					if file_name == &"temperate":
-						print()
-					
-					if resource:
-						resource.id = StringName(file_name.trim_suffix(".tres"))						
-						if table.has(resource.id):
-							push_warning("a resource with id=%s is already present in target dict"%[resource.id])
-							resource = null
-					if resource:
-						if resource.has_method("validate") && not resource.validate():
-							printerr("resource %s doesn't meet its validation condition"%[file_name])
-							resource = null
-					if resource:
-						table[resource.id] = resource
-					else:
-						printerr("%s%s was NOT added into its target dictionary" % [directory, file_name])
+          if not file_name.ends_with(".import"):
+            var resource
+            if not use_safe_loader:
+              resource = ResourceLoader.load(directory + file_name)
+            else:#NO USAR SI ESTÁ EN .res/ EL DIRECTORIO, NO HACE FALTA
+              resource = SafeResourceLoader.load(directory + file_name)
+            
+            if file_name == &"temperate":
+              print()
+            
+            if resource:
+              resource.id = StringName(file_name.trim_suffix(".tres"))						
+              if table.has(resource.id):
+                push_warning("a resource with id=%s is already present in target dict"%[resource.id])
+                resource = null
+            if resource:
+              if resource.has_method("validate") && not resource.validate():
+                printerr("resource %s doesn't meet its validation condition"%[file_name])
+                resource = null
+            if resource:
+              table[resource.id] = resource
+            else:
+              printerr("%s%s was NOT added into its target dictionary" % [directory, file_name])
 					
 				elif check_subfolders:
 					var subdict: Dictionary = _index_all_found_resource_instances([directory+file_name+"/"], true)

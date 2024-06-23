@@ -118,6 +118,7 @@ layout_mode = 2
 text = "Create Character"
 
 [node name="CharacterCreation" type="TextureRect" parent="."]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -475,6 +476,7 @@ theme_override_font_sizes/font_size = 30
 text = "LOBBY"
 
 [connection signal="pressed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer1/LeaveButton" to="." method="_on_leave_button_pressed"]
+[connection signal="text_changed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer3/WriteMsgBox" to="ChatLobbyContainer/VBoxContainer/ChatComponent" method="_on_write_msg_box_text_changed"]
 [connection signal="pressed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer3/CreateCharacterButton" to="." method="_on_create_character_button_pressed"]
 [connection signal="text_changed" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/Control/NameInput" to="." method="_on_name_input_text_changed"]
 [connection signal="body_scale_changed" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_body_scale_changed"]

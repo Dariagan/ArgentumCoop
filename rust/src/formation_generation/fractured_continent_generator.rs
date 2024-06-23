@@ -1,10 +1,8 @@
 use std::borrow::BorrowMut;
-
 use gxhash::HashSet;
-
 use super::*;
 
-//RECOMMENDED SIZE = 2000X2000
+//RECOMMENDED SIZE = 2500X2500
 pub struct FracturedContinentGenerator{}
 
 #[derive(strum_macros::VariantNames, EnumCount)]
@@ -121,7 +119,7 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
     let (beachness, beach) = val_surpasses_cutoff(calc_beachness(rel_coords, big_beacher, small_beacher, continentness), BEACHER_CUTOFF);
     if beach {
       tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::Beach as usize).get_unid(rng))
-    }
+    }//else rocky
     else {
       
       let lake =  calc_lakeness(rel_coords, big_laker, small_laker, beachness, continentness);
@@ -156,46 +154,46 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
   all_trees.extend(trees.drf().get_unchecked_mut(thread_i).iter());
   all_bushes.extend(bushes.drf().get_unchecked_mut(thread_i).iter());
 }
-// {// place_dungeon_entrances
-//   const MAX_TRIES: u64 = 1_000_000;
+{// place_dungeon_entrances
+  const MAX_TRIES: u64 = 1_000_000;
 
-//   const DUNGEONS_TO_PLACE: usize = Target::COUNT - Target::Cave0 as usize;
-//   let mut placed_dungeons_coords: [UnsVec; DUNGEONS_TO_PLACE] = Default::default();
+  const DUNGEONS_TO_PLACE: usize = Target::COUNT - Target::Cave0 as usize;
+  let mut placed_dungeons_coords: [UnsVec; DUNGEONS_TO_PLACE] = Default::default();
 
-//   let mut min_distance_multiplier = 1.0;
-//   let mut tries_count = 1;
-//   let rng = rngs.drf().get_unchecked_mut(0);
+  let mut min_distance_multiplier = 1.0;
+  let mut tries_count = 1;
+  let rng = rngs.drf().get_unchecked_mut(0);
 
-//   let mut placed_count: usize = 0;
-//   while placed_count < placed_dungeons_coords.len() {
-//     let r_coords = UnsVec {
-//         lef: rng.gen_range(size.lef/10..size.lef*9/10),
-//         right: rng.gen_range(size.right/10..size.right*9/10),
-//       };
+  let mut placed_count: usize = 0;
+  while placed_count < placed_dungeons_coords.len() {
+    let r_coords = UnsVec {
+        lef: rng.gen_range(size.lef/10..size.lef*9/10),
+        right: rng.gen_range(size.right/10..size.right*9/10),
+      };
   
-//     let continentness = calc_continentness(continenter, r_coords, size, None, Some(continenter_offset));
-//     if continentness > CONTINENTER_CUTOFF + 0.005 
-//       && !calc_lakeness(r_coords, big_laker, small_laker, calc_beachness(r_coords, big_beacher, small_beacher, continentness), continentness)
-//       && clear_of(&all_trees, r_coords, 3, true)
-//     {
-//       let min_distance_between_dungeons = size.length() as f64 * 0.25 * min_distance_multiplier;
+    let continentness = calc_continentness(continenter, r_coords, size, None, Some(continenter_offset));
+    if continentness > CONTINENTER_CUTOFF + 0.005 
+      && !calc_lakeness(r_coords, big_laker, small_laker, calc_beachness(r_coords, big_beacher, small_beacher, continentness), continentness)
+      && clear_of(&all_trees, r_coords, 3, true)
+    {
+      let min_distance_between_dungeons = size.length() as f64 * 0.25 * min_distance_multiplier;
 
-//       let is_separated_enough = |coord: &UnsVec| r_coords.distance_to(coord) > min_distance_between_dungeons;
+      let is_separated_enough = |coord: &UnsVec| r_coords.distance_to(coord) > min_distance_between_dungeons;
 
-//       if placed_dungeons_coords.iter().all(|coord| is_separated_enough(coord)) {
-//         *placed_dungeons_coords.get_unchecked_mut(placed_count) = r_coords;
-//         overwrite_formation_tile(world_ptr, (origin, r_coords), unidordist_mped2targets.drf().get_unchecked(Target::Cave0 as usize + placed_count).get_unid(rng), None);
-//         placed_count += 1;
-//         godot_print!("{}", r_coords);
-//       } else {
-//         min_distance_multiplier = (1500.0 / tries_count as f64).clamp(0.0, 1.0);
-//       }
-//     }
-//     if tries_count > MAX_TRIES {panic!("Dungeon placement condition unmeetable!");}
+      if placed_dungeons_coords.iter().all(|coord| is_separated_enough(coord)) {
+        *placed_dungeons_coords.get_unchecked_mut(placed_count) = r_coords;
+        overwrite_formation_tile(world_ptr, (origin, r_coords), unidordist_mped2targets.drf().get_unchecked(Target::Cave0 as usize + placed_count).get_unid(rng), None);
+        placed_count += 1;
+        godot_print!("{}", r_coords);
+      } else {
+        min_distance_multiplier = (1500.0 / tries_count as f64).clamp(0.0, 1.0);
+      }
+    }
+    if tries_count > MAX_TRIES {panic!("Dungeon placement condition unmeetable!");}
 
-//     tries_count += 1;
-//   }
-// }// end of place_dungeon_entrances
+    tries_count += 1;
+  }
+}// end of place_dungeon_entrances
 }}
 }
 #[inline] //se puede mejorar viendo el peninsulerness value

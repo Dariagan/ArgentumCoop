@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
-[ext_resource type="PackedScene" uid="uid://dhuq261jv5fvi" path="res://scenes/character_creation_lobby.tscn" id="4_lphit"]
 [ext_resource type="Script" path="res://scripts/lobby.gd" id="4_vtap0"]
 [ext_resource type="Script" path="res://scripts/game.gd" id="5_2eji3"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
@@ -22,6 +21,19 @@
 [ext_resource type="StyleBox" uid="uid://cp1n46uhb301n" path="res://resource_instances/ui/lineeditname.tres" id="22_uo2mf"]
 [ext_resource type="PackedScene" uid="uid://u4wi1nj2aok3" path="res://scenes/ui/coolborder_small.tscn" id="23_m410m"]
 [ext_resource type="PackedScene" uid="uid://drxjcl2mm30w4" path="res://scenes/ui/lobby/character_characterization.tscn" id="24_741ey"]
+
+[sub_resource type="PackedScene" id="PackedScene_yuns1"]
+_bundled = {
+"conn_count": 0,
+"conns": PackedInt32Array(),
+"editable_instances": [],
+"names": PackedStringArray("CharacterCreation", "Node"),
+"node_count": 1,
+"node_paths": [],
+"nodes": PackedInt32Array(-1, -1, 1, 0, -1, 0, 0),
+"variants": [],
+"version": 3
+}
 
 [sub_resource type="PackedScene" id="PackedScene_63sr3"]
 _bundled = {
@@ -94,7 +106,7 @@ script = ExtResource("1_iuim6")
 
 [node name="Lobby" type="Node" parent="."]
 script = ExtResource("4_vtap0")
-character_creation_scene = ExtResource("4_lphit")
+character_creation_scene = SubResource("PackedScene_yuns1")
 
 [node name="Game" type="Node" parent="Lobby"]
 script = ExtResource("5_2eji3")

@@ -18,6 +18,7 @@ func _setup_config():
 	y_sort_enabled = true
 
 
+
 func _process(_delta):
 	pass
 
