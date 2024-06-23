@@ -19,9 +19,9 @@ const FORESTER_CUTOFF: f32 = 5.5;
 
 //TODO LO Q SE TOQUE EN EL GAMEPLAY DEBE SER GUARDADO EN UN DICT(INCLUSO LO DESTRUIDO)
 impl IFormationGenerator for FracturedContinentGenerator {
-fn generate(mut world: WorldMatrix, origin: UnsVec, size: UnsVec,
+fn generate(world: &mut WorldMatrix, origin: UnsVec, size: UnsVec,
 tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary,
-) -> WorldMatrix{unsafe{
+) {unsafe{
 //NOTA: SI ES MUY ALTO SE QUEDA INFINITAMENTE EN EL WHILE DE ABAJO
 CONTINENTER_CUTOFF = 1.72*f32::powf(size.length_f32()/1000.0, 0.05);
 
@@ -196,7 +196,6 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
 //     tries_count += 1;
 //   }
 // }// end of place_dungeon_entrances
-world
 }}
 }
 #[inline] //se puede mejorar viendo el peninsulerness value

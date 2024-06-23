@@ -1,7 +1,7 @@
 pub(crate) mod world_matrix;
 
 use world_matrix::*;
-use crate::formation_generator::*;
+use crate::formation_generation::*;
 use crate::tiling::TileDto;
 use crate::utils::safe_vec::SafeVec;
 use crate::utils::uns_vec::UnsVec;
@@ -9,7 +9,7 @@ use godot::builtin::Dictionary;
 use godot::engine::{ITileMap, TileMap};
 use godot::prelude::*;
 use gxhash::{HashMap, HashSet, HashSetExt as _};
-use std::borrow::Borrow;
+use std::borrow::{Borrow, BorrowMut};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 #[derive(GodotClass)]
@@ -71,7 +71,7 @@ impl RustTileMap {
   fn generate_formation(&mut self, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
     
     let now = std::time::Instant::now();
-    generate(self.world_matrix.take().expect("world matrix not present"), formation, origin, size, tile_selection, seed, data);
+    generate(self.world_matrix.as_mut().unwrap(), formation, origin, size, tile_selection, seed, data);
     godot_print!("time taken to generate: {:.2?}", now.elapsed());
     true
   }

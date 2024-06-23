@@ -3,7 +3,7 @@ use godot::prelude::*;
 
 mod utils;
 mod rust_tilemap;
-mod formation_generator;
+mod formation_generation;
 mod beings;
 
 struct ArgentumExtension;

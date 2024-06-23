@@ -28,7 +28,7 @@ pub enum FormGenEnum {
   FracturedContinentGenerator = 0,
 }
 
-pub fn generate(world_matrix: WorldMatrix, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> WorldMatrix{
+pub fn generate(world_matrix: &mut WorldMatrix, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) {
 
   let (origin, size) = 
       (UnsVec::try_from(origin).expect("({} at {}, {}): passed arg origin: Vector2i is negative"), 
@@ -53,13 +53,13 @@ pub fn generate(world_matrix: WorldMatrix, formation: FormGenEnum, origin: Vecto
 
 pub trait IFormationGenerator {
   fn generate(
-    world: WorldMatrix,
+    world_matrix: &mut WorldMatrix,
     origin: UnsVec,
     size: UnsVec,
     tile_selection: Gd<TileSelection>,
     seed: i32,
     data: Dictionary,
-  ) -> WorldMatrix;
+  );
 }
 pub fn overwrite_all_tiles_at_coord(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), unids: &TileUnidArray, instantiation_data: Option<Dictionary>){
   unsafe{
