@@ -1,6 +1,7 @@
 pub(crate) mod world_matrix;
 
 use world_matrix::*;
+use crate::beings::BeingUnid;
 use crate::formation_generation::*;
 use crate::tiling::TileDto;
 use crate::utils::safe_vec::SafeVec;
@@ -170,8 +171,3 @@ fn exceeds_tile_limit(arr: &VariantArray) -> Result<(),()> {
   if arr.len() >= TileUnid::NULL.0 as usize {Ok(())} 
   else {Err(())}
 }
-
-#[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
-struct BeingUnid(i64);
-impl Hash for BeingUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i64(self.0);}}
-impl fmt::Display for BeingUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bunid{}", self.0)}}

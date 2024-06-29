@@ -5,7 +5,7 @@ class_name Wear
 
 @export var compatible_races: Array[BasicRace]
 
-@export var sex: Constants.Sex
+@export var sex: Enums.Sex
 
 @export var frames: SpriteFrames
 
@@ -14,4 +14,4 @@ class_name Wear
 @export var covered_body_groups: Array[String]#Bodygroups
 #hacer dictionary y poner de value el multiplier para esa parte?
 
-@export var occupied_layers: Array[Constants.Layer] = [Constants.Layer.BOTTOM]
+@export var occupied_layers: Array[Enums.ClothingLayer] = [Enums.ClothingLayer.BOTTOM]

@@ -11,12 +11,9 @@ TODO CHARACTER CREATION:
 """
 @onready var players_label: Label = $ChatLobbyContainer/VBoxContainer/HBoxContainer2/PlayersLabel
 
-@onready var chat_component: Node = $ChatLobbyContainer/VBoxContainer/ChatComponent
 
 @onready var h_box_container: HBoxContainer = $ChatLobbyContainer/VBoxContainer/HBoxContainer1
 @onready var h_box_container_3: HBoxContainer = $ChatLobbyContainer/VBoxContainer/HBoxContainer3
-
-
 
 
 var lobby_title_line_edit: LineEdit 
@@ -26,12 +23,15 @@ var start_button: Button
 
 signal ready_toggled(value: bool)
 
-signal player_clicked_leave
 
+signal clicked_leave
 signal character_create(value: bool)
 
 func _ready() -> void:
 	get_children()[1].hide()
+	Chat.input_enabled = true
+	Chat.chat_label = $ChatLobbyContainer/VBoxContainer/HBoxContainer2/ScrollContainer/ChatLabel
+	Chat.chat_text_edit = $ChatLobbyContainer/VBoxContainer/HBoxContainer3/WriteMsgBox
 
 func update_player_list(new_player_list: Array) -> void:
 	players_label.text = ""
@@ -56,7 +56,7 @@ func _add_lobby_title_line_edit(host_name: String) -> void:
 	lobby_title_line_edit.caret_blink = true
 	h_box_container.add_child(lobby_title_line_edit)
 	h_box_container.move_child(lobby_title_line_edit, 0)
-	lobby_title_line_edit.connect("text_submitted", _on_lobby_title_text_submitted)
+	lobby_title_line_edit.text_changed.connect(_on_lobby_title_text_changed)
 	
 	
 func _add_lobby_title_label(new_title: String) -> void:
@@ -72,8 +72,6 @@ func set_up_joiner_lobby() -> void:
 	_add_start_button(false)
 	_add_lobby_title_label("")
 	
-	
-	
 func _add_start_button(hosting: bool) -> void:
 	if hosting:
 		start_button = Button.new()
@@ -86,8 +84,6 @@ func _add_start_button(hosting: bool) -> void:
 	
 	start_button.custom_minimum_size.x = 150
 	h_box_container_3.add_child(start_button)
-	
-
 
 func _ready_button_pressed(toggled: bool = true) -> void:
 	ready_toggled.emit(toggled)
@@ -95,22 +91,19 @@ func _ready_button_pressed(toggled: bool = true) -> void:
 func _update_lobby_title_for_client(peer_id: int):
 	_update_lobby_title_client_side.rpc_id(peer_id, lobby_title_line_edit.text)
 
-func _on_lobby_title_text_submitted(new_text: String) -> void:
+func _on_lobby_title_text_changed(new_text: String) -> void:
 	_update_lobby_title_client_side.rpc(new_text)
 	
 @rpc
 func _update_lobby_title_client_side(new_text: String) -> void:
-	
-	if lobby_title_label:
-		lobby_title_label.text = new_text
+	if lobby_title_label: lobby_title_label.text = new_text
 
 func _on_leave_button_pressed() -> void:
-	player_clicked_leave.emit()
-
+	clicked_leave.emit()
 
 func _on_create_character_button_pressed() -> void:
 	get_children()[0].hide()
-	chat_component.input_enabled = false
+	Chat.input_enabled = false
 	get_children()[1].show()
 
 # ------------------------------------------------------------
@@ -118,12 +111,12 @@ func _on_create_character_button_pressed() -> void:
 # ------------------------------------------------------------
 func _on_lobby_button_pressed() -> void:
 	get_children()[1].hide()
-	chat_component.input_enabled = true
+	Chat.input_enabled = true
 	get_children()[0].show()
 
 signal name_changed(new_name: StringName)
 signal race_selected(race: ControllableRace)
-signal sex_selected(sex: Constants.Sex)
+signal sex_selected(sex: Enums.Sex)
 signal class_selected(klass: Klass)
 signal head_selected(head: SpriteData)
 signal follower_selected(follower: UncontrollableRace)
@@ -136,7 +129,7 @@ func _on_character_characterization_race_selected(race: ControllableRace) -> voi
 	race_selected.emit(race)
 	# mostrar stats en cuadradito
 	
-func _on_character_characterization_sex_selected(sex: Constants.Sex) -> void:
+func _on_character_characterization_sex_selected(sex: Enums.Sex) -> void:
 	sex_selected.emit(sex)
 func _on_character_characterization_class_selected(klass: Klass) -> void:
 	class_selected.emit(klass)

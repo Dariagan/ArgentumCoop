@@ -1,16 +1,24 @@
-[gd_scene load_steps=6 format=3 uid="uid://bxcw3yocig3he"]
+[gd_scene load_steps=8 format=3 uid="uid://bxcw3yocig3he"]
 
 [ext_resource type="Script" path="res://scripts/beings/being.gd" id="1_qp2au"]
 [ext_resource type="PackedScene" uid="uid://dh6xc1ceawroh" path="res://scenes/animated_body_portion.tscn" id="2_7wa3q"]
 [ext_resource type="Script" path="res://scripts/beings/being_internal_state.gd" id="3_ptxgd"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_c0jbg"]
-size = Vector2(11.7222, 5.52427)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_igabf"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_p46nv"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/replication_mode = 1
+
+[sub_resource type="SystemFont" id="SystemFont_gf34w"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_bmw10"]
+font = SubResource("SystemFont_gf34w")
+font_size = 9
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 0
 
 [node name="Being" type="CharacterBody2D"]
 z_index = 10
@@ -26,18 +34,22 @@ offset = Vector2(0, -5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 15)
-scale = Vector2(1, 2)
-shape = SubResource("RectangleShape2D_c0jbg")
+shape = SubResource("RectangleShape2D_igabf")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_p46nv")
 
-[node name="Name" type="Label" parent="."]
-offset_left = 42.0
-offset_top = -9.0
-offset_right = 82.0
-offset_bottom = 14.0
+[node name="NameLabel" type="Label" parent="." groups=["NameLabel"]]
+offset_left = -53.0
+offset_top = 22.0
+offset_right = 63.0
+offset_bottom = 35.0
+scale = Vector2(0.912424, 1.08214)
+theme_override_font_sizes/font_size = 8
+text = "fffff"
+label_settings = SubResource("LabelSettings_bmw10")
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Meditation" type="AnimatedSprite2D" parent="."]
 
@@ -58,3 +70,5 @@ debug_enabled = true
 
 [node name="InternalState" type="Node" parent="."]
 script = ExtResource("3_ptxgd")
+
+[node name="AiBehavior" type="Node" parent="."]

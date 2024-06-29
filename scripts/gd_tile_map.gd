@@ -17,22 +17,21 @@ func _setup_config():
 	set_layer_y_sort_enabled(2, true)
 	y_sort_enabled = true
 
-
-
 func _process(_delta):
 	pass
 
 
 @rpc("call_local")
 func generate_world():
-	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y >500)
+	@warning_ignore("assert_always_true")
+	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y > 500)
 	
 	var tiles: Array[Tile] = []
-	tiles.append_array(GlobalData.tiles_data.values())
+	tiles.append_array(Global.tiles_data.values())
 		
 	generate_world_matrix(WORLD_SIZE, tiles)
 	
-	generate_formation(0, Vector2i.ZERO, WORLD_SIZE, GlobalData.tile_selections[&"temperate"], 5, {})
+	generate_formation(0, Vector2i.ZERO, WORLD_SIZE, Global.tile_selections[&"temperate"], 5, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
@@ -59,13 +58,12 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 	
 	var being: Being = preload("res://scenes/being.tscn").instantiate()
 	#nota: el being.name hay q ponerlo antes del add_child
-	add_child(being, true)
 	being.uid = _birthed_beings_i; _birthed_beings_i += 1
+	add_child(being, true)
+	being.z_index = 10
 	being.construct(preinitdata)
-	
+	being.sync_pos_reliable.rpc(loc_coords)
 	if player or get_cell_tile_data(0, local_to_map(loc_coords)):
-		being.position = loc_coords
-		being.z_index = 10
 		return being
 	else:
 		_beings[being.uid] = being.serialize() # no sé si hacer esto o guardar packedscene del being
@@ -76,8 +74,8 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 func birth_beingkind_at_snapped(beingkind_id: StringName, faction: StringName, map_coords: Vector2i) -> Being:
 	return birth_beingkind_at(beingkind_id, faction, map_to_local(map_coords))
 func birth_beingkind_at(beingkind_id: StringName, faction: StringName, loc_coords: Vector2) -> Being:
-	assert(GlobalData.beingkinds.has(beingkind_id))
-	var beingkind: BeingKind = GlobalData.beingkinds[beingkind_id]
+	assert(Global.beingkinds.has(beingkind_id))
+	var beingkind: BeingKind = Global.beingkinds[beingkind_id]
 	
 	return birth_being_at(beingkind.instantiate(faction), loc_coords)
 #endregion SPAWNING

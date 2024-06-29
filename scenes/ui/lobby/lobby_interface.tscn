@@ -1,7 +1,6 @@
-[gd_scene load_steps=18 format=3 uid="uid://dvqq1banvf1yw"]
+[gd_scene load_steps=17 format=3 uid="uid://dvqq1banvf1yw"]
 
 [ext_resource type="Script" path="res://scripts/ui/uim_lobby_interface.gd" id="1_gewq0"]
-[ext_resource type="PackedScene" uid="uid://cpat3jp6fu4q2" path="res://scenes/ui/lobby/chat_component.tscn" id="2_5fe4g"]
 [ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse-7021371.jpg" id="3_rncrb"]
 [ext_resource type="FontFile" uid="uid://ctrsrtkxeu85y" path="res://assets/fonts/Exocet2.ttf" id="4_n6a85"]
 [ext_resource type="StyleBox" uid="uid://c1i3svkycn37m" path="res://resource_instances/ui/buttonhover.tres" id="5_43a4n"]
@@ -66,11 +65,6 @@ size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ChatLobbyContainer"]
 layout_mode = 2
-
-[node name="ChatComponent" parent="ChatLobbyContainer/VBoxContainer" node_paths=PackedStringArray("chat_text_edit", "chat_label", "scroll_container") instance=ExtResource("2_5fe4g")]
-chat_text_edit = NodePath("../HBoxContainer3/WriteMsgBox")
-chat_label = NodePath("../HBoxContainer2/ScrollContainer/ChatLabel")
-scroll_container = NodePath("../HBoxContainer2/ScrollContainer")
 
 [node name="HBoxContainer1" type="HBoxContainer" parent="ChatLobbyContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 50)
@@ -262,17 +256,17 @@ theme_override_constants/margin_bottom = 10
 [node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="NetStatsLabel" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 27
 text = "Net stats"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="NetStatsScrollContainer" type="ScrollContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer/ScrollContainer"]
+[node name="NetStatsContentLabel" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer/NetStatsScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -476,7 +470,6 @@ theme_override_font_sizes/font_size = 30
 text = "LOBBY"
 
 [connection signal="pressed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer1/LeaveButton" to="." method="_on_leave_button_pressed"]
-[connection signal="text_changed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer3/WriteMsgBox" to="ChatLobbyContainer/VBoxContainer/ChatComponent" method="_on_write_msg_box_text_changed"]
 [connection signal="pressed" from="ChatLobbyContainer/VBoxContainer/HBoxContainer3/CreateCharacterButton" to="." method="_on_create_character_button_pressed"]
 [connection signal="text_changed" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/Control/NameInput" to="." method="_on_name_input_text_changed"]
 [connection signal="body_scale_changed" from="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft/MarginContainer/CharacterCharacterization" to="." method="_on_character_characterization_body_scale_changed"]

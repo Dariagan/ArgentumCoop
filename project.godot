@@ -26,8 +26,10 @@ config/features=PackedStringArray("4.3")
 
 [autoload]
 
-GlobalData="*res://scripts/singletons/global_data.gd"
+Global="*res://scripts/singletons/global.gd"
 GameData="*res://scripts/singletons/game_data.gd"
+Chat="*res://scripts/singletons/chat.gd"
+MusicPlayer="*res://scripts/singletons/music_player.gd"
 
 [display]
 
@@ -61,6 +63,10 @@ folder_colors={
 "res://scripts/": "green",
 "res://scripts/beings/": "green"
 }
+
+[global_group]
+
+NameLabel=""
 
 [importer_defaults]
 

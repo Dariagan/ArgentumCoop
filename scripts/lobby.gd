@@ -1,135 +1,148 @@
 extends Node
-# local peer
-var peer = ENetMultiplayerPeer.new()
+var mp_peer = ENetMultiplayerPeer.new()
 
 @export var character_creation_scene: PackedScene
 
 var _lobby_interface: LobbyInterface
-var _players: Array = []
-var _peers: Array = []
-var _ready_peers: Array = []
-var _characters_spawn_data: Array = [] 
+
+#usar dicts?
+var _players: PackedStringArray = [] # se tiene q pushear en el momento q hostea porque puede cambiar, no se puede poner desde el inicio de todo
+var _peers: PackedInt32Array = [1] #hay que usar esto en vez de multiplayer get_peer porque si se va alguien se pierde toda la ordenacion por indice i entre los distintos arrays
+var _ready_peers: PackedInt32Array = [] # doesn't include host
+var _characters_spawn_data: Array = [{}] 
+
+func _ready():
+	if Global.insta_start:
+		start_new_game()
+	
+	multiplayer.connected_to_server.connect(_clientfn_on_connect)
+	multiplayer.connection_failed.connect(_clientfn_on_fail_connect)#todo retornar si falla
+	multiplayer.server_disconnected.connect(_reset_arrays)
+	multiplayer.server_disconnected.connect(%MenuControl._return_from_lobby_to_menu)
+
+func _clientfn_on_peer_closed():
+	multiplayer.server_disconnected.disconnect(_clientfn_on_peer_closed)
+	if not orderly_shutdown:
+		pass#todo abrupt closing message
+
+func _clientfn_on_connect(): _clientfn_send_username_to_host.rpc_id(1, Global.username)
+func _clientfn_on_fail_connect(): push_error("failed to connect to %s:%d" % [_joined_ip, PORT])
+
+var _joined_ip: String
+
+func _on_join_pressed():
+	pass
 
 func _on_menu_control_lobby_started(lobby_interface: LobbyInterface, joined_ip: String) -> void:
+	_joined_ip = joined_ip
 	_lobby_interface = lobby_interface
 	_connect_signals(_lobby_interface)
 	
 	#_lobby_interface.follower_body_i_selected.connect(_on_follower_body_selected)
 	
-	if not joined_ip:
-		_lobby_interface.set_up_host_lobby(GlobalData.username)
-		_lobby_interface.player_clicked_leave.connect(_cancel_host, CONNECT_ONE_SHOT)
-		_host()
-	else:
+	var host: bool = not joined_ip;
+	if host:
+		_lobby_interface.set_up_host_lobby(Global.username)
+		multiplayer.peer_connected.connect(_hostfn_on_player_join)
+		multiplayer.peer_disconnected.connect(_hostfn_on_player_disconnect)
+		multiplayer.server_disconnected.connect(_hostfn_disconnect_signals)
+		_hostfn_create_server()
+	else: # client
+		multiplayer.server_disconnected.connect(_clientfn_on_peer_closed)
 		_lobby_interface.set_up_joiner_lobby()
-		_lobby_interface.player_clicked_leave.connect(_leave_as_client, CONNECT_ONE_SHOT)
-		_join(joined_ip)
+		_clientfn_create_client(joined_ip)
 
-const PORT: int = 1025 #PORTS BELOW 1024 MAY NOT WORK
+const PORT: int = 1025 #WARNING PORTS BELOW 1024 MAY NOT WORK
 
-func _host() -> void:
-	peer.create_server(PORT)
-	multiplayer.multiplayer_peer = peer
-	multiplayer.peer_connected.connect(_on_player_join)
-	multiplayer.peer_disconnected.connect(_on_player_disconnect)
-	_players.push_back(GlobalData.username)
-	_peers.push_back(1)
-	_characters_spawn_data.push_back({})
+func _hostfn_create_server() -> void:
+	_players.push_back(Global.username)
+	mp_peer.create_server(PORT)
+	multiplayer.multiplayer_peer = mp_peer
 	
-func _join(ip: String) -> void:
-	peer.create_client(ip, PORT)
+func _clientfn_create_client(ip: String) -> void:
+	mp_peer.create_client(ip, PORT)
+	multiplayer.multiplayer_peer = mp_peer
 	
-	multiplayer.multiplayer_peer = peer
-
-	#TODO: check if connection is successful
+func _hostfn_on_player_join(peer_id: int) -> void:
+	if peer_id != 1:
+		await _username_received#TODO poner timeout
+		_lobby_interface._update_lobby_title_for_client(peer_id)
+		_peers.push_back(peer_id)
+		_characters_spawn_data.push_back({})
+		_clientfn_get_arrays.rpc(_peers, _players, _ready_peers, _characters_spawn_data)
+		_update_players_for_gui()
+func _hostfn_on_player_disconnect(peer_id: int) -> void:
+	if peer_id != 1:
+		var ready_peer_i: int = _ready_peers.find(peer_id)
+		if ready_peer_i != -1:
+			_ready_peers.remove_at(ready_peer_i)
+		var peer_i: int = _peers.find(peer_id)
+		_players.remove_at(peer_i)
+		_characters_spawn_data.remove_at(peer_i)
+		_peers.remove_at(peer_i)
+		_clientfn_get_arrays.rpc(_peers, _players, _ready_peers, _characters_spawn_data)
+		_update_players_for_gui()
 	
+@rpc
+func _clientfn_get_arrays(peers: PackedInt32Array, players: PackedStringArray, 
+		ready_peers: PackedInt32Array, characters_spawn_data: Array):
+	_players = players; _update_players_for_gui()
+	_peers = peers
+	_ready_peers = ready_peers
+	_characters_spawn_data = characters_spawn_data
 	
-# executed ONLY on the host's PC
-func _on_player_join(peer_id: int) -> void:
-	await get_tree().create_timer(0.5).timeout
-	_lobby_interface._update_lobby_title_for_client(peer_id)
-	_request_player_username(peer_id)
-	_players.push_back(await player_username_received)
-	_peers.push_back(peer_id)
-	_characters_spawn_data.push_back({})
-	_sync_state_for_clients()
-	_update_players_for_gui()
-func _on_player_disconnect(peer_id: int) -> void:
-	var player_i: int = _peers.find(peer_id)
-	_players.remove_at(player_i)
-	_characters_spawn_data.remove_at(player_i)
-	_peers.erase(peer_id)
-	_ready_peers.erase(peer_id)
-	_sync_state_for_clients()
-	_update_players_for_gui()
-# executed ONLY on the host's PC
+var orderly_shutdown = false
+@rpc 
+func _orderly_closed_lobby():
+	orderly_shutdown = true
 	
-func _sync_state_for_clients() -> void: 
-	_give_player_list.rpc(_players) 
-	_give_peer_list.rpc(_peers)
-	_give_ready_peers_list.rpc(_ready_peers)
-	_give_characters_spawn_data.rpc(_characters_spawn_data)
-	
-@rpc func _give_player_list(players: Array) -> void: _players = players; _update_players_for_gui()
-@rpc func _give_peer_list(peers: Array) -> void: _peers = peers
-@rpc func _give_ready_peers_list(ready_peers: Array) -> void: _ready_peers = ready_peers	
-@rpc func _give_characters_spawn_data(characters_spawn_data: Array) -> void: _characters_spawn_data = characters_spawn_data
-	
-func _cancel_host() -> void:
-	clear_arrays()
-	_remove_from_lobby.rpc(false)
-	await get_tree().create_timer(1).timeout
-	peer.close()
-	peer = ENetMultiplayerPeer.new()
+func _hostfn_disconnect_signals() -> void:
+	multiplayer.peer_connected.disconnect(_hostfn_on_player_join)
+	multiplayer.peer_disconnected.disconnect(_hostfn_on_player_disconnect)
 		
-func _leave_as_client() -> void:
-	peer.close()
-	clear_arrays()
-		
-func clear_arrays() -> void:
+func _reset_arrays() -> void:
+	orderly_shutdown = false
+	_peers = [1]
+	_ready_peers = [{}]
 	_players.clear()
-	_peers.clear()
-	_ready_peers.clear()
 	_characters_spawn_data.clear()
 
-signal removed_from_lobby(kicked: bool)
+
 @rpc
-func _remove_from_lobby(kicked: bool) -> void:
-	clear_arrays()
-	removed_from_lobby.emit(kicked)
+func _clientfn_kick_from_lobby() -> void:
+	orderly_shutdown = true#ta mal porq pondria el mismo mensaje q si se cerra el lobby y no hay forma de distinguirlos con solo este bool
+	multiplayer.multiplayer_peer.close()#ejecuta señal on server closed
 
 func _update_players_for_gui() -> void:
 	if is_instance_valid(_lobby_interface):
 		_lobby_interface.update_player_list(_players)
 	
-@onready var game: Node = $Game
-
 # when ready is pressed in the GUI
-func _on_player_ready(_ready: bool) -> void:
+func _on_player_ready(ready: bool) -> void:
 	if multiplayer.get_unique_id() != 1:
-		_peer_is_ready.rpc(_ready)
-		
-	elif GlobalData.ignore_joiners_readiness_on_start or _is_everybody_ready():
+		_peer_is_ready.rpc(ready)
+	elif _is_everybody_ready() or Global.ignore_joiners_readiness_on_start:
 		_on_game_start.rpc()
-		game.start_new_game(_characters_spawn_data, _peers)
+		start_new_game()
 		
 @rpc("call_local")
 func _on_game_start():
 	_lobby_interface.queue_free()
 
-
 @rpc("call_local", "any_peer")
-func _peer_is_ready(_ready: bool) -> void:
+func _peer_is_ready(ready: bool) -> void:
 	var peer_id: int = multiplayer.get_remote_sender_id()
-	if _ready and peer_id not in _ready_peers:
+	if ready and peer_id not in _ready_peers:
 		_ready_peers.push_back(peer_id)
-	elif not _ready:
-		_ready_peers.erase(peer_id)
+	elif not ready:
+		_ready_peers.remove_at(_ready_peers.find(peer_id))
 	
-func _is_everybody_ready() -> bool:
-	return _ready_peers.size() + 1 == _peers.size()
-		
+func _is_everybody_ready() -> bool:#doesn't count host
+	return _ready_peers.size() == multiplayer.get_peers().size()
+			
 func _connect_signals(lobby_interface: LobbyInterface):
+	lobby_interface.clicked_leave.connect(mp_peer.close)
+	
 	lobby_interface.ready_toggled.connect(_on_player_ready)
 	lobby_interface.name_changed.connect(_on_name_selected)
 	lobby_interface.race_selected.connect(_on_race_selected)
@@ -139,55 +152,93 @@ func _connect_signals(lobby_interface: LobbyInterface):
 	lobby_interface.follower_selected.connect(_on_follower_selected)
 	lobby_interface.body_scale_changed.connect(_on_body_scale_changed)
 	
-# EN VEZ DE TODO ESTO HACER Q APENAS SE UNA EL PLAYER ESTE EJECUTE UN .RPC_ID(1, _username) Y EL SERVER SE LO QUEDA AHÍ
-#region for requesting a peer's username
-signal player_username_received(username: String)
-var requested_peer: int = -1
-func _request_player_username(peer_id: int) -> void:
-	requested_peer = peer_id
-	_return_player_username.rpc_id(peer_id)
-@rpc 
-func _return_player_username() -> void:
-	_receive_player_username.rpc_id(multiplayer.get_remote_sender_id(), GlobalData.username)
+signal _username_received
 @rpc("any_peer")
-func _receive_player_username(username: String) -> void:
-	if  multiplayer.get_remote_sender_id() == requested_peer:
-		player_username_received.emit(username)
-	requested_peer = -1
-#endregion for requesting a peer's username
-
+func _clientfn_send_username_to_host(username: String) -> void:
+	if multiplayer.get_remote_sender_id() == multiplayer.get_peers()[-1]:#posible bug si se une uno justo
+		_players.push_back(username)
+		_username_received.emit()
 
 #region Character creation synchronization
 func _on_name_selected(new_name: String):
-	if new_name: _update_characterization_for_everyone.rpc(Constants.KEYS.NAME, new_name)
-	else: _update_characterization_for_everyone.rpc(Constants.KEYS.NAME)
+	if new_name: _allfn_update_characterization.rpc(Constants.KEYS.NAME, new_name)
+	else: _allfn_update_characterization.rpc(Constants.KEYS.NAME)
 func _on_race_selected(race: ControllableRace):
-	if race: _update_characterization_for_everyone.rpc(Constants.KEYS.RACE, race.id)
-	else: _update_characterization_for_everyone.rpc(Constants.KEYS.RACE)
-func _on_sex_selected(sex: Constants.Sex):
-	if sex > 0: _update_characterization_for_everyone.rpc(Constants.KEYS.SEX, sex)
-	else: _update_characterization_for_everyone.rpc(Constants.KEYS.SEX)
+	if race: _allfn_update_characterization.rpc(Constants.KEYS.RACE, race.id)
+	else: _allfn_update_characterization.rpc(Constants.KEYS.RACE)
+func _on_sex_selected(sex: Enums.Sex):
+	if sex > 0: _allfn_update_characterization.rpc(Constants.KEYS.SEX, sex)
+	else: _allfn_update_characterization.rpc(Constants.KEYS.SEX)
 	
 func _on_head_selected(head : SpriteData):
 	if head: 
-		_update_characterization_for_everyone.rpc(Constants.KEYS.HEAD, head.id)
+		_allfn_update_characterization.rpc(Constants.KEYS.HEAD, head.id)
 	else: 
-		_update_characterization_for_everyone.rpc(Constants.KEYS.HEAD)
+		_allfn_update_characterization.rpc(Constants.KEYS.HEAD)
 	
 func _on_class_selected(klass: Klass):
-	if klass: _update_characterization_for_everyone.rpc(Constants.KEYS.KLASS, klass.id)
-	else: _update_characterization_for_everyone.rpc(Constants.KEYS.KLASS)
+	if klass: _allfn_update_characterization.rpc(Constants.KEYS.KLASS, klass.id)
+	else: _allfn_update_characterization.rpc(Constants.KEYS.KLASS)
 func _on_follower_selected(follower: UncontrollableRace):
-	if follower: _update_characterization_for_everyone.rpc(Constants.KEYS.FOLLOWERS, [follower.id])
-	else: _update_characterization_for_everyone.rpc(Constants.KEYS.FOLLOWERS)
+	if follower: _allfn_update_characterization.rpc(Constants.KEYS.FOLLOWERS, [follower.id])
+	else: _allfn_update_characterization.rpc(Constants.KEYS.FOLLOWERS)
 func _on_body_scale_changed(new_scale: Vector3):
-	_update_characterization_for_everyone.rpc(Constants.KEYS.BODY_SCALE, new_scale)
+	_allfn_update_characterization.rpc(Constants.KEYS.BODY_SCALE, new_scale)
 	
 @rpc("call_local", "any_peer")
-func _update_characterization_for_everyone(characterization_key: StringName, value = null): 
+func _allfn_update_characterization(characterization_key: StringName, value = null): 
 	var sender_i: int = _peers.find(multiplayer.get_remote_sender_id())
 	if value != null:
 		_characters_spawn_data[sender_i][characterization_key] = value
 	else:
 		_characters_spawn_data[sender_i].erase(characterization_key)
+#endregion
+
+#region Pregame
+
+@onready var tile_map: GdTileMap = $GdTileMap	
+
+func start_new_game() -> void:
+	
+	#TODO hacer un subviewport de tamaño fijo para el game, y poner gui en los costados
+	#TODO CONFIGURAR ESTO MANULMENTE? 
+	#DisplayServer.screen_get_size()
+	get_tree().root.size = Vector2i(900, 500)
+
+	tile_map.generate_world.rpc()
+	
+	var spawned_beings: Array[Being] = []
+	
+	var i: int = 0
+	for player_start_data: Dictionary in _characters_spawn_data:
+		
+		if not player_start_data.has(Constants.KEYS.NAME):
+			player_start_data[Constants.KEYS.NAME] = "nameless_player%d"%i
+		if not player_start_data.has(Constants.KEYS.RACE):
+			player_start_data[Constants.KEYS.RACE] = &"controllable_random"
+		if not player_start_data.has(Constants.KEYS.KLASS):
+			player_start_data[Constants.KEYS.KLASS] = &"random"
+		if not player_start_data.has(Constants.KEYS.SEX):
+			player_start_data[Constants.KEYS.SEX] = &"random"
+		if not player_start_data.has(Constants.KEYS.HEAD):
+			player_start_data[Constants.KEYS.HEAD] = &"random"
+		if not player_start_data.has(Constants.KEYS.BODY):
+			player_start_data[Constants.KEYS.BODY] = &"random"
+		
+		player_start_data[Constants.KEYS.FACTION] = &"player"	
+		
+		#extra health para los protagonists
+		player_start_data[Constants.KEYS.HEALTH_MULTIP] = 2	
+		
+		var player_being_preinit_data = BeingStatePreIniter.new()
+		player_being_preinit_data.construct(player_start_data)
+		
+		var being: Being = tile_map.spawn_starting_player(player_being_preinit_data)
+		spawned_beings.push_back(being)
+		i+=1
+		
+	i=0
+	for being in spawned_beings:
+		being.give_control.rpc(_peers[i])
+		i+=1
 #endregion

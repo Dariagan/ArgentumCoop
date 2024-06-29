@@ -1,5 +1,6 @@
 extends AnimatedSprite2D
 class_name AnimatedBodyPortion
+#no usar synchronizer para esto porq sino hay q hacer configuraci
 
 var _animation_states: Array
 var _starting_sprite_width_frontally_sideways_height: Vector3
@@ -43,7 +44,7 @@ func _set_starting_sprite_data(sprite_data: SpriteData) -> void:
 
 @rpc
 func _set_starting_sprite_data_remotely(data: Array):
-	sprite_frames = GlobalData.sprites_datas[data[0]].frames
+	sprite_frames = Global.sprites_datas[data[0]].frames
 	_animation_states = data[1]
 	position = data[2]
 	position.y = data[3]
@@ -54,29 +55,46 @@ func change_sprite_data(sprite_data: SpriteData) -> void:
 	_animation_states = sprite_data.animation_states
 	
 	var net_scale: Vector3 = _starting_sprite_width_frontally_sideways_height * _character_width_frontally_sideways_height * sprite_data.width_frontally_sideways_height
-	self.set("_scale", net_scale)
+	_scale = net_scale
 
 
-func _play_handled(animation_name: String = "", custom_speed: float = 1.0, from_end: bool = false) -> void:
-	var split_string: PackedStringArray = animation_name.split("_", false, 1)
-	var animation_state: StringName = split_string[0]
-	var animation_direction: StringName = split_string[1]
-	
+func _play_handled(animation_state: Enums.AnimationState, direction: Enums.Dir, custom_speed: float = 1.0, from_end: bool = false) -> void:
 	if _width_asimetrically_altered:
-		match animation_direction:
-			&"up", &"down":
+		match direction:
+			Enums.Dir.UP, Enums.Dir.DOWN:
 				_set_x_scale_remotely.rpc(_scale[0])
-			&"left", &"right":
+			Enums.Dir.LEFT, Enums.Dir.RIGHT:
 				_set_x_scale_remotely.rpc(_scale[1])
 	
-	if animation_state in _animation_states:
-		_play_remotely.rpc(animation_name, custom_speed, from_end)
-	else:	
-		_play_remotely.rpc(animation_name.replace(animation_state, "idle"), custom_speed, from_end)
+	if _animation_states.find(animation_state) != -1:
+		_play_remotely.rpc(get_animation_name(animation_state, direction), custom_speed, from_end)
+	else:
+		_play_remotely.rpc(get_animation_name(Enums.AnimationState.IDLE, direction), custom_speed, from_end)
+	
+	
+
+static func get_animation_name(animation_state: Enums.AnimationState, direction: Enums.Dir) -> StringName:
+	match [animation_state, direction]:
+		[Enums.AnimationState.IDLE, Enums.Dir.LEFT]:  return &"idle_left"
+		[Enums.AnimationState.IDLE, Enums.Dir.RIGHT]: return &"idle_right"
+		[Enums.AnimationState.IDLE, Enums.Dir.DOWN]:  return &"idle_down"
+		[Enums.AnimationState.IDLE, Enums.Dir.UP]:    return &"idle_up"
+		[Enums.AnimationState.WALK, Enums.Dir.LEFT]:  return &"walk_left"
+		[Enums.AnimationState.WALK, Enums.Dir.RIGHT]: return &"walk_right"
+		[Enums.AnimationState.WALK, Enums.Dir.DOWN]:  return &"walk_down"
+		[Enums.AnimationState.WALK, Enums.Dir.UP]:    return &"walk_up"
+		[Enums.AnimationState.JOG, Enums.Dir.LEFT]:   return &"jog_left"
+		[Enums.AnimationState.JOG, Enums.Dir.RIGHT]:  return &"jog_right"
+		[Enums.AnimationState.JOG, Enums.Dir.DOWN]:   return &"jog_down"
+		[Enums.AnimationState.JOG, Enums.Dir.UP]:     return &"jog_up"
+		#meter mas animationstates si hace falta, simplemente no usarlos si no se usan en el caso default
+		#ejemplo EXTRA1, EXTRA2
+	push_error("couldn't match")
+	return &""
 
 #sacar lo de any peer y asignar authority
 @rpc("call_local", "any_peer", "unreliable")
-func _play_remotely(animation_name: String, custom_speed: float, from_end: bool):
+func _play_remotely(animation_name: StringName, custom_speed: float, from_end: bool):
 	super.play(animation_name, custom_speed, from_end)
 
 #sacar lo de any peer y asignar authority

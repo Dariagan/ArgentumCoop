@@ -25,11 +25,8 @@ impl SafeVec {
   pub fn is_strictly_smaller_than(&self, other: Self) -> bool {self.lef < other.lef && self.right < other.right}
   pub fn is_strictly_smaller_than_unsvec(&self, other: UnsVec) -> bool {self.lef < other.lef as i32 && self.right < other.right as i32}
   pub fn all_bigger_than_min(&self, min: i32) -> Result<Self, String> {
-  if self.lef >= min && self.right >= min {
-    Ok(*self)
-  } else {
-    Err(format!("One or both values are less than the minimum value of {}", min))
-  }
+    if self.lef >= min && self.right >= min { Ok(*self)} 
+    else { Err(format!("One or both values are less than the minimum value of {}", min))}
   }
   pub fn is_equal_or_bigger_than(&self, other: Self) -> bool {self.lef >= other.lef && self.right >= other.right}
   pub fn is_strictly_bigger_than(&self, other: &Self) -> bool {self.lef > other.lef && self.right > other.right}
@@ -71,10 +68,10 @@ impl AddAssign for SafeVec {
 impl Sub for SafeVec {
   type Output = SafeVec;
   fn sub(self, other: SafeVec) -> SafeVec {
-  SafeVec {
-    lef: self.lef - other.lef,
-    right: self.right - other.right,
-  }
+    SafeVec {
+      lef: self.lef - other.lef,
+      right: self.right - other.right,
+    }
   }
 }
 impl SubAssign for SafeVec {

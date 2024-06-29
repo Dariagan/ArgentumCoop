@@ -7,11 +7,17 @@ var id: StringName
 @export var race_id: StringName
 @export var klass_id: StringName = &"random"
 
+#use an if inside the script to change its behavior depending if its faction is the playerfaction
+#scripts can extend each other, no need to duplicate code for similar ai behaviors
+@export var ai_process: GDScript
+
+@export var display_being_name: bool = false
+
 #meter los spritesdatas directamente?
 @export var bodies_distribution: Dictionary
 @export var heads_distribution: Dictionary
 
-@export var sex: Constants.Sex = Constants.Sex.ANY
+@export var sex: Enums.Sex = Enums.Sex.ANY
 
 @export var extra_health_multiplier_range: Vector2 = Vector2.ONE
 @export var head_scale_range: Vector2 = Vector2.ONE
@@ -34,20 +40,22 @@ var id: StringName
 #TODO hacer sets de tiles whitelisted comúnes para reutilizar
 @export var whitelisted_tiles_for_spawning: Dictionary = {}
 
+
+
 func _instantiate_being_birth_dict() -> Dictionary:
 	assert(id and race_id)
 	
-	if GlobalData.controllable_races.has(race_id):
+	if Global.controllable_races.has(race_id):
 		if klass_id != &"random":
-			assert(GlobalData.klasses.has(klass_id))
+			assert(Global.klasses.has(klass_id))
 	else:
-		assert(GlobalData.uncontrollable_races.has(race_id))
+		assert(Global.uncontrollable_races.has(race_id))
 	
 	assert(extra_health_multiplier_range.x <= extra_health_multiplier_range.y)
 	assert(head_scale_range.x <= head_scale_range.y)
 	assert(body_scale_range.x <= body_scale_range.y)
 	assert(dropped_xp_range.x <= dropped_xp_range.y)
-	var race: BasicRace = GlobalData.races[race_id]
+	var race: BasicRace = Global.races[race_id]
 	for head: SpriteData in heads_distribution:
 		assert(race.head_sprites_datas.has(head))
 	for body: BodySpriteData in bodies_distribution:

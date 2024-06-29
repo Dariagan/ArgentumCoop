@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/uim_main_menu_interface.gd" id="1_acy1w"]
 
-[node name="no deberia ser control" type="Control"]
+[node name="Control" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -58,6 +58,7 @@ placeholder_text = "Player name"
 [node name="MenuButton" type="MenuButton" parent="."]
 layout_mode = 0
 
+[connection signal="pressed" from="TextureRect/Quick Start" to="." method="_on_quick_start_pressed"]
 [connection signal="pressed" from="TextureRect/Host" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="TextureRect/join" to="." method="_on_join_pressed"]
 [connection signal="text_submitted" from="TextureRect/LineEdit" to="." method="_on_line_edit_text_submitted"]

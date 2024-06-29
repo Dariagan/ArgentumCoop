@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ncfuhdmiaxbl"]
+
+[ext_resource type="Script" path="res://scripts/singletons/chat.gd" id="1_jqqsc"]
+
+[node name="ChatComponent" type="Node"]
+script = ExtResource("1_jqqsc")

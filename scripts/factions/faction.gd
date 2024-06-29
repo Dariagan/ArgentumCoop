@@ -3,7 +3,4 @@ extends Resource
 class_name Faction
 
 var name: String
-
-
-
-
+var name_label_color: Color 

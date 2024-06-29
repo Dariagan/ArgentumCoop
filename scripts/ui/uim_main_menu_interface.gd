@@ -1,14 +1,15 @@
 extends Control
 
+signal quick_start_pressed
 signal host_pressed
 signal join_pressed(ip: String)
 signal name_changed(new_name: String)
 
 func _ready():
-	%IpLineEdit.text = GlobalData.default_ip_to_join
+	%IpLineEdit.text = Global.default_ip_to_join
 
 func _on_quick_start_pressed() -> void:
-	pass 
+	quick_start_pressed.emit() 
 
 func _on_host_pressed() -> void:
 	hide()

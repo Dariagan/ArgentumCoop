@@ -8,10 +8,7 @@ use godot::builtin::{Vector2, Vector2i};
 use crate::utils::safe_vec::SafeVec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct UnsVec {
-  pub lef: u32,
-  pub right: u32,
-}
+pub struct UnsVec {pub lef: u32, pub right: u32}
 
 #[allow(dead_code)]
 impl UnsVec {
@@ -27,7 +24,7 @@ impl UnsVec {
   pub fn is_strictly_smaller_than(&self, other: Self) -> bool {self.lef < other.lef && self.right < other.right}
   pub fn is_strictly_bigger_than(&self, other: &Self) -> bool {self.lef > other.lef && self.right > other.right}
   pub fn is_bigger_or_equal_than(&self, other: Self) -> bool {self.lef >= other.lef && self.right >= other.right}
-  pub fn flat_index(&self, size: &UnsVec) -> usize{(self.lef*size.lef + self.right) as usize}
+  pub fn flat_index(&self, size: &UnsVec) -> usize{(self.lef * size.lef + self.right) as usize}
   pub fn length(&self) -> f64 {self.distance_to(&UnsVec { lef: 0, right: 0 })}
   pub fn length_f32(&self) -> f32 {self.distance_to(&UnsVec { lef: 0, right: 0 }) as f32}
   
@@ -44,7 +41,6 @@ impl UnsVec {
     let checked: SafeVec = checked.into();
     checked.is_equal_or_bigger_than(top_left) && checked.is_strictly_smaller_than(bottom_right)
   }
-
 
   pub fn distance_to(&self, other: &Self) -> f64 {
   (((self.lef - other.lef).pow(2) + (self.right - other.right).pow(2)) as f64).sqrt()

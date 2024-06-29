@@ -8,8 +8,8 @@ class_name SpriteData
 
 @export var frames: SpriteFrames
 
-@export var sex: Constants.Sex = Constants.Sex.ANY
-@export var animation_states: Array[StringName] = [&"idle"]
+@export var sex: Enums.Sex = Enums.Sex.ANY
+@export var animation_states: Array[Enums.AnimationState] = [Enums.AnimationState.IDLE]
 
 @export var offset_global: Vector2 = Vector2.ZERO
 @export var offset_down: Vector2 = Vector2.ZERO

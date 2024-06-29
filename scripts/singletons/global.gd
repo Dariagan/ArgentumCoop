@@ -5,30 +5,12 @@ extends Node
 @export var insta_start: bool = false
 @export var debug: bool = true
 @export var debug_walk_mult:float = 3
-@export var noclip: bool = true
+@export var noclip: bool = false
 @export var noclip_speed_mult:float = 600
 var default_ip_to_join: String = "localhost"
 #endregion Debugging configuration
-
 # PRESIONA F1 PARA IMPRIMIR TU POSICIÓN ACTUAL EN EL TILEMAP POR CONSOLA!
-
 var username: String
-
-const CPP_BUFFER_LENGTH_MINUS_ONE = 32 - 1
-const item_data_directories: Array[String] = []#["res://resource_instances/things/items/", "res://resource_instances/things/items/wear/body/"]
-const sprites_datas_directories: Array[String] = ["res://resource_instances/beings/sprites/spritesdatas/"]
-const recipes_directories: Array[String] = []
-const building_data_directories: Array[String] = []
-const controllable_races_directories: Array[String] = ["res://resource_instances/beings/races/controllable/"]
-const uncontrollable_races_directories: Array[String] = ["res://resource_instances/beings/races/uncontrollable/"]
-const tile_selections_directories: Array[String] =["res://resource_instances/tiling/tile_selections/"]
-
-const klasses_directories: Array[String] = ["res://resource_instances/beings/klasses/"]
-const tiles_directories: Array[String] = ["res://resource_instances/tiling/tiles/terrain/", "res://resource_instances/tiling/tiles/structures/"]
-const spawnable_scenes_directories: Array[String] = ["res://scenes/tiles/"]
-
-const beingkinds_directories: Array[String] = ["res://resource_instances/beings/beingkinds/"]
-#TODO hacer un player mods directory
 
 var item_data: Dictionary
 
@@ -49,10 +31,24 @@ var tile_selections: Dictionary
 
 var spawnable_scenes: Array[String]
 
+var taunt_sounds: Dictionary
+
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resource_instances/tiling/tiles/tile_set.tres")
 
 func _init() -> void:
+	const item_data_directories: Array[String] = []#["res://resource_instances/things/items/", "res://resource_instances/things/items/wear/body/"]
+	const sprites_datas_directories: Array[String] = ["res://resource_instances/beings/sprites/spritesdatas/"]
+	const recipes_directories: Array[String] = []
+	const building_data_directories: Array[String] = []
+	const controllable_races_directories: Array[String] = ["res://resource_instances/beings/races/controllable/"]
+	const uncontrollable_races_directories: Array[String] = ["res://resource_instances/beings/races/uncontrollable/"]
+	const tile_selections_directories: Array[String] =["res://resource_instances/tiling/tile_selections/"]
+	const klasses_directories: Array[String] = ["res://resource_instances/beings/klasses/"]
+	const tiles_directories: Array[String] = ["res://resource_instances/tiling/tiles/terrain/", "res://resource_instances/tiling/tiles/structures/"]
+	#const spawnable_scenes_directories: Array[String] = ["res://scenes/tiles/"]
+	const beingkinds_directories: Array[String] = ["res://resource_instances/beings/beingkinds/"]
+	const taunt_directories: Array[String] = ["res://assets/sound/taunts/"]
 	
 	item_data = _index_all_found_resource_instances(item_data_directories, true)
 	sprites_datas = _index_all_found_resource_instances(sprites_datas_directories, true)
@@ -72,6 +68,9 @@ func _init() -> void:
 	tiles_data.make_read_only()
 	
 	beingkinds = _index_all_found_resource_instances(beingkinds_directories, true)
+	beingkinds.make_read_only()
+	
+	taunt_sounds = _index_all_found_resource_instances(taunt_directories, false)
 	
 	#spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
 
@@ -81,7 +80,7 @@ func _index_all_found_resource_instances(directories: Array[String], check_subfo
 	var table: Dictionary = {}
 	
 	for directory in directories:
-		dir_access = DirAccess.open(directory) 
+		dir_access = DirAccess.open(directory)
 		
 		if dir_access:
 			dir_access.list_dir_begin()
@@ -89,30 +88,28 @@ func _index_all_found_resource_instances(directories: Array[String], check_subfo
 			
 			while file_name != "":
 				if !dir_access.current_is_dir():
-          if not file_name.ends_with(".import"):
-            var resource
-            if not use_safe_loader:
-              resource = ResourceLoader.load(directory + file_name)
-            else:#NO USAR SI ESTÁ EN .res/ EL DIRECTORIO, NO HACE FALTA
-              resource = SafeResourceLoader.load(directory + file_name)
-            
-            if file_name == &"temperate":
-              print()
-            
-            if resource:
-              resource.id = StringName(file_name.trim_suffix(".tres"))						
-              if table.has(resource.id):
-                push_warning("a resource with id=%s is already present in target dict"%[resource.id])
-                resource = null
-            if resource:
-              if resource.has_method("validate") && not resource.validate():
-                printerr("resource %s doesn't meet its validation condition"%[file_name])
-                resource = null
-            if resource:
-              table[resource.id] = resource
-            else:
-              printerr("%s%s was NOT added into its target dictionary" % [directory, file_name])
-					
+					if not file_name.ends_with(".import"):
+						var resource
+						if not use_safe_loader:
+							resource = ResourceLoader.load(directory + file_name)
+						else:#NO USAR SI ESTÁ EN .res/ EL DIRECTORIO, NO HACE FALTA
+							resource = SafeResourceLoader.load(directory + file_name)
+						
+						if resource:
+							var id: StringName = file_name.get_basename()
+							if file_name.ends_with(".tres"): resource.id = id
+							if table.has(id):
+								push_warning("a resource with id=%s is already present in target dict"%[resource.id])
+								resource = null
+							if resource:
+								if resource.has_method(&"validate") && not resource.validate():
+									printerr("resource %s doesn't meet its validation condition"%[file_name])
+									resource = null
+							if resource:
+								table[id] = resource
+						else:
+							printerr("%s%s was NOT added into its target dictionary" % [directory, file_name])
+								
 				elif check_subfolders:
 					var subdict: Dictionary = _index_all_found_resource_instances([directory+file_name+"/"], true)
 					for key in subdict:
@@ -130,7 +127,7 @@ func _list_all_spawnable_scenes(directories: Array[String]) -> Array[String]:
 	var found_scenes: Array[String] = []
 	
 	for directory in directories:
-		dir_access = DirAccess.open(directory) 
+		dir_access = DirAccess.open(directory)
 		
 		if dir_access:
 			dir_access.list_dir_begin()
@@ -145,3 +142,9 @@ func _list_all_spawnable_scenes(directories: Array[String]) -> Array[String]:
 			print("Couldn't open directory %s" % [directory])
 	
 	return found_scenes
+
+#includes host
+func get_all_peers() -> PackedInt32Array:
+	var peers: PackedInt32Array = [1]
+	peers.append_array(multiplayer.get_peers())
+	return peers;

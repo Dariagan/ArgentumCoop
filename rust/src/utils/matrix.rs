@@ -46,14 +46,14 @@ impl<T: Default + Clone> IndexMut<UnsVec> for Matrix<T> {
     unsafe{self.flattened_matrix.get_unchecked_mut(coords.flat_index(&self.size))}
   }
 }
-pub struct DownScalingMatrix<T: Default + Clone> {
+pub struct DownScalingMatrix<T: Default> {
   downscale_factor: u8,
   flattened_matrix: Vec<T>,
   downscaled_size: UnsVec,
   area: usize,
 }
 #[allow(dead_code)]
-impl<T: Default + Clone> DownScalingMatrix<T> {
+impl<T: Default> DownScalingMatrix<T> {
   pub fn size(&self) -> UnsVec {self.downscaled_size}
   pub fn area(&self) -> usize {self.area}
   pub fn new(size_to_downscale_from: UnsVec, downscale_factor: u8) -> Self {
@@ -67,14 +67,6 @@ impl<T: Default + Clone> DownScalingMatrix<T> {
       flattened_matrix,
       downscaled_size,
       area,
-    }
-  }
-  pub fn new_with_element_value(size_to_downscale_from: UnsVec, downscale_factor: u8, element_value: &T) -> Self {
-    let downscaled_size = size_to_downscale_from / downscale_factor;
-    let area = downscaled_size.area();
-    Self {
-      flattened_matrix: vec![element_value.clone(); area],
-      downscaled_size, area, downscale_factor,
     }
   }
   pub fn at(&self, coords: UnsVec) -> Option<&T> {

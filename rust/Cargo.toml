@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-godot = { git = "https://github.com/godot-rust/gdext", branch = "master"}
+godot = "*"
 gxhash = "=3.4.1"
 #num = "0.4"
 #ranged-num = "0.1"
@@ -26,3 +26,16 @@ crate-type = ["cdylib"]
 [dependencies.fastnoise-lite]
 version = "*"
 features = ["f64"]
+
+[profile.release]
+opt-level = 3
+debug = false
+split-debuginfo = '...'  # Platform-specific.
+strip = "none"
+debug-assertions = false
+overflow-checks = false
+lto = false
+panic = 'unwind'
+incremental = false
+codegen-units = 16
+rpath = false

@@ -26,7 +26,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 	assert(being_birth_dict != null && being_birth_dict != {})
 	
 	#region are constructed inside internal_state
-	var sex: Constants.Sex
+	var sex: Enums.Sex
 	var race: BasicRace
 	var klass: Klass
 	var faction: Faction
@@ -47,24 +47,24 @@ func construct(being_birth_dict: Dictionary) -> void:
 	
 	if race_id == &"controllable_random":
 		being_birth_dict[Constants.KEYS.RACE] = &"random"
-		race = handle_key(Constants.KEYS.RACE, being_birth_dict, GlobalData.controllable_races)
+		race = handle_key(Constants.KEYS.RACE, being_birth_dict, Global.controllable_races)
 	elif race_id == &"uncontrollable_random":
 		being_birth_dict[Constants.KEYS.RACE] = &"random"
-		race = handle_key(Constants.KEYS.RACE, being_birth_dict, GlobalData.uncontrollable_races)	
-	elif GlobalData.races[race_id] is ControllableRace:
-		race = handle_key(Constants.KEYS.RACE, being_birth_dict, GlobalData.controllable_races)
-	elif GlobalData.races[race_id] is UncontrollableRace:
-		race = handle_key(Constants.KEYS.RACE, being_birth_dict, GlobalData.uncontrollable_races)
+		race = handle_key(Constants.KEYS.RACE, being_birth_dict, Global.uncontrollable_races)	
+	elif Global.races[race_id] is ControllableRace:
+		race = handle_key(Constants.KEYS.RACE, being_birth_dict, Global.controllable_races)
+	elif Global.races[race_id] is UncontrollableRace:
+		race = handle_key(Constants.KEYS.RACE, being_birth_dict, Global.uncontrollable_races)
 	else:
 		push_error("not a valid race id")
 		
-	klass = handle_key(Constants.KEYS.KLASS, being_birth_dict, GlobalData.klasses)
+	klass = handle_key(Constants.KEYS.KLASS, being_birth_dict, Global.klasses)
 	
 	faction = handle_key(Constants.KEYS.FACTION, being_birth_dict, GameData.factions)
 		
 	if being_birth_dict.has(Constants.KEYS.FOLLOWERS):
-		# BUG, ARREGLAR. DICE  AHÍ. HAY Q ARREGLAR ETO
-		followers = GlobalData.klasses[being_birth_dict[Constants.KEYS.FOLLOWERS]]
+		# BUG, ARREGLAR. DICE klasses AHÍ. HAY Q ARREGLAR ETO
+		followers = Global.klasses[being_birth_dict[Constants.KEYS.FOLLOWERS]]
 			
 	sprite_head = handle_key(Constants.KEYS.HEAD, being_birth_dict, race.head_sprites_datas)
 			
@@ -78,19 +78,19 @@ func construct(being_birth_dict: Dictionary) -> void:
 	
 	var sex_value = being_birth_dict[Constants.KEYS.SEX]
 	
-	if sex_value is StringName or sex_value == Constants.Sex.ANY:
+	if sex_value is StringName or sex_value == Enums.Sex.ANY:
 		var sex_probs: Dictionary = {
-			Constants.Sex.MALE: race.males_ratio,
-			Constants.Sex.FEMALE: 1 - race.males_ratio
+			Enums.Sex.MALE: race.males_ratio,
+			Enums.Sex.FEMALE: 1 - race.males_ratio
 		}
 		sex = WeightedChoice.pick(sex_probs)
-	elif sex_value is Constants.Sex:
+	elif sex_value is Enums.Sex:
 		sex = sex_value
 	else:
 		push_error("invalid type for \"sex\" entry in birth dict")
 		
 	if being_birth_dict.has(Constants.KEYS.BEINGKIND):
-		beingkind = handle_key(Constants.KEYS.BEINGKIND, being_birth_dict, GlobalData.beingkinds)
+		beingkind = handle_key(Constants.KEYS.BEINGKIND, being_birth_dict, Global.beingkinds)
 
 	assert(sex && race && faction)
 	internal_state = BeingInternalState.new()

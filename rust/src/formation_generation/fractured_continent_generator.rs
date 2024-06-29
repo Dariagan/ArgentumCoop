@@ -109,7 +109,7 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
   
   
   let (continentness, continental): (f32, bool) = 
-  val_surpasses_cutoff(peninsuler.get_noise_2d(rel_coords)*calc_continentness(continenter, rel_coords, size, None, Some(continenter_offset)), CONTINENTER_CUTOFF);
+  val_surpasses_cutoff(calc_continentness(continenter, rel_coords, size, Some(peninsuler) ,Some(continenter_offset), None), CONTINENTER_CUTOFF);
   
         
   let rng: &mut Lcg128Xsl64 = rngs.drf().get_unchecked_mut(thread_i);
@@ -171,7 +171,7 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
         right: rng.gen_range(size.right/10..size.right*9/10),
       };
   
-    let continentness = calc_continentness(continenter, r_coords, size, None, Some(continenter_offset));
+    let continentness = calc_continentness(continenter, r_coords, size, Some(peninsuler), Some(continenter_offset), None);
     if continentness > CONTINENTER_CUTOFF + 0.005 
       && !calc_lakeness(r_coords, big_laker, small_laker, calc_beachness(r_coords, big_beacher, small_beacher, continentness), continentness)
       && clear_of(&all_trees, r_coords, 3, true)

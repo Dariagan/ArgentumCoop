@@ -5,6 +5,8 @@ var id: StringName
 @export var name: String = " "
 @export var icon: Texture2D
 
+
+
 @export var default_being_names: Array[StringName] = []
 
 #may be overriden by specific beingkinds
@@ -31,12 +33,14 @@ var id: StringName
 
 #@export var body: Body las partes del cuerpo, incluyendo si están incluidas en la generación de damage o no
 
+@export var ai_process: GDScript = preload("res://scripts/beings/default_ai_process.gd")
+
 @export_category("Eating")
 @export_range(0, 3) var hunger_rate: float = 1
 @export var diets: Array[Diet] = []
 
 @export_category("Abilities")
-@export var can_walk_on: Array[Constants.TerrainType] = [Constants.TerrainType.LAND]
+@export var can_walk_on: Array[Enums.TerrainType] = [Enums.TerrainType.LAND]
 @export var can_vent: bool = false
 @export var can_climb: bool = false#hacer int de nivel 0-10?
 

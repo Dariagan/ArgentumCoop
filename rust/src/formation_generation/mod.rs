@@ -83,10 +83,14 @@ pub fn generate_stateful_instance(world_matrix: *mut WorldMatrix, (origin, relat
 
 
 #[inline]
-pub fn calc_continentness(continenter: SharedNoise, rel_coords: UnsVec, size: UnsVec, power: Option<f32>, offset: Option<UnsVec>) -> f32 {
+pub fn calc_continentness(continenter: SharedNoise, rel_coords: UnsVec, size: UnsVec, peninsuler: Option<SharedNoise>, offset: Option<UnsVec>, power: Option<f32>, ) -> f32 {
   let bff = get_border_farness_factor(rel_coords, size, power);
-  let val = bff * continenter.get_noise_2d(rel_coords + offset.unwrap_or_default());
-  val
+
+  let peninsuler_val = peninsuler.map_or(1.0, |p| p.get_noise_2d(rel_coords));
+
+  let offset_coords = rel_coords + offset.unwrap_or_default();
+
+  bff * continenter.get_noise_2d(offset_coords) * peninsuler_val
 }
 #[inline]
 pub fn noise_surpasses_cutoff(fast_noise_lite: SharedNoise, rel_coords: UnsVec, cutoff: f32) ->(f32, bool){
@@ -103,8 +107,8 @@ pub fn get_border_farness_factor(rel_coords: UnsVec, world_size: UnsVec, power: 
   1.0 - horizontal_border_closeness.max(vertical_border_closeness)
 }
 pub fn clear_of(set_to_check: &HashSet<UnsVec>, rel_coords: UnsVec, radius: i32, check_forwards: bool,) -> bool {
-  for lef in -(radius)..=(check_forwards as i32 * radius) {
-    for right in -(radius)..=radius{
+  for lef in -(radius)..(check_forwards as i32 * (radius+1)) {
+    for right in -(radius)..(check_forwards as i32 * (radius+1)){
       if set_to_check.contains(&UnsVec::new((rel_coords.lef as i32 + lef) as u32,( rel_coords.right as i32 + right) as u32)) {
         return false;
       }

@@ -4,12 +4,10 @@ extends Node
 @onready var tile_map: GdTileMap = $GdTileMap
 
 func _ready() -> void:
-	if GlobalData.insta_start:
+	if Global.insta_start:
 		start_new_game([{}], [1])
 
-
-
-func start_new_game(players_start_data: Array, peers: Array) -> void:
+func start_new_game(players_start_data: Array, peers: PackedInt32Array) -> void:
 	
 	#TODO hacer un subviewport de tamaño fijo para el game, y poner gui en los costados
 	#TODO CONFIGURAR ESTO MANULMENTE? 
@@ -50,9 +48,7 @@ func start_new_game(players_start_data: Array, peers: Array) -> void:
 		
 		var being: Being = tile_map.spawn_starting_player(player_being_preinit_data)
 		
-		await get_tree().create_timer(0.0001).timeout
+		await get_tree().create_timer(0.3).timeout#SI NO SE HACE ESTO SE LE SACA LA AUTHORITY AL HOST ANTES DE Q PUEDA PONERLE LA POSITION
 		being.give_control.rpc(peers[i])
 		
 		i+=1
-		
-	
