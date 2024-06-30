@@ -71,17 +71,18 @@ func take_control() -> void:
 @rpc("call_local") 
 func free_control() -> void: uncontrolled = true
 		
-var zoom_min = Vector2(0.05, 0.05); var zoom_max = Vector2(9999999, 9999999)		
+var zoom_min = 1.51*Vector2.ONE; var zoom_max = 999*Vector2.ONE		
 		
 func _input(event: InputEvent) -> void:
 	if is_multiplayer_authority() and event.is_pressed():
 		
 		if event is InputEventMouseButton:
-			if event.is_action("wheel_down"):
-				camera_2d.zoom *= 0.9
-			elif event.is_action("wheel_up"):
-				camera_2d.zoom *= 1.1
-			camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
+			if Global.enable_change_zoom:
+				if event.is_action("wheel_down"):
+					camera_2d.zoom *= 0.9
+				elif event.is_action("wheel_up"):
+					camera_2d.zoom *= 1.1
+				camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
 			
 		if Global.debug and event.is_action("f1"):
 			print((get_parent() as TileMap).local_to_map(position))
