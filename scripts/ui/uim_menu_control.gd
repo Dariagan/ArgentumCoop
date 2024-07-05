@@ -9,7 +9,7 @@ class_name UimMenuControl
 var lobby_interface: LobbyInterface
 
 func _ready() -> void:
-	if Global.insta_start:
+	if Config.insta_start:
 		hide()
 		
 func _on_main_menu_quick_start_pressed():

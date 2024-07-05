@@ -23,14 +23,14 @@ func construct_for_posterior_serialization(sex: Enums.Sex, race: BasicRace, fact
 
 @rpc("call_local")
 func construct_from_seri(serialized_self: Dictionary) -> void:
-	sex = serialized_self[Constants.KEYS.SEX]
+	sex = serialized_self[Keys.SEX]
 	
-	faction = GameData.factions[serialized_self[Constants.KEYS.FACTION]]
+	faction = GameData.factions[serialized_self[Keys.FACTION]]
 	#body = HarmableBody.new(serialized_self["body"])
 	
-	race = Global.races[serialized_self[Constants.KEYS.RACE]]
+	race = Global.races[serialized_self[Keys.RACE]]
 	if race is ControllableRace:
-		klass = Global.klasses[serialized_self[Constants.KEYS.KLASS]]
+		klass = Global.klasses[serialized_self[Keys.KLASS]]
 
 func get_max_speed() -> float:
 	var max_speed: float =  400 * race.combat_multipliers.speed 
@@ -41,11 +41,11 @@ func get_max_speed() -> float:
 func serialize() -> Dictionary:
 	assert(sex and race and faction)
 	var data: Dictionary =  {
-		Constants.KEYS.SEX: sex,
-		Constants.KEYS.RACE: race.id,
+		Keys.SEX: sex,
+		Keys.RACE: race.id,
 		#"body": body.serialize(),
-		Constants.KEYS.FACTION: faction.instance_id,
+		Keys.FACTION: faction.instance_id,
 		"inv": {}#.serialize()
 	}
-	if klass: data[Constants.KEYS.KLASS] = klass.id
+	if klass: data[Keys.KLASS] = klass.id
 	return data

@@ -9,10 +9,9 @@ reloadable = true
 
 macos.debug = "res://bin/libargentum_rust.macos.template_debug.framework"
 macos.release = "res://bin/libargentum_rust.macos.template_release.framework"
-windows.debug.x86_32 = "res://bin/libargentum_rust.windows.template_debug.x86_32.dll"
-windows.release.x86_32 = "res://bin/libargentum_rust.windows.template_release.x86_32.dll"
-windows.debug.x86_64 = "res://bin/libargentum_rust.windows.template_debug.x86_64.dll"
-windows.release.x86_64 = "res://bin/libargentum_rust.windows.template_release.x86_64.dll"
+
+windows.debug.x86_64 = "res://rust/target/release/argentum_rust.dll"
+windows.release.x86_64 = "res://rust/target/release/argentum_rust.dll"
 
 linux.debug.x86_64 = "res://rust/target/release/libargentum_rust.so"
 linux.release.x86_64 = "res://rust/target/release/libargentum_rust.so"

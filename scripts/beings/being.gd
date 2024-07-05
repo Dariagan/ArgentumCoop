@@ -77,14 +77,14 @@ func _input(event: InputEvent) -> void:
 	if is_multiplayer_authority() and event.is_pressed():
 		
 		if event is InputEventMouseButton:
-			if Global.enable_change_zoom:
+			if Config.enable_change_zoom:
 				if event.is_action("wheel_down"):
 					camera_2d.zoom *= 0.9
 				elif event.is_action("wheel_up"):
 					camera_2d.zoom *= 1.1
 				camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
 			
-		if Global.debug and event.is_action("f1"):
+		if Config.debug and event.is_action("f1"):
 			print((get_parent() as TileMap).local_to_map(position))
 
 func _physics_process(delta: float) -> void:
@@ -153,10 +153,10 @@ func _update_direction_axis_by_input(delta: float) -> void:
 		velocity = velocity.limit_length(internal_state.get_max_speed())
 		_update_facing_direction()
 	
-	if not Global.noclip:
+	if not Config.noclip:
 		move_and_slide()
 	else:
-		position += _direction_axis * Global.noclip_speed_mult
+		position += _direction_axis * Config.noclip_speed
 	
 	distance_moved_since_load += distance_moved
 	

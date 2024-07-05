@@ -12,7 +12,7 @@ var _ready_peers: PackedInt32Array = [] # doesn't include host
 var _characters_spawn_data: Array = [{}] 
 
 func _ready():
-	if Global.insta_start:
+	if Config.insta_start:
 		start_new_game()
 	
 	multiplayer.connected_to_server.connect(_clientfn_on_connect)
@@ -121,7 +121,7 @@ func _update_players_for_gui() -> void:
 func _on_player_ready(ready: bool) -> void:
 	if multiplayer.get_unique_id() != 1:
 		_peer_is_ready.rpc(ready)
-	elif _is_everybody_ready() or Global.ignore_joiners_readiness_on_start:
+	elif _is_everybody_ready() or Config.ignore_joiners_readiness_on_start:
 		_on_game_start.rpc()
 		start_new_game()
 		
@@ -161,29 +161,29 @@ func _clientfn_send_username_to_host(username: String) -> void:
 
 #region Character creation synchronization
 func _on_name_selected(new_name: String):
-	if new_name: _allfn_update_characterization.rpc(Constants.KEYS.NAME, new_name)
-	else: _allfn_update_characterization.rpc(Constants.KEYS.NAME)
+	if new_name: _allfn_update_characterization.rpc(Keys.NAME, new_name)
+	else: _allfn_update_characterization.rpc(Keys.NAME)
 func _on_race_selected(race: ControllableRace):
-	if race: _allfn_update_characterization.rpc(Constants.KEYS.RACE, race.id)
-	else: _allfn_update_characterization.rpc(Constants.KEYS.RACE)
+	if race: _allfn_update_characterization.rpc(Keys.RACE, race.id)
+	else: _allfn_update_characterization.rpc(Keys.RACE)
 func _on_sex_selected(sex: Enums.Sex):
-	if sex > 0: _allfn_update_characterization.rpc(Constants.KEYS.SEX, sex)
-	else: _allfn_update_characterization.rpc(Constants.KEYS.SEX)
+	if sex > 0: _allfn_update_characterization.rpc(Keys.SEX, sex)
+	else: _allfn_update_characterization.rpc(Keys.SEX)
 	
 func _on_head_selected(head : SpriteData):
 	if head: 
-		_allfn_update_characterization.rpc(Constants.KEYS.HEAD, head.id)
+		_allfn_update_characterization.rpc(Keys.HEAD, head.id)
 	else: 
-		_allfn_update_characterization.rpc(Constants.KEYS.HEAD)
+		_allfn_update_characterization.rpc(Keys.HEAD)
 	
 func _on_class_selected(klass: Klass):
-	if klass: _allfn_update_characterization.rpc(Constants.KEYS.KLASS, klass.id)
-	else: _allfn_update_characterization.rpc(Constants.KEYS.KLASS)
+	if klass: _allfn_update_characterization.rpc(Keys.KLASS, klass.id)
+	else: _allfn_update_characterization.rpc(Keys.KLASS)
 func _on_follower_selected(follower: UncontrollableRace):
-	if follower: _allfn_update_characterization.rpc(Constants.KEYS.FOLLOWERS, [follower.id])
-	else: _allfn_update_characterization.rpc(Constants.KEYS.FOLLOWERS)
+	if follower: _allfn_update_characterization.rpc(Keys.FOLLOWERS, [follower.id])
+	else: _allfn_update_characterization.rpc(Keys.FOLLOWERS)
 func _on_body_scale_changed(new_scale: Vector3):
-	_allfn_update_characterization.rpc(Constants.KEYS.BODY_SCALE, new_scale)
+	_allfn_update_characterization.rpc(Keys.BODY_SCALE, new_scale)
 	
 @rpc("call_local", "any_peer")
 func _allfn_update_characterization(characterization_key: StringName, value = null): 
@@ -203,7 +203,6 @@ func start_new_game() -> void:
 	#TODO hacer un subviewport de tamaño fijo para el game, y poner gui en los costados
 	#TODO CONFIGURAR ESTO MANULMENTE? 
 	#DisplayServer.screen_get_size()
-	get_tree().root.size = Vector2i(900, 500)
 
 	tile_map.generate_world.rpc()
 	
@@ -212,23 +211,23 @@ func start_new_game() -> void:
 	var i: int = 0
 	for player_start_data: Dictionary in _characters_spawn_data:
 		
-		if not player_start_data.has(Constants.KEYS.NAME):
-			player_start_data[Constants.KEYS.NAME] = "nameless_player%d"%i
-		if not player_start_data.has(Constants.KEYS.RACE):
-			player_start_data[Constants.KEYS.RACE] = &"controllable_random"
-		if not player_start_data.has(Constants.KEYS.KLASS):
-			player_start_data[Constants.KEYS.KLASS] = &"random"
-		if not player_start_data.has(Constants.KEYS.SEX):
-			player_start_data[Constants.KEYS.SEX] = &"random"
-		if not player_start_data.has(Constants.KEYS.HEAD):
-			player_start_data[Constants.KEYS.HEAD] = &"random"
-		if not player_start_data.has(Constants.KEYS.BODY):
-			player_start_data[Constants.KEYS.BODY] = &"random"
+		if not player_start_data.has(Keys.NAME):
+			player_start_data[Keys.NAME] = &"random"
+		if not player_start_data.has(Keys.RACE):
+			player_start_data[Keys.RACE] = &"controllable_random"
+		if not player_start_data.has(Keys.KLASS):
+			player_start_data[Keys.KLASS] = &"random"
+		if not player_start_data.has(Keys.SEX):
+			player_start_data[Keys.SEX] = &"random"
+		if not player_start_data.has(Keys.HEAD):
+			player_start_data[Keys.HEAD] = &"random"
+		if not player_start_data.has(Keys.BODY):
+			player_start_data[Keys.BODY] = &"random"
 		
-		player_start_data[Constants.KEYS.FACTION] = &"player"	
+		player_start_data[Keys.FACTION] = &"player"	
 		
 		#extra health para los protagonists
-		player_start_data[Constants.KEYS.HEALTH_MULTIP] = 2	
+		player_start_data[Keys.HEALTH_MULTIP] = 2	
 		
 		var player_being_preinit_data = BeingStatePreIniter.new()
 		player_being_preinit_data.construct(player_start_data)

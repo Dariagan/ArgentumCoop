@@ -9,8 +9,8 @@ use crate::utils::uns_vec::UnsVec;
 use godot::builtin::Dictionary;
 use godot::engine::{ITileMap, TileMap};
 use godot::prelude::*;
-use gxhash::{HashMap, HashSet, HashSetExt as _};
 use std::borrow::{Borrow, BorrowMut};
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 #[derive(GodotClass)]

@@ -4,7 +4,7 @@ extends Node
 @onready var tile_map: GdTileMap = $GdTileMap
 
 func _ready() -> void:
-	if Global.insta_start:
+	if Config.insta_start:
 		start_new_game([{}], [1])
 
 func start_new_game(players_start_data: Array, peers: PackedInt32Array) -> void:
@@ -25,23 +25,23 @@ func start_new_game(players_start_data: Array, peers: PackedInt32Array) -> void:
 	var i: int = 0
 	for player_start_data: Dictionary in players_start_data:
 		
-		if not player_start_data.has(Constants.KEYS.NAME):
-			player_start_data[Constants.KEYS.NAME] = "nameless_player%d"%i
-		if not player_start_data.has(Constants.KEYS.RACE):
-			player_start_data[Constants.KEYS.RACE] = &"controllable_random"
-		if not player_start_data.has(Constants.KEYS.KLASS):
-			player_start_data[Constants.KEYS.KLASS] = &"random"
-		if not player_start_data.has(Constants.KEYS.SEX):
-			player_start_data[Constants.KEYS.SEX] = &"random"
-		if not player_start_data.has(Constants.KEYS.HEAD):
-			player_start_data[Constants.KEYS.HEAD] = &"random"
-		if not player_start_data.has(Constants.KEYS.BODY):
-			player_start_data[Constants.KEYS.BODY] = &"random"
+		if not player_start_data.has(Keys.NAME):
+			player_start_data[Keys.NAME] = "nameless_player%d"%i
+		if not player_start_data.has(Keys.RACE):
+			player_start_data[Keys.RACE] = &"controllable_random"
+		if not player_start_data.has(Keys.KLASS):
+			player_start_data[Keys.KLASS] = &"random"
+		if not player_start_data.has(Keys.SEX):
+			player_start_data[Keys.SEX] = &"random"
+		if not player_start_data.has(Keys.HEAD):
+			player_start_data[Keys.HEAD] = &"random"
+		if not player_start_data.has(Keys.BODY):
+			player_start_data[Keys.BODY] = &"random"
 		
-		player_start_data[Constants.KEYS.FACTION] = &"player"	
+		player_start_data[Keys.FACTION] = &"player"	
 		
 		#extra health para los protagonists
-		player_start_data[Constants.KEYS.HEALTH_MULTIP] = 2	
+		player_start_data[Keys.HEALTH_MULTIP] = 2	
 		
 		var player_being_preinit_data = BeingStatePreIniter.new()
 		player_being_preinit_data.construct(player_start_data)

@@ -6,7 +6,7 @@ signal join_pressed(ip: String)
 signal name_changed(new_name: String)
 
 func _ready():
-	%IpLineEdit.text = Global.default_ip_to_join
+	%IpLineEdit.text = Config.default_ip_to_join
 
 func _on_quick_start_pressed() -> void:
 	quick_start_pressed.emit() 

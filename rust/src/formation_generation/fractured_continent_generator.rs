@@ -1,6 +1,7 @@
 use std::borrow::BorrowMut;
-use gxhash::HashSet;
 use super::*;
+use std::collections::{HashMap, HashSet};
+
 
 //RECOMMENDED SIZE = 2500X2500
 pub struct FracturedContinentGenerator{}
@@ -197,10 +198,8 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
 }}
 }
 #[inline] //se puede mejorar viendo el peninsulerness value
-pub fn calc_beachness(rel_coords: UnsVec, big_beacher: SharedNoise, small_beacher: SharedNoise, 
-  continentness: f32) -> f32 {unsafe {
+pub fn calc_beachness(rel_coords: UnsVec, big_beacher: SharedNoise, small_beacher: SharedNoise, continentness: f32) -> f32 {unsafe {
     big_beacher.get_noise_2d(rel_coords).max(small_beacher.get_noise_2d(rel_coords)) - (continentness-CONTINENTER_CUTOFF).powf(0.6)
-          
   }
 }
 #[inline]

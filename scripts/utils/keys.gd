@@ -1,0 +1,15 @@
+class_name Keys
+
+const NAME: StringName = &"name"
+const SEX: StringName = &"sex"
+const RACE: StringName = &"race"
+const FACTION: StringName = &"faction"
+const KLASS: StringName = &"klass"
+const FOLLOWERS: StringName = &"followers"
+const HEAD_SCALE: StringName = &"head_scale"
+const BODY_SCALE: StringName = &"body_scale"
+const HEAD: StringName = &"head"
+const BODY: StringName = &"body"
+const HEALTH_MULTIP: StringName = &"health_multiplier"
+const BEINGKIND: StringName = &"beingkind"
+const INTERNAL_STATE: StringName = &"istate"

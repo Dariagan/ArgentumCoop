@@ -65,23 +65,23 @@ func _instantiate_being_birth_dict() -> Dictionary:
 	var b_scale: float = randf_range(body_scale_range.x, body_scale_range.y)
 	
 	var being_birth_dict: Dictionary = {
-		Constants.KEYS.NAME: WeightedChoice.pick(names_distribution),
-		Constants.KEYS.HEALTH_MULTIP: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
-		Constants.KEYS.RACE: race_id,
-		Constants.KEYS.SEX: sex,
-		Constants.KEYS.KLASS: klass_id,
-		Constants.KEYS.HEAD: &"random" if not heads_distribution else WeightedChoice.pick(heads_distribution),
-		Constants.KEYS.BODY: &"random" if not bodies_distribution else WeightedChoice.pick(bodies_distribution),
-		Constants.KEYS.HEAD_SCALE: Vector3(h_scale, h_scale, h_scale),
-		Constants.KEYS.BODY_SCALE: Vector3(b_scale, b_scale, b_scale),
-		#Constants.KEYS.EQUIPMENT: null,
-		Constants.KEYS.BEINGKIND: id, 
+		Keys.NAME: WeightedChoice.pick(names_distribution),
+		Keys.HEALTH_MULTIP: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
+		Keys.RACE: race_id,
+		Keys.SEX: sex,
+		Keys.KLASS: klass_id,
+		Keys.HEAD: &"random" if not heads_distribution else WeightedChoice.pick(heads_distribution),
+		Keys.BODY: &"random" if not bodies_distribution else WeightedChoice.pick(bodies_distribution),
+		Keys.HEAD_SCALE: Vector3(h_scale, h_scale, h_scale),
+		Keys.BODY_SCALE: Vector3(b_scale, b_scale, b_scale),
+		#Keys.EQUIPMENT: null,
+		Keys.BEINGKIND: id, 
 	}
 	return being_birth_dict
 
 func instantiate(faction: StringName) -> BeingStatePreIniter:
 	var being_pre_init = BeingStatePreIniter.new()
 	var birth_dict: Dictionary = _instantiate_being_birth_dict();
-	birth_dict[Constants.KEYS.FACTION] = faction
+	birth_dict[Keys.FACTION] = faction
 	being_pre_init.construct(birth_dict)
 	return being_pre_init;

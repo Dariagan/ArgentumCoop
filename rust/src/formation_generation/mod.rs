@@ -16,7 +16,8 @@ use strum::{EnumCount, VariantNames};
 use enum_primitive_derive::Primitive;
 use godot::obj::{Base, Gd, GdRef};
 use godot::prelude::*;
-use gxhash::HashSet;
+use std::collections::{HashMap, HashSet};
+
 
 use strum::IntoEnumIterator;
 
