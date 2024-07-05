@@ -13,3 +13,6 @@ const BODY: StringName = &"body"
 const HEALTH_MULTIP: StringName = &"health_multiplier"
 const BEINGKIND: StringName = &"beingkind"
 const INTERNAL_STATE: StringName = &"istate"
+
+const PEACE_ORDER: StringName = &"peace_order"
+const COMBAT_ORDER: StringName = &"combat_order"

@@ -237,7 +237,9 @@ func start_new_game() -> void:
 		i+=1
 		
 	i=0
-	for being in spawned_beings:
+	for being: Being in spawned_beings:
 		being.give_control.rpc(_peers[i])
 		i+=1
+	MusicPlayer.play_playlist_shuffled(Keys.PEACE_ORDER, true)
+	
 #endregion

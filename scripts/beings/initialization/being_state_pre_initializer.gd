@@ -34,8 +34,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 	var beingkind: BeingKind 
 	#endregion
 	var result
-	result = handle_key(Keys.NAME, being_birth_dict)
-	if result: name = result; result = null
+	
 	
 	result = handle_key(Keys.HEALTH_MULTIP, being_birth_dict)
 	if result: extra_health_multiplier = result; result = null
@@ -57,6 +56,13 @@ func construct(being_birth_dict: Dictionary) -> void:
 		race = handle_key(Keys.RACE, being_birth_dict, Global.uncontrollable_races)
 	else:
 		push_error("not a valid race id")
+		
+	if being_birth_dict[Keys.NAME] != &"random":
+		name = being_birth_dict[Keys.NAME]
+	elif race.default_being_names.size() > 0:
+		name = race.default_being_names.pick_random()
+	else:
+		name = "nameless"
 		
 	klass = handle_key(Keys.KLASS, being_birth_dict, Global.klasses)
 	
@@ -130,19 +136,16 @@ func get_array_of_ids(array_of_objects: Array) ->  Array:
 func handle_key(key: StringName, being_birth_dict: Dictionary, data_structure = null):
 	if being_birth_dict.has(key):
 		if data_structure is Dictionary and data_structure.keys().size() > 0:
-			if being_birth_dict[key] != &"random":
+			if being_birth_dict[key] != &"random" && being_birth_dict[key] != "":
 				return data_structure[being_birth_dict[key]]
 			else:
-				return get_random(data_structure.values())
+				return data_structure.values().pick_random()
 		elif data_structure is Array and data_structure.size() > 0:
 			for item in data_structure:
 				if being_birth_dict[key] == item.id:
 					return item
-			return get_random(data_structure)
+			return (data_structure as Array).pick_random()
 		else: 
 			return being_birth_dict[key]
 	else:
 		push_warning("key %s not found" % key)
-
-func get_random(list_for_random: Array):
-	if list_for_random.size() > 0: return list_for_random[randi() % list_for_random.size()]

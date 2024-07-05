@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="Culture" load_steps=2 format=3 uid="uid://cb0p081drin4w"]
+
+[ext_resource type="Script" path="res://scripts/factions/culture.gd" id="1_7av6w"]
+
+[resource]
+script = ExtResource("1_7av6w")
+possible_fac_names = Array[String]([])

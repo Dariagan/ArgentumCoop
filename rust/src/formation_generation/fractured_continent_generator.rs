@@ -84,7 +84,7 @@ let mut continenter_offset: UnsVec = UnsVec { lef: 0, right: 0 };
   while continenter.get_noise_2d(center + continenter_offset) < CONTINENTER_CUTOFF +0.01 {
     continenter_offset += UnsVec{lef:3, right:3}
   }
-}let continenter_offset: UnsVec = continenter_offset;
+}let continenter_offset: UnsVec = continenter_offset; 
 
 const N_THREADS: usize = 16;
 let mut threads: [Option<JoinHandle<()>>; N_THREADS] = Default::default();
@@ -123,16 +123,16 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
     }//else rocky
     else {
       
-      let lake =  calc_lakeness(rel_coords, big_laker, small_laker, beachness, continentness);
+      let lake: bool =  calc_lakeness(rel_coords, big_laker, small_laker, beachness, continentness);
       
       if lake {
         tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::Lake as usize).get_unid(rng))
       }
       else if beachness < BEACHER_CUTOFF - 0.05{
-        let good_roll = rng.gen_range(0.0..=4.0) + forester.get_noise_2d(rel_coords)*1.4 > FORESTER_CUTOFF;
-        let rogue_tree = rng.gen_bool(1.0/1000.0);
+        let good_roll: bool = rng.gen_range(0.0..=4.0) + forester.get_noise_2d(rel_coords)*1.4 > FORESTER_CUTOFF;
+        let rogue_tree: bool = rng.gen_bool(1.0/1000.0);
         
-        let tree = (good_roll || rogue_tree) && clear_of(trees, rel_coords, 3, false);
+        let tree: bool = (good_roll || rogue_tree) && clear_of(trees, rel_coords, 3, false);
         
         if tree{
           trees.insert(rel_coords);
@@ -161,8 +161,8 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
   const DUNGEONS_TO_PLACE: usize = Target::COUNT - Target::Cave0 as usize;
   let mut placed_dungeons_coords: [UnsVec; DUNGEONS_TO_PLACE] = Default::default();
 
-  let mut min_distance_multiplier = 1.0;
-  let mut tries_count = 1;
+  let mut min_distance_multiplier: f64 = 1.0;
+  let mut tries_count: u64 = 1;
   let rng = rngs.drf().get_unchecked_mut(0);
 
   let mut placed_count: usize = 0;

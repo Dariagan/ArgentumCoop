@@ -7,7 +7,7 @@ var id: StringName
 
 
 
-@export var default_being_names: Array[StringName] = []
+@export var default_being_names: Array[String] = []
 
 #may be overriden by specific beingkinds
 @export var default_blacklisted_tiles_for_spawning: Array[String]

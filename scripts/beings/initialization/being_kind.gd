@@ -23,7 +23,7 @@ var id: StringName
 @export var head_scale_range: Vector2 = Vector2.ONE
 @export var body_scale_range: Vector2 = Vector2.ONE
 
-@export var names_distribution: Dictionary = {"placeholder_name": 1}
+#@export var names_distribution: Dictionary = {"placeholder_name": 1}
 @export var equipment_distribution: Dictionary
 @export var loot_distribution: Dictionary
 @export var raid_unit_cost: int = 100
@@ -65,7 +65,7 @@ func _instantiate_being_birth_dict() -> Dictionary:
 	var b_scale: float = randf_range(body_scale_range.x, body_scale_range.y)
 	
 	var being_birth_dict: Dictionary = {
-		Keys.NAME: WeightedChoice.pick(names_distribution),
+		Keys.NAME: &"random",
 		Keys.HEALTH_MULTIP: randf_range(extra_health_multiplier_range.x, extra_health_multiplier_range.y),
 		Keys.RACE: race_id,
 		Keys.SEX: sex,

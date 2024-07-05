@@ -44,11 +44,16 @@ func construct(preiniter: BeingStatePreIniter) -> void:
 	else:
 		ai_behavior.set_script(internal_state.race.ai_process)
 	
-	if internal_state.faction is PlayerFaction or (internal_state.beingkind and internal_state.beingkind.display_being_name):
-		set_name_label_text_and_color.rpc(preiniter.name, internal_state.faction.name_label_color)
+	
+	var show_label: bool = internal_state.faction is PlayerFaction or (internal_state.beingkind and internal_state.beingkind.display_being_name)
+	
+	set_name_label_text_and_color.rpc(preiniter.name, internal_state.faction.color, show_label)
 		#TODO key press para ocultar las namelabels de todos (usar el grupo)
 	
-@rpc("call_local") func set_name_label_text_and_color(text: String, color: Color): name_label.text = text; name_label.label_settings.font_color = color
+@rpc("call_local") func set_name_label_text_and_color(text: String, color: Color, show_label: bool): 
+	
+	name_label.text = text; name_label.visible = show_label
+	name_label.label_settings = name_label.label_settings.duplicate(); name_label.label_settings.font_color = color; 
 
 var uncontrolled: bool = true
 

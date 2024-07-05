@@ -1,16 +1,18 @@
 extends Resource
 class_name Culture
 
-@export var id: String
 
 # tendencia a friendly towards cultures: blablabla
 # tendencia a aversion towards cultures: blablabla
 
+@export var playable: bool = true
+
 # lista nombres posibles generables para instancias de facciones IA con esta culture
-@export var faction_names: Array[String] 
+@export var possible_fac_names: Array[String] = ["placeholder"]
 
+@export var native_being_kinds: Array[BeingKind]
 
-# buildings
-# techs
-# bonuses por pop % en tu faction
-# races pertenecientes al bonus
+# TODO buildings
+# TODO techs
+# TODO bonuses por pop % en tu faction
+# ...y races pertenecientes al bonus x, y, z

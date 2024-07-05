@@ -1,8 +1,6 @@
 extends Node
+# Global
 
-#region Debugging configuration
-
-#endregion Debugging configuration
 # PRESIONA F1 PARA IMPRIMIR TU POSICIÓN ACTUAL EN EL TILEMAP POR CONSOLA!
 var username: String
 
@@ -25,55 +23,71 @@ var tile_selections: Dictionary
 
 var spawnable_scenes: Array[String]
 
+var music: Dictionary = {}
+
+var music_peace_order: Dictionary
+
+
+
 var taunt_sounds: Dictionary
 
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resource_instances/tiling/tiles/tile_set.tres")
 
 func _init() -> void:
-	const item_data_directories: Array[String] = []#["res://resource_instances/things/items/", "res://resource_instances/things/items/wear/body/"]
-	const sprites_datas_directories: Array[String] = ["res://resource_instances/beings/sprites/spritesdatas/"]
-	const recipes_directories: Array[String] = []
-	const building_data_directories: Array[String] = []
-	const controllable_races_directories: Array[String] = ["res://resource_instances/beings/races/controllable/"]
-	const uncontrollable_races_directories: Array[String] = ["res://resource_instances/beings/races/uncontrollable/"]
-	const tile_selections_directories: Array[String] =["res://resource_instances/tiling/tile_selections/"]
-	const klasses_directories: Array[String] = ["res://resource_instances/beings/klasses/"]
-	const tiles_directories: Array[String] = ["res://resource_instances/tiling/tiles/terrain/", "res://resource_instances/tiling/tiles/structures/"]
-	#const spawnable_scenes_directories: Array[String] = ["res://scenes/tiles/"]
-	const beingkinds_directories: Array[String] = ["res://resource_instances/beings/beingkinds/"]
-	const taunt_directories: Array[String] = ["res://assets/sound/taunts/"]
+	const item_data_dirs: Array[String] = []#["res://resource_instances/things/items/", "res://resource_instances/things/items/wear/body/"]
+	const sprites_datas_dirs: Array[String] = ["res://resource_instances/beings/sprites/spritesdatas/"]
+	const recipes_dirs: Array[String] = []
+	const building_data_dirs: Array[String] = []
+	const controllable_races_dirs: Array[String] = ["res://resource_instances/beings/races/controllable/"]
+	const uncontrollable_races_dirs: Array[String] = ["res://resource_instances/beings/races/uncontrollable/"]
+	const tile_selections_dirs: Array[String] =["res://resource_instances/tiling/tile_selections/"]
+	const klasses_dirs: Array[String] = ["res://resource_instances/beings/klasses/"]
+	const tiles_dirs: Array[String] = ["res://resource_instances/tiling/tiles/terrain/", "res://resource_instances/tiling/tiles/structures/"]
+	#const spawnable_scenes_dirs: Array[String] = ["res://scenes/tiles/"]
+	const beingkinds_dirs: Array[String] = ["res://resource_instances/beings/beingkinds/"]
+	const taunt_dirs: Array[String] = ["res://assets/sound/taunts/"]
+	const music_peace_order_dirs: Array[String] = ["res://assets/sound/music/ingame/peace/order/"]
 	
-	item_data = _index_all_found_resource_instances(item_data_directories, true)
-	sprites_datas = _index_all_found_resource_instances(sprites_datas_directories, true)
+	item_data = _index_all_found_resource_instances(item_data_dirs, true)
+	sprites_datas = _index_all_found_resource_instances(sprites_datas_dirs, true)
 	sprites_datas.make_read_only()
-	recipe_data = _index_all_found_resource_instances(recipes_directories, true)
-	building_data = _index_all_found_resource_instances(building_data_directories, true)
-	controllable_races = _index_all_found_resource_instances(controllable_races_directories, true)
-	uncontrollable_races = _index_all_found_resource_instances(uncontrollable_races_directories, true)
+	recipe_data = _index_all_found_resource_instances(recipes_dirs, true)
+	building_data = _index_all_found_resource_instances(building_data_dirs, true)
+	controllable_races = _index_all_found_resource_instances(controllable_races_dirs, true)
+	uncontrollable_races = _index_all_found_resource_instances(uncontrollable_races_dirs, true)
 	races.merge(uncontrollable_races, true); races.merge(controllable_races, true)
 	races.make_read_only()
 	
-	tile_selections = _index_all_found_resource_instances(tile_selections_directories, false)
+	tile_selections = _index_all_found_resource_instances(tile_selections_dirs, false)
 	tile_selections.make_read_only()
-	klasses = _index_all_found_resource_instances(klasses_directories, true)
+	klasses = _index_all_found_resource_instances(klasses_dirs, true)
 	klasses.make_read_only()
-	tiles_data = _index_all_found_resource_instances(tiles_directories, true)
+	tiles_data = _index_all_found_resource_instances(tiles_dirs, true)
 	tiles_data.make_read_only()
 	
-	beingkinds = _index_all_found_resource_instances(beingkinds_directories, true)
+	beingkinds = _index_all_found_resource_instances(beingkinds_dirs, true)
 	beingkinds.make_read_only()
 	
-	taunt_sounds = _index_all_found_resource_instances(taunt_directories, false)
+	taunt_sounds = _index_all_found_resource_instances(taunt_dirs, false)
+	taunt_sounds.make_read_only()
 	
-	#spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_directories)
+	music_peace_order = _index_all_found_resource_instances(music_peace_order_dirs, true)
+	music_peace_order.make_read_only()
+	
+	music[Keys.PEACE_ORDER] = music_peace_order
+
+	#spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_dirs)
 
 #TODO CHEQUEAR COLLISION DE KEYS ENCONTRADAS ANTES DE METER AL DICT (PUSHEAR UN ERROR)
-func _index_all_found_resource_instances(directories: Array[String], check_subfolders: bool, use_safe_loader: bool = false) -> Dictionary:
+func _index_all_found_resource_instances(dirs: Array[String], check_subfolders: bool, use_safe_loader: bool = false) -> Dictionary:
 	var dir_access: DirAccess
 	var table: Dictionary = {}
 	
-	for directory in directories:
+	for directory in dirs:
+		if not directory.ends_with("/"):
+			directory += "/"
+		
 		dir_access = DirAccess.open(directory)
 		
 		if dir_access:
@@ -116,11 +130,11 @@ func _index_all_found_resource_instances(directories: Array[String], check_subfo
 	#table.make_read_only()
 	return table
 
-func _list_all_spawnable_scenes(directories: Array[String]) -> Array[String]:
+func _list_all_spawnable_scenes(dirs: Array[String]) -> Array[String]:
 	var dir_access: DirAccess
 	var found_scenes: Array[String] = []
 	
-	for directory in directories:
+	for directory in dirs:
 		dir_access = DirAccess.open(directory)
 		
 		if dir_access:

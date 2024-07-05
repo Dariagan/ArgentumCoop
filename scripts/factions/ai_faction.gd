@@ -2,8 +2,8 @@ extends Faction
 class_name AiFaction
 #hacer .duplicate() cuando se asigne en algun lugar
 
-@export var id: StringName = ""
-@export  var instance_id: StringName = ""
+@export var id: StringName = &""
+@export  var instance_id: StringName = ""# reasignar
 
 @export var culture: Culture
 
