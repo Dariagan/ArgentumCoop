@@ -215,6 +215,7 @@ impl TryFrom<Gd<TileDistribution>> for UnidOrDist {
       let tile = gd_tile_dist.tiles.get(0).unwrap_unchecked();
       return Ok(UnidOrDist::Nid((tile.bind().unid.unwrap_unchecked(), tile.bind().z_level)));
     }}
+    #[allow(unused_unsafe)]
     unsafe{
       let mut choices: Vec<(TileUnid, TileZLevel)> = Vec::new();
       let sampler: WeightedAliasIndex<i32> = WeightedAliasIndex::new(gd_tile_dist.weights.as_slice().to_vec()).unwrap();

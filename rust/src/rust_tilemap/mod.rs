@@ -45,7 +45,6 @@ impl ITileMap for RustTileMap {
 }
 #[godot_api]
 impl RustTileMap {
-
   #[func]
   fn generate_world_matrix(&mut self, size: Vector2i, tiles: Array<Gd<Tile>>) {
     

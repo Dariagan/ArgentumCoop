@@ -51,8 +51,11 @@ func construct(preiniter: BeingStatePreIniter) -> void:
 		#TODO key press para ocultar las namelabels de todos (usar el grupo)
 	
 @rpc("call_local") func set_name_label_text_and_color(text: String, color: Color, show_label: bool): 
+	name = text
+	var ui_show_labels: bool = true
+	#if show_label:
 	
-	name_label.text = text; name_label.visible = show_label
+	name_label.text = text; name_label.visible = show_label and ui_show_labels
 	name_label.label_settings = name_label.label_settings.duplicate(); name_label.label_settings.font_color = color; 
 
 var uncontrolled: bool = true

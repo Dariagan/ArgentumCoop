@@ -7,7 +7,7 @@ func _ready() -> void:
 	self.finished.connect(semaphore.post)
 	self.volume_db -= 10
 	
-@rpc("call_local", "any_peer")
+@rpc("call_local")
 func stop_prev_thread():
 	if thread:
 		continue_playing = false
@@ -18,9 +18,8 @@ func stop_prev_thread():
 var semaphore: Semaphore = Semaphore.new()
 
 func play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
-	stop_prev_thread()
 	if not Global.music.has(playlist_key):
-		push_error("playlist %s not found", playlist_key)
+		push_error("playlist %s not found" % playlist_key)
 		return
 	
 	if not Global.music[playlist_key].is_empty():
@@ -32,7 +31,7 @@ func play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
 		continue_playing = true
 		thread.start(_thread_play_playlist_shuffled.bind(playlist_key, sync_mp), Thread.PRIORITY_LOW)
 	else:
-		push_error("empty playlist passed")
+		push_error("playlist %s is empty" % playlist_key)
 
 func _thread_play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
 	var playlist = Global.music[playlist_key]
@@ -54,7 +53,7 @@ func _thread_play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
 func play_stream_deferred_rpc(playlist_key: StringName, soundtrack_id: StringName):
 	_play_stream.rpc(playlist_key, soundtrack_id)
 
-@rpc("call_local", "any_peer")
+@rpc("call_local")
 func _play_stream(playlist_key: StringName, soundtrack_id: StringName):
 	self.stream = Global.music[playlist_key][soundtrack_id]
 	self.play()

@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Range, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 use godot::builtin::{Vector2, Vector2i};
 
@@ -32,8 +32,8 @@ impl UnsVec {
   pub fn all_bigger_than_min(&self, min: u32) -> Result<Self, &str> {
   if self.lef >= min && self.right >= min {Ok(*self)} else {Err("all bigger than min")}
   }
-  pub fn mod_unsv(&self, modder: UnsVec) -> UnsVec {UnsVec{lef: self.lef%modder.lef, right: self.right%modder.right}}
-  pub fn mod_u32(&self, val: u32) -> UnsVec {UnsVec{lef: self.lef%val, right: self.right%val}}
+  pub fn mod_unsv(&self, divider: UnsVec) -> UnsVec {UnsVec{lef: self.lef%divider.lef, right: self.right%divider.right}}
+  pub fn mod_u32(&self, divider: u32) -> UnsVec {UnsVec{lef: self.lef%divider, right: self.right%divider}}
 
   pub fn within_bounds_centered(&self, checked: SafeVec) -> bool{
     let top_left: SafeVec = SafeVec::from(*self)/2.neg();

@@ -9,17 +9,6 @@ func _ready() -> void:
 
 func start_new_game(players_start_data: Array, peers: PackedInt32Array) -> void:
 	
-	#TODO hacer un subviewport de tamaño fijo para el game, y poner gui en los costados
-	#TODO CONFIGURAR ESTO MANULMENTE? 
-	#DisplayServer.screen_get_size()
-	get_tree().root.size = Vector2i(900, 500)
-	get_tree().root.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
-	get_tree().root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP_HEIGHT
-	get_tree().root.content_scale_stretch = Window.CONTENT_SCALE_STRETCH_FRACTIONAL
-	"""get_tree().root.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
-	get_tree().root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
-	get_tree().root.content_scale_stretch = Window.CONTENT_SCALE_STRETCH_FRACTIONAL #nota: esto afecta al viewport stretching"""
-
 	tile_map.generate_world.rpc()
 	
 	var i: int = 0

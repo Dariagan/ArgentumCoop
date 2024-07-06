@@ -20,8 +20,8 @@ impl WorldMatrix {
     self.index(coords).iter().filter(move |&&unid| unid != TileUnid::default())
   }
 
-  pub fn at(&self, coords: UnsVec) -> Option<&TileUnidArray> {self.matrix.at(coords)}
-  pub fn at_mut(&mut self, coords: UnsVec) -> Option<&mut TileUnidArray> {self.matrix.at_mut(coords)}
+  pub fn get(&self, coords: UnsVec) -> Option<&TileUnidArray> {self.matrix.get(coords)}
+  pub fn get_mut(&mut self, coords: UnsVec) -> Option<&mut TileUnidArray> {self.matrix.get_mut(coords)}
   pub unsafe fn count_at(&self, coords: UnsVec) -> usize {
     self[coords]
       .iter()
@@ -42,7 +42,7 @@ impl WorldMatrix {
   }
 
   pub unsafe fn overwrite_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel){
-    let prev_tile = self.at_mut(coords).expect("TODO CAMBIAR POR CORCHETES").arr.get_unchecked_mut(z_level as usize);
+    let prev_tile = self.get_mut(coords).expect("TODO CAMBIAR POR CORCHETES").arr.get_unchecked_mut(z_level as usize);
     *prev_tile = tile;
   }
   pub unsafe fn place_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel) -> Result<(), String>{
@@ -69,7 +69,7 @@ impl IndexMut<UnsVec> for WorldMatrix {
 
 #[derive(Default, Clone, Copy)]
 pub struct TileUnidArray{
-  pub arr: [TileUnid; TileZLevel::Roof as usize +1]
+  pub arr: [TileUnid; TileZLevel::COUNT]
 }
 impl TileUnidArray {
   #[inline]
