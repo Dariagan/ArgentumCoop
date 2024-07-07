@@ -39,7 +39,7 @@ func generate_world():
 	
 	if multiplayer.get_unique_id() == 1:
 		await get_tree().create_timer(2).timeout
-		birth_beingkind_at_snapped(&"basic_warrior", &"wild", WORLD_SIZE/2 + Vector2i.ONE*2)
+		birth_being_gen_template_at_snapped(&"basic_warrior", &"wild", WORLD_SIZE/2 + Vector2i.ONE*2)
 
 #region SPAWNING 
 var _players_start_position: Vector2i
@@ -71,13 +71,13 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 		#freeze_and_store_being(local_to_map(loc_coords), being.uid)
 		return null
 
-func birth_beingkind_at_snapped(beingkind_id: StringName, faction: StringName, map_coords: Vector2i) -> Being:
-	return birth_beingkind_at(beingkind_id, faction, map_to_local(map_coords))
-func birth_beingkind_at(beingkind_id: StringName, faction: StringName, loc_coords: Vector2) -> Being:
-	assert(Global.beingkinds.has(beingkind_id))
-	var beingkind: BeingKind = Global.beingkinds[beingkind_id]
+func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, faction: StringName, map_coords: Vector2i) -> Being:
+	return birth_being_gen_template_at(being_gen_template_id, faction, map_to_local(map_coords))
+func birth_being_gen_template_at(being_gen_template_id: StringName, faction: StringName, loc_coords: Vector2) -> Being:
+	assert(Global.being_gen_templates.has(being_gen_template_id))
+	var being_gen_template: BeingGenTemplate = Global.being_gen_templates[being_gen_template_id]
 	
-	return birth_being_at(beingkind.instantiate(faction), loc_coords)
+	return birth_being_at(being_gen_template.instantiate(faction), loc_coords)
 #endregion SPAWNING
 
 	

@@ -1,15 +1,15 @@
-[gd_resource type="RustBeingKind" script_class="BeingKind" load_steps=2 format=3 uid="uid://c7liawgky24wj"]
+[gd_resource type="RustBeingGenTemplate" script_class="BeingGenTemplate" load_steps=2 format=3 uid="uid://bcstlr7qtpu3t"]
 
-[ext_resource type="Script" path="res://scripts/beings/initialization/beingkind.gd" id="1_5bsb3"]
+[ext_resource type="Script" path="res://scripts/beings/initialization/being_gen_template.gd" id="1_8r44u"]
 
 [resource]
-script = ExtResource("1_5bsb3")
+script = ExtResource("1_8r44u")
 race_id = &"human"
-klass_id = &"warrior"
+klass_id = &"random"
 display_being_name = false
 bodies_distribution = {}
 heads_distribution = {}
-sex = 0
+males_ratio = -1.0
 extra_health_multiplier_range = Vector2(1, 1)
 head_scale_range = Vector2(1, 1)
 body_scale_range = Vector2(1, 1)

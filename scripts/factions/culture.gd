@@ -10,7 +10,7 @@ class_name Culture
 # lista nombres posibles generables para instancias de facciones IA con esta culture
 @export var possible_fac_names: Array[String] = ["placeholder"]
 
-@export var native_being_kinds: Array[BeingKind]
+@export var native_being_kinds: Array[BeingGenTemplate]
 
 # TODO buildings
 # TODO techs

@@ -15,7 +15,7 @@ var races: Dictionary
 var controllable_races: Dictionary
 var uncontrollable_races: Dictionary
 var klasses: Dictionary
-var beingkinds: Dictionary
+var being_gen_templates: Dictionary
 
 var tiles_data: Dictionary
 
@@ -45,7 +45,7 @@ func _init() -> void:
 	const klasses_dirs: Array[String] = ["res://resource_instances/beings/klasses/"]
 	const tiles_dirs: Array[String] = ["res://resource_instances/tiling/tiles/terrain/", "res://resource_instances/tiling/tiles/structures/"]
 	#const spawnable_scenes_dirs: Array[String] = ["res://scenes/tiles/"]
-	const beingkinds_dirs: Array[String] = ["res://resource_instances/beings/beingkinds/"]
+	const being_gen_templates_dirs: Array[String] = ["res://resource_instances/beings/being_gen_templates/"]
 	const taunt_dirs: Array[String] = ["res://assets/sound/taunts/"]
 	const music_peace_order_dirs: Array[String] = ["res://assets/sound/music/ingame/peace/order/"]
 	
@@ -66,8 +66,8 @@ func _init() -> void:
 	tiles_data = _index_all_found_resource_instances(tiles_dirs, true)
 	tiles_data.make_read_only()
 	
-	beingkinds = _index_all_found_resource_instances(beingkinds_dirs, true)
-	beingkinds.make_read_only()
+	being_gen_templates = _index_all_found_resource_instances(being_gen_templates_dirs, true)
+	being_gen_templates.make_read_only()
 	
 	taunt_sounds = _index_all_found_resource_instances(taunt_dirs, false)
 	taunt_sounds.make_read_only()

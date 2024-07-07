@@ -52,8 +52,8 @@ impl fmt::Display for BeingKindUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -
 
 use godot::{engine::{IResource, Resource}, obj::Base,register::godot_api, register::GodotClass,};
 #[derive(GodotClass)]
-#[class(tool, base=Resource)] // SAQUÉ TOOL
-pub struct RustBeingKind {
+#[class(base=Resource)] // SAQUÉ TOOL
+pub struct RustBeingGenTemplate {
   base: Base<Resource>,
   #[var]
   id: StringName,
@@ -68,7 +68,7 @@ pub struct RustBeingKind {
   rust_blacklisted_tiles_for_spawning: HashSet<TileDto>,
 }
 #[godot_api]
-impl IResource for RustBeingKind {
+impl IResource for RustBeingGenTemplate {
   fn init(base: Base<Resource>) -> Self {
     Self {
       base: base,
@@ -81,7 +81,7 @@ impl IResource for RustBeingKind {
   }
 }
 #[godot_api]
-impl RustBeingKind {
+impl RustBeingGenTemplate {
   pub fn base(&self) -> &Base<Resource> {
     &self.base
   }
@@ -91,7 +91,7 @@ impl RustBeingKind {
 }
 
 use crate::formation_generation::{Tile, TileDto};
-impl Hash for RustBeingKind {
+impl Hash for RustBeingGenTemplate {
   fn hash<H: Hasher>(&self, state: &mut H) {
     state.write_u32(self.id.hash());
   }

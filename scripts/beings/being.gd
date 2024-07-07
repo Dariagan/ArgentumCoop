@@ -5,9 +5,9 @@ class_name Being
 
 var uid: int = randi_range(-9223372036854775808, 9223372036854775807)
 
-@export var acceleration = 2500
+var acceleration = 2500
 
-@export var friction = 1600 #hacer q provenga de la tile en custom data
+var friction = 1600 #hacer q provenga de la tile en custom data
 
 @onready var body_holder: Node2D = $BodyHolder
 @onready var camera_2d: Camera2D = $Camera2D
@@ -38,14 +38,14 @@ func construct(preiniter: BeingStatePreIniter) -> void:
 			head.construct(preiniter.sprite_head, preiniter.head_scale, preiniter.sprite_body.head_v_offset, preiniter.body_scale.z)
 			
 	internal_state.construct_from_seri.rpc(preiniter.internal_state.serialize())
-	if internal_state.beingkind:
-		if internal_state.beingkind.ai_process:
-			ai_behavior.set_script(internal_state.beingkind.ai_process)	
+	if internal_state.being_gen_template:
+		if internal_state.being_gen_template.ai_process:
+			ai_behavior.set_script(internal_state.being_gen_template.ai_process)	
 	else:
 		ai_behavior.set_script(internal_state.race.ai_process)
 	
 	
-	var show_label: bool = internal_state.faction is PlayerFaction or (internal_state.beingkind and internal_state.beingkind.display_being_name)
+	var show_label: bool = internal_state.faction is PlayerFaction or (internal_state.being_gen_template and internal_state.being_gen_template.display_being_name)
 	
 	set_name_label_text_and_color.rpc(preiniter.name, internal_state.faction.color, show_label)
 		#TODO key press para ocultar las namelabels de todos (usar el grupo)
@@ -144,7 +144,7 @@ func _adjust_speed_scale(distance_moved: float, factor: float):
 			body_part.speed_scale = distance_moved/factor
 		
 func owned_ai_control(): pass		
-func ai_control(): pass #q llame a un @export script que este en beingkind
+func ai_control(): pass #q llame a un @export script que este en being_gen_template
 	
 var _direction_axis: Vector2 = Vector2.ZERO
 

@@ -1,8 +1,8 @@
 extends RefCounted 
 #BeingRequiredInitializationData
 class_name BeingStatePreIniter
-#se diferencia de un beingkind en q el beingkind puede incluir rangos de aleatoriedad/sets weighteados configurables para ciertos atributos/variables
-#dentro de ahí, (money, possible loot, health, possible names). y en beingkind no se especifica la faction. en esto sí, para saber en cual meter al being
+#se diferencia de un being_gen_template en q el being_gen_template puede incluir rangos de aleatoriedad/sets weighteados configurables para ciertos atributos/variables
+#dentro de ahí, (money, possible loot, health, possible names). y en being_gen_template no se especifica la faction. en esto sí, para saber en cual meter al being
 #
 #esto devuelve solo valores absolutamente especificos y deterministas para el
 # spawning de un individuo específico con caracteristicas especificadas
@@ -31,7 +31,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 	var klass: Klass
 	var faction: Faction
 	var followers: Array[UncontrollableRace] 
-	var beingkind: BeingKind 
+	var being_gen_template: BeingGenTemplate 
 	#endregion
 	var result
 	
@@ -95,12 +95,12 @@ func construct(being_birth_dict: Dictionary) -> void:
 	else:
 		push_error("invalid type for \"sex\" entry in birth dict")
 		
-	if being_birth_dict.has(Keys.BEINGKIND):
-		beingkind = handle_key(Keys.BEINGKIND, being_birth_dict, Global.beingkinds)
+	if being_birth_dict.has(Keys.BEING_GEN_TEMPLATE):
+		being_gen_template = handle_key(Keys.BEING_GEN_TEMPLATE, being_birth_dict, Global.being_gen_templates)
 
 	assert(sex && race && faction)
 	internal_state = BeingInternalState.new()
-	internal_state.construct_for_posterior_serialization(sex, race, faction, null, klass, beingkind)
+	internal_state.construct_for_posterior_serialization(sex, race, faction, null, klass, being_gen_template)
 
 # TODO
 func construct_from_serialized(serialized_being_spawn_data: Dictionary) -> void:

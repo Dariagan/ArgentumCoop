@@ -15,11 +15,11 @@ var body: HarmableBody #contains health state for each body part
 var inventory: InventoryData = null# TODO USAR EL PLUGIN INVENTORYSYSTEM?
 var skills_data = null
 
-var beingkind: BeingKind = null 
+var being_gen_template: BeingGenTemplate = null 
 
 #necesario para que funciona  serialize()
-func construct_for_posterior_serialization(sex: Enums.Sex, race: BasicRace, faction: Faction, body: HarmableBody, klass: Klass, beingkind: BeingKind):
-	self.sex = sex; self.race = race; self.faction = faction; self.body = body; self.klass= klass; self.beingkind = beingkind
+func construct_for_posterior_serialization(sex: Enums.Sex, race: BasicRace, faction: Faction, body: HarmableBody, klass: Klass, being_gen_template: BeingGenTemplate):
+	self.sex = sex; self.race = race; self.faction = faction; self.body = body; self.klass= klass; self.being_gen_template = being_gen_template
 
 @rpc("call_local")
 func construct_from_seri(serialized_self: Dictionary) -> void:

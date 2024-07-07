@@ -11,7 +11,7 @@ const BODY_SCALE: StringName = &"body_scale"
 const HEAD: StringName = &"head"
 const BODY: StringName = &"body"
 const HEALTH_MULTIP: StringName = &"health_multiplier"
-const BEINGKIND: StringName = &"beingkind"
+const BEING_GEN_TEMPLATE: StringName = &"being_gen_template"
 const INTERNAL_STATE: StringName = &"istate"
 
 const PEACE_ORDER: StringName = &"peace_order"

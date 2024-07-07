@@ -1,6 +1,6 @@
-extends RustBeingKind
+extends RustBeingGenTemplate
 ## akin to PawnKind in Rimworld
-class_name BeingKind
+class_name BeingGenTemplate
 
 @export var race_id: StringName
 @export var klass_id: StringName = &"random"
@@ -14,7 +14,7 @@ class_name BeingKind
 @export var bodies_distribution: Dictionary
 @export var heads_distribution: Dictionary
 
-#poner ratio en vez de esto
+#if unset it uses the race's ratio
 @export var males_ratio: float = -1
 
 @export var extra_health_multiplier_range: Vector2 = Vector2.ONE
@@ -61,7 +61,7 @@ func _instantiate_being_birth_dict() -> Dictionary:
 		Keys.HEAD_SCALE: Vector3(h_scale, h_scale, h_scale),
 		Keys.BODY_SCALE: Vector3(b_scale, b_scale, b_scale),
 		#Keys.EQUIPMENT: null,
-		Keys.BEINGKIND: id, 
+		Keys.BEING_GEN_TEMPLATE: id, 
 	}
 	return being_birth_dict
 
