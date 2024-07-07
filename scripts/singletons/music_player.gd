@@ -3,8 +3,14 @@ extends AudioStreamPlayer
 var continue_playing: bool = false
 var thread: Thread
 
+var sem_count: int = 0
+var semaphore: Semaphore = Semaphore.new()
+
+func sem_post(): semaphore.post()
+
 func _ready() -> void:
-	self.finished.connect(semaphore.post)
+	self.finished.connect(sem_post)
+	
 	self.volume_db -= 10
 	
 @rpc("call_local")
@@ -15,7 +21,6 @@ func stop_prev_thread():
 		self.finished.emit()
 		thread.wait_to_finish()
 		
-var semaphore: Semaphore = Semaphore.new()
 
 func play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
 	if not Global.music.has(playlist_key):
@@ -49,11 +54,13 @@ func _thread_play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
 			remaining.append_array(playlist.keys().duplicate())
 		
 		semaphore.wait()
+		OS.delay_msec(20000)
 
 func play_stream_deferred_rpc(playlist_key: StringName, soundtrack_id: StringName):
 	_play_stream.rpc(playlist_key, soundtrack_id)
 
 @rpc("call_local")
 func _play_stream(playlist_key: StringName, soundtrack_id: StringName):
+	self.stop()
 	self.stream = Global.music[playlist_key][soundtrack_id]
 	self.play()
