@@ -69,6 +69,8 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 	if preinitdata.followers.size() > 0:
 		for follower_template in preinitdata.followers:
 			var follower = birth_being_at(follower_template.instantiate(preinitdata.internal_state.faction.instance_id),loc_coords,player)
+			being.internal_state.followers.append(follower)
+			follower.internal_state.following = being
 			
 	if player or get_cell_tile_data(0, local_to_map(loc_coords)):
 		return being
