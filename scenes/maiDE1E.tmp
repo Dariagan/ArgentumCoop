@@ -44,7 +44,7 @@ layer_2/y_sort_enabled = true
 layer_2/z_index = 10
 script = ExtResource("7_itdl2")
 
-[node name="chequear AutoSpawnList" type="MultiplayerSpawner" parent="Lobby"]
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="Lobby"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
 spawn_path = NodePath("../GdTileMap")
 script = ExtResource("6_r3dut")

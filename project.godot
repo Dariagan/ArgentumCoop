@@ -26,8 +26,6 @@ config/features=PackedStringArray("4.3")
 
 [autoload]
 
-Global="*res://scripts/singletons/global.gd"
-GameData="*res://scripts/singletons/game_data.gd"
 Chat="*res://scripts/singletons/chat.gd"
 MusicPlayer="*res://scripts/singletons/music_player.gd"
 Config="*res://zconfig.gd"

@@ -31,6 +31,9 @@ pub enum FormGenEnum {
 
 pub fn generate(world_matrix: &mut WorldMatrix, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) {
 
+  let asd = crate::beings::retrieve_being_gen_template_from_id("basic_warrior".into());
+  
+
   let (origin, size) = 
       (UnsVec::try_from(origin).expect("({} at {}, {}): passed arg origin: Vector2i is negative"), 
       UnsVec::try_from(size).expect("({} at {}, {}): passed arg size: Vector2i is negative")); 

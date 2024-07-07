@@ -1,40 +1,39 @@
-extends Node
-# Global
+extends Object
+class_name Global
 
 # PRESIONA F1 PARA IMPRIMIR TU POSICIÓN ACTUAL EN EL TILEMAP POR CONSOLA!
-var username: String
+static var username: String
 
-var item_data: Dictionary
+static var item_data: Dictionary
 
-var sprites_datas: Dictionary
+static var sprites_datas: Dictionary
 
-var recipe_data: Dictionary
-var building_data: Dictionary
+static var recipe_data: Dictionary
+static var building_data: Dictionary
 
-var races: Dictionary
-var controllable_races: Dictionary
-var uncontrollable_races: Dictionary
-var klasses: Dictionary
-var being_gen_templates: Dictionary
+static var races: Dictionary
+static var controllable_races: Dictionary
+static var uncontrollable_races: Dictionary
+static var klasses: Dictionary
+static var being_gen_templates: Dictionary
 
-var tiles_data: Dictionary
+static var tiles_data: Dictionary
 
-var tile_selections: Dictionary
+static var tile_selections: Dictionary
 
-var spawnable_scenes: Array[String]
+static var spawnable_scenes: Array[String]
 
-var music: Dictionary = {}
+static var music: Dictionary = {}
 
-var music_peace_order: Dictionary
+static var music_peace_order: Dictionary
 
-
-
-var taunt_sounds: Dictionary
+static var taunt_sounds: Dictionary
 
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resource_instances/tiling/tiles/tile_set.tres")
 
 func _init() -> void:
+	Engine.register_singleton(&"Global", self)
 	const item_data_dirs: Array[String] = []#["res://resource_instances/things/items/", "res://resource_instances/things/items/wear/body/"]
 	const sprites_datas_dirs: Array[String] = ["res://resource_instances/beings/sprites/spritesdatas/"]
 	const recipes_dirs: Array[String] = []
@@ -80,7 +79,7 @@ func _init() -> void:
 	#spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_dirs)
 
 #TODO CHEQUEAR COLLISION DE KEYS ENCONTRADAS ANTES DE METER AL DICT (PUSHEAR UN ERROR)
-func _index_all_found_resource_instances(dirs: Array[String], check_subfolders: bool, use_safe_loader: bool = false) -> Dictionary:
+static func _index_all_found_resource_instances(dirs: Array[String], check_subfolders: bool, use_safe_loader: bool = false) -> Dictionary:
 	var dir_access: DirAccess
 	var table: Dictionary = {}
 	
@@ -130,7 +129,7 @@ func _index_all_found_resource_instances(dirs: Array[String], check_subfolders: 
 	#table.make_read_only()
 	return table
 
-func _list_all_spawnable_scenes(dirs: Array[String]) -> Array[String]:
+static func _list_all_spawnable_scenes(dirs: Array[String]) -> Array[String]:
 	var dir_access: DirAccess
 	var found_scenes: Array[String] = []
 	
@@ -150,9 +149,3 @@ func _list_all_spawnable_scenes(dirs: Array[String]) -> Array[String]:
 			print("Couldn't open directory %s" % [directory])
 	
 	return found_scenes
-
-#includes host
-func get_all_peers() -> PackedInt32Array:
-	var peers: PackedInt32Array = [1]
-	peers.append_array(multiplayer.get_peers())
-	return peers;
