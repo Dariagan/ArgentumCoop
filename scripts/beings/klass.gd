@@ -13,7 +13,7 @@ var id: StringName
 
 func validate():
 	for follower in available_followers:
-		assert(Global.races[follower] is UncontrollableRace)
+		assert(Global.races[follower.race_id] is UncontrollableRace)
 
 
 # class shouldn't change how much you are capable of carrying

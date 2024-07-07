@@ -20,6 +20,7 @@ var chosen_extra_sprites: Array[int] = []
 var extra_health_multiplier: float = 1
 
 var internal_state: BeingInternalState
+var followers: Array[BeingGenTemplate] = []
 
 
 func construct(being_birth_dict: Dictionary) -> void:
@@ -30,7 +31,6 @@ func construct(being_birth_dict: Dictionary) -> void:
 	var race: BasicRace
 	var klass: Klass
 	var faction: Faction
-	var followers: Array[UncontrollableRace] 
 	var being_gen_template: BeingGenTemplate 
 	#endregion
 	var result
@@ -69,8 +69,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 	faction = handle_key(Keys.FACTION, being_birth_dict, GameData.factions)
 		
 	if being_birth_dict.has(Keys.FOLLOWERS):
-		# BUG, ARREGLAR. DICE klasses AHÍ. HAY Q ARREGLAR ETO
-		followers = Global.klasses[being_birth_dict[Keys.FOLLOWERS]]
+		followers = Global.being_gen_templates[being_birth_dict[Keys.FOLLOWERS]]
 			
 	sprite_head = handle_key(Keys.HEAD, being_birth_dict, race.head_sprites_datas)
 			
@@ -120,7 +119,7 @@ func serialize() -> Dictionary:
 		Keys.HEALTH_MULTIP: extra_health_multiplier,
 		#extra_stats_multiplier,
 	}
-	#dict[Keys.FOLLOWERS] = get_array_of_ids(followers)
+	dict[Keys.FOLLOWERS] = get_array_of_ids(followers)
 	return dict
 
 #NO IMPLEMENTAR ESTA FUNCIÓN, PERO IMPLEMENTAR LA IDEA DE CARGAR STARTER CHARACTERS ASÍ NO PERDÉS TIEMPO RE-CREÁNDOLOS EN CADA LOBBY

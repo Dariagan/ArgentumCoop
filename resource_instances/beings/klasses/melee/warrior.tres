@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="Klass" load_steps=5 format=3 uid="uid://uyg87htef0lk"]
+[gd_resource type="Resource" script_class="Klass" load_steps=6 format=3 uid="uid://uyg87htef0lk"]
 
-[ext_resource type="Script" path="res://scripts/beings/race/uncontrollable_race.gd" id="1_tytdi"]
+[ext_resource type="Script" path="res://scripts/beings/initialization/being_gen_template.gd" id="1_gujke"]
 [ext_resource type="Script" path="res://scripts/beings/klass.gd" id="2_5fesx"]
+[ext_resource type="RustBeingGenTemplate" uid="uid://dxcvvfdoulgn6" path="res://resource_instances/beings/being_gen_templates/common_chancho.tres" id="2_5nu35"]
 [ext_resource type="Script" path="res://scripts/damage_health_system/combat_multipliers.gd" id="2_rwlfp"]
 
 [sub_resource type="Resource" id="Resource_ys5by"]
@@ -22,6 +23,6 @@ war_cry_strength = 1.0
 [resource]
 script = ExtResource("2_5fesx")
 name = "warrior"
-available_followers = Array[ExtResource("1_tytdi")]([])
+available_followers = Array[ExtResource("1_gujke")]([ExtResource("2_5nu35")])
 combat_multipliers = SubResource("Resource_ys5by")
-available_spells = Array[String]([])
+available_spells = Array[StringName]([])

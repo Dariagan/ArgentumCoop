@@ -2,13 +2,14 @@ extends Faction
 class_name PlayerFaction
 
 #type id
-var id: StringName = &"player"
-var instance_id: StringName = &"player"
+
 
 var members: Array[Being] = []
 	
 func _init() -> void:
 	color = Color.PALE_GOLDENROD
+	id = &"player"
+	instance_id = &"player"
 	pass
 	
 

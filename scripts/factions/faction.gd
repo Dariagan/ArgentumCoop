@@ -4,3 +4,5 @@ class_name Faction
 
 var name: String
 var color: Color 
+var instance_id: StringName
+@export var id: StringName

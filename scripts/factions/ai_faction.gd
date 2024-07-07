@@ -2,9 +2,6 @@ extends Faction
 class_name AiFaction
 #hacer .duplicate() cuando se asigne en algun lugar
 
-@export var id: StringName = &""
-@export  var instance_id: StringName = ""# reasignar
-
 @export var culture: Culture
 
 #este power es como la faction strength en el mod de lotr de warband, se reduce cuando pierde battles y aumenta si gana
