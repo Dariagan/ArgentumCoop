@@ -44,7 +44,7 @@ script = ExtResource("3_0lt3k")
 name = "Warrior"
 available_followers = Array[ExtResource("7_y3sv1")]([])
 combat_multipliers = SubResource("Resource_5i6c3")
-available_spells = Array[String]([])
+available_spells = Array[StringName]([])
 
 [resource]
 name = "Human"

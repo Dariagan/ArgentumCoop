@@ -42,7 +42,8 @@ func generate_world():
 	if multiplayer.get_unique_id() == 1:
 		await get_tree().create_timer(2).timeout
 		birth_being_gen_template_at_snapped(&"basic_warrior", &"wild", WORLD_SIZE/2 + Vector2i.ONE*2)
-
+		birth_being_gen_template_at_snapped(&"common_chancho", &"wild", WORLD_SIZE/2 + Vector2i.ONE*4)
+		
 #region SPAWNING 
 var _players_start_position: Vector2i
 
