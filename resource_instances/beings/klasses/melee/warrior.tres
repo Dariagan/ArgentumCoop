@@ -1,11 +1,27 @@
-[gd_resource type="Resource" script_class="Klass" load_steps=3 format=3 uid="uid://b8lgllcsn3y18"]
+[gd_resource type="Resource" script_class="Klass" load_steps=5 format=3 uid="uid://uyg87htef0lk"]
 
-[ext_resource type="Resource" uid="uid://bm5mlop6d50eo" path="res://resource_instances/beings/races/uncontrollable/pig.tres" id="1_jrhdh"]
-[ext_resource type="Script" path="res://scripts/beings/being_klass.gd" id="2_5fesx"]
+[ext_resource type="Script" path="res://scripts/beings/race/uncontrollable_race.gd" id="1_tytdi"]
+[ext_resource type="Script" path="res://scripts/beings/klass.gd" id="2_5fesx"]
+[ext_resource type="Script" path="res://scripts/damage_health_system/combat_multipliers.gd" id="2_rwlfp"]
+
+[sub_resource type="Resource" id="Resource_ys5by"]
+script = ExtResource("2_rwlfp")
+health = 1.0
+speed = 1.0
+strength = 1.0
+stamina = 1.0
+sneaking_proficiency = 1.0
+incoming_damage_types = {
+"blunt": 1,
+"fire": 1,
+"magic": 1,
+"sharp": 1
+}
+war_cry_strength = 1.0
 
 [resource]
 script = ExtResource("2_5fesx")
-id = "class_warrior"
-name = "Warrior"
-available_followers = Array[Resource("res://scripts/beings/race/uncontrollable_race.gd")]([ExtResource("1_jrhdh")])
+name = "warrior"
+available_followers = Array[ExtResource("1_tytdi")]([])
+combat_multipliers = SubResource("Resource_ys5by")
 available_spells = Array[String]([])

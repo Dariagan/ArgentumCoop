@@ -1,7 +1,8 @@
 [gd_resource type="Resource" script_class="SpriteData" load_steps=3 format=3 uid="uid://bsfv14kk64tct"]
 
 [ext_resource type="SpriteFrames" uid="uid://bdxi1q8fxxdwi" path="res://resource_instances/beings/sprites/frames/head/human_male_brunette_mullet.tres" id="1_qs566"]
-[ext_resource type="Script" path="res://scripts/beings/sprites/sprite_data.gd" id="2_f06jt"]
+[ext_resource type="Script" path="res://scripts/beings/sprites/spritedata.gd" id="2_f06jt"]
+
 
 [resource]
 script = ExtResource("2_f06jt")

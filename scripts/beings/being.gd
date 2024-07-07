@@ -90,7 +90,8 @@ func _input(event: InputEvent) -> void:
 					camera_2d.zoom *= 0.9
 				elif event.is_action("wheel_up"):
 					camera_2d.zoom *= 1.1
-				camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
+				if Config.enable_zoom_limit and not Config.debug:
+					camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
 			
 		if Config.debug and event.is_action("f1"):
 			print((get_parent() as TileMap).local_to_map(position))

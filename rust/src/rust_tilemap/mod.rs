@@ -1,9 +1,11 @@
 pub(crate) mod world_matrix;
 
+use spawn_weights_matrix::SpawnWeightsMatrix;
 use world_matrix::*;
-use crate::beings::BeingUnid;
+use crate::beings::*;
 use crate::formation_generation::*;
 use crate::tiling::TileDto;
+use crate::utils::matrix::DownScalingMatrix;
 use crate::utils::safe_vec::SafeVec;
 use crate::utils::uns_vec::UnsVec;
 use godot::builtin::Dictionary;
@@ -27,6 +29,8 @@ struct RustTileMap {
   //don't reduce this directly
   tile_shared_loads_count: HashMap<UnsVec, i64>,
 //-- beings section --
+  beings_in_chunk_count: Option<DownScalingMatrix<u16>>,
+  spawn_weights_matrix: Option<SpawnWeightsMatrix>,
 
 }
 #[godot_api]
@@ -39,12 +43,17 @@ impl ITileMap for RustTileMap {
       tile_unid_mapping: Vec::new(),
       world_size: UnsVec::ZERO,
       being_loaded_tiles_map: Default::default(),
-      tile_shared_loads_count: Default::default()
+      tile_shared_loads_count: Default::default(),
+      spawn_weights_matrix: None,
+      beings_in_chunk_count: None
     }
   }
 }
 #[godot_api]
 impl RustTileMap {
+  const MACROSCOPIC_SPAWNING_CHUNK_SIZE: u8 = 15;
+  const BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK: u16 = 200;  
+
   #[func]
   fn generate_world_matrix(&mut self, size: Vector2i, tiles: Array<Gd<Tile>>) {
     
@@ -65,7 +74,8 @@ impl RustTileMap {
     }
 
     self.world_matrix = Some(WorldMatrix::new(size));     
-    self.world_size = size
+    self.world_size = size;
+    self.spawn_weights_matrix = Some(SpawnWeightsMatrix::new(size, 3));
   }
   #[func]
   fn generate_formation(&mut self, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
@@ -160,6 +170,12 @@ impl RustTileMap {
   }}
 
   pub fn tile_nid_mapping(&self) -> &Vec<TileDto> {&self.tile_unid_mapping}
+
+// hacerlo async (no bloqueante)
+//solo debería ejecutar esto el host y desp retransmitir los spawneos específicos
+  #[func] fn do_natural_spawning(&mut self) {
+          
+  }
 
   #[signal] pub fn birth_being_kind(coords: Vector2i, id: StringName);
   #[signal] pub fn birth_being_w_init_data(coords: Vector2i, init_data: Dictionary);

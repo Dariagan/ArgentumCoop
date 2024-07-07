@@ -1,24 +1,19 @@
-[gd_resource type="Resource" script_class="BeingKind" load_steps=2 format=3 uid="uid://bhd0ufukmdxnm"]
+[gd_resource type="RustBeingKind" script_class="BeingKind" load_steps=2 format=3 uid="uid://c7liawgky24wj"]
 
-[ext_resource type="Script" path="res://scripts/beings/initialization/being_kind.gd" id="1_161fn"]
+[ext_resource type="Script" path="res://scripts/beings/initialization/beingkind.gd" id="1_5bsb3"]
 
 [resource]
-script = ExtResource("1_161fn")
-id = "basic_warrior"
+script = ExtResource("1_5bsb3")
 race_id = &"human"
-klass_id = &"random"
+klass_id = &"warrior"
+display_being_name = false
 bodies_distribution = {}
 heads_distribution = {}
 sex = 0
 extra_health_multiplier_range = Vector2(1, 1)
 head_scale_range = Vector2(1, 1)
 body_scale_range = Vector2(1, 1)
-names_distribution = {
-"placeholder": 1
-}
 equipment_distribution = {}
 loot_distribution = {}
 raid_unit_cost = 100
 dropped_xp_range = Vector2(10, 10)
-blacklisted_tiles_for_spawning = {}
-whitelisted_tiles_for_spawning = {}

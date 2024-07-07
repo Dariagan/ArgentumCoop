@@ -1,42 +1,63 @@
-[gd_resource type="Resource" script_class="ControllableRace" load_steps=10 format=3 uid="uid://p2k16l677mta"]
+[gd_resource type="BasicRace" script_class="ControllableRace" load_steps=12 format=3 uid="uid://fvc8ujsjerjq"]
 
-[ext_resource type="Script" path="res://scripts/beings/default_ai_process.gd" id="1_6xhsi"]
-[ext_resource type="Resource" uid="uid://b8lgllcsn3y18" path="res://resource_instances/beings/klasses/melee/warrior.tres" id="1_8iuop"]
-[ext_resource type="Script" path="res://scripts/beings/race/controllable_race.gd" id="1_766p0"]
-[ext_resource type="Script" path="res://scripts/beings/sprites/body_sprite_data.gd" id="1_aerh4"]
-[ext_resource type="Resource" uid="uid://br6gqx36f275l" path="res://resource_instances/beings/sprites/spritesdatas/body/human_male_body_1.tres" id="1_tpem5"]
-[ext_resource type="Resource" uid="uid://bsfv14kk64tct" path="res://resource_instances/beings/sprites/spritesdatas/head/human_male_head.tres" id="2_d7k1k"]
-[ext_resource type="Script" path="res://scripts/beings/race/diet.gd" id="3_smayd"]
-[ext_resource type="Script" path="res://scripts/beings/sprites/sprite_data.gd" id="4_kw1op"]
-[ext_resource type="Script" path="res://scripts/beings/being_klass.gd" id="6_wdv1a"]
+[ext_resource type="Script" path="res://scripts/beings/sprites/bodyspritedata.gd" id="1_ikied"]
+[ext_resource type="Resource" uid="uid://br6gqx36f275l" path="res://resource_instances/beings/sprites/spritesdatas/body/human_male_body_1.tres" id="2_53po6"]
+[ext_resource type="Script" path="res://scripts/beings/sprites/spritedata.gd" id="2_sruu1"]
+[ext_resource type="Script" path="res://scripts/beings/klass.gd" id="3_0lt3k"]
+[ext_resource type="Script" path="res://scripts/damage_health_system/combat_multipliers.gd" id="3_8payl"]
+[ext_resource type="Script" path="res://scripts/beings/race/controllablerace.gd" id="4_46qb0"]
+[ext_resource type="Resource" uid="uid://bsfv14kk64tct" path="res://resource_instances/beings/sprites/spritesdatas/head/human_male_head.tres" id="5_07lp5"]
+[ext_resource type="Script" path="res://scripts/beings/race/uncontrollable_race.gd" id="7_y3sv1"]
+
+[sub_resource type="Resource" id="Resource_k5nht"]
+script = ExtResource("3_8payl")
+health = 1.0
+speed = 1.0
+strength = 1.0
+stamina = 1.0
+sneaking_proficiency = 1.0
+incoming_damage_types = {
+"blunt": 1,
+"fire": 1,
+"magic": 1,
+"sharp": 1
+}
+war_cry_strength = 1.0
+
+[sub_resource type="Resource" id="Resource_5i6c3"]
+script = ExtResource("3_8payl")
+health = 1.0
+speed = 1.0
+strength = 1.0
+stamina = 1.0
+sneaking_proficiency = 1.0
+incoming_damage_types = {
+"blunt": 1,
+"fire": 1,
+"magic": 1,
+"sharp": 1
+}
+war_cry_strength = 1.0
+
+[sub_resource type="Resource" id="Resource_4wpx6"]
+script = ExtResource("3_0lt3k")
+name = "Warrior"
+available_followers = Array[ExtResource("7_y3sv1")]([])
+combat_multipliers = SubResource("Resource_5i6c3")
+available_spells = Array[String]([])
 
 [resource]
-script = ExtResource("1_766p0")
-klasses = Array[ExtResource("6_wdv1a")]([ExtResource("1_8iuop")])
+name = "Human"
+script = ExtResource("4_46qb0")
+combat_multipliers = SubResource("Resource_k5nht")
+head_sprites_datas = Array[ExtResource("2_sruu1")]([ExtResource("5_07lp5")])
+body_sprites_datas = Array[ExtResource("1_ikied")]([ExtResource("2_53po6")])
+other_sprites_datas = Array[ExtResource("2_sruu1")]([])
+klasses = Array[ExtResource("3_0lt3k")]([SubResource("Resource_4wpx6")])
 max_width_frontally_sideways_height = Vector3(1, 1, 1.3)
+fallback_possible_loot = {}
 global_learning_multiplier = 1.0
 smithing_learning_multiplier = 1.0
 manual_labor_multiplier = 1.0
 research_multiplier = 1.0
 trade_proficiency = 1.0
-name = " "
-default_being_names = Array[StringName]([])
-default_blacklisted_tiles_for_spawning = Array[String]([])
-head_sprites_datas = Array[ExtResource("4_kw1op")]([ExtResource("2_d7k1k")])
-body_sprites_datas = Array[ExtResource("1_aerh4")]([ExtResource("1_tpem5")])
-other_sprites_datas = Array[ExtResource("4_kw1op")]([])
-demonym = ""
-singular_denomination = ""
-plural_denomination = ""
-description = ""
-can_equip_tools = false
-filth_generation = 0.0
-max_encumberance_multiplier = 1.0
-comfortable_temp_range = Vector2i(16, 23)
-ai_process = ExtResource("1_6xhsi")
-hunger_rate = 1.0
-diets = Array[ExtResource("3_smayd")]([])
-can_walk_on = Array[int]([0])
-can_vent = false
-can_climb = false
-males_ratio = 0.5

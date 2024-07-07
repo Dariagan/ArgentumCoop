@@ -8,6 +8,7 @@ class_name CombatMultipliers
 @export var stamina: float = 1
 @export var sneaking_proficiency: float = 1
 
+#TODO USAR KEY CONSTANTS PA ESTO (Keys)
 @export var incoming_damage_types: Dictionary = {"sharp": 1, "blunt": 1, "fire": 1, "magic": 1}
  #key: id of the damage type. value: value the incoming damage of the specified tyoe is multiplied by
 @export var war_cry_strength: float = 1

@@ -84,11 +84,11 @@ func construct(being_birth_dict: Dictionary) -> void:
 	
 	var sex_value = being_birth_dict[Keys.SEX]
 	
-	if sex_value is StringName or sex_value == Enums.Sex.ANY:
-		var sex_probs: Dictionary = {
-			Enums.Sex.MALE: race.males_ratio,
-			Enums.Sex.FEMALE: 1 - race.males_ratio
-		}
+	if sex_value is float and sex_value >= 0.0 and sex_value <= 1.0:
+		var sex_probs: Dictionary = {Enums.Sex.MALE: sex_value, Enums.Sex.FEMALE: 1 - sex_value}
+		sex = WeightedChoice.pick(sex_probs)
+	elif sex_value is StringName or sex_value == Enums.Sex.ANY or (sex_value is float and (sex_value<0.0 or sex_value>1.0)):
+		var sex_probs: Dictionary = {Enums.Sex.MALE: race.males_ratio, Enums.Sex.FEMALE: 1 - race.males_ratio}
 		sex = WeightedChoice.pick(sex_probs)
 	elif sex_value is Enums.Sex:
 		sex = sex_value

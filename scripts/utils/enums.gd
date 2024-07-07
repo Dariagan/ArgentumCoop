@@ -10,4 +10,5 @@ enum ClothingLayer {BOTTOM, MIDDLE, TOP}
 
 enum Dir {LEFT, RIGHT, UP, DOWN}
 
+#WARNING chequear que esté igual que como está definido en Rust
 enum AnimationState { IDLE, WALK, JOG, EXTRA0, EXTRA1, EXTRA2, EXTRA3 }

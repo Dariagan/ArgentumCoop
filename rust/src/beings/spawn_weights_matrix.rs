@@ -19,6 +19,10 @@ pub struct SpawnWeightsMatrix{
 }
 #[allow(dead_code)]
 impl SpawnWeightsMatrix{
+  
+  pub fn new(size_to_downscale_from: UnsVec, downscale_factor: u8) -> Self {
+    Self { ds_matrix: DownScalingMatrix::new(size_to_downscale_from, downscale_factor) }
+  }
 
   pub fn overwrite_at(&mut self, coords: UnsVec, being_kind_id: BeingKindStrId, new_weight: SpawnWeight) {
     self.ds_matrix.get_unchecked_mut(coords).insert(being_kind_id, new_weight);
@@ -30,7 +34,7 @@ impl SpawnWeightsMatrix{
       .or_insert(added_weight);
   }
   
-  pub fn cleat_at(&mut self, coords: UnsVec) {
+  pub fn clear_at(&mut self, coords: UnsVec) {
     if let Some(sw_vec) = self.ds_matrix.get_mut(coords){
       sw_vec.clear();
     }
