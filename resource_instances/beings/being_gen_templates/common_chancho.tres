@@ -1,0 +1,19 @@
+[gd_resource type="RustBeingGenTemplate" script_class="BeingGenTemplate" load_steps=2 format=3 uid="uid://dxcvvfdoulgn6"]
+
+[ext_resource type="Script" path="res://scripts/beings/initialization/being_gen_template.gd" id="1_ish22"]
+
+[resource]
+script = ExtResource("1_ish22")
+race_id = &"pig"
+klass_id = &"random"
+display_being_name = false
+bodies_distribution = {}
+heads_distribution = {}
+males_ratio = -1.0
+extra_health_multiplier_range = Vector2(1, 1)
+head_scale_range = Vector2(1, 1)
+body_scale_range = Vector2(1, 1)
+equipment_distribution = {}
+loot_distribution = {}
+raid_unit_cost = 100
+dropped_xp_range = Vector2(10, 10)

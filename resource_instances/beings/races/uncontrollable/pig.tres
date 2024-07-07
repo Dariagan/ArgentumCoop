@@ -1,0 +1,14 @@
+[gd_resource type="BasicRace" script_class="UncontrollableRace" load_steps=5 format=3 uid="uid://dswdlo717paf3"]
+
+[ext_resource type="Script" path="res://scripts/beings/sprites/bodyspritedata.gd" id="1_feonu"]
+[ext_resource type="Resource" uid="uid://cms52k2dbl8ho" path="res://resource_instances/beings/sprites/spritesdatas/body/pig_body_data.tres" id="2_fydbc"]
+[ext_resource type="Script" path="res://scripts/beings/sprites/spritedata.gd" id="2_kwkpa"]
+[ext_resource type="Script" path="res://scripts/beings/race/uncontrollable_race.gd" id="3_elw0e"]
+
+[resource]
+name = "Chancho"
+script = ExtResource("3_elw0e")
+taming_difficulty = 0.5
+head_sprites_datas = Array[ExtResource("2_kwkpa")]([])
+body_sprites_datas = Array[ExtResource("1_feonu")]([ExtResource("2_fydbc")])
+fallback_possible_loot = {}
