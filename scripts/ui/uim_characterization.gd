@@ -11,13 +11,13 @@ var _current_race: ControllableRace
 var _current_sex: Enums.Sex
 var _current_head: SpriteData
 var _current_class: Klass
-var _current_follower: UncontrollableRace
+var _current_follower: BeingGenTemplate
 
 signal race_selected(race: ControllableRace)
 signal class_selected(klass: Klass)
 signal sex_selected(sex: Enums.Sex)
 signal head_selected(head: SpriteData)
-signal follower_selected(follower: UncontrollableRace)
+signal follower_selected(follower: BeingGenTemplate)
 signal body_scale_changed(new_scale: Vector3)
 
 # HACER QUE SE PUEDA CAMBIAR EL NAME DE TU FOLLOWER
@@ -99,7 +99,6 @@ func _on_follower_selected(id: int):
 	follower_selected.emit(_current_follower)
 	follower_menu_button.text = "Follower: %s" % _current_follower.name
 	
-	
 func _update_popup_menu(popup_menu: PopupMenu, items: Array):
 	popup_menu.clear()
 	var i: int = 0
@@ -108,7 +107,7 @@ func _update_popup_menu(popup_menu: PopupMenu, items: Array):
 			popup_menu.add_icon_item(item.icon, item.name, i)
 		elif item is BasicRace and item.head_sprites_datas and item.head_sprites_datas.size() >= 1 and item.head_sprites_datas[0] and item.head_sprites_datas[0].frames:
 			popup_menu.add_icon_item(item.head_sprites_datas[0].frames.get_frame_texture("idle_down", 0), item.name, i)
-		elif item is UncontrollableRace and item.body_sprites_datas and item.body_sprites_datas.size() >= 1 and item.body_sprites_datas[0] and item.body_sprites_datas[0].frames:
+		elif item is BeingGenTemplate and item.body_sprites_datas and item.body_sprites_datas.size() >= 1 and item.body_sprites_datas[0] and item.body_sprites_datas[0].frames:
 			popup_menu.add_icon_item(item.body_sprites_datas[0].frames.get_frame_texture("idle_down", 0), item.name, i)
 		else:
 			popup_menu.add_item(item.name, i)

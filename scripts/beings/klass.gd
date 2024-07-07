@@ -5,11 +5,15 @@ var id: StringName
 
 @export var name: String
 
-@export var available_followers: Array[UncontrollableRace]
+@export var available_followers: Array[BeingGenTemplate]
 
 @export var combat_multipliers: CombatMultipliers = CombatMultipliers.new()
 
 @export var available_spells: Array[StringName]
+
+func validate():
+	for follower in available_followers:
+		assert(Global.races[follower] is UncontrollableRace)
 
 
 # class shouldn't change how much you are capable of carrying

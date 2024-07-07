@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://scripts/beings/sprites/spritedata.gd" id="2_sruu1"]
 [ext_resource type="Script" path="res://scripts/beings/klass.gd" id="3_0lt3k"]
 [ext_resource type="Script" path="res://scripts/damage_health_system/combat_multipliers.gd" id="3_8payl"]
-[ext_resource type="Script" path="res://scripts/beings/race/controllablerace.gd" id="4_46qb0"]
+[ext_resource type="Script" path="res://scripts/beings/race/controllable_race.gd" id="4_46qb0"]
 [ext_resource type="Resource" uid="uid://bsfv14kk64tct" path="res://resource_instances/beings/sprites/spritesdatas/head/human_male_head.tres" id="5_07lp5"]
 [ext_resource type="Script" path="res://scripts/beings/race/uncontrollable_race.gd" id="7_y3sv1"]
 

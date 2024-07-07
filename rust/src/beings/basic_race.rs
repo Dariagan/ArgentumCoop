@@ -7,7 +7,7 @@ use crate::formation_generation::{Tile, TileDto};
 use super::diet::Diet;
 
 #[derive(GodotClass)]
-#[class(tool, base=Resource)] // SAQUÉ TOOL
+#[class(tool, base=Resource)] 
 pub struct BasicRace {
   base: Base<Resource>,
   #[var] id: StringName,
