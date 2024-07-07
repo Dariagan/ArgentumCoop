@@ -29,6 +29,7 @@ config/features=PackedStringArray("4.3")
 Chat="*res://scripts/singletons/chat.gd"
 MusicPlayer="*res://scripts/singletons/music_player.gd"
 Config="*res://zconfig.gd"
+Global="*res://scripts/singletons/global.gd"
 
 [display]
 

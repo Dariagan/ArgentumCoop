@@ -119,7 +119,7 @@ signal race_selected(race: ControllableRace)
 signal sex_selected(sex: Enums.Sex)
 signal class_selected(klass: Klass)
 signal head_selected(head: SpriteData)
-signal follower_selected(follower: UncontrollableRace)
+signal follower_selected(follower: BeingGenTemplate)
 signal body_scale_changed(new_scale: Vector3)
 #signal follower_body_selected
 
@@ -139,7 +139,7 @@ func _on_character_characterization_head_selected(head: SpriteData) -> void:
 	head_selected.emit(head)
 	# mostrar stats en cuadradito
 	
-func _on_character_characterization_follower_selected(follower: UncontrollableRace) -> void:
+func _on_character_characterization_follower_selected(follower: BeingGenTemplate) -> void:
 	follower_selected.emit(follower)
 	# mostrar stats en cuadradito
 

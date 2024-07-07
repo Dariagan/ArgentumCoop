@@ -1,7 +1,6 @@
 extends Node
 
 func _enter_tree() -> void:
-	Global.new()
 	GameData.new()
 	set_scaling_settings_for_menu_ui()
 	Global.username = "nameless_%s" % _generate_random_string(4)

@@ -63,15 +63,23 @@ func construct(being_birth_dict: Dictionary) -> void:
 		name = race.default_being_names.pick_random()
 	else:
 		name = "nameless"
-		
-	klass = handle_key(Keys.KLASS, being_birth_dict, Global.klasses)
+	
+	if race is ControllableRace:
+		klass = handle_key(Keys.KLASS, being_birth_dict, race.klasses)
 	
 	faction = handle_key(Keys.FACTION, being_birth_dict, GameData.factions)
-		
+	
 	if being_birth_dict.has(Keys.FOLLOWERS):
-		followers = Global.being_gen_templates[being_birth_dict[Keys.FOLLOWERS]]
-			
-	sprite_head = handle_key(Keys.HEAD, being_birth_dict, race.head_sprites_datas)
+		for follower_template_id in being_birth_dict[Keys.FOLLOWERS]:
+			followers.append(Global.being_gen_templates[follower_template_id])
+	elif klass and klass.available_followers != null and klass.available_followers.size() > 0:
+		if faction is PlayerFaction:
+			followers.append(klass.available_followers.pick_random())
+		elif randi_range(0, 10) == 0:
+			followers.append(klass.available_followers.pick_random())
+		
+	if race.head_sprites_datas and race.head_sprites_datas.size() > 0:
+		sprite_head = handle_key(Keys.HEAD, being_birth_dict, race.head_sprites_datas)
 			
 	sprite_body = handle_key(Keys.BODY, being_birth_dict, race.body_sprites_datas) as BodySpriteData
 	

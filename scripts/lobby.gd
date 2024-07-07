@@ -179,7 +179,7 @@ func _on_head_selected(head : SpriteData):
 func _on_class_selected(klass: Klass):
 	if klass: _allfn_update_characterization.rpc(Keys.KLASS, klass.id)
 	else: _allfn_update_characterization.rpc(Keys.KLASS)
-func _on_follower_selected(follower: UncontrollableRace):
+func _on_follower_selected(follower: BeingGenTemplate):
 	if follower: _allfn_update_characterization.rpc(Keys.FOLLOWERS, [follower.id])
 	else: _allfn_update_characterization.rpc(Keys.FOLLOWERS)
 func _on_body_scale_changed(new_scale: Vector3):

@@ -1,7 +1,10 @@
-[gd_resource type="Resource" script_class="Culture" load_steps=2 format=3 uid="uid://cb0p081drin4w"]
+[gd_resource type="Resource" script_class="Culture" load_steps=3 format=3 uid="uid://cb0p081drin4w"]
 
 [ext_resource type="Script" path="res://scripts/factions/culture.gd" id="1_7av6w"]
+[ext_resource type="Script" path="res://scripts/beings/initialization/being_gen_template.gd" id="1_qwudw"]
 
 [resource]
 script = ExtResource("1_7av6w")
+playable = true
 possible_fac_names = Array[String]([])
+native_being_kinds = Array[ExtResource("1_qwudw")]([])

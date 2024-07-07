@@ -4,7 +4,7 @@ class_name BeingGenTemplate
 
 @export var race_id: StringName
 @export var klass_id: StringName = &"random"
-
+@export var name: StringName = &"missingname"
 
 @export var ai_process: GDScript
 

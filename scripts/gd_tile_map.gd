@@ -42,7 +42,6 @@ func generate_world():
 	if multiplayer.get_unique_id() == 1:
 		await get_tree().create_timer(2).timeout
 		birth_being_gen_template_at_snapped(&"basic_warrior", &"wild", WORLD_SIZE/2 + Vector2i.ONE*2)
-		birth_being_gen_template_at_snapped(&"common_chancho", &"wild", WORLD_SIZE/2 + Vector2i.ONE*4)
 		
 #region SPAWNING 
 var _players_start_position: Vector2i
@@ -70,7 +69,7 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 	if preinitdata.followers.size() > 0:
 		for follower_template in preinitdata.followers:
 			var follower = birth_being_at(follower_template.instantiate(preinitdata.internal_state.faction.instance_id),loc_coords,player)
-
+			
 	if player or get_cell_tile_data(0, local_to_map(loc_coords)):
 		return being
 	else:

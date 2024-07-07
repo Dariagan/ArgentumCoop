@@ -11,9 +11,10 @@ var id: StringName
 
 @export var available_spells: Array[StringName]
 
-func validate():
+func validate() -> bool: 
 	for follower in available_followers:
-		assert(Global.races[follower.race_id] is UncontrollableRace)
+		if not (Global.races[follower.race_id] is UncontrollableRace): return false
+	return true
 
 
 # class shouldn't change how much you are capable of carrying
