@@ -86,5 +86,5 @@ static func get_animation_name(animation_state: Enums.AnimationState, direction:
 		[Enums.AnimationState.JOG, Enums.Dir.UP]:     return &"jog_up"
 		#meter mas animationstates si hace falta, simplemente no usarlos si no se usan en el caso default
 		#ejemplo EXTRA1, EXTRA2
-	push_error("couldn't match")
+	push_error("couldn't match %d %d", animation_state, direction)
 	return &""

@@ -60,17 +60,16 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 	
 	var being: Being = preload("res://scenes/being.tscn").instantiate()
 	#nota: el being.name hay q ponerlo antes del add_child
-	being.uid = _birthed_beings_i; _birthed_beings_i += 1
 	add_child(being, true)
 	being.z_index = 10
-	being.construct(preinitdata)
+	being.construct(preinitdata, _birthed_beings_i); _birthed_beings_i += 1
+	
 	being.sync_pos_reliable.rpc(loc_coords)
 	
 	if preinitdata.followers.size() > 0:
 		for follower_template in preinitdata.followers:
-			var follower = birth_being_at(follower_template.instantiate(preinitdata.istate.faction.instance_id),loc_coords,player)
-			being.istate.followers.append(follower)
-			follower.istate.following = being
+			var follower: Being = birth_being_at(follower_template.instantiate(preinitdata.istate.faction.instance_id),loc_coords,player)
+			set_master_follower.rpc(being.get_path(), follower.get_path())
 			
 	if player or get_cell_tile_data(0, local_to_map(loc_coords)):
 		return being
@@ -79,6 +78,14 @@ func birth_being_at(preinitdata: BeingStatePreIniter, loc_coords: Vector2, playe
 		being.queue_free()
 		#freeze_and_store_being(local_to_map(loc_coords), being.uid)
 		return null
+		
+@rpc("call_local")
+func set_master_follower(master_name: NodePath, follower_name: NodePath):
+	var master: Being = get_node(master_name)
+	var follower: Being = get_node(follower_name)
+	master.istate.followers.append(follower)
+	follower.istate.master = master
+	
 
 func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, faction: StringName, map_coords: Vector2i) -> Being:
 	return birth_being_gen_template_at(being_gen_template_id, faction, map_to_local(map_coords))
@@ -89,7 +96,6 @@ func birth_being_gen_template_at(being_gen_template_id: StringName, faction: Str
 	return birth_being_at(being_gen_template.instantiate(faction), loc_coords)
 #endregion SPAWNING
 
-	
 
 
 func _on_tile_unloaded(coords):

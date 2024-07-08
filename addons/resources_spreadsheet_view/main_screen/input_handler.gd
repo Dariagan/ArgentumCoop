@@ -108,7 +108,7 @@ func _key_specific_action(event : InputEvent):
 		TextEditingUtilsClass.multi_copy(selection.edited_cells_text)
 		get_viewport().set_input_as_handled()
 			
-	# The following actions do not work on non-editable cells.
+	# The master actions do not work on non-editable cells.
 	if !selection.column_editors[column].is_text() or editor_view.columns[column] == "resource_path":
 		return
 	

@@ -131,8 +131,7 @@ func serialize() -> Dictionary:
 	return dict
 
 #NO IMPLEMENTAR ESTA FUNCIÓN, PERO IMPLEMENTAR LA IDEA DE CARGAR STARTER CHARACTERS ASÍ NO PERDÉS TIEMPO RE-CREÁNDOLOS EN CADA LOBBY
-func _construct_from_saved_starter_character(starter_character: Resource) -> void:
-	pass
+#func _construct_from_saved_starter_character(starter_character: Resource) -> void: pass
 
 func get_array_of_ids(array_of_objects: Array) ->  Array:
 	var array_ids: Array = []

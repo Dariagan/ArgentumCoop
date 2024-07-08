@@ -3,7 +3,7 @@ extends CharacterBody2D
 class_name Being
 #para persistirlo habrá que usar packedscene para guardar las cosas custom children q puede ser q tenga, sino habrá q iterar por cada child
 
-var uid: int = randi_range(-9223372036854775808, 9223372036854775807)
+var uid: int
 
 var acceleration = 2500
 var ai_process: AiProcess = AiProcess.new(self)
@@ -21,25 +21,31 @@ func _ready():
 	load_tiles_around_me.connect(tile_map.load_tiles_around)
 
 #constructs for multiplayer too
-func construct(preiniter: BeingStatePreIniter) -> void:
+func construct(preiniter: BeingStatePreIniter, uid: int) -> void:
 	if preiniter.sprite_body:
 		body.construct(preiniter.sprite_body, preiniter.body_scale)
 		if preiniter.sprite_head:
 			head.construct(preiniter.sprite_head, preiniter.head_scale, preiniter.sprite_body.head_v_offset, preiniter.body_scale.z)
 			
 	istate.construct_from_seri.rpc(preiniter.istate.serialize())
-	if istate.being_gen_template and istate.being_gen_template.ai_process:
-		ai_process = istate.being_gen_template.ai_process.new(self)
-	elif istate.race.ai_process:
-		ai_process = istate.race.ai_process.new(self)
+	
+	set_ai_process.rpc()
 	
 	var show_label: bool = istate.faction is PlayerFaction or (istate.being_gen_template and istate.being_gen_template.display_being_name)
 	
 	set_name_label_text_and_color.rpc(preiniter.name, istate.faction.color, show_label)
-		#TODO key press para ocultar las namelabels de todos (usar el grupo)
 	
+	self.setsync_node_name_and_uid.rpc(preiniter.name, uid)
+		#TODO key press para ocultar las namelabels de todos (usar el grupo)
+
+@rpc("call_local")
+func set_ai_process():
+	if istate.being_gen_template and istate.being_gen_template.ai_process:
+		ai_process = istate.being_gen_template.ai_process.new(self)
+	elif istate.race.ai_process:
+		ai_process = istate.race.ai_process.new(self)
+
 @rpc("call_local") func set_name_label_text_and_color(text: String, color: Color, show_label: bool): 
-	name = text
 	var ui_show_labels: bool = true
 	
 	name_label.text = text; name_label.visible = show_label and ui_show_labels
@@ -73,14 +79,14 @@ func _input(event: InputEvent) -> void:
 	if controlling_peer==multiplayer.get_unique_id() and event.is_pressed():
 		if event is InputEventMouseButton:
 			if Config.enable_change_zoom:
-				if event.is_action("wheel_down"):
+				if event.is_action(&"wheel_down"):
 					camera_2d.zoom *= 0.9
-				elif event.is_action("wheel_up"):
+				elif event.is_action(&"wheel_up"):
 					camera_2d.zoom *= 1.1
 				if Config.enable_zoom_limit and not Config.debug:
 					camera_2d.zoom = camera_2d.zoom.clamp(Config.zoom_out_max, Config.zoom_in_max)
 			
-		if Config.debug and event.is_action("f1"):
+		if Config.debug and event.is_action(&"f1"):
 			print((get_parent() as TileMap).local_to_map(position))
 
 func _process(delta: float) -> void:
@@ -118,14 +124,16 @@ func _adjust_speed_scale(distance_moved: float, factor: float):
 		if body_part is AnimatedBodyPortion:
 			body_part.speed_scale = distance_moved/factor
 		
-func ai_control(delta: float): wall_min_slide_angle = 0; pass #q llame a un @export script que este en being_gen_template
+func ai_control(delta: float): 
+	ai_process.behave(delta)
+	_update_velocity(delta)
 	
 var _direction_axis: Vector2 = Vector2.ZERO
 
 var distance_moved_since_load: float = 501
 func _update_direction_axis_by_input(delta: float) -> void:
 	
-	_direction_axis = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	_direction_axis = Input.get_vector(&"ui_left", &"ui_right", &"ui_up", &"ui_down")
 	
 	apply_friction(friction, delta)
 	_update_velocity(delta)
@@ -178,3 +186,6 @@ func serialize() -> Dictionary:#guardar como packedscene en vez de esto
 	}
 
 @rpc("call_local") func sync_pos_reliable(loc_pos: Vector2): position = loc_pos; _previous_position = loc_pos
+
+@rpc("call_local")
+func setsync_node_name_and_uid(_name: String, _uid: int): self.uid = _uid; self.name = str(_uid)+"."+_name

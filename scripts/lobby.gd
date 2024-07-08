@@ -118,9 +118,9 @@ func _update_players_for_gui() -> void:
 		_lobby_interface.update_player_list(_players)
 	
 # when ready is pressed in the GUI
-func _on_player_ready(ready: bool) -> void:
+func _on_player_ready(_ready: bool) -> void:
 	if multiplayer.get_unique_id() != 1:
-		_peer_is_ready.rpc(ready)
+		_peer_is_ready.rpc(_ready)
 	elif _is_everybody_ready() or Config.ignore_joiners_readiness_on_start:
 		_on_game_start.rpc()
 		start_new_game()
@@ -130,7 +130,7 @@ func _on_game_start():
 	_lobby_interface.queue_free()
 
 @rpc("call_local", "any_peer")
-func _peer_is_ready(ready: bool) -> void:
+func _peer_is_ready(_ready: bool) -> void:
 	var peer_id: int = multiplayer.get_remote_sender_id()
 	if ready and peer_id not in _ready_peers:
 		_ready_peers.push_back(peer_id)

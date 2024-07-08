@@ -18,7 +18,7 @@ var skills_data = null
 var being_gen_template: BeingGenTemplate = null 
 
 var followers: Array[Being] = []
-var following: Being = null
+var master: Being = null
 #necesario para que funciona  serialize()
 func construct_for_posterior_serialization(sex: Enums.Sex, race: BasicRace, faction: Faction, body: HarmableBody, klass: Klass, being_gen_template: BeingGenTemplate):
 	self.sex = sex; self.race = race; self.faction = faction; self.body = body; self.klass= klass; self.being_gen_template = being_gen_template
