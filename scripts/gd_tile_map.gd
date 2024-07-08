@@ -50,7 +50,7 @@ var _player_i: int = -1
 #TODO buscar suitable tiles
 func spawn_starting_player(preinitdata: BeingStatePreIniter) -> Being:
 	_player_i += 1
-	return birth_being_snapped_at(preinitdata, _players_start_position + Vector2i(_player_i, 0), true)
+	return birth_being_snapped_at(preinitdata, _players_start_position + Vector2i(_player_i*2, 0), true)
 
 var _birthed_beings_i: int = 0
 #ALERT, NO APARECE EL BEING SI LA TILE NO ESTÁ CARGADA EN EL MOMENTO Q SPAWNEA
