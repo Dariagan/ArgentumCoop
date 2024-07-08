@@ -19,14 +19,14 @@ var chosen_extra_sprites: Array[int] = []
 
 var extra_health_multiplier: float = 1
 
-var internal_state: BeingInternalState
+var istate: BeingInternalState
 var followers: Array[BeingGenTemplate] = []
 
 
 func construct(being_birth_dict: Dictionary) -> void:
 	assert(being_birth_dict != null && being_birth_dict != {})
 	
-	#region are constructed inside internal_state
+	#region are constructed inside istate
 	var sex: Enums.Sex
 	var race: BasicRace
 	var klass: Klass
@@ -106,15 +106,15 @@ func construct(being_birth_dict: Dictionary) -> void:
 		being_gen_template = handle_key(Keys.BEING_GEN_TEMPLATE, being_birth_dict, Global.being_gen_templates)
 
 	assert(sex && race && faction)
-	internal_state = BeingInternalState.new()
-	internal_state.construct_for_posterior_serialization(sex, race, faction, null, klass, being_gen_template)
+	istate = BeingInternalState.new()
+	istate.construct_for_posterior_serialization(sex, race, faction, null, klass, being_gen_template)
 
 # TODO
 func construct_from_serialized(serialized_being_spawn_data: Dictionary) -> void:
 	pass
 	
 func serialize_being_internal_state() -> Dictionary:
-	return internal_state.serialize()
+	return istate.serialize()
 
 func serialize() -> Dictionary:
 	var dict: Dictionary = {
@@ -123,7 +123,7 @@ func serialize() -> Dictionary:
 		Keys.BODY_SCALE: body_scale,
 		Keys.HEAD: sprite_head.id,
 		Keys.BODY: sprite_body.id,
-		Keys.INTERNAL_STATE: internal_state.serialize(),
+		Keys.INTERNAL_STATE: istate.serialize(),
 		Keys.HEALTH_MULTIP: extra_health_multiplier,
 		#extra_stats_multiplier,
 	}

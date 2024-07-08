@@ -57,21 +57,18 @@ func change_sprite_data(sprite_data: SpriteData) -> void:
 	var net_scale: Vector3 = _starting_sprite_width_frontally_sideways_height * _character_width_frontally_sideways_height * sprite_data.width_frontally_sideways_height
 	_scale = net_scale
 
-
 func _play_handled(animation_state: Enums.AnimationState, direction: Enums.Dir, custom_speed: float = 1.0, from_end: bool = false) -> void:
 	if _width_asimetrically_altered:
 		match direction:
 			Enums.Dir.UP, Enums.Dir.DOWN:
-				_set_x_scale_remotely.rpc(_scale[0])
+				scale.x = _scale[0]
 			Enums.Dir.LEFT, Enums.Dir.RIGHT:
-				_set_x_scale_remotely.rpc(_scale[1])
+				scale.x = _scale[1]
 	
 	if _animation_states.find(animation_state) != -1:
-		_play_remotely.rpc(get_animation_name(animation_state, direction), custom_speed, from_end)
+		super.play(get_animation_name(animation_state, direction), custom_speed, from_end)
 	else:
-		_play_remotely.rpc(get_animation_name(Enums.AnimationState.IDLE, direction), custom_speed, from_end)
-	
-	
+		super.play(get_animation_name(Enums.AnimationState.IDLE, direction), custom_speed, from_end)
 
 static func get_animation_name(animation_state: Enums.AnimationState, direction: Enums.Dir) -> StringName:
 	match [animation_state, direction]:
@@ -91,13 +88,3 @@ static func get_animation_name(animation_state: Enums.AnimationState, direction:
 		#ejemplo EXTRA1, EXTRA2
 	push_error("couldn't match")
 	return &""
-
-#sacar lo de any peer y asignar authority
-@rpc("call_local", "any_peer", "unreliable")
-func _play_remotely(animation_name: StringName, custom_speed: float, from_end: bool):
-	super.play(animation_name, custom_speed, from_end)
-
-#sacar lo de any peer y asignar authority
-@rpc("call_local", "any_peer", "unreliable")
-func _set_x_scale_remotely(value: float):
-	scale.x = value

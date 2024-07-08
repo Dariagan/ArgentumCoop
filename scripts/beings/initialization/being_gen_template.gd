@@ -7,7 +7,6 @@ class_name BeingGenTemplate
 @export var name: StringName = &"missingname"
 
 @export var ai_process: GDScript
-
 @export var display_being_name: bool = false
 
 #meter los spritesdatas directamente?

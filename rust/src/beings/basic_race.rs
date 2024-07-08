@@ -55,7 +55,7 @@ impl IResource for BasicRace {
       diets: Array::new(),
       filth_generation: 0.0,
       comfortable_temp_range: Vector2i { x: 16, y: 23 },
-      ai_process: None,
+      ai_process: None, //Some(godot::tools::load::<GDScript>("res://scripts/beings/default_ai_process.gd")),
       whitelisted_tiles_for_spawning: Array::new(), blacklisted_tiles_for_spawning: Array::new(),
       rust_whitelisted_tiles_for_spawning: HashSet::new(), rust_blacklisted_tiles_for_spawning: HashSet::new(),
     }

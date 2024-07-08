@@ -1,11 +1,11 @@
-extends Node
+extends Object
 class_name AiProcess
 
-@onready var being: Being = get_parent()
+var being: Being
 
+func _init(_being: Being = null):
+	being = _being
 
-func _ready():
-	pass # Replace with function body.
-
-func _process(delta):
+func behave(delta: float):
+	
 	pass
