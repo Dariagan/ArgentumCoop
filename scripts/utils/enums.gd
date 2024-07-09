@@ -15,3 +15,5 @@ enum TileZLevel {Soil = 0, Floor, Stain, Structure, Roof}
 
 #WARNING chequear que esté igual que como está definido en Rust
 enum AnimationState { IDLE, WALK, JOG, EXTRA0, EXTRA1, EXTRA2, EXTRA3 }
+
+enum AiState { WANDER, CHASE, ATTACK_RANGED, FLEE,}

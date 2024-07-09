@@ -35,8 +35,8 @@ func construct(preiniter: BeingStatePreIniter, uid: int) -> void:
 	
 	set_name_label_text_and_color.rpc(preiniter.name, istate.faction.color, show_label)
 	
-	self.setsync_node_name_and_uid.rpc(preiniter.name, uid)
-		#TODO key press para ocultar las namelabels de todos (usar el grupo)
+	self.setsync_node_name_and_uid.rpc(uid)
+	#TODO key press para ocultar las namelabels de todos (usar el grupo)
 
 @rpc("call_local")
 func set_ai_process():
@@ -96,7 +96,7 @@ func _process(delta: float) -> void:
 		[true, _]: ai_control(delta)
 	_update_distance_moved()
 	_update_body_state()
-	_play_animation(_body_state, _facing_dir)
+	_play_animation()
 
 var distance_moved: float; var _previous_position: Vector2 = position
 func _update_distance_moved() -> void:
@@ -115,7 +115,7 @@ func _update_body_state() -> void:
 
 var _body_state: Enums.AnimationState = Enums.AnimationState.IDLE
 		
-var _facing_dir: Enums.Dir = Enums.Dir.DOWN
+var _faced_dir: Enums.Dir = Enums.Dir.DOWN
 
 func _change_body_state(new_body_state: Enums.AnimationState):
 	_body_state = new_body_state
@@ -135,13 +135,7 @@ func _update_direction_axis_by_input(delta: float) -> void:
 	
 	_direction_axis = Input.get_vector(&"ui_left", &"ui_right", &"ui_up", &"ui_down")
 	
-	apply_friction(friction, delta)
 	_update_velocity(delta)
-	
-	if not Config.noclip:
-		move_and_slide()
-	else:
-		position += _direction_axis * Config.noclip_speed
 	
 	distance_moved_since_load += distance_moved
 	
@@ -153,39 +147,45 @@ func apply_friction(amount: float, delta: float):
 	velocity = velocity.move_toward(Vector2.ZERO, amount * delta)
 
 func _update_velocity(delta: float):
+	apply_friction(friction, delta)
 	if _direction_axis != Vector2.ZERO:
 		_direction_axis = _direction_axis.normalized()
 		velocity += _direction_axis * acceleration * delta
 		
 		velocity = velocity.limit_length(istate.get_max_speed())
-		_calc_facing_dir(_direction_axis)
+		_update_faced_dir(_direction_axis)
+		if controlling_peer==0 or not (Config.noclip and controlling_peer > 0):
+			move_and_slide()
+		else:
+			position += _direction_axis * Config.noclip_speed
 		
-func _calc_facing_dir(direction: Vector2) -> void:
+func _update_faced_dir(direction: Vector2) -> void:
 	var new_dir: Enums.Dir
 	if abs(direction.x) > abs(direction.y): 
 		new_dir = Enums.Dir.LEFT if direction.x < 0 else Enums.Dir.RIGHT
 	else: 
 		new_dir = Enums.Dir.UP if direction.y < 0 else Enums.Dir.DOWN
 	
-	if new_dir != _facing_dir: _sync_facing_dir.rpc(new_dir)
+	if new_dir != _faced_dir: _setsync_faced_dir.rpc(new_dir)
 
-@rpc("call_local", "any_peer") func _sync_facing_dir(new_dir: Enums.Dir): 
+@rpc("call_local", "any_peer") func _setsync_faced_dir(new_dir: Enums.Dir): 
 	if is_multiplayer_authority() or controlling_peer == multiplayer.get_remote_sender_id():
-		_facing_dir = new_dir
-
-func _play_animation(animation_state: Enums.AnimationState, direction: Enums.Dir) -> void:	
+		_faced_dir = new_dir
+		
+func _play_animation() -> void:	
 	for body_part in body_holder.get_children():
 		if body_part is AnimatedBodyPortion and body_part.sprite_frames:
-			body_part._play_handled(animation_state, direction)
+			body_part._play_handled(_body_state, _faced_dir)
 			
 func serialize() -> Dictionary:#guardar como packedscene en vez de esto
 	return {
-		&"direction": _facing_dir,
+		&"direction": _faced_dir,
 		&"position": position,
 		&"state": istate.serialize()
 	}
 
-@rpc("call_local") func sync_pos_reliable(loc_pos: Vector2): position = loc_pos; _previous_position = loc_pos
+@rpc("call_local")func setsync_pos_reliable(loc_pos: Vector2): position=loc_pos; _previous_position=loc_pos
+@rpc("call_local")func setsync_node_name_and_uid(_uid:int):self.name="%d%s%s"%[_uid,istate.race.name,name_label.text];self.uid=_uid;
 
-@rpc("call_local")
-func setsync_node_name_and_uid(_name: String, _uid: int): self.uid = _uid; self.name = str(_uid)+"."+_name
+func distance_to(thing: Node2D) -> float: return self.global_position.distance_to(thing.global_position)
+	

@@ -1,0 +1,96 @@
+[gd_scene load_steps=12 format=3 uid="uid://3oyxjehm0b8"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
+[ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
+[ext_resource type="Script" path="res://scripts/lobby.gd" id="4_vtap0"]
+[ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
+[ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resource_instances/tiling/tile_set.tres" id="6_67353"]
+[ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
+[ext_resource type="Script" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
+[ext_resource type="Script" path="res://scripts/gd_tile_map.gd" id="7_itdl2"]
+[ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
+[ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="10_ysw5o"]
+
+[sub_resource type="PackedScene" id="PackedScene_yuns1"]
+_bundled = {
+"conn_count": 0,
+"conns": PackedInt32Array(),
+"editable_instances": [],
+"names": PackedStringArray("CharacterCreation", "Node"),
+"node_count": 1,
+"node_paths": [],
+"nodes": PackedInt32Array(-1, -1, 1, 0, -1, 0, 0),
+"variants": [],
+"version": 3
+}
+
+[node name="Main" type="Node"]
+script = ExtResource("1_iuim6")
+
+[node name="Lobby" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_vtap0")
+character_creation_scene = SubResource("PackedScene_yuns1")
+
+[node name="GdTileMap" type="RustTileMap" parent="Lobby"]
+unique_name_in_owner = true
+y_sort_enabled = true
+tile_set = ExtResource("6_67353")
+rendering_quadrant_size = 128
+layer_1/name = "Layer1"
+layer_1/z_index = 5
+layer_2/name = "Layer2"
+layer_2/y_sort_enabled = true
+layer_2/z_index = 10
+script = ExtResource("7_itdl2")
+
+[node name="chequear AutoSpawnList" type="MultiplayerSpawner" parent="Lobby"]
+_spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
+spawn_path = NodePath("../GdTileMap")
+script = ExtResource("6_r3dut")
+
+[node name="Canvas" type="CanvasLayer" parent="."]
+
+[node name="HUD" type="Control" parent="Canvas"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="InventoryInterface" type="Control" parent="Canvas/HUD"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_10wcn")
+
+[node name="Inventory" parent="Canvas/HUD/InventoryInterface" instance=ExtResource("5_7q6ev")]
+layout_mode = 1
+
+[node name="MenuControl" type="Container" parent="Canvas"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(182, -118)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("7_6o24h")
+lobby_interface_scene = ExtResource("10_ysw5o")
+
+[node name="MainMenu" parent="Canvas/MenuControl" instance=ExtResource("7_wv7ku")]
+layout_mode = 2
+
+[connection signal="tile_unloaded" from="Lobby/GdTileMap" to="Lobby/GdTileMap" method="_on_tile_unloaded"]
+[connection signal="host_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_host_pressed"]
+[connection signal="join_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_join_pressed"]
+[connection signal="name_changed" from="Canvas/MenuControl/MainMenu" to="." method="_on_main_menu_name_changed"]
+[connection signal="quick_start_pressed" from="Canvas/MenuControl/MainMenu" to="." method="_on_main_menu_quick_start_pressed"]
+[connection signal="quick_start_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_quick_start_pressed"]

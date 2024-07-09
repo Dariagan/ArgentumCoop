@@ -16,7 +16,7 @@ var inventory: InventoryData = null# TODO USAR EL PLUGIN INVENTORYSYSTEM?
 var skills_data = null
 
 var being_gen_template: BeingGenTemplate = null 
-
+# https://docs.godotengine.org/en/stable/classes/class_%40globalscope.html#class-globalscope-method-weakref
 var followers: Array[Being] = []
 var master: Being = null
 #necesario para que funciona  serialize()

@@ -232,14 +232,11 @@ func start_new_game() -> void:
 		var player_being_preinit_data = BeingStatePreIniter.new()
 		player_being_preinit_data.construct(player_start_data)
 		
-		var being: Being = tile_map.spawn_starting_player(player_being_preinit_data)
+		var being: Being = tile_map.spawn_starting_player(player_being_preinit_data, _peers[i])
 		spawned_beings.push_back(being)
-		i+=1
-		
-	i=0
-	for being: Being in spawned_beings:
 		being.give_control.rpc(_peers[i])
 		i+=1
+	
 	MusicPlayer.play_playlist_shuffled(Keys.PEACE_ORDER, true)
 	
 #endregion
