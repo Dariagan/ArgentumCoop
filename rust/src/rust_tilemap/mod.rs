@@ -13,20 +13,22 @@ use crate::utils::matrix::DownScalingMatrix;
 use crate::utils::safe_vec::SafeVec;
 use crate::utils::uns_vec::UnsVec;
 use godot::builtin::Dictionary;
-use godot::engine::{ITileMap, TileMap};
+use godot::engine::{INode2D, Node2D};
 use godot::prelude::*;
 use std::borrow::{Borrow, BorrowMut};
 use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 #[derive(GodotClass)]
-#[class(tool, base=TileMap)]
+#[class(base=Node2D)]
 struct RustTileMap {
+
+  
   #[var]
   seed: i64,
   tile_unid_mapping: Vec<TileDto>,
   world_matrix: Option<WorldMatrix>,
-  base: Base<TileMap>,
+  base: Base<Node2D>,
   world_size: UnsVec,
   //don't remove an entry directly
   being_loaded_tiles_map: HashMap<BeingUnid, HashSet<UnsVec>>,
@@ -38,8 +40,8 @@ struct RustTileMap {
 
 }
 #[godot_api]
-impl ITileMap for RustTileMap {
-  fn init(base: Base<TileMap>) -> Self {
+impl INode2D for RustTileMap {
+  fn init(base: Base<Node2D>) -> Self {
     Self {
       base,
       seed: 0,
@@ -54,17 +56,13 @@ impl ITileMap for RustTileMap {
   }
 
   fn enter_tree(&mut self) {
-    godot_print!("hola rust");
-    if Engine::singleton().is_editor_hint(){
 
-      let layer_names: Array<StringName> = TileZLevel::VARIANTS
-        .iter().map(|&name| StringName::from(name)).collect();
+    let layer_names: Array<StringName> = TileZLevel::VARIANTS
+      .iter().map(|&name| StringName::from(name)).collect();
 
-      let layer_names: [Variant; 1] = [layer_names.to_variant()];
-     
-      self.base_mut().call( "_add_tile_map_layers".into(), &layer_names);
-     
-    }
+    let layer_names: [Variant; 1] = [layer_names.to_variant()];
+    
+    self.base_mut().call( "_add_tile_map_layers".into(), &layer_names);
   }
 }
 #[godot_api]
@@ -103,13 +101,18 @@ impl RustTileMap {
     godot_print!("time taken to generate: {:.2?}", now.elapsed());
     true
   }
+  fn local_to_map(&mut self, loc_pos: Vector2) -> Vector2i {
+      let arg: [Variant; 1] = [loc_pos.to_variant()];
+      unsafe{self.base_mut().call("local_to_tilemap".into(), &arg).try_to().unwrap_unchecked()}
+  }
+
   #[func]
-  fn load_tiles_around(&mut self, _local_coords: Vector2, chunk_size: Vector2i, being_unid: i64) {
+  fn load_tiles_around(&mut self, _being_coords: Vector2i, chunk_size: Vector2i, being_unid: i64) {
 
     let chunk_size = SafeVec::from(chunk_size).all_bigger_than_min(10).expect("chunk size is smaller than minimum 10");
     let being_unid = BeingUnid(being_unid);
     
-    let being_coords: SafeVec = self.base().local_to_map(_local_coords).into(); let _local_coords = ();
+    let being_coords: SafeVec = _being_coords.into();
 
     let world_size = self.world_size;
 
@@ -134,16 +137,18 @@ impl RustTileMap {
     self.unload_excess_tiles(being_coords, chunk_size.into(), being_unid);
   }
   fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) {
-    let tile: *const TileDto = self.tile_nid_mapping().get(unid.0 as usize).expect(format!("tile mapped to {unid} not found").as_str());
+    let tile: &TileDto = self.tile_nid_mapping().get(unid.0 as usize).expect(format!("tile mapped to {unid} not found").as_str());
     unsafe{
-      let atlas_origin_position = (*tile).origin_position;
-      let modulo_tiling_area = (*tile).modulo_tiling_area;
-      let atlas_origin_position_offset = matrix_coord.mod_unsv(modulo_tiling_area.try_into().unwrap_unchecked()); 
-      self.base_mut().set_cell_ex((*tile).z_level as i32, matrix_coord.into())
-        .source_id((*tile).source_atlas)
-        .atlas_coords(atlas_origin_position + atlas_origin_position_offset.into())
-        .alternative_tile((*tile).alternative_id)
-        .done()
+      let tile_z_level: i32 = tile.z_level as i32;
+      let atlas_origin_position: Vector2i = (*tile).origin_position;
+      let atlas_origin_position_offset: Vector2i = matrix_coord.mod_unsv((*tile).modulo_tiling_area.try_into().unwrap_unchecked()).into(); 
+      
+      let args: [Variant; 7] = 
+        [tile_z_level.to_variant(), Into::<Vector2i>::into(matrix_coord).to_variant(), (*tile).source_atlas.to_variant(),
+        (atlas_origin_position+atlas_origin_position_offset).to_variant(),  (*tile).alternative_id.to_variant(), (*tile).id.to_variant(), (*tile).own_layer.to_variant()];
+
+      // TODO: METER  NUEVA TILEMAPLAYER SI NO TA. GUARDAR SU REF EN UN DICT CON KEY=TILEID
+      self.base_mut().call("_set_cell_handled".into(), &args);
     }
   }
   fn unload_excess_tiles(&mut self, being_coords: SafeVec, chunk_size: UnsVec, being_unid: BeingUnid) {unsafe {
@@ -165,7 +170,7 @@ impl RustTileMap {
       
       if count == 0 {
         for layer_i in 0..TileZLevel::COUNT {
-          self.base_mut().erase_cell(layer_i, tile_coord.into());
+          // self.base_mut().erase_cell(layer_i, tile_coord.into());
         }
         self.tile_shared_loads_count.remove(tile_coord.borrow());
         let tile_coord: Vector2i = tile_coord.into();

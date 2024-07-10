@@ -28,6 +28,8 @@ var music_peace_order: Dictionary
 
 var taunt_sounds: Dictionary
 
+var shaders: Dictionary
+
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resource_instances/tiling/tiles/tile_set.tres")
 

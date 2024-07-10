@@ -12,6 +12,7 @@ enum Dir {LEFT, RIGHT, UP, DOWN}
 
 #chequear que esté igual que como está puesto en rust
 enum TileZLevel {Soil = 0, Floor, Stain, Structure, Roof}
+const TileZLevelKey:Array[StringName] = [&"Soil", &"Floor", &"Stain", &"Structure", &"Roof"]
 
 #WARNING chequear que esté igual que como está definido en Rust
 enum AnimationState { IDLE, WALK, JOG, EXTRA0, EXTRA1, EXTRA2, EXTRA3 }

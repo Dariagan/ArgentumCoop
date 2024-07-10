@@ -14,6 +14,9 @@ pub struct SafeVec {
 }
 #[allow(dead_code)]
 impl SafeVec {
+
+  pub const ZERO: SafeVec = SafeVec{lef: 0, right: 0};
+
   pub fn new(lef: i32, right: i32) -> Self {SafeVec { lef, right }}
 
   pub fn add_assign_lef(&mut self, other: &Self) {self.lef += other.lef;}

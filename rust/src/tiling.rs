@@ -33,7 +33,7 @@ pub struct Tile {
   #[export] random_scale_range: Vector4,// tal vez es mejor volver a los bushes y trees escenas para poder hacer esto
   #[export] flipped_at_random: bool,
 
-  #[export] standalone_layer: bool, //new layer uses id as layer name
+  #[export] standalone_layer: bool, //new layer uses id as layer name. must be bool bc different shaders can't be mixed in the same tilemaplayer
   #[export] shader_id: StringName,
   
   pub unid: Option<TileUnid>,
@@ -49,6 +49,9 @@ impl Tile {
   pub fn alternative_id(&self) -> i32 { self.alternative_id }
   pub fn random_scale_range(&self) -> Vector4 { self.random_scale_range }
   pub fn flipped_at_random(&self) -> bool { self.flipped_at_random }
+
+  pub fn standalone_layer(&self) -> bool { self.standalone_layer }
+  pub fn shader_id(&self) -> &StringName { &self.shader_id }
 
   #[func]
   fn validate(&self) -> bool {
@@ -70,12 +73,13 @@ impl Tile {
 #[godot_api]
 impl IResource for Tile{
   fn init(base: Base<Resource>) -> Self {
-    Self {base, id: StringName::try_from("").expect("stringn"), z_level: TileZLevel::Soil, source_atlas: -1, origin_position: Vector2i{x: 0, y: 0}, modulo_tiling_area: Vector2i{x: 1, y: 1}, 
-    alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, unid: None }
+    Self {base, id: StringName::from(""), z_level: TileZLevel::Soil, source_atlas: -1, origin_position: Vector2i{x: 0, y: 0}, modulo_tiling_area: Vector2i{x: 1, y: 1}, 
+    alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, unid: None, shader_id: StringName::from(""), standalone_layer: false }
   }
 }
-impl Into<TileDto> for Gd<Tile> {fn into(self) -> TileDto {let gd_tile = self.bind(); TileDto { z_level: gd_tile.z_level(), source_atlas: gd_tile.source_atlas(), origin_position: gd_tile.origin_position(), modulo_tiling_area: gd_tile.modulo_tiling_area(), alternative_id: gd_tile.alternative_id(), random_scale_range: gd_tile.random_scale_range(), flipped_at_random: gd_tile.flipped_at_random() }}}
+impl Into<TileDto> for Gd<Tile> {fn into(self) -> TileDto {let gd_tile = self.bind(); TileDto { id: gd_tile.id().clone(), z_level: gd_tile.z_level(), source_atlas: gd_tile.source_atlas(), origin_position: gd_tile.origin_position(), modulo_tiling_area: gd_tile.modulo_tiling_area(), alternative_id: gd_tile.alternative_id(), random_scale_range: gd_tile.random_scale_range(), flipped_at_random: gd_tile.flipped_at_random(), own_layer: gd_tile.standalone_layer(), shader_id: gd_tile.shader_id().clone() }}}
 pub struct TileDto{
+  pub id: StringName,
   pub z_level: TileZLevel,
   pub source_atlas: i32,
   pub origin_position: Vector2i,
@@ -83,6 +87,9 @@ pub struct TileDto{
   pub alternative_id: i32,
   pub random_scale_range: Vector4,
   pub flipped_at_random: bool,
+
+  pub own_layer: bool, //new layer uses id as layer name. must be bool bc different shaders can't be mixed in the same tilemaplayer
+  pub shader_id: StringName,
 }
 
 #[derive(GodotClass)]

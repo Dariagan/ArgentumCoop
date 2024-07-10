@@ -2248,6 +2248,27 @@ texture_region_size = Vector2i(32, 32)
 41:0/1/texture_origin = Vector2i(-1, 144)
 41:0/1/physics_layer_0/polygon_0/points = PackedVector2Array(-6.4, 6.4, 6.4, 6.4, 6.4, 16, -6.4, 16)
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nly37"]
+resource_name = "bush_0"
+texture = ExtResource("7_1hcf8")
+texture_region_size = Vector2i(32, 32)
+0:0/size_in_atlas = Vector2i(2, 2)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/1 = 1
+0:0/1/flip_h = true
+0:0/1/y_sort_origin = 3
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_chq5d"]
+resource_name = "bush_1"
+texture = ExtResource("8_tjstt")
+texture_region_size = Vector2i(32, 32)
+0:0/size_in_atlas = Vector2i(2, 2)
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/1 = 1
+0:0/1/flip_h = true
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7hxp8"]
 texture = ExtResource("6_8lgdo")
 texture_region_size = Vector2i(32, 32)
@@ -2508,27 +2529,6 @@ texture_region_size = Vector2i(32, 32)
 14:15/0 = 0
 15:15/0 = 0
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nly37"]
-resource_name = "bush_0"
-texture = ExtResource("7_1hcf8")
-texture_region_size = Vector2i(32, 32)
-0:0/size_in_atlas = Vector2i(2, 2)
-0:0/next_alternative_id = 2
-0:0/0 = 0
-0:0/1 = 1
-0:0/1/flip_h = true
-0:0/1/y_sort_origin = 3
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_chq5d"]
-resource_name = "bush_1"
-texture = ExtResource("8_tjstt")
-texture_region_size = Vector2i(32, 32)
-0:0/size_in_atlas = Vector2i(2, 2)
-0:0/next_alternative_id = 2
-0:0/0 = 0
-0:0/1 = 1
-0:0/1/flip_h = true
-
 [resource]
 tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
@@ -2540,7 +2540,7 @@ sources/4 = SubResource("TileSetAtlasSource_igwfx")
 sources/6 = SubResource("TileSetAtlasSource_nly37")
 sources/7 = SubResource("TileSetAtlasSource_chq5d")
 sources/0 = SubResource("TileSetAtlasSource_s6fl6")
-sources/5 = SubResource("TileSetAtlasSource_7hxp8")
+sources/8 = SubResource("TileSetAtlasSource_7hxp8")
 metadata/_better_terrain = {
 "decoration": ["Decoration", Color(0.411765, 0.411765, 0.411765, 1), 3, [], {
 "path": "res://addons/better-terrain/icons/Decoration.svg"

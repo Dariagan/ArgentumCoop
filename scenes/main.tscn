@@ -1,10 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=11 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
 [ext_resource type="Script" path="res://scripts/lobby.gd" id="4_vtap0"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
-[ext_resource type="TileSet" uid="uid://dt7wa4b136j67" path="res://resource_instances/tiling/tile_set.tres" id="6_67353"]
 [ext_resource type="Script" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
 [ext_resource type="Script" path="res://scripts/gd_tile_map.gd" id="7_itdl2"]
@@ -34,128 +33,7 @@ character_creation_scene = SubResource("PackedScene_yuns1")
 
 [node name="GdTileMap" type="RustTileMap" parent="Lobby"]
 unique_name_in_owner = true
-y_sort_enabled = true
-tile_set = ExtResource("6_67353")
-rendering_quadrant_size = 128
-layer_0/name = "Layer63"
-layer_1/name = "Layer64"
-layer_2/name = "Layer65"
-layer_3/name = "Layer66"
-layer_3/y_sort_enabled = true
-layer_3/z_index = 10
-layer_4/name = "Layer59"
-layer_5/name = "Layer60"
-layer_6/name = "Layer61"
-layer_7/name = "Layer62"
-layer_7/y_sort_enabled = true
-layer_7/z_index = 10
-layer_8/name = "Layer55"
-layer_9/name = "Layer56"
-layer_10/name = "Layer57"
-layer_11/name = "Layer58"
-layer_11/y_sort_enabled = true
-layer_11/z_index = 10
-layer_12/name = "Layer51"
-layer_13/name = "Layer52"
-layer_14/name = "Layer53"
-layer_15/name = "Layer54"
-layer_15/y_sort_enabled = true
-layer_15/z_index = 10
-layer_16/name = "Layer47"
-layer_17/name = "Layer48"
-layer_18/name = "Layer49"
-layer_19/name = "Layer50"
-layer_19/y_sort_enabled = true
-layer_19/z_index = 10
-layer_20/name = "Layer43"
-layer_21/name = "Layer44"
-layer_22/name = "Layer45"
-layer_23/name = "Layer46"
-layer_23/y_sort_enabled = true
-layer_23/z_index = 10
-layer_24/name = "Layer39"
-layer_25/name = "Layer40"
-layer_26/name = "Layer41"
-layer_27/name = "Layer42"
-layer_27/y_sort_enabled = true
-layer_27/z_index = 10
-layer_28/name = "Layer35"
-layer_29/name = "Layer36"
-layer_30/name = "Layer37"
-layer_31/name = "Layer38"
-layer_31/y_sort_enabled = true
-layer_31/z_index = 10
-layer_32/name = "Layer31"
-layer_33/name = "Layer32"
-layer_34/name = "Layer33"
-layer_35/name = "Layer34"
-layer_35/y_sort_enabled = true
-layer_35/z_index = 10
-layer_36/name = "Layer27"
-layer_37/name = "Layer28"
-layer_38/name = "Layer29"
-layer_39/name = "Layer30"
-layer_39/y_sort_enabled = true
-layer_39/z_index = 10
-layer_40/name = "Layer23"
-layer_41/name = "Layer24"
-layer_42/name = "Layer25"
-layer_43/name = "Layer26"
-layer_43/y_sort_enabled = true
-layer_43/z_index = 10
-layer_44/name = "Layer19"
-layer_45/name = "Layer20"
-layer_46/name = "Layer21"
-layer_47/name = "Layer22"
-layer_47/y_sort_enabled = true
-layer_47/z_index = 10
-layer_48/name = "Layer15"
-layer_49/name = "Layer16"
-layer_50/name = "Layer17"
-layer_51/name = "Layer18"
-layer_51/y_sort_enabled = true
-layer_51/z_index = 10
-layer_52/name = "Layer11"
-layer_53/name = "Layer12"
-layer_54/name = "Layer13"
-layer_55/name = "Layer14"
-layer_55/y_sort_enabled = true
-layer_55/z_index = 10
-layer_56/name = "Layer7"
-layer_57/name = "Layer8"
-layer_58/name = "Layer9"
-layer_59/name = "Layer10"
-layer_59/y_sort_enabled = true
-layer_59/z_index = 10
-layer_60/name = "Layer3"
-layer_61/name = "Layer4"
-layer_62/name = "Layer5"
-layer_63/name = "Layer6"
-layer_63/y_sort_enabled = true
-layer_63/z_index = 10
-layer_64/name = "Layer0"
-layer_65/name = "Layer1"
-layer_65/z_index = 5
-layer_66/name = "Layer2"
-layer_66/y_sort_enabled = true
-layer_66/z_index = 10
 script = ExtResource("7_itdl2")
-
-[node name="Roof" type="TileMapLayer" parent="Lobby/GdTileMap"]
-tile_set = ExtResource("6_67353")
-
-[node name="Structure" type="TileMapLayer" parent="Lobby/GdTileMap"]
-y_sort_enabled = true
-tile_set = ExtResource("6_67353")
-
-[node name="Stain" type="TileMapLayer" parent="Lobby/GdTileMap"]
-tile_set = ExtResource("6_67353")
-
-[node name="Floor" type="TileMapLayer" parent="Lobby/GdTileMap"]
-tile_set = ExtResource("6_67353")
-
-[node name="Soil" type="TileMapLayer" parent="Lobby/GdTileMap"]
-tile_set = ExtResource("6_67353")
 
 [node name="chequear AutoSpawnList" type="MultiplayerSpawner" parent="Lobby"]
 _spawnable_scenes = PackedStringArray("res://scenes/being.tscn")
@@ -201,7 +79,6 @@ lobby_interface_scene = ExtResource("10_ysw5o")
 [node name="MainMenu" parent="Canvas/MenuControl" instance=ExtResource("7_wv7ku")]
 layout_mode = 2
 
-[connection signal="tile_unloaded" from="Lobby/GdTileMap" to="Lobby/GdTileMap" method="_on_tile_unloaded"]
 [connection signal="host_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_host_pressed"]
 [connection signal="join_pressed" from="Canvas/MenuControl/MainMenu" to="Canvas/MenuControl" method="_on_main_menu_join_pressed"]
 [connection signal="name_changed" from="Canvas/MenuControl/MainMenu" to="." method="_on_main_menu_name_changed"]

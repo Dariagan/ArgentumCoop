@@ -11,7 +11,7 @@ func _init(_being: Being = null):
 #overridear esto
 func behave(delta: float):
 	if mybeing.istate.master:
-		goto_being(delta, mybeing.istate.master, mybeing.distance_to(mybeing.istate.master), 150, 2, wander)
+		goto_being(delta, mybeing.istate.master, mybeing.distance_to(mybeing.istate.master), 150, 2)
 		pass
 	pass
 

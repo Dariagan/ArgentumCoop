@@ -13,12 +13,8 @@ var friction = 1600 #hacer q provenga de la tile en custom data
 @onready var istate: BeingInternalState = $InternalState
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body; @onready var head: AnimatedBodyPortion = $BodyHolder/Head
 @onready var name_label = $NameLabel; @onready var nav = $NavigationAgent2D
-@onready var tile_map: RustTileMap = get_parent()
+@onready var tile_map: GdTileMap = get_parent()
 
-signal load_tiles_around_me(coords: Vector2, chunk_size: Vector2i, uid: int)
-#NO BORRAR
-func _ready():
-	load_tiles_around_me.connect(tile_map.load_tiles_around)
 
 #constructs for multiplayer too
 func construct(preiniter: BeingStatePreIniter, uid: int) -> void:
@@ -87,7 +83,7 @@ func _input(event: InputEvent) -> void:
 					camera_2d.zoom = camera_2d.zoom.clamp(Config.zoom_out_max, Config.zoom_in_max)
 			
 		if Config.debug and event.is_action(&"f1"):
-			print((get_parent() as TileMap).local_to_map(position))
+			print(tile_map.local_to_tilemap(position))
 
 func _process(delta: float) -> void:
 	var my_peer:int = multiplayer.get_unique_id()
@@ -140,7 +136,7 @@ func _update_direction_axis_by_input(delta: float) -> void:
 	distance_moved_since_load += distance_moved
 	
 	if distance_moved_since_load > 500:
-		load_tiles_around_me.emit(position, Vector2i(192, 120), uid)#195, 120
+		tile_map.load_tiles_around(tile_map.local_to_tilemap(position), Vector2i(192, 120), uid)#195, 120
 		distance_moved_since_load = 0
 		
 func apply_friction(amount: float, delta: float):
