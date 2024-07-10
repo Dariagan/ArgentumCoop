@@ -11,7 +11,7 @@ func _init(_being: Being = null):
 #overridear esto
 func behave(delta: float):
 	if mybeing.istate.master:
-		goto_being(delta, mybeing.istate.master, mybeing.distance_to(mybeing.istate.master), 150, 2)
+		goto_being(delta, mybeing.istate.master, mybeing.distance_to(mybeing.istate.master), 150, 2, wander)
 		pass
 	pass
 
@@ -40,10 +40,10 @@ func goto_being(delta: float, target_being: Being, distance: float, min_distance
 	else:
 		mybeing._direction_axis = Vector2.ZERO
 		if on_min_distance_reached.is_valid():
-			on_min_distance_reached.call_deferred()
+			on_min_distance_reached.call(delta )
 
 var _nodir_rem_time: float = 1.0; var _maintaindir_rem_time: float
-func wander(delta: float, _nodir_restime: float, _maintaindir_restime: float):
+func wander(delta: float):
 	_nodir_rem_time -= delta
 	_maintaindir_rem_time
 	

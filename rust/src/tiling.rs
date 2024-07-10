@@ -1,3 +1,4 @@
+use godot::engine::{Material, Shader, ShaderMaterial};
 use godot::{register::GodotClass, prelude::*};
 use rand_distr::{Distribution, WeightedAliasIndex};
 use rand_pcg::Lcg128Xsl64; use std::fmt::{self, format};
@@ -13,7 +14,7 @@ impl Hash for TileUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u1
 impl fmt::Display for TileUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Tunid{}", self.0)}}//alt+z
 
 use strum_macros::EnumIter;
-#[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter)]
+#[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter, VariantNames)]
 #[godot(via = i32)]
 pub enum TileZLevel {Soil = 0, Floor, Stain, Structure, Roof,}
 
@@ -31,6 +32,9 @@ pub struct Tile {
   #[export] alternative_id: i32,
   #[export] random_scale_range: Vector4,// tal vez es mejor volver a los bushes y trees escenas para poder hacer esto
   #[export] flipped_at_random: bool,
+
+  #[export] standalone_layer: bool, //new layer uses id as layer name
+  #[export] shader_id: StringName,
   
   pub unid: Option<TileUnid>,
 }

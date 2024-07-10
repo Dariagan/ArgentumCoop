@@ -1,6 +1,10 @@
 pub(crate) mod world_matrix;
 
+use godot::engine::Engine;
 use spawn_weights_matrix::SpawnWeightsMatrix;
+use strum::EnumCount;
+use strum::IntoEnumIterator;
+use strum::VariantNames;
 use world_matrix::*;
 use crate::beings::*;
 use crate::formation_generation::*;
@@ -16,7 +20,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 #[derive(GodotClass)]
-#[class(base=TileMap)]
+#[class(tool, base=TileMap)]
 struct RustTileMap {
   #[var]
   seed: i64,
@@ -46,6 +50,20 @@ impl ITileMap for RustTileMap {
       tile_shared_loads_count: Default::default(),
       spawn_weights_matrix: None,
       beings_in_chunk_count: None
+    }
+  }
+
+  fn enter_tree(&mut self) {
+    godot_print!("hola rust");
+    if Engine::singleton().is_editor_hint(){
+
+      let layer_names: Array<StringName> = TileZLevel::VARIANTS
+        .iter().map(|&name| StringName::from(name)).collect();
+
+      let layer_names: [Variant; 1] = [layer_names.to_variant()];
+     
+      self.base_mut().call( "_add_tile_map_layers".into(), &layer_names);
+     
     }
   }
 }
@@ -146,7 +164,7 @@ impl RustTileMap {
       if count > 0 {count -= 1;}
       
       if count == 0 {
-        for layer_i in 0..self.base().get_layers_count() {
+        for layer_i in 0..TileZLevel::COUNT {
           self.base_mut().erase_cell(layer_i, tile_coord.into());
         }
         self.tile_shared_loads_count.remove(tile_coord.borrow());

@@ -1,3 +1,4 @@
+@tool
 extends RustTileMap
 class_name GdTileMap
 
@@ -5,16 +6,28 @@ var _beings: Dictionary # key(str): individual unique id. value: Being Scene. el
 var tiles_states: Dictionary # key: posx_posy_zi (vec3, no un string). value: state object
 const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
 
-
-
 # IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
+#TODO pasarlo a rust cuando agreguen TileMapLayer
+var mlayers: Array[TileMapLayer] = []
+func _add_tile_map_layers(layer_names: Array[StringName]):
+	if Engine.is_editor_hint():
+		var i: int = 0
+		for layer_name in layer_names:
+			var new_child = TileMapLayer.new()
+			new_child.name = layer_name 
+			if not has_node(NodePath(new_child.name)):
+				add_child(new_child); move_child(new_child, 0)
+				new_child.tile_set = preload("res://resource_instances/tiling/tile_set.tres")
+				mlayers.append(new_child)
+				new_child.owner = get_tree().edited_scene_root
+				if layer_name == &"Structure":
+					new_child.y_sort_enabled = true	
+# la watar va a haber q tratarla de una forma especial en set_cell
 
 func _ready():
 	_setup_config()
 	
 func _setup_config():
-	self.tile_set = preload("res://resource_instances/tiling/tile_set.tres")
-	add_layer(0);add_layer(1);add_layer(2)
 	set_layer_z_index(Enums.TileZLevel.Structure, 10)
 	set_layer_y_sort_enabled(Enums.TileZLevel.Structure, true)
 	y_sort_enabled = true
