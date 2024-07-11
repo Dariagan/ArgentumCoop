@@ -4,44 +4,48 @@ var _beings: Dictionary # key(str): individual unique id. value: Being Scene. el
 var tiles_states: Dictionary # key: posx_posy_zi (vec3, no un string). value: state object
 const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
 
-var beings_z_index: int = -1
 
 #IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
+const TILE_SET: TileSet = preload("res://resource_instances/tiling/tile_set.tres")
 
-var tileidbinded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
-
+var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
+var beings_z_index: int = -1
 #TODO pasarlo a rust cuando agreguen TileMapLayer
-var zlevelbinded_layers: Array[TileMapLayer] = []
+var zlevel_layers: Array[TileMapLayer] = []
 # ALERT SÍ HACE FALTA TOOL PORQUE TIENE QUE ESTAR PRELOADED ANTES DE QUE SUCEDA MULTIPLAYER. ADD_CHILD NO SIRVE PORQUE LOS RPC NO FUNCIONARIAN
-func _add_tile_map_layers(layer_names: Array[StringName]):
+func _add_tile_map_layers(layer_names: Array[StringName]) -> void:
 	var i: int = 0
 	for layer_name in layer_names:
 		var new_child = TileMapLayer.new()
 		new_child.name = layer_name 
 		add_child(new_child); move_child(new_child, i); new_child.z_index = i
-		new_child.tile_set = preload("res://resource_instances/tiling/tile_set.tres")
-		zlevelbinded_layers.append(new_child)
+		new_child.tile_set = TILE_SET
+		zlevel_layers.append(new_child) 
 		if layer_name == &"Structure":
 			new_child.y_sort_enabled = true	
-			beings_z_index = i
+			beings_z_index = i-1
 		i+=1
 
 func _process(delta):
 	pass
 
-func _set_cell_handled(z_level: int, coords: Vector2i, source_atlas: int, atlas_pos: Vector2i, alt_id: int, tile_id: StringName = &"", own_layer: bool = false):
-	if not own_layer:
-		(get_child(z_level) as TileMapLayer).set_cell(coords, source_atlas, atlas_pos, alt_id)
-	elif tileidbinded_layers.has(tile_id):
-		(tileidbinded_layers[tile_id] as TileMapLayer).set_cell(coords, source_atlas, atlas_pos, alt_id)
-	elif Global.tiles_data.has(tile_id):#crear la layer
-		var new_layer: TileMapLayer = TileMapLayer.new(); add_child(new_layer) #ojo, así no esta synqueado el orden de los hijos de tilemap. 
-		tileidbinded_layers[tile_id] = new_layer
+func _set_cell_handled(z_level: int, coords: Vector2i, source_atlas: int, atlas_pos: Vector2i, alt_id: int, tile_id: StringName, shader_id : StringName = &""):
+	if shader_id.is_empty():
+		zlevel_layers[z_level].set_cell(coords, source_atlas, atlas_pos, alt_id)
+	elif tile_id_binded_layers.has(tile_id):
+		
+		(tile_id_binded_layers[tile_id] as TileMapLayer).set_cell(coords, source_atlas, atlas_pos, alt_id)
+	elif Global.tilesdict.has(tile_id):#crear la layer
+		layer_count+=1; var new_layer: TileMapLayer = TileMapLayer.new(); add_child(new_layer); 
+		move_child(new_layer, zlevel_layers.size()+tile_id_binded_layers.size()); 
+		tile_id_binded_layers[tile_id] = new_layer
+		
 		new_layer.z_index = z_level
-		var tile: Tile = Global.tiles_data[tile_id]
-		new_layer.material = Global.shaders[tile.shader_id]
-		new_layer.tile_set = preload("res://resource_instances/tiling/tile_set.tres")
+		var dict = Global.shaders
+		new_layer.material = Global.shaders[shader_id]
+		new_layer.tile_set = TILE_SET
+		new_layer.name = tile_id
 		new_layer.set_cell(coords, source_atlas, atlas_pos, alt_id)
 	else:
 		push_error("banana")
@@ -53,7 +57,7 @@ func generate_world():
 	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y > 500)
 	
 	var tiles: Array[Tile] = []
-	tiles.append_array(Global.tiles_data.values())
+	tiles.append_array(Global.tilesdict.values())
 		
 	generate_world_matrix(WORLD_SIZE, tiles)
 	
@@ -97,7 +101,7 @@ func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, player:bool=
 			var spawned_follower: Being = birth_being_at(follower_template.instantiate(preinit.istate.faction.instance_id),loc_pos,player)
 			set_master_follower.rpc(being.get_path(), spawned_follower.get_path())
 			
-	if player or zlevelbinded_layers[0].get_cell_tile_data(local_to_tilemap(loc_pos)): #TODO
+	if player or zlevel_layers[0].get_cell_tile_data(local_to_tilemap(loc_pos)): #TODO
 		being.set_multiplayer_authority(mp_auth)
 		return being
 	else:
@@ -122,9 +126,9 @@ func birth_being_gen_template_at(being_gen_template_id: StringName, faction: Str
 	return birth_being_at(being_gen_template.instantiate(faction), loc_pos, false, mp_auth)
 #endregion SPAWNING
 
-func tilemap_to_local(tilemap_pos: Vector2i) -> Vector2: return zlevelbinded_layers[0].map_to_local(tilemap_pos)
+func tilemap_to_local(tilemap_pos: Vector2i) -> Vector2: return zlevel_layers[0].map_to_local(tilemap_pos)
 
-func local_to_tilemap(local_pos: Vector2) -> Vector2i: return zlevelbinded_layers[0].local_to_map(local_pos)
+func local_to_tilemap(local_pos: Vector2) -> Vector2i: return zlevel_layers[0].local_to_map(local_pos)
 
 
 func _on_tile_unloaded(coords):

@@ -1,7 +1,7 @@
 [gd_scene load_steps=17 format=3 uid="uid://dvqq1banvf1yw"]
 
 [ext_resource type="Script" path="res://scripts/ui/uim_lobby_interface.gd" id="1_gewq0"]
-[ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse-7021371.jpg" id="3_rncrb"]
+[ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse.jpg" id="3_rncrb"]
 [ext_resource type="FontFile" uid="uid://ctrsrtkxeu85y" path="res://assets/fonts/Exocet2.ttf" id="4_n6a85"]
 [ext_resource type="StyleBox" uid="uid://c1i3svkycn37m" path="res://resource_instances/ui/buttonhover.tres" id="5_43a4n"]
 [ext_resource type="PackedScene" uid="uid://vxv66o5h4qwi" path="res://scenes/ui/coolborder.tscn" id="5_msqxt"]

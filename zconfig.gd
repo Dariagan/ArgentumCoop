@@ -2,10 +2,10 @@ extends Node
 
 const default_ip_to_join: String = "localhost"
 var ignore_joiners_readiness_on_start: bool = true
-var insta_start: bool = 0
+var insta_start: bool = 1
 var debug: bool = 1
 var debug_walk_mult:float = 3
-var noclip: bool = 0
+var noclip: bool = 1
 var enable_change_zoom: bool = 1
 var enable_zoom_limit: bool = 0
 var noclip_speed:float = 600

@@ -29,7 +29,6 @@ config/features=PackedStringArray("4.3")
 Chat="*res://scripts/singletons/chat.gd"
 MusicPlayer="*res://scripts/singletons/music_player.gd"
 Config="*res://zconfig.gd"
-Global="*res://scripts/singletons/global.gd"
 
 [display]
 
@@ -61,7 +60,8 @@ folder_colors={
 "res://bin/": "gray",
 "res://resource_instances/": "yellow",
 "res://scripts/": "green",
-"res://scripts/beings/": "green"
+"res://scripts/beings/": "green",
+"res://scripts/shaders/": "gray"
 }
 
 [global_group]
@@ -145,3 +145,4 @@ f1={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+environment/defaults/default_clear_color=Color(0.251877, 0.426284, 0.544064, 1)

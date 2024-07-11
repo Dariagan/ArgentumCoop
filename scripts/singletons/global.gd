@@ -1,39 +1,35 @@
-extends Node
-
+extends Object
+class_name Global
 # PRESIONA F1 PARA IMPRIMIR TU POSICIÓN ACTUAL EN EL TILEMAP POR CONSOLA!
-var username: String
+static var username: String
 
-var item_data: Dictionary
+static var item_data: Dictionary
 
-var sprites_datas: Dictionary
+static var sprites_datas: Dictionary
 
-var recipe_data: Dictionary
-var building_data: Dictionary
+static var recipe_data: Dictionary
+static var building_data: Dictionary
 
-var races: Dictionary
-var controllable_races: Dictionary
-var uncontrollable_races: Dictionary
-var klasses: Dictionary
-var being_gen_templates: Dictionary
+static var races: Dictionary
+static var controllable_races: Dictionary
+static var uncontrollable_races: Dictionary
+static var klasses: Dictionary
+static var being_gen_templates: Dictionary
 
-var tiles_data: Dictionary
+static var tilesdict: Dictionary
 
-var tile_selections: Dictionary
+static var tile_selections: Dictionary
 
-var spawnable_scenes: Array[String]
-
-var music: Dictionary = {}
-
-var music_peace_order: Dictionary
-
-var taunt_sounds: Dictionary
-
-var shaders: Dictionary
+static var spawnable_scenes: Array[String]
+static var music: Dictionary = {}
+static var music_peace_order: Dictionary
+static var taunt_sounds: Dictionary
+static var shaders: Dictionary
 
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resource_instances/tiling/tiles/tile_set.tres")
 
-func _ready() -> void:
+func _init() -> void:
 	Engine.register_singleton(&"Global", self)
 	const item_data_dirs: Array[String] = []#["res://resource_instances/things/items/", "res://resource_instances/things/items/wear/body/"]
 	const sprites_datas_dirs: Array[String] = ["res://resource_instances/beings/sprites/spritesdatas/"]
@@ -48,6 +44,7 @@ func _ready() -> void:
 	const being_gen_templates_dirs: Array[String] = ["res://resource_instances/beings/being_gen_templates/"]
 	const taunt_dirs: Array[String] = ["res://assets/sound/taunts/"]
 	const music_peace_order_dirs: Array[String] = ["res://assets/sound/music/ingame/peace/order/"]
+	const shaders_dirs: Array[String] = ["res://resource_instances/shaders/"]
 	
 	item_data = _index_all_found_resource_instances(item_data_dirs, true)
 	sprites_datas = _index_all_found_resource_instances(sprites_datas_dirs, true)
@@ -56,47 +53,43 @@ func _ready() -> void:
 	building_data = _index_all_found_resource_instances(building_data_dirs, true)
 	controllable_races = _index_all_found_resource_instances(controllable_races_dirs, true)
 	uncontrollable_races = _index_all_found_resource_instances(uncontrollable_races_dirs, true)
-	races.merge(uncontrollable_races, true); races.merge(controllable_races, true)
-	races.make_read_only()
+	races.merge(uncontrollable_races, true); races.merge(controllable_races, true); races.make_read_only()
 	
-	tile_selections = _index_all_found_resource_instances(tile_selections_dirs, false)
-	tile_selections.make_read_only()
-	klasses = _index_all_found_resource_instances(klasses_dirs, true)
-	klasses.make_read_only()
-	tiles_data = _index_all_found_resource_instances(tiles_dirs, true)
-	tiles_data.make_read_only()
+	tile_selections = _index_all_found_resource_instances(tile_selections_dirs, false); tile_selections.make_read_only()
+	klasses = _index_all_found_resource_instances(klasses_dirs, true); klasses.make_read_only()
+	tilesdict = _index_all_found_resource_instances(tiles_dirs, true); tilesdict.make_read_only()
 	
-	being_gen_templates = _index_all_found_resource_instances(being_gen_templates_dirs, true)
-	being_gen_templates.make_read_only()
+	being_gen_templates = _index_all_found_resource_instances(being_gen_templates_dirs, true); being_gen_templates.make_read_only()
 	
-	taunt_sounds = _index_all_found_resource_instances(taunt_dirs, false)
-	taunt_sounds.make_read_only()
+	taunt_sounds = _index_all_found_resource_instances(taunt_dirs, false); taunt_sounds.make_read_only()
 	
-	music_peace_order = _index_all_found_resource_instances(music_peace_order_dirs, true)
-	music_peace_order.make_read_only()
+	music_peace_order = _index_all_found_resource_instances(music_peace_order_dirs, true); music_peace_order.make_read_only()
 	
 	music[Keys.PEACE_ORDER] = music_peace_order
+	
+	shaders = _index_all_found_resource_instances(shaders_dirs, true); shaders.make_read_only()
 
 	#spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_dirs)
 
+static func allowed_file_extension(file_name: String) -> bool:
+	const blacklisted_extensions: Array[String] = [".import", ".gdshader"]
+	for ex in blacklisted_extensions:
+		if file_name.ends_with(ex):
+			return false
+	return true
+
 #TODO CHEQUEAR COLLISION DE KEYS ENCONTRADAS ANTES DE METER AL DICT (PUSHEAR UN ERROR)
-func _index_all_found_resource_instances(dirs: Array[String], check_subfolders: bool, use_safe_loader: bool = false) -> Dictionary:
-	var dir_access: DirAccess
-	var table: Dictionary = {}
-	
+static func _index_all_found_resource_instances(dirs: Array[String], check_subfolders: bool, use_safe_loader: bool = false) -> Dictionary:
+	var dir_access: DirAccess; var table: Dictionary = {}
 	for directory in dirs:
-		if not directory.ends_with("/"):
-			directory += "/"
-		
+		if not directory.ends_with("/"): directory += "/"
 		dir_access = DirAccess.open(directory)
-		
 		if dir_access:
 			dir_access.list_dir_begin()
 			var file_name = dir_access.get_next()
-			
 			while file_name != "":
 				if !dir_access.current_is_dir():
-					if not file_name.ends_with(".import"):
+					if allowed_file_extension(file_name):
 						var resource
 						if not use_safe_loader:
 							resource = ResourceLoader.load(directory + file_name)
@@ -105,7 +98,7 @@ func _index_all_found_resource_instances(dirs: Array[String], check_subfolders: 
 						
 						if resource:
 							var id: StringName = file_name.get_basename()
-							if file_name.ends_with(".tres"): resource.id = id
+							if file_name.ends_with(".tres") and resource is not ShaderMaterial: resource.id = id
 							if table.has(id):
 								push_warning("a resource with id=%s is already present in target dict"%[resource.id])
 								resource = null
@@ -127,7 +120,6 @@ func _index_all_found_resource_instances(dirs: Array[String], check_subfolders: 
 				file_name = dir_access.get_next()
 		else:
 			printerr("Couldn't open directory %s" % [directory])
-	#table.make_read_only()
 	return table
 
 func _list_all_spawnable_scenes(dirs: Array[String]) -> Array[String]:
