@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c1xenaye5ja8p"
-path="res://.godot/imported/water5014.png-e84883ddfee7fae7e0852c39ff2b3f8c.ctex"
+uid="uid://bh4psp5qjqrrb"
+path="res://.godot/imported/waterfull.png-a4132f3e8d075aef43afe7aa8c29d66e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/world/terrain/ocean_water/water5014.png"
-dest_files=["res://.godot/imported/water5014.png-e84883ddfee7fae7e0852c39ff2b3f8c.ctex"]
+source_file="res://assets/textures/world/terrain/waterfull.png"
+dest_files=["res://.godot/imported/waterfull.png-a4132f3e8d075aef43afe7aa8c29d66e.ctex"]
 
 [params]
 
@@ -23,12 +23,12 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=false
 mipmaps/limit=-1
-roughness/mode=0
+roughness/mode=1
 roughness/src_normal=""
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
-process/hdr_clamp_exposure=false
+process/hdr_clamp_exposure=true
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

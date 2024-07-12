@@ -6,9 +6,8 @@ use std::collections::{HashMap, HashSet};
 //RECOMMENDED SIZE = 2500X2500
 pub struct FracturedContinentGenerator{}
 
-#[derive(strum_macros::VariantNames, EnumCount)]
-#[strum(serialize_all = "snake_case")]//no poner targets nuevos al final (ahí van las caves)
-enum Target{ Beach = 0, Lake, Cont, Tree, Bush, Ocean, Cave0, Cave1, Cave2}
+#[derive(strum_macros::VariantNames, EnumCount)] #[allow(non_camel_case_types)]
+enum Target{ beach = 0, oceanfloor, lake, cont, tree, bush, ocean, cave0, cave1, cave2}//no poner targets nuevos al final (ahí van las caves)
 
 
 const BIG_LAKER_CUTOFF: f32 = 1.23;
@@ -115,18 +114,18 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
         
   let rng: &mut Lcg128Xsl64 = rngs.drf().get_unchecked_mut(thread_i);
   if continental{
-    tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::Cont as usize).get_unid(rng));
-    
+    tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::cont as usize).get_unid(rng));
+  
     let (beachness, beach) = val_surpasses_cutoff(calc_beachness(rel_coords, big_beacher, small_beacher, continentness), BEACHER_CUTOFF);
     if beach {
-      tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::Beach as usize).get_unid(rng))
+      tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::beach as usize).get_unid(rng))
     }//else rocky
     else {
       
       let lake: bool =  calc_lakeness(rel_coords, big_laker, small_laker, beachness, continentness);
       
       if lake {
-        tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::Lake as usize).get_unid(rng))
+        tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::lake as usize).get_unid(rng))
       }
       else if beachness < BEACHER_CUTOFF - 0.05{
         let good_roll: bool = rng.gen_range(0.0..=4.0) + forester.get_noise_2d(rel_coords)*1.4 > FORESTER_CUTOFF;
@@ -136,16 +135,17 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
         
         if tree{
           trees.insert(rel_coords);
-          tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::Tree as usize).get_unid(rng));
+          tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::tree as usize).get_unid(rng));
         }
         else if rng.gen_bool(1.0/400.0) && clear_of(&bushes, rel_coords, 1, false){
           bushes.insert(rel_coords);
-          tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::Bush as usize).get_unid(rng));
+          tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::bush as usize).get_unid(rng));
         }
       }
     }
   } else {
-    tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::Ocean as usize).get_unid(rng));
+    tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::oceanfloor as usize).get_unid(rng));
+    tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::ocean as usize).get_unid(rng));
   }
   overwrite_all_tiles_at_coord(world_ptr, (origin, rel_coords), &tiles_2b_placed, None);
 }
@@ -158,7 +158,7 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
 {// place_dungeon_entrances
   const MAX_TRIES: u64 = 1_000_000;
 
-  const DUNGEONS_TO_PLACE: usize = Target::COUNT - Target::Cave0 as usize;
+  const DUNGEONS_TO_PLACE: usize = Target::COUNT - Target::cave0 as usize;
   let mut placed_dungeons_coords: [UnsVec; DUNGEONS_TO_PLACE] = Default::default();
 
   let mut min_distance_multiplier: f64 = 1.0;
@@ -183,7 +183,7 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
 
       if placed_dungeons_coords.iter().all(|coord| is_separated_enough(coord)) {
         *placed_dungeons_coords.get_unchecked_mut(placed_count) = r_coords;
-        overwrite_formation_tile(world_ptr, (origin, r_coords), unidordist_mped2targets.drf().get_unchecked(Target::Cave0 as usize + placed_count).get_unid(rng), None);
+        overwrite_formation_tile(world_ptr, (origin, r_coords), unidordist_mped2targets.drf().get_unchecked(Target::cave0 as usize + placed_count).get_unid(rng), None);
         placed_count += 1;
         godot_print!("{}", r_coords);
       } else {

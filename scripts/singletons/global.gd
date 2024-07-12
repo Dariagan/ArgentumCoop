@@ -142,3 +142,5 @@ func _list_all_spawnable_scenes(dirs: Array[String]) -> Array[String]:
 			print("Couldn't open directory %s" % [directory])
 	
 	return found_scenes
+
+#para mods externos, usar https://github.com/EiTaNBaRiBoA/JsonClassConverter

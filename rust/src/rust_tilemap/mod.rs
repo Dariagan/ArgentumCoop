@@ -55,7 +55,7 @@ impl INode2D for RustTileMap {
     }
   }
 
-  fn enter_tree(&mut self) {
+  fn ready(&mut self) {
 
     let layer_names: Array<StringName> = TileZLevel::VARIANTS
       .iter().map(|&name| StringName::from(name)).collect();
@@ -137,22 +137,14 @@ impl RustTileMap {
     unsafe{
       let tile_z_level: i32 = tile.z_level as i32;
       let atlas_origin_position: Vector2i = (*tile).origin_position;
-      let mut atlas_origin_position_offset: Vector2i = Vector2i::ZERO;
-      let mut source_atlas_offset: i32 = 0;
-      if tile.shader_id == "".into() {
-        atlas_origin_position_offset = matrix_coord.mod_unsv((*tile).modulo_tiling_area).into(); 
-      }
-      else{
-        source_atlas_offset = matrix_coord.mod_unsv((*tile).modulo_tiling_area).swap_components().flat_index(&(*tile).modulo_tiling_area) as i32;
-      }
+      let atlas_origin_position_offset: Vector2i = matrix_coord.mod_unsv((*tile).modulo_tiling_area).into(); 
 
-      
-      let args: [Variant; 7] = 
-        [tile_z_level.to_variant(), Into::<Vector2i>::into(matrix_coord).to_variant(), ((*tile).source_atlas+source_atlas_offset).to_variant(),
-        (atlas_origin_position+atlas_origin_position_offset).to_variant(),  (*tile).alternative_id.to_variant(), (*tile).id.to_variant(), (*tile).shader_id.to_variant()];
+      let args: [Variant; 4] = 
+        [Into::<Vector2i>::into(matrix_coord).to_variant(), ((*tile).source_atlas).to_variant(),
+        (atlas_origin_position+atlas_origin_position_offset).to_variant(), (*tile).alternative_id.to_variant()];
 
       // TODO: METER  NUEVA TILEMAPLAYER SI NO TA. GUARDAR SU REF EN UN DICT CON KEY=TILEID
-      self.base_mut().call("_set_cell_handled".into(), &args);
+      self.base_mut().get_child(tile_z_level).unwrap_unchecked().call("set_cell".into(), &args);
     }
   }
   fn unload_excess_tiles(&mut self, being_coords: SafeVec, chunk_size: UnsVec, being_unid: BeingUnid) {unsafe {

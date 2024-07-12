@@ -1,4 +1,4 @@
-use godot::engine::{Material, Shader, ShaderMaterial};
+use godot::engine::{ISprite2D, Material, Shader, ShaderMaterial, Sprite2D};
 use godot::{register::GodotClass, prelude::*};
 use rand_distr::{Distribution, WeightedAliasIndex};
 use rand_pcg::Lcg128Xsl64; use std::fmt::{self, format};
@@ -16,7 +16,7 @@ impl fmt::Display for TileUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt
 use strum_macros::EnumIter;
 #[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter, VariantNames)]
 #[godot(via = i32)]
-pub enum TileZLevel {Soil = 0, Floor, Stain, Structure, Roof,}
+pub enum TileZLevel {Soil = 0, Water, Floor, Stain, Structure, Roof,}
 
 impl Default for TileZLevel {fn default() -> Self {Self::Soil}} impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
 
@@ -33,7 +33,6 @@ pub struct Tile {
   #[export] random_scale_range: Vector4,// tal vez es mejor volver a los bushes y trees escenas para poder hacer esto
   #[export] flipped_at_random: bool,
 
-  #[export] shader_id: StringName,
   
   pub unid: Option<TileUnid>,
 }
@@ -49,7 +48,6 @@ impl Tile {//TODO hacer
   pub fn random_scale_range(&self) -> Vector4 { self.random_scale_range }
   pub fn flipped_at_random(&self) -> bool { self.flipped_at_random }
 
-  pub fn shader_id(&self) -> &StringName { &self.shader_id }
 
   #[func]
   fn validate(&self) -> bool {
@@ -72,10 +70,10 @@ impl Tile {//TODO hacer
 impl IResource for Tile{
   fn init(base: Base<Resource>) -> Self {
     Self {base, id: StringName::from(""), z_level: TileZLevel::Soil, source_atlas: -1, origin_position: Vector2i{x: 0, y: 0}, modulo_tiling_area: Vector2i{x: 1, y: 1}, 
-    alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, unid: None, shader_id: StringName::from("")}
+    alternative_id: 0, random_scale_range: Vector4{x: 1.0, y: 1.0, z: 1.0, w: 1.0}, flipped_at_random: false, unid: None,}
   }
 }
-impl Into<TileDto> for Gd<Tile> {fn into(self) -> TileDto {let gd_tile = self.bind(); TileDto { id: gd_tile.id().clone(), z_level: gd_tile.z_level(), source_atlas: gd_tile.source_atlas(), origin_position: gd_tile.origin_position(), modulo_tiling_area: gd_tile.modulo_tiling_area().try_into().expect("error negative"), alternative_id: gd_tile.alternative_id(), random_scale_range: gd_tile.random_scale_range(), flipped_at_random: gd_tile.flipped_at_random(), shader_id: gd_tile.shader_id().clone() }}}
+impl Into<TileDto> for Gd<Tile> {fn into(self) -> TileDto {let gd_tile = self.bind(); TileDto { id: gd_tile.id().clone(), z_level: gd_tile.z_level(), source_atlas: gd_tile.source_atlas(), origin_position: gd_tile.origin_position(), modulo_tiling_area: gd_tile.modulo_tiling_area().try_into().expect("error negative"), alternative_id: gd_tile.alternative_id(), random_scale_range: gd_tile.random_scale_range(), flipped_at_random: gd_tile.flipped_at_random() }}}
 pub struct TileDto{
   pub id: StringName,
   pub z_level: TileZLevel,
@@ -86,7 +84,6 @@ pub struct TileDto{
   pub random_scale_range: Vector4,
   pub flipped_at_random: bool,
 
-  pub shader_id: StringName,
 }
 
 #[derive(GodotClass)]
@@ -117,14 +114,8 @@ impl TileSelection {
 }
 //TODO HACERLE UN INIT CON UNA ID MALA PLACEHOLDER ASÍ SE PUEDE VALIDAR^^^
 
-pub struct GdTileSelectionIterator{
-  tile_selection: Gd<TileSelection>, current_index: usize
-}
-impl GdTileSelectionIterator{
-  pub fn new(tile_selection: Gd<TileSelection>) -> Self {
-    Self{tile_selection, current_index: 0}
-  }
-}
+pub struct GdTileSelectionIterator{tile_selection: Gd<TileSelection>, current_index: usize}
+impl GdTileSelectionIterator{pub fn new(tile_selection: Gd<TileSelection>) -> Self {Self{tile_selection, current_index: 0}}}
 impl Iterator for GdTileSelectionIterator {
   type Item = UnidOrDist;
 
@@ -165,7 +156,6 @@ impl TileDistribution {
   pub fn validate(&self) -> bool {//hacer que devuelva un stringname con el error?
     ! self.tiles.is_empty()
     && self.tiles.len() == self.weights.len() 
-    //&& self.tiles.iter_shared().all(|tile| tile.bind().layer >= 0 && tile.bind().layer < TileZLevel::COUNT)
     && self.weights.as_slice().iter().all(|x| *x >= 0) 
   }
 }
@@ -288,3 +278,4 @@ pub fn fill_targets(nids_arr: &mut[UnidOrDist], target_names: &[&str], arg_tile_
       else {panic!("target {} not found: ", target);}
     })
 }
+

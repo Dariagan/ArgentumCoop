@@ -38,8 +38,6 @@ unique_name_in_owner = true
 script = ExtResource("7_itdl2")
 
 [node name="WaterSprite" type="Sprite2D" parent="Lobby/GdTileMap"]
-visible = false
-z_index = -1
 material = ExtResource("4_g3unu")
 position = Vector2(1498, 910.5)
 scale = Vector2(2000, 1215.67)

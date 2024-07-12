@@ -7,7 +7,11 @@ const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
 
 #IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
-const TILE_SET: TileSet = preload("res://resource_instances/tiling/tile_set.tres")
+const TILE_SET: TileSet = preload("res://resource_instances/tiling/tset.tres")
+
+@onready var water_sprite: Sprite2D = $WaterSprite
+
+
 
 var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
 var beings_z_index: int = -1
@@ -20,36 +24,17 @@ func _add_tile_map_layers(layer_names: Array[StringName]) -> void:
 		var new_child = TileMapLayer.new()
 		new_child.name = layer_name 
 		add_child(new_child); move_child(new_child, i); new_child.z_index = i
+		new_child.rendering_quadrant_size = 20
 		new_child.tile_set = TILE_SET
 		zlevel_layers.append(new_child) 
 		if layer_name == &"Structure":
 			new_child.y_sort_enabled = true	
 			beings_z_index = i-1
 		i+=1
+	water_sprite.z_index = Enums.TileZLevel.Water
 
 func _process(delta):
 	pass
-
-func _set_cell_handled(z_level: int, coords: Vector2i, source_atlas: int, atlas_pos: Vector2i, alt_id: int, tile_id: StringName, shader_id : StringName = &""):
-	if shader_id.is_empty():
-		zlevel_layers[z_level].set_cell(coords, source_atlas, atlas_pos, alt_id)
-	elif tile_id_binded_layers.has(tile_id):
-		
-		(tile_id_binded_layers[tile_id] as TileMapLayer).set_cell(coords, source_atlas, atlas_pos, alt_id)
-	elif Global.tilesdict.has(tile_id):#crear la layer
-		layer_count+=1; var new_layer: TileMapLayer = TileMapLayer.new(); add_child(new_layer); 
-		move_child(new_layer, zlevel_layers.size()+tile_id_binded_layers.size()); 
-		tile_id_binded_layers[tile_id] = new_layer
-		
-		new_layer.z_index = z_level
-		var dict = Global.shaders
-		new_layer.material = Global.shaders[shader_id]
-		new_layer.tile_set = TILE_SET
-		new_layer.name = tile_id
-		new_layer.set_cell(coords, source_atlas, atlas_pos, alt_id)
-	else:
-		push_error("banana")
-	
 
 @rpc("call_local")
 func generate_world():
@@ -61,16 +46,16 @@ func generate_world():
 		
 	generate_world_matrix(WORLD_SIZE, tiles)
 	
-	generate_formation(0, Vector2i.ZERO, WORLD_SIZE, Global.tile_selections[&"temperate"], 0, {})
+	generate_formation(0, Vector2i.ZERO, WORLD_SIZE, Global.tile_selections[&"selectiontemperate"], 0, {})
 	
 	_players_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
 	# ALERT SI APARECE TODO VACÍO PUEDE SER PORQUE EL SPAWN POINT ESTÁ PUESTO EN UN LUGAR VACÍO
-	
+	#water_sprite.show()
 	if multiplayer.get_unique_id() == 1:
 		await get_tree().create_timer(2).timeout
 		birth_being_gen_template_at_snapped(&"basic_warrior", &"wild", WORLD_SIZE/2 + Vector2i.ONE*2)
-		
+	
 #region SPAWNING 
 var _players_start_position: Vector2i
 

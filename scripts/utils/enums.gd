@@ -11,7 +11,7 @@ enum ClothingLayer {BOTTOM, MIDDLE, TOP}
 enum Dir {LEFT, RIGHT, UP, DOWN}
 
 #chequear que esté igual que como está puesto en rust
-enum TileZLevel {Soil = 0, Floor, Stain, Structure, Roof}
+enum TileZLevel {Soil = 0, Water, Floor, Stain, Structure, Roof}
 const TileZLevelKey:Array[StringName] = [&"Soil", &"Floor", &"Stain", &"Structure", &"Roof"]
 
 #WARNING chequear que esté igual que como está definido en Rust

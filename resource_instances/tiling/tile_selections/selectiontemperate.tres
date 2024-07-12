@@ -1,0 +1,16 @@
+[gd_resource type="TileSelection" load_steps=9 format=3 uid="uid://caatdrn8yqx56"]
+
+[ext_resource type="Tile" uid="uid://5ek7hgr41e3t" path="res://resource_instances/tiling/tiles/terrain/soil/beach.tres" id="1_hcshb"]
+[ext_resource type="Tile" uid="uid://c8hdu43xe6m36" path="res://resource_instances/tiling/tiles/terrain/water/lake.tres" id="2_k8gax"]
+[ext_resource type="Tile" uid="uid://dsj3n5ytfej0r" path="res://resource_instances/tiling/tiles/terrain/soil/grass.tres" id="3_jjwg0"]
+[ext_resource type="Tile" uid="uid://raf4v5nr45ia" path="res://resource_instances/tiling/tiles/terrain/water/ocean_water.tres" id="4_r41ch"]
+[ext_resource type="Tile" uid="uid://vv7wvaopfanj" path="res://resource_instances/tiling/tiles/structures/dungeons/cave_mossy.tres" id="5_ivybo"]
+[ext_resource type="TileDistribution" uid="uid://ddmptjvj0bxgo" path="res://resource_instances/tiling/tile_selections/distributions/trees_temp.tres" id="6_k4uqe"]
+[ext_resource type="Tile" uid="uid://dom17mag7sjvi" path="res://resource_instances/tiling/tiles/terrain/soil/ocean_sand.tres" id="6_u0ucm"]
+[ext_resource type="TileDistribution" uid="uid://0n8xl1bnolyu" path="res://resource_instances/tiling/tile_selections/distributions/bushes_temp.tres" id="7_fmr6v"]
+
+[resource]
+targets = Array[StringName]([&"beach", &"lake", &"cont", &"tree", &"bush", &"ocean", &"cave0", &"cave1", &"cave2", &"oceanfloor"])
+use_distribution = Array[bool]([false, false, false, true, true])
+tiles = Array[Tile]([ExtResource("1_hcshb"), ExtResource("2_k8gax"), ExtResource("3_jjwg0"), null, null, ExtResource("4_r41ch"), ExtResource("5_ivybo"), ExtResource("5_ivybo"), ExtResource("5_ivybo"), ExtResource("6_u0ucm")])
+tiles_distributions = Array[TileDistribution]([null, null, null, ExtResource("6_k4uqe"), ExtResource("7_fmr6v")])

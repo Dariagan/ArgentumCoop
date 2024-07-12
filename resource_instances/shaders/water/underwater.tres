@@ -4,19 +4,20 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_hays7"]
 noise_type = 2
-seed = 298
-frequency = 0.015
+frequency = 0.016
 fractal_type = 2
+fractal_gain = 0.98
 fractal_weighted_strength = 0.73
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2mvvf"]
 seamless = true
-seamless_blend_skirt = 0.648
+seamless_blend_skirt = 0.563
+normalize = false
 noise = SubResource("FastNoiseLite_hays7")
 
 [resource]
 shader = ExtResource("1_qtdpq")
 shader_parameter/speed = Vector2(0.5, 0.2)
 shader_parameter/wave_strength = 2.0
-shader_parameter/color = Color(0, 0.776471, 0.956863, 1)
+shader_parameter/sourcecolor = Color(0.101961, 0.234477, 0.358302, 1)
 shader_parameter/noise_texture = SubResource("NoiseTexture2D_2mvvf")

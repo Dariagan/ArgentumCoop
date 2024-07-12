@@ -27,7 +27,7 @@ impl WorldMatrix {
       .iter()
       .filter(|&&unid| unid != TileUnid::default())
       .count()
-  }
+  } 
   pub unsafe fn is_empty_at_unchk(&self, coords: UnsVec) -> bool {
     self.count_at(coords) == 0
   }

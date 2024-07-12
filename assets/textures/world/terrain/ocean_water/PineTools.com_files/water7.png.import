@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://1xk11mxdxl7p"
-path="res://.godot/imported/water - Copy.png-e6662ef1c9fb20d0a7448cf69b1cf141.ctex"
+uid="uid://dt3r2crtpj2oq"
+path="res://.godot/imported/water7.png-df98944babc36cc633d1d1d699438522.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/world/terrain/ocean_water/PineTools.com_files/water - Copy.png"
-dest_files=["res://.godot/imported/water - Copy.png-e6662ef1c9fb20d0a7448cf69b1cf141.ctex"]
+source_file="res://assets/textures/world/terrain/ocean_water/PineTools.com_files/water7.png"
+dest_files=["res://.godot/imported/water7.png-df98944babc36cc633d1d1d699438522.ctex"]
 
 [params]
 

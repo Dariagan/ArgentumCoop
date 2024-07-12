@@ -1,5 +1,6 @@
 [gd_resource type="Tile" format=3 uid="uid://raf4v5nr45ia"]
 
 [resource]
-source_atlas = 7
-shader_id = &"water"
+z_level = 1
+source_atlas = 50
+shader_id = &"singlewater"

@@ -14,6 +14,7 @@ var friction = 1600 #hacer q provenga de la tile en custom data
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body; @onready var head: AnimatedBodyPortion = $BodyHolder/Head
 @onready var name_label = $NameLabel; @onready var nav = $NavigationAgent2D
 @onready var tile_map: GdTileMap = get_parent()
+const CHUNK_SIZE: Vector2 = Vector2i(192, 120)
 
 
 #constructs for multiplayer too
@@ -136,7 +137,7 @@ func _update_direction_axis_by_input(delta: float) -> void:
 	distance_moved_since_load += distance_moved
 	
 	if distance_moved_since_load > 500:
-		tile_map.load_tiles_around(tile_map.local_to_tilemap(position), Vector2i(192, 120), uid)#195, 120
+		tile_map.load_tiles_around(tile_map.local_to_tilemap(position), CHUNK_SIZE, uid)#195, 120
 		distance_moved_since_load = 0
 		
 func apply_friction(amount: float, delta: float):
