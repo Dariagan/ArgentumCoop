@@ -11,13 +11,13 @@ void vertex() {
 	// Called for every vertex the material is visible on.
 	float displacement = (sin(TIME) + 1.0)*5.0;
 	VERTEX += vec2(displacement, displacement);
-	
+
 }
 
 void fragment() {
 	// Called for every pixel the material is visible on.
 	vec2 uv = UV + speed * TIME;
-	
+
 	vec2 noise = texture(noise_texture, uv).rg;
 	//TODO hacer q solo el noise se mueva su sampling
 	COLOR = sourcecolor + vec4(noise.x, noise.y, 1, 1);

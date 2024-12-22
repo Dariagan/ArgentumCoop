@@ -14,12 +14,12 @@ uniform float wave_strength = 0.7;
 void vertex() {
 	//float displacement = (sin(TIME) + 1.0)*5.0;
 	//VERTEX += vec2(displacement, displacement);
-	
+
 }
 
 void fragment() {
-	
-	
+
+
 	// Called for every pixel the material is visible on.
 	vec2 uv = UV + speed * TIME;
 	//

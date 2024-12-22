@@ -9,9 +9,6 @@ const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
 
 const TILE_SET: TileSet = preload("res://resource_instances/tiling/tset.tres")
 
-@onready var water_sprite: Sprite2D = $WaterSprite
-
-
 
 var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
 var beings_z_index: int = -1
@@ -31,7 +28,6 @@ func _add_tile_map_layers(layer_names: Array[StringName]) -> void:
 			new_child.y_sort_enabled = true	
 			beings_z_index = i-1
 		i+=1
-	water_sprite.z_index = Enums.TileZLevel.Water
 
 func _process(delta):
 	pass

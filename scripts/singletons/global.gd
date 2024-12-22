@@ -72,7 +72,7 @@ func _init() -> void:
 	#spawnable_scenes = _list_all_spawnable_scenes(spawnable_scenes_dirs)
 
 static func allowed_file_extension(file_name: String) -> bool:
-	const blacklisted_extensions: Array[String] = [".import", ".gdshader"]
+	const blacklisted_extensions: Array[String] = [".import", ".gdshader", ".uid"]
 	for ex in blacklisted_extensions:
 		if file_name.ends_with(ex):
 			return false

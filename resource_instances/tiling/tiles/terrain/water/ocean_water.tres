@@ -2,5 +2,5 @@
 
 [resource]
 z_level = 1
-source_atlas = 50
-shader_id = &"singlewater"
+source_atlas = 2
+modulo_tiling_area = Vector2i(2, 2)

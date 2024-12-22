@@ -11,7 +11,7 @@ uniform float distortion_strength : hint_range(-1.0, 1.0, 0.1) = 0.2;
 void fragment() {
 	vec4 noise_col = texture(noise, UV + scroll * TIME);
 	vec4 screen_col = texture(screen_content, SCREEN_UV + distortion_strength * noise_col.rr);
-	
+
 	COLOR = screen_col;
 }
 
