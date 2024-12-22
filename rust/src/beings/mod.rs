@@ -1,8 +1,6 @@
-use diet::Diet;
 use godot::builtin::StringName;
 use godot::builtin::{Array, Dictionary, GString, Vector2i};
-use godot::engine::{GDScript, Node, Object, ResourcePreloader, Texture2D};
-use godot::log::godot_print;
+use godot::classes::{GDScript, Node, Object, ResourcePreloader, Texture2D};
 use godot::obj::{Gd, NewGd};
 use godot::register::property::Var;
 use godot::register::{Export, GodotConvert, Var};
@@ -29,24 +27,24 @@ impl fmt::Display for BeingGenTemplateUnid {fn fmt(&self, f: &mut fmt::Formatter
 
 #[allow(dead_code)]
 pub fn retrieve_being_gen_template_from_id(being_gen_template_id: StringName) -> Gd<RustBeingGenTemplate> {
-  let obj = godot::classes::Engine::singleton().get_singleton(StringName::from("Global")).expect("couldn't retrieve /Global singleton");
+  let obj = godot::classes::Engine::singleton().get_singleton("Global").expect("couldn't retrieve /Global singleton");
 
-  let being_gen_templates: Dictionary = obj.get("being_gen_templates".into()).try_to().expect("couldn't get dict being_gen_templates from Global");
+  let being_gen_templates: Dictionary = obj.get("being_gen_templates").try_to().expect("couldn't get dict being_gen_templates from Global");
 
   being_gen_templates.get(being_gen_template_id.clone()).expect(format!("couldn't find {} in Global's being_gen_templates dict", being_gen_template_id).as_str())
     .try_to().expect(format!("couldn't parse object at being_gen_templates[\"{}\"] as a RustBeingGenTemplate", being_gen_template_id).as_str())
 }
 
-use godot::{engine::{IResource, Resource}, obj::Base,register::godot_api, register::GodotClass,};
+use godot::{classes::{IResource, Resource}, obj::Base,register::godot_api, register::GodotClass,};
 #[derive(GodotClass)]
 #[class(base=Resource)] // SAQUÉ TOOL
 pub struct RustBeingGenTemplate {
   base: Base<Resource>,
-  #[var] id: StringName,
+  #[var] mid: StringName,
   //if none specified (array is empty), race defaults are used
   //TODO hacer sets de tiles whitelisted comúnes para reutilizar (hacerlo un array const definido en godot usando preload?)
-  #[export] whitelisted_tiles_for_spawning: Array<Gd<Tile>>, //TODO SETTER QUE ACTUALIZE whitelisted_tiles_for_spawning TMB
-  #[export] blacklisted_tiles_for_spawning: Array<Gd<Tile>>,
+  #[export] mwhitelisted_tiles_for_spawning: Array<Gd<Tile>>, //TODO SETTER QUE ACTUALIZE whitelisted_tiles_for_spawning TMB
+  #[export] mblacklisted_tiles_for_spawning: Array<Gd<Tile>>,
 
   rust_whitelisted_tiles_for_spawning: HashSet<TileDto>,
   rust_blacklisted_tiles_for_spawning: HashSet<TileDto>,
@@ -56,9 +54,9 @@ impl IResource for RustBeingGenTemplate {
   fn init(base: Base<Resource>) -> Self {
     Self {
       base: base,
-      id: StringName::from(""),
-      whitelisted_tiles_for_spawning: Array::new(),
-      blacklisted_tiles_for_spawning: Array::new(),
+      mid: StringName::from(""),
+      mwhitelisted_tiles_for_spawning: Array::new(),
+      mblacklisted_tiles_for_spawning: Array::new(),
       rust_whitelisted_tiles_for_spawning: HashSet::new(),
       rust_blacklisted_tiles_for_spawning: HashSet::new(),
     }
@@ -70,14 +68,14 @@ impl RustBeingGenTemplate {
     &self.base
   }
   pub fn id(&self) -> &StringName {
-    &self.id
+    &self.mid
   }
 }
 
 use crate::formation_generation::{Tile, TileDto};
 impl Hash for RustBeingGenTemplate {
   fn hash<H: Hasher>(&self, state: &mut H) {
-    state.write_u32(self.id.hash());
+    state.write_u32(self.mid.hash());
   }
 }
 

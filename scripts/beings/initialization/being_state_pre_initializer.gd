@@ -59,29 +59,40 @@ func construct(being_birth_dict: Dictionary) -> void:
 		
 	if being_birth_dict[Keys.NAME] != &"random":
 		name = being_birth_dict[Keys.NAME]
-	elif race.default_being_names.size() > 0:
-		name = race.default_being_names.pick_random()
+	elif race.mdefault_being_names.size() > 0:
+		name = race.mdefault_being_names.pick_random()
 	else:
 		name = "nameless"
 	
 	if race is ControllableRace:
-		klass = handle_key(Keys.KLASS, being_birth_dict, race.klasses)
+		klass = handle_key(Keys.KLASS, being_birth_dict, race.mklasses)
 	
 	faction = handle_key(Keys.FACTION, being_birth_dict, GameData.factions)
+	
+	if being_birth_dict.has(Keys.BEING_GEN_TEMPLATE):
+		being_gen_template = handle_key(Keys.BEING_GEN_TEMPLATE, being_birth_dict, Global.being_gen_templates)
 	
 	if being_birth_dict.has(Keys.FOLLOWERS):
 		for follower_template_id in being_birth_dict[Keys.FOLLOWERS]:
 			followers.append(Global.being_gen_templates[follower_template_id])
-	elif klass and klass.available_followers != null and klass.available_followers.size() > 0:
-		if faction is PlayerFaction:
-			followers.append(klass.available_followers.pick_random())
-		elif randi_range(0, 10) == 0:
-			followers.append(klass.available_followers.pick_random())
+	elif being_gen_template:
+		var pick: BeingGenTemplate = WeightedChoice.pick(being_gen_template.mav_followers_weighted_dist)
 		
-	if race.head_sprites_datas and race.head_sprites_datas.size() > 0:
-		sprite_head = handle_key(Keys.HEAD, being_birth_dict, race.head_sprites_datas)
+	elif klass.mavailable_followers != null and klass.mavailable_followers.size() > 0:
+		const MAX_TRIES: int = 1000
+		for tries in MAX_TRIES:
+			var pick: BeingGenTemplate = WeightedChoice.pick(klass.mavailable_followers)
+			if pick != null:
+				followers.append(pick)
+				break
+			elif tries == MAX_TRIES - 1:
+				push_error("couldn't get a non-null follower for klass %s", klass.mid)
+				
+		
+	if race.mhead_sprites_datas and race.mhead_sprites_datas.size() > 0:
+		sprite_head = handle_key(Keys.HEAD, being_birth_dict, race.mhead_sprites_datas)
 			
-	sprite_body = handle_key(Keys.BODY, being_birth_dict, race.body_sprites_datas) as BodySpriteData
+	sprite_body = handle_key(Keys.BODY, being_birth_dict, race.mbody_sprites_datas) as BodySpriteData
 	
 	result = handle_key(Keys.HEAD_SCALE, being_birth_dict)
 	if result: head_scale = result; result = null
@@ -95,15 +106,14 @@ func construct(being_birth_dict: Dictionary) -> void:
 		var sex_probs: Dictionary = {Enums.Sex.MALE: sex_value, Enums.Sex.FEMALE: 1 - sex_value}
 		sex = WeightedChoice.pick(sex_probs)
 	elif sex_value is StringName or sex_value == Enums.Sex.ANY or (sex_value is float and (sex_value<0.0 or sex_value>1.0)):
-		var sex_probs: Dictionary = {Enums.Sex.MALE: race.males_ratio, Enums.Sex.FEMALE: 1 - race.males_ratio}
+		var sex_probs: Dictionary = {Enums.Sex.MALE: race.mmales_ratio, Enums.Sex.FEMALE: 1 - race.mmales_ratio}
 		sex = WeightedChoice.pick(sex_probs)
 	elif sex_value is Enums.Sex:
 		sex = sex_value
 	else:
 		push_error("invalid type for \"sex\" entry in birth dict")
 		
-	if being_birth_dict.has(Keys.BEING_GEN_TEMPLATE):
-		being_gen_template = handle_key(Keys.BEING_GEN_TEMPLATE, being_birth_dict, Global.being_gen_templates)
+	
 
 	assert(sex && race && faction)
 	istate = BeingInternalState.new()
@@ -121,8 +131,8 @@ func serialize() -> Dictionary:
 		Keys.NAME: name,
 		Keys.HEAD_SCALE: head_scale,
 		Keys.BODY_SCALE: body_scale,
-		Keys.HEAD: sprite_head.id,
-		Keys.BODY: sprite_body.id,
+		Keys.HEAD: sprite_head.mid,
+		Keys.BODY: sprite_body.mid,
 		Keys.INTERNAL_STATE: istate.serialize(),
 		Keys.HEALTH_MULTIP: extra_health_multiplier,
 		#extra_stats_multiplier,
@@ -136,19 +146,23 @@ func serialize() -> Dictionary:
 func get_array_of_ids(array_of_objects: Array) ->  Array:
 	var array_ids: Array = []
 	for o in array_of_objects:
-		array_ids.push_back(o.id)
+		array_ids.push_back(o.mid)
 	return array_ids
 
 func handle_key(key: StringName, being_birth_dict: Dictionary, data_structure = null):
 	if being_birth_dict.has(key):
+		if data_structure != null and data_structure.is_empty():
+			assert(false, "Global dict/array for key=%s is empty"%[key])
 		if data_structure is Dictionary and data_structure.keys().size() > 0:
 			if being_birth_dict[key] != &"random" && being_birth_dict[key] != "":
-				return data_structure[being_birth_dict[key]]
+				return data_structure[being_birth_dict[key]]	
 			else:
 				return data_structure.values().pick_random()
 		elif data_structure is Array and data_structure.size() > 0:
 			for item in data_structure:
-				if being_birth_dict[key] == item.id:
+				if item == null:
+					assert(false, "iterated data_structure has null (key=%s)"%[key])
+				if being_birth_dict[key] == item.mid:
 					return item
 			return (data_structure as Array).pick_random()
 		else: 

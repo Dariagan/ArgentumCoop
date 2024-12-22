@@ -1,7 +1,7 @@
 extends Resource
 class_name SpriteData
 
-var id: StringName
+var mid: StringName
 
 #sprite node name
 @export var name: StringName

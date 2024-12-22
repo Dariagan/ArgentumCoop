@@ -7,7 +7,7 @@ func _init() -> void:
 
 
 #clearear al salir de la partida
-static var factions: Dictionary = {
-	&"player": PlayerFaction.new(),# en el caso de cargar una savefile, va a haber q agregarlo diferentemente
-	&"wild": WildFaction.new(),
+static var factions: Dictionary[StringName, Faction] = {
+	Keys.PLAYER_FACTION_INSTANCE: PlayerFaction.new(),# en el caso de cargar una savefile, va a haber q agregarlo diferentemente
+	Keys.WILD_FACTION_INSTANCE: WildFaction.new(),
 }

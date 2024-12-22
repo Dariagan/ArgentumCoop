@@ -10,12 +10,12 @@ func _init(_being: Being = null):
 
 #overridear esto
 func behave(delta: float):
-	if mybeing.istate.master:
-		goto_being(delta, mybeing.istate.master, mybeing.distance_to(mybeing.istate.master), 150, 2)
+	if mybeing.istate.mmaster:
+		goto_being(delta, mybeing.istate.mmaster, mybeing.distance_to(mybeing.istate.mmaster), 150, 2)
 		pass
 	pass
 
-# posible optimizacion, solo calcular hasta la primera mitad de los puntos del camino (no pathear a un punto arbitrario intermedio, puede ser inválido)
+# posible optimizacion: solo calcular hasta la primera mitad de los puntos del camino (no pathear a un punto arbitrario intermedio, puede ser inválido)
 
 var i: int = 0
 var recalc_path_remai_time: float # llamar con super.gotobeing() en subscripts
@@ -45,7 +45,7 @@ func goto_being(delta: float, target_being: Being, distance: float, min_distance
 var _nodir_rem_time: float = 1.0; var _maintaindir_rem_time: float
 func wander(delta: float):
 	_nodir_rem_time -= delta
-	_maintaindir_rem_time
+	#_maintaindir_rem_time
 	
 	
 	

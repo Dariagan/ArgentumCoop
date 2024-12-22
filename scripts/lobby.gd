@@ -12,8 +12,7 @@ var _ready_peers: PackedInt32Array = [] # doesn't include host
 var _characters_spawn_data: Array = [{}] 
 
 func _ready():
-	if Config.insta_start:
-		start_new_game()
+	if Config.insta_start: start_new_game()
 	
 	multiplayer.connected_to_server.connect(_clientfn_on_connect)
 	multiplayer.connection_failed.connect(_clientfn_on_fail_connect)#todo retornar si falla
@@ -130,11 +129,11 @@ func _on_game_start():
 	_lobby_interface.queue_free()
 
 @rpc("call_local", "any_peer")
-func _peer_is_ready(_ready: bool) -> void:
+func _peer_is_ready(sender_is_ready: bool) -> void:
 	var peer_id: int = multiplayer.get_remote_sender_id()
-	if ready and peer_id not in _ready_peers:
+	if sender_is_ready and peer_id not in _ready_peers:
 		_ready_peers.push_back(peer_id)
-	elif not ready:
+	elif not sender_is_ready:
 		_ready_peers.remove_at(_ready_peers.find(peer_id))
 	
 func _is_everybody_ready() -> bool:#doesn't count host
@@ -164,7 +163,7 @@ func _on_name_selected(new_name: String):
 	if new_name: _allfn_update_characterization.rpc(Keys.NAME, new_name)
 	else: _allfn_update_characterization.rpc(Keys.NAME)
 func _on_race_selected(race: ControllableRace):
-	if race: _allfn_update_characterization.rpc(Keys.RACE, race.id)
+	if race: _allfn_update_characterization.rpc(Keys.RACE, race.mid)
 	else: _allfn_update_characterization.rpc(Keys.RACE)
 func _on_sex_selected(sex: Enums.Sex):
 	if sex > 0: _allfn_update_characterization.rpc(Keys.SEX, sex)
@@ -172,15 +171,15 @@ func _on_sex_selected(sex: Enums.Sex):
 	
 func _on_head_selected(head : SpriteData):
 	if head: 
-		_allfn_update_characterization.rpc(Keys.HEAD, head.id)
+		_allfn_update_characterization.rpc(Keys.HEAD, head.mid)
 	else: 
 		_allfn_update_characterization.rpc(Keys.HEAD)
 	
 func _on_class_selected(klass: Klass):
-	if klass: _allfn_update_characterization.rpc(Keys.KLASS, klass.id)
+	if klass: _allfn_update_characterization.rpc(Keys.KLASS, klass.mid)
 	else: _allfn_update_characterization.rpc(Keys.KLASS)
 func _on_follower_selected(follower: BeingGenTemplate):
-	if follower: _allfn_update_characterization.rpc(Keys.FOLLOWERS, [follower.id])
+	if follower: _allfn_update_characterization.rpc(Keys.FOLLOWERS, [follower.mid])
 	else: _allfn_update_characterization.rpc(Keys.FOLLOWERS)
 func _on_body_scale_changed(new_scale: Vector3):
 	_allfn_update_characterization.rpc(Keys.BODY_SCALE, new_scale)
@@ -224,7 +223,7 @@ func start_new_game() -> void:
 		if not player_start_data.has(Keys.BODY):
 			player_start_data[Keys.BODY] = &"random"
 		
-		player_start_data[Keys.FACTION] = &"player"	
+		player_start_data[Keys.FACTION] = Keys.PLAYER_FACTION_INSTANCE
 		
 		#extra health para los protagonists
 		player_start_data[Keys.HEALTH_MULTIP] = 2	

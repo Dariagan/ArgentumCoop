@@ -1,6 +1,6 @@
 [gd_resource type="Tile" format=3 uid="uid://dclune6eplqit"]
 
 [resource]
-z_level = 3
-source_atlas = 4
-origin_position = Vector2i(8, 2)
+mz_level = 3
+msource_atlas = 4
+morigin_position = Vector2i(8, 2)

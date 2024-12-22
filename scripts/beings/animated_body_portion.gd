@@ -41,7 +41,7 @@ func _set_starting_sprite_data(sprite_data: SpriteData) -> void:
 	position = sprite_data.offset_global
 	position.y += _vertical_offset
 	position.y *= pow(_vertical_offset_mult, 1/1.5)
-	_set_starting_sprite_data_remotely.rpc([sprite_data.id, _avai_animation_states, sprite_data.offset_global, position.y])
+	_set_starting_sprite_data_remotely.rpc([sprite_data.mid, _avai_animation_states, sprite_data.offset_global, position.y])
 
 @rpc
 func _set_starting_sprite_data_remotely(data: Array):

@@ -22,9 +22,9 @@ uniform float wave_strength = 1.2;
 void fragment() {
 	// Called for every pixel the material is visible on.
 	vec2 uv = UV + speed * TIME;
-	
+
 	vec2 noise = 2.0 * texture(noise_texture, uv).rg - vec2(1.0);
-	
+
 	COLOR = texture(TEXTURE, UV + noise * wave_strength);
 	//esto agarra el color del fondo
 	COLOR *= texture(screen_texture, SCREEN_UV + noise * distortion);

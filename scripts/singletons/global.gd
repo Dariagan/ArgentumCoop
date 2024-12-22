@@ -98,13 +98,13 @@ static func _index_all_found_resource_instances(dirs: Array[String], check_subfo
 						
 						if resource:
 							var id: StringName = file_name.get_basename()
-							if file_name.ends_with(".tres") and resource is not ShaderMaterial: resource.id = id
+							if file_name.ends_with(".tres") and resource is not ShaderMaterial: resource.mid = id
 							if table.has(id):
-								push_warning("a resource with id=%s is already present in target dict"%[resource.id])
+								push_warning("a resource with id=%s is already present in target dict"%[resource.mid])
 								resource = null
 							if resource:
 								if resource.has_method(&"validate") && not resource.validate():
-									printerr("resource %s doesn't meet its validation condition"%[file_name])
+									assert(false, "resource %s doesn't meet its validation condition"%[file_name])
 									resource = null
 							if resource:
 								table[id] = resource

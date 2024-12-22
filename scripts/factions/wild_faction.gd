@@ -4,5 +4,5 @@ class_name WildFaction
 #type id
 
 func _init() -> void:
-	instance_id = &"wild"
-	color = Color.SADDLE_BROWN
+	minstance_id = Keys.WILD_FACTION_INSTANCE
+	mcolor = Color.SADDLE_BROWN

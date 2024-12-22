@@ -18,7 +18,7 @@ const CHUNK_SIZE: Vector2 = Vector2i(192, 120)
 
 
 #constructs for multiplayer too
-func construct(preiniter: BeingStatePreIniter, uid: int) -> void:
+func construct(preiniter: BeingStatePreIniter, uid_: int) -> void:
 	if preiniter.sprite_body:
 		body.construct(preiniter.sprite_body, preiniter.body_scale)
 		if preiniter.sprite_head:
@@ -28,19 +28,19 @@ func construct(preiniter: BeingStatePreIniter, uid: int) -> void:
 	
 	set_ai_process.rpc()
 	
-	var show_label: bool = istate.faction is PlayerFaction or (istate.being_gen_template and istate.being_gen_template.display_being_name)
+	var show_label: bool = istate.mfaction is PlayerFaction or (istate.mbeing_gen_template and istate.being_gen_template.display_being_name)
 	
-	set_name_label_text_and_color.rpc(preiniter.name, istate.faction.color, show_label)
+	set_name_label_text_and_color.rpc(preiniter.name, istate.mfaction.mcolor, show_label)
 	
-	self.setsync_node_name_and_uid.rpc(uid)
+	self.setsync_node_name_and_uid.rpc(uid_)
 	#TODO key press para ocultar las namelabels de todos (usar el grupo)
 
 @rpc("call_local")
 func set_ai_process():
-	if istate.being_gen_template and istate.being_gen_template.ai_process:
-		ai_process = istate.being_gen_template.ai_process.new(self)
-	elif istate.race.ai_process:
-		ai_process = istate.race.ai_process.new(self)
+	if istate.mbeing_gen_template and istate.mbeing_gen_template.mai_process:
+		ai_process = istate.mbeing_gen_template.mai_process.new(self)
+	elif istate.mrace.mai_process:
+		ai_process = istate.mrace.mai_process.new(self)
 
 @rpc("call_local") func set_name_label_text_and_color(text: String, color: Color, show_label: bool): 
 	var ui_show_labels: bool = true
@@ -54,7 +54,7 @@ func set_controlling_peer(peer: int): controlling_peer = max(0, peer); if contro
 @rpc("call_local", "any_peer")
 func give_control(new_controller_peer: int) -> void:
 	if (controlling_peer==0 or multiplayer.get_remote_sender_id() == controlling_peer)\
-	   and istate.faction is PlayerFaction and istate.race is ControllableRace:
+	   and istate.mfaction is PlayerFaction and istate.mrace is ControllableRace:
 		set_multiplayer_authority(new_controller_peer)
 		controlling_peer = new_controller_peer
 		if new_controller_peer == multiplayer.get_unique_id():
@@ -62,7 +62,7 @@ func give_control(new_controller_peer: int) -> void:
 
 @rpc("call_local", "any_peer")
 func take_control() -> void:
-	if controlling_peer==0 and istate.faction is PlayerFaction and istate.race is ControllableRace:
+	if controlling_peer==0 and istate.mfaction is PlayerFaction and istate.mrace is ControllableRace:
 		controlling_peer = multiplayer.get_remote_sender_id()
 		set_multiplayer_authority(multiplayer.get_remote_sender_id())
 		if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
@@ -102,10 +102,10 @@ func _update_distance_moved() -> void:
 	
 func _update_body_state() -> void: 	
 	if distance_moved > 1:
-		_adjust_speed_scale(distance_moved, 1)
+		_adjust_speed_scale(1)
 		_change_body_state(Enums.AnimationState.JOG)
 	elif distance_moved > 0.01:
-		_adjust_speed_scale(distance_moved, 0.8)
+		_adjust_speed_scale(0.8)
 		_change_body_state(Enums.AnimationState.WALK)
 	else:
 		_change_body_state(Enums.AnimationState.IDLE)
@@ -116,7 +116,7 @@ var _faced_dir: Enums.Dir = Enums.Dir.DOWN
 
 func _change_body_state(new_body_state: Enums.AnimationState):
 	_body_state = new_body_state
-func _adjust_speed_scale(distance_moved: float, factor: float):
+func _adjust_speed_scale(factor: float):
 	for body_part in body_holder.get_children():
 		if body_part is AnimatedBodyPortion:
 			body_part.speed_scale = distance_moved/factor
@@ -182,7 +182,7 @@ func serialize() -> Dictionary:#guardar como packedscene en vez de esto
 	}
 
 @rpc("call_local")func setsync_pos_reliable(loc_pos: Vector2): position=loc_pos; _previous_position=loc_pos
-@rpc("call_local")func setsync_node_name_and_uid(_uid:int):self.name="%d%s%s"%[_uid,istate.race.name,name_label.text];self.uid=_uid;
+@rpc("call_local")func setsync_node_name_and_uid(_uid:int):self.name="%d%s%s"%[_uid,istate.mrace.mname,name_label.text];self.uid=_uid;
 
 func distance_to(thing: Node2D) -> float: return self.global_position.distance_to(thing.global_position)
 	

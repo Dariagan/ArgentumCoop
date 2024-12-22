@@ -56,7 +56,7 @@ func add_chat_message(new_text : String, sender: String) -> void:
 		chat_label.text += "%s: %s\n" % [sender, new_text]
 		chat_log = chat_label.text
 		await get_tree().create_timer(0.001).timeout
-		_scroll_container.scroll_vertical = _scroll_container.get_v_scroll_bar().max_value as float
+		_scroll_container.scroll_vertical = _scroll_container.get_v_scroll_bar().max_value as int
 
 var prev_textedit_text = ''
 var prev_cursor_line = 0

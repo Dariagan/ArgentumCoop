@@ -23,8 +23,7 @@ use strum::IntoEnumIterator;
 
 use fractured_continent_generator::*;
 #[derive(GodotConvert, Var, Export, Primitive, Debug, strum_macros::VariantNames, EnumCount, Display)]
-#[strum(serialize_all = "PascalCase")]
-#[godot(via = i64)]
+#[strum(serialize_all = "PascalCase")] #[godot(via = i64)]
 pub enum FormGenEnum {
   FracturedContinentGenerator = 0,
 }

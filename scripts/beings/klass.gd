@@ -1,19 +1,27 @@
 extends Resource
 class_name Klass
 
-var id: StringName
+var mid: StringName
 
-@export var name: String
+@export var mname: String
 
-@export var available_followers: Array[BeingGenTemplate]
+@export var mavailable_followers: Dictionary[BeingGenTemplate, float] = {}#use a null as key to specify weight of getting no follower
 
-@export var combat_multipliers: CombatMultipliers = CombatMultipliers.new()
+@export var mcombat_multipliers: CombatMultipliers = CombatMultipliers.new()
 
-@export var available_spells: Array[StringName]
+@export var mavailable_spells: Array[StringName] = []
 
 func validate() -> bool: 
-	for follower in available_followers:
-		if not (Global.races[follower.race_id] is UncontrollableRace): return false
+	var sum_of_weights: float = 0
+	for follower: BeingGenTemplate in mavailable_followers.keys():
+		var weight: float = mavailable_followers[follower]
+		sum_of_weights += weight
+		if weight < 0: return false
+		if not follower.mrace is UncontrollableRace: return false
+	
+	if not mavailable_followers.keys().is_empty() and sum_of_weights <= 0:
+		push_error("sum of weights for available followers in klass %s is zero"%[mid])
+		return false
 	return true
 
 

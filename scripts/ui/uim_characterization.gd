@@ -38,7 +38,7 @@ func _on_race_selected(id: int):
 	_current_race = _found_races[id]
 	race_selected.emit(_current_race)
 	
-	if _current_class and not _current_class in _current_race.klasses:
+	if _current_class and not _current_class in _current_race.mklasses:
 		_current_class = null
 		class_selected.emit(null)
 	if not _current_class:
@@ -54,7 +54,7 @@ func _on_race_selected(id: int):
 	if _current_race and _current_sex > 0:
 		_setup_head_menu_popup(_current_sex)
 	
-	_update_popup_menu(class_menu_button.get_popup(), _current_race.klasses)
+	_update_popup_menu(class_menu_button.get_popup(), _current_race.mklasses)
 	#selected_race.emit(_current_race)
 
 func _on_sex_selected(id: int):

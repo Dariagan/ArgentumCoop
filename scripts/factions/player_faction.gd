@@ -4,11 +4,11 @@ class_name PlayerFaction
 #type id
 
 
-var members: Array[Being] = []
+var mmembers: Array[Being] = []
 	
 func _init() -> void:
-	instance_id = &"player"
-	color = Color.BISQUE
+	minstance_id = Keys.PLAYER_FACTION_INSTANCE
+	mcolor = Color.BISQUE
 	pass
 	
 

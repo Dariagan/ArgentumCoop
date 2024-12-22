@@ -1,5 +1,4 @@
 [gd_resource type="Tile" format=3 uid="uid://dsj3n5ytfej0r"]
 
 [resource]
-source_atlas = 0
-modulo_tiling_area = Vector2i(32, 32)
+msource_atlas = 0

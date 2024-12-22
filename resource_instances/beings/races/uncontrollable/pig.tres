@@ -1,14 +1,32 @@
-[gd_resource type="BasicRace" script_class="UncontrollableRace" load_steps=5 format=3 uid="uid://dswdlo717paf3"]
+[gd_resource type="BasicRace" script_class="UncontrollableRace" load_steps=7 format=3 uid="uid://dr4fk4i73qhkk"]
 
-[ext_resource type="Script" path="res://scripts/beings/sprites/bodyspritedata.gd" id="1_feonu"]
+[ext_resource type="Script" uid="uid://nkdjmrfrcmic" path="res://scripts/beings/sprites/bodyspritedata.gd" id="1_feonu"]
 [ext_resource type="Resource" uid="uid://cms52k2dbl8ho" path="res://resource_instances/beings/sprites/spritesdatas/body/pig_body_data.tres" id="2_fydbc"]
-[ext_resource type="Script" path="res://scripts/beings/sprites/spritedata.gd" id="2_kwkpa"]
-[ext_resource type="Script" path="res://scripts/beings/race/uncontrollable_race.gd" id="3_elw0e"]
+[ext_resource type="Script" uid="uid://cxgjpxndfrg4y" path="res://scripts/beings/sprites/spritedata.gd" id="2_kwkpa"]
+[ext_resource type="Script" uid="uid://firm1xvtgire" path="res://scripts/damage_health_system/combat_multipliers.gd" id="3_87tya"]
+[ext_resource type="Script" uid="uid://gl17abvp1ckc" path="res://scripts/beings/race/uncontrollable_race.gd" id="3_elw0e"]
+
+[sub_resource type="Resource" id="Resource_w5fxt"]
+script = ExtResource("3_87tya")
+health = 1.0
+speed = 1.0
+strength = 1.0
+stamina = 1.0
+sneaking_proficiency = 1.0
+incoming_damage_types = {
+"blunt": 1,
+"fire": 1,
+"magic": 1,
+"sharp": 1
+}
+war_cry_strength = 1.0
+metadata/_custom_type_script = ExtResource("3_87tya")
 
 [resource]
-name = "Chancho"
 script = ExtResource("3_elw0e")
-taming_difficulty = 0.5
-head_sprites_datas = Array[ExtResource("2_kwkpa")]([])
-body_sprites_datas = Array[ExtResource("1_feonu")]([ExtResource("2_fydbc")])
-fallback_possible_loot = {}
+mtaming_difficulty = 0.5
+mcombat_multipliers = SubResource("Resource_w5fxt")
+mhead_sprites_datas = Array[ExtResource("2_kwkpa")]([])
+mbody_sprites_datas = Array[ExtResource("1_feonu")]([ExtResource("2_fydbc")])
+mfallback_possible_loot = {}
+metadata/_custom_type_script = ExtResource("3_elw0e")

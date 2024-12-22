@@ -1,4 +1,4 @@
-use godot::{builtin::Dictionary, engine::{IResource, Resource}, obj::Base, register::{godot_api, GodotClass}};
+use godot::{builtin::Dictionary, classes::{IResource, Resource}, obj::Base, register::{godot_api, GodotClass}};
 #[derive(GodotClass)]
 #[class(init, tool, base=Resource)]
 pub struct Diet {

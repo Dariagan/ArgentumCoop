@@ -1,6 +1,7 @@
 pub(crate) mod world_matrix;
 
-use godot::engine::Engine;
+use godot::classes::TileSet;
+use godot::obj::NewGd;
 use spawn_weights_matrix::SpawnWeightsMatrix;
 use strum::EnumCount;
 use strum::IntoEnumIterator;
@@ -13,7 +14,7 @@ use crate::utils::matrix::DownScalingMatrix;
 use crate::utils::safe_vec::SafeVec;
 use crate::utils::uns_vec::UnsVec;
 use godot::builtin::Dictionary;
-use godot::engine::{INode2D, Node2D};
+use godot::classes::{INode2D, Node2D, TileMapLayer};
 use godot::prelude::*;
 use std::borrow::{Borrow, BorrowMut};
 use std::collections::{HashMap, HashSet};
@@ -25,19 +26,23 @@ struct RustTileMap {
 
   #[var] layer_count: u16,
   #[var] seed: i64,
+  #[var(get = get_tile_set_path)] tile_set_path: GString,
+  #[var] beings_z_index: i32 /*z to assign on spawned beings*/,
+  #[var] zlevel_layers: Array<Gd<TileMapLayer>>,
   tile_unid_mapping: Vec<TileDto>,
+  tile_set: Gd<TileSet>,
   world_matrix: Option<WorldMatrix>,
   base: Base<Node2D>,
   world_size: UnsVec,
-  //don't remove an entry directly
-  being_loaded_tiles_map: HashMap<BeingUnid, HashSet<UnsVec>>,
-  //don't reduce this directly
-  tile_shared_loads_count: HashMap<UnsVec, i64>,
+  being_loaded_tiles_map: HashMap<BeingUnid, HashSet<UnsVec>> /*don't remove an entry directly*/,
+  tile_shared_loads_count: HashMap<UnsVec, i64>  /*don't reduce this directly*/,
 //-- beings section --
   beings_in_chunk_count: Option<DownScalingMatrix<u16>>,
   spawn_weights_matrix: Option<SpawnWeightsMatrix>,
 
 }
+
+
 #[godot_api]
 impl INode2D for RustTileMap {
   fn init(base: Base<Node2D>) -> Self {
@@ -45,9 +50,13 @@ impl INode2D for RustTileMap {
       base,
       layer_count: TileZLevel::COUNT as u16,
       seed: 0,
+      tile_set_path: RustTileMap::TILE_SET_PATH.into(),
+      tile_set: try_load(RustTileMap::TILE_SET_PATH).expect(format!("couldn't find tile set in {}", RustTileMap::TILE_SET_PATH).as_str()),
       world_matrix: None,
       tile_unid_mapping: Vec::new(),
       world_size: UnsVec::ZERO,
+      zlevel_layers: Default::default(),
+      beings_z_index: -1,
       being_loaded_tiles_map: Default::default(),
       tile_shared_loads_count: Default::default(),
       spawn_weights_matrix: None,
@@ -60,16 +69,36 @@ impl INode2D for RustTileMap {
     let layer_names: Array<StringName> = TileZLevel::VARIANTS
       .iter().map(|&name| StringName::from(name)).collect();
 
-    let layer_names: [Variant; 1] = [layer_names.to_variant()];
+    for (i, layer_name) in layer_names.iter_shared().enumerate(){
+      let mut new_child: Gd<TileMapLayer> = TileMapLayer::new_alloc(); let i: i32 = i as i32;
+      new_child.set_name(&layer_name.to_string());
+
+      self.base_mut().add_child(&new_child);
+      self.base_mut().move_child(&new_child, i);
+      new_child.set_z_index(i);
+
+      new_child.set_rendering_quadrant_size(20);
+      new_child.set_tile_set(&self.tile_set);
+
+      self.zlevel_layers.push(&new_child);
+
+      if layer_name.to_string() == "Structure" {
+          new_child.set_y_sort_enabled(true);
+          self.beings_z_index = i - 1; // Define beings_z_index as part of your struct if needed
+      }
+    }
+
     
-    self.base_mut().call( "_add_tile_map_layers".into(), &layer_names);
   }
 }
 #[godot_api]
 impl RustTileMap {
-  const MACROSCOPIC_SPAWNING_CHUNK_SIZE: u8 = 15;
-  const BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK: u16 = 200;  
-
+  #[constant] const MACROSCOPIC_SPAWNING_CHUNK_SIZE: u8 = 15;
+  #[constant] const BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK: u16 = 200;  
+  const TILE_SET_PATH: &'static str = "res://resource_instances/tiling/tset.tres";
+  
+  #[func]fn get_tile_set_path(&self) -> GString {return self.tile_set_path.clone();}
+  
   #[func]
   fn generate_world_matrix(&mut self, size: Vector2i, tiles: Array<Gd<Tile>>) {
     
@@ -105,12 +134,12 @@ impl RustTileMap {
   #[func]
   fn load_tiles_around(&mut self, _being_coords: Vector2i, chunk_size: Vector2i, being_unid: i64) {
 
-    let chunk_size = SafeVec::from(chunk_size).all_bigger_than_min(10).expect("chunk size is smaller than minimum 10");
-    let being_unid = BeingUnid(being_unid);
+    let chunk_size: SafeVec = SafeVec::from(chunk_size).all_bigger_than_min(10).expect("chunk size is smaller than minimum 10");
+    let being_unid: BeingUnid = BeingUnid(being_unid);
     
     let being_coords: SafeVec = _being_coords.into();
 
-    let world_size = self.world_size;
+    let world_size: UnsVec = self.world_size;
 
     for chunk_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))
       .map(|vec| SafeVec::from(vec) + being_coords)
@@ -144,13 +173,13 @@ impl RustTileMap {
         (atlas_origin_position+atlas_origin_position_offset).to_variant(), (*tile).alternative_id.to_variant()];
 
       // TODO: METER  NUEVA TILEMAPLAYER SI NO TA. GUARDAR SU REF EN UN DICT CON KEY=TILEID
-      self.base_mut().get_child(tile_z_level).unwrap_unchecked().call("set_cell".into(), &args);
+      self.base_mut().get_child(tile_z_level).unwrap_unchecked().call("set_cell", &args);
     }
   }
   fn unload_excess_tiles(&mut self, being_coords: SafeVec, chunk_size: UnsVec, being_unid: BeingUnid) {unsafe {
     let self_ptr: *mut Self = self as *mut _;
 
-    let loaded_tiles = self.being_loaded_tiles_map.get_mut(&being_unid).unwrap_unchecked();
+    let loaded_tiles: &mut HashSet<UnsVec> = self.being_loaded_tiles_map.get_mut(&being_unid).unwrap_unchecked();
 
     loaded_tiles.retain(|&tile_coord| {
       let keep: bool = chunk_size.within_bounds_centered(SafeVec::from(tile_coord) - being_coords);
@@ -168,9 +197,9 @@ impl RustTileMap {
         self.tile_shared_loads_count.remove(tile_coord.borrow());
         let tile_coord: &[Variant; 1] = &[Into::<Vector2i>::into(tile_coord).to_variant()];
         for layer_i in 0..self.layer_count {
-          unsafe{self.base_mut().get_child(layer_i as i32).unwrap_unchecked().call("erase_cell".into(), tile_coord);}
+          unsafe{self.base_mut().get_child(layer_i as i32).unwrap_unchecked().call("erase_cell", tile_coord);}
         }
-        self.base_mut().emit_signal("tile_unloaded".into(), tile_coord);
+        self.base_mut().emit_signal("tile_unloaded", tile_coord);
       }
     }
   }

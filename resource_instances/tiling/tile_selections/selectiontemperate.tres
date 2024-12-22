@@ -10,7 +10,7 @@
 [ext_resource type="TileDistribution" uid="uid://0n8xl1bnolyu" path="res://resource_instances/tiling/tile_selections/distributions/bushes_temp.tres" id="7_fmr6v"]
 
 [resource]
-targets = Array[StringName]([&"beach", &"lake", &"cont", &"tree", &"bush", &"ocean", &"cave0", &"cave1", &"cave2", &"oceanfloor"])
-use_distribution = Array[bool]([false, false, false, true, true])
-tiles = Array[Tile]([ExtResource("1_hcshb"), ExtResource("2_k8gax"), ExtResource("3_jjwg0"), null, null, ExtResource("4_r41ch"), ExtResource("5_ivybo"), ExtResource("5_ivybo"), ExtResource("5_ivybo"), ExtResource("6_u0ucm")])
-tiles_distributions = Array[TileDistribution]([null, null, null, ExtResource("6_k4uqe"), ExtResource("7_fmr6v")])
+mtargets = Array[StringName]([&"beach", &"lake", &"cont", &"tree", &"bush", &"ocean", &"cave0", &"cave1", &"cave2", &"oceanfloor"])
+muse_distribution = Array[bool]([false, false, false, true, true])
+mtiles = Array[Tile]([ExtResource("1_hcshb"), ExtResource("2_k8gax"), ExtResource("3_jjwg0"), null, null, ExtResource("4_r41ch"), ExtResource("5_ivybo"), ExtResource("5_ivybo"), ExtResource("5_ivybo"), ExtResource("6_u0ucm")])
+mtiles_distributions = Array[TileDistribution]([null, null, null, ExtResource("6_k4uqe"), ExtResource("7_fmr6v")])

@@ -4,50 +4,50 @@ class_name BeingInternalState
 #para agregar más funcionalidad/estado, addchildear nodos hijos de estado
 # VA A HABER Q VER COMO SYNCEAR EN MP
 
-var _carried_weight: int = 0
-var faction: Faction
+var mcarried_weight: int = 0
+var mfaction: Faction
 
-var sex: Enums.Sex
-var race: BasicRace #mover estos dos a una clase Characterization guardada en otro lado?
-var klass: Klass = null #mover estos dos a una clase Characterization guardada en otro lado?
+var msex: Enums.Sex
+var mrace: BasicRace #mover estos dos a una clase Characterization guardada en otro lado?
+var mklass: Klass = null #mover estos dos a una clase Characterization guardada en otro lado?
 
-var body: HarmableBody #contains health state for each body part
-var inventory: InventoryData = null# TODO USAR EL PLUGIN INVENTORYSYSTEM?
-var skills_data = null
+var mbody: HarmableBody #contains health state for each body part
+var minventory: InventoryData = null# TODO USAR EL PLUGIN INVENTORYSYSTEM?
+var mskills_data = null
 
-var being_gen_template: BeingGenTemplate = null 
+var mbeing_gen_template: BeingGenTemplate = null 
 # https://docs.godotengine.org/en/stable/classes/class_%40globalscope.html#class-globalscope-method-weakref
-var followers: Array[Being] = []
-var master: Being = null
+var mfollowers: Array[Being] = []
+var mmaster: Being = null
 #necesario para que funciona  serialize()
-func construct_for_posterior_serialization(sex: Enums.Sex, race: BasicRace, faction: Faction, body: HarmableBody, klass: Klass, being_gen_template: BeingGenTemplate):
-	self.sex = sex; self.race = race; self.faction = faction; self.body = body; self.klass= klass; self.being_gen_template = being_gen_template
+func construct_for_posterior_serialization(psex: Enums.Sex, prace: BasicRace, pfaction: Faction, pbody: HarmableBody, pklass: Klass, pbeing_gen_template: BeingGenTemplate):
+	self.msex = psex; self.mrace = prace; self.mfaction = pfaction; self.mbody = pbody; self.mklass= pklass; self.mbeing_gen_template = pbeing_gen_template
 
 @rpc("call_local")
-func construct_from_seri(serialized_self: Dictionary) -> void:
-	sex = serialized_self[Keys.SEX]
+func construct_from_seri(pserialized_self: Dictionary) -> void:
+	msex = pserialized_self[Keys.SEX]
 	
-	faction = GameData.factions[serialized_self[Keys.FACTION]]
-	#body = HarmableBody.new(serialized_self["body"])
+	mfaction = GameData.factions[pserialized_self[Keys.FACTION]]
+	#mbody = HarmableBody.new(pserialized_self[Keys.BODY])
 	
-	race = Global.races[serialized_self[Keys.RACE]]
-	if race is ControllableRace:
-		klass = Global.klasses[serialized_self[Keys.KLASS]]
+	mrace = Global.races[pserialized_self[Keys.RACE]]
+	if mrace is ControllableRace:
+		mklass = Global.klasses[pserialized_self[Keys.KLASS]]
 
 func get_max_speed() -> float:
-	var max_speed: float =  400 * race.combat_multipliers.speed 
-	if klass:
-		max_speed *= klass.combat_multipliers.speed
+	var max_speed: float =  400 * mrace.mcombat_multipliers.speed 
+	if mklass:
+		max_speed *= mklass.mcombat_multipliers.speed
 	return max_speed
 
 func serialize() -> Dictionary:
-	assert(sex and race and faction)
+	assert(msex and mrace and mfaction)
 	var data: Dictionary =  {
-		Keys.SEX: sex,
-		Keys.RACE: race.id,
-		#"body": body.serialize(),
-		Keys.FACTION: faction.instance_id,
+		Keys.SEX: msex,
+		Keys.RACE: mrace.mid,
+		#"mbody": mbody.serialize(),
+		Keys.FACTION: mfaction.minstance_id,
 		"inv": {}#.serialize()
 	}
-	if klass: data[Keys.KLASS] = klass.id
+	if mklass: data[Keys.KLASS] = mklass.mid
 	return data
