@@ -6,6 +6,7 @@
 *cpp/src/*.o
 *cpp/src/*.os
 *rust/target
-
+*.tmp
+*.uid
 
 ApocalypseArgentum.code-workspace
