@@ -4,23 +4,20 @@ class_name BeingStatePreIniter
 #se diferencia de un being_gen_template en q el being_gen_template puede incluir rangos de aleatoriedad/sets weighteados configurables para ciertos atributos/variables
 #dentro de ahí, (money, possible loot, health, possible names). y en being_gen_template no se especifica la faction. en esto sí, para saber en cual meter al being
 #
-#esto devuelve solo valores absolutamente especificos y deterministas para el
+# esto DEVUELVE solo valores absolutamente especificos y deterministas (pos-selección aleatoria de las distribuciones especificadas) para el
 # spawning de un individuo específico con caracteristicas especificadas
 # (excepto por la randomización de la cara y cuerpo si no se especifican)
 
 var name: String 
-var head_scale: Vector3 = Vector3.ONE
-var body_scale: Vector3 = Vector3.ONE
+var head_scale: Vector3 = Vector3.ONE; var body_scale: Vector3 = Vector3.ONE
 
-var sprite_head: SpriteData
-var sprite_body: BodySpriteData
+var sprite_head: SpriteData; var sprite_body: BodySpriteData
 
 var chosen_extra_sprites: Array[int] = []
 
 var extra_health_multiplier: float = 1
 
-var istate: BeingInternalState
-var followers: Array[BeingGenTemplate] = []
+var istate: BeingInternalState; var followers: Array[BeingGenTemplate] = []
 
 
 func construct(being_birth_dict: Dictionary) -> void:
@@ -34,7 +31,6 @@ func construct(being_birth_dict: Dictionary) -> void:
 	var being_gen_template: BeingGenTemplate 
 	#endregion
 	var result
-	
 	
 	result = handle_key(Keys.HEALTH_MULTIP, being_birth_dict)
 	if result: extra_health_multiplier = result; result = null
@@ -75,19 +71,22 @@ func construct(being_birth_dict: Dictionary) -> void:
 	if being_birth_dict.has(Keys.FOLLOWERS):
 		for follower_template_id in being_birth_dict[Keys.FOLLOWERS]:
 			followers.append(Global.being_gen_templates[follower_template_id])
-	elif being_gen_template:
-		var pick: BeingGenTemplate = WeightedChoice.pick(being_gen_template.mav_followers_weighted_dist)
+	elif being_gen_template and being_gen_template.mav_followers_weighted_dist != null and not being_gen_template.mav_followers_weighted_dist.is_empty():
+		if being_gen_template.mav_raid_points_for_followers == -1: # ignore raid point costs
+			for follower_i in being_gen_template.max_followers_count:
+				followers.append(Global.being_gen_templates[WeightedChoice.pick(being_gen_template.mav_followers_weighted_dist)])
+		elif being_gen_template.mav_raid_points_for_followers > 0:
+			var remaining_points: int = being_gen_template.mav_raid_points_for_followers
+			var cheapest_follower_points: int = being_gen_template.mav_followers_weighted_dist.values().min()
+			
+			while remaining_points > 0 and remaining_points >= cheapest_follower_points:
+				var pick: BeingGenTemplate = Global.being_gen_templates[WeightedChoice.pick(being_gen_template.mav_followers_weighted_dist)]
+				if pick.munit_raid_points <= remaining_points: 
+					remaining_points -= pick.munit_raid_points
+					followers.append(pick)
 		
-	elif klass.mavailable_followers != null and klass.mavailable_followers.size() > 0:
-		const MAX_TRIES: int = 1000
-		for tries in MAX_TRIES:
-			var pick: BeingGenTemplate = WeightedChoice.pick(klass.mavailable_followers)
-			if pick != null:
-				followers.append(pick)
-				break
-			elif tries == MAX_TRIES - 1:
-				push_error("couldn't get a non-null follower for klass %s", klass.mid)
-				
+	elif race is ControllableRace and klass.mselectable_followers != null and klass.mselectable_followers.size() > 0:
+		var pick: BeingGenTemplate = klass.mselectable_followers.pick_random()
 		
 	if race.mhead_sprites_datas and race.mhead_sprites_datas.size() > 0:
 		sprite_head = handle_key(Keys.HEAD, being_birth_dict, race.mhead_sprites_datas)
@@ -111,7 +110,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 	elif sex_value is Enums.Sex:
 		sex = sex_value
 	else:
-		push_error("invalid type for \"sex\" entry in birth dict")
+		assert(false, "invalid type for \"sex\" entry in birth dict")
 		
 	
 
@@ -129,10 +128,8 @@ func serialize_being_internal_state() -> Dictionary:
 func serialize() -> Dictionary:
 	var dict: Dictionary = {
 		Keys.NAME: name,
-		Keys.HEAD_SCALE: head_scale,
-		Keys.BODY_SCALE: body_scale,
-		Keys.HEAD: sprite_head.mid,
-		Keys.BODY: sprite_body.mid,
+		Keys.HEAD_SCALE: head_scale, Keys.BODY_SCALE: body_scale,
+		Keys.HEAD: sprite_head.mid, Keys.BODY: sprite_body.mid,
 		Keys.INTERNAL_STATE: istate.serialize(),
 		Keys.HEALTH_MULTIP: extra_health_multiplier,
 		#extra_stats_multiplier,
@@ -143,6 +140,7 @@ func serialize() -> Dictionary:
 #NO IMPLEMENTAR ESTA FUNCIÓN, PERO IMPLEMENTAR LA IDEA DE CARGAR STARTER CHARACTERS ASÍ NO PERDÉS TIEMPO RE-CREÁNDOLOS EN CADA LOBBY
 #func _construct_from_saved_starter_character(starter_character: Resource) -> void: pass
 
+# LEAVE WITHOUT TYPING FOR Array, OTHERWISE IT ISN'T SENDABLE THROUGH RPC
 func get_array_of_ids(array_of_objects: Array) ->  Array:
 	var array_ids: Array = []
 	for o in array_of_objects:

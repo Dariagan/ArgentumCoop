@@ -35,8 +35,7 @@ pub struct BasicRace {
   #[export] mwhitelisted_tiles_for_spawning: Array<Gd<Tile>>, //TODO SETTER QUE ACTUALIZE whitelisted_tiles_for_spawning TMB
   #[export] mblacklisted_tiles_for_spawning: Array<Gd<Tile>>,//toma precedencia si la tile aparece en whitelisted
 
-  rust_whitelisted_tiles_for_spawning: HashSet<TileDto>,
-  rust_blacklisted_tiles_for_spawning: HashSet<TileDto>,
+  rust_whitelisted_tiles_for_spawning: HashSet<TileDto>, rust_blacklisted_tiles_for_spawning: HashSet<TileDto>,
 }
 #[godot_api]
 impl IResource for BasicRace {
@@ -51,7 +50,7 @@ impl IResource for BasicRace {
       mcan_vent: true,
       mcan_walk_on: Array::new(),
       mmax_encumberance_multiplier: 1.0,
-      mhunger_rate: 0.1, mhunger_size: 5.0,
+      mhunger_rate: 1.0, mhunger_size: 5.0,
       mdiets: Array::new(),
       mfilth_generation: 0.0,
       mcomfortable_temp_range: Vector2i { x: 16, y: 23 },
@@ -65,6 +64,9 @@ impl IResource for BasicRace {
 impl BasicRace {
   pub fn base(&self) -> &Base<Resource> {&self.base}
   pub fn id(&self) -> &StringName {&self.mid}
+
+  #[func]
+  pub fn validate(&self) -> bool {return self.mmales_ratio >= 0.0 && self.mmales_ratio <= 1.0;}
 }
 
 impl Hash for BasicRace {

@@ -1,10 +1,14 @@
-[gd_resource type="Resource" script_class="Klass" load_steps=3 format=3 uid="uid://cvkw8mcnvjt8e"]
+[gd_resource type="Resource" script_class="Klass" load_steps=4 format=3 uid="uid://crunidnoqow0l"]
 
 [ext_resource type="Script" uid="uid://cxobg6ntpa8p7" path="res://scripts/beings/initialization/being_gen_template.gd" id="1_gujke"]
 [ext_resource type="Script" uid="uid://cwjwcbyo0kbwl" path="res://scripts/beings/klass.gd" id="2_5fesx"]
+[ext_resource type="RustBeingGenTemplate" uid="uid://dxcvvfdoulgn6" path="res://resource_instances/beings/being_gen_templates/common_chancho.tres" id="2_5nu35"]
 
 [resource]
 script = ExtResource("2_5fesx")
-mname = "warrior"
-mavailable_followers = Dictionary[ExtResource("1_gujke"), float]({})
+mname = "Warrior"
+mselectable_followers = Array[ExtResource("1_gujke")]([ExtResource("2_5nu35")])
+mmax_followers = 1
+mmax_bk_points = -1
 mavailable_spells = Array[StringName]([])
+metadata/_custom_type_script = ExtResource("2_5fesx")

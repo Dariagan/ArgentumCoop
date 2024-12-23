@@ -9,11 +9,7 @@ use std::collections::HashSet;
 use std::str::FromStr;
 use std::{fmt, hash::*};
 
-pub mod being_builder;
-pub mod diet;
-pub mod spawn_weights_matrix;
-pub mod basic_race;
-pub mod sprite_data;
+pub mod being_builder; pub mod diet; pub mod spawn_weights_matrix; pub mod basic_race; pub mod sprite_data;
 
 #[derive(PartialEq, Eq, Clone)]
 pub struct BeingKindStrId(pub StringName); impl Hash for BeingKindStrId {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u32(self.0.hash())}}
@@ -43,48 +39,28 @@ pub struct RustBeingGenTemplate {
   #[var] mid: StringName,
   //if none specified (array is empty), race defaults are used
   //TODO hacer sets de tiles whitelisted comúnes para reutilizar (hacerlo un array const definido en godot usando preload?)
-  #[export] mwhitelisted_tiles_for_spawning: Array<Gd<Tile>>, //TODO SETTER QUE ACTUALIZE whitelisted_tiles_for_spawning TMB
-  #[export] mblacklisted_tiles_for_spawning: Array<Gd<Tile>>,
+  #[export] mwhitelisted_tiles_for_spawning: Array<Gd<Tile>>, #[export] mblacklisted_tiles_for_spawning: Array<Gd<Tile>>,
+  //TODO SETTER QUE ACTUALIZE whitelisted_tiles_for_spawning TMB
 
-  rust_whitelisted_tiles_for_spawning: HashSet<TileDto>,
-  rust_blacklisted_tiles_for_spawning: HashSet<TileDto>,
+  rust_whitelisted_tiles_for_spawning: HashSet<TileDto>, rust_blacklisted_tiles_for_spawning: HashSet<TileDto>,
 }
 #[godot_api]
 impl IResource for RustBeingGenTemplate {
   fn init(base: Base<Resource>) -> Self {
     Self {
-      base: base,
-      mid: StringName::from(""),
-      mwhitelisted_tiles_for_spawning: Array::new(),
-      mblacklisted_tiles_for_spawning: Array::new(),
-      rust_whitelisted_tiles_for_spawning: HashSet::new(),
-      rust_blacklisted_tiles_for_spawning: HashSet::new(),
+      base: base, mid: StringName::from(""),
+      mwhitelisted_tiles_for_spawning: Array::new(), mblacklisted_tiles_for_spawning: Array::new(),
+      rust_whitelisted_tiles_for_spawning: HashSet::new(), rust_blacklisted_tiles_for_spawning: HashSet::new(),
     }
   }
 }
 #[godot_api]
 impl RustBeingGenTemplate {
-  pub fn base(&self) -> &Base<Resource> {
-    &self.base
-  }
-  pub fn id(&self) -> &StringName {
-    &self.mid
-  }
+  pub fn base(&self) -> &Base<Resource> {&self.base}
+  pub fn id(&self) -> &StringName {&self.mid}
 }
 
 use crate::formation_generation::{Tile, TileDto};
-impl Hash for RustBeingGenTemplate {
-  fn hash<H: Hasher>(&self, state: &mut H) {
-    state.write_u32(self.mid.hash());
-  }
-}
+impl Hash for RustBeingGenTemplate {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u32(self.mid.hash());}}
 
-
-
-#[derive(GodotConvert, Var, Export)]
-#[godot(via = i8)]
-pub enum Sex {
-    Male, 
-    Female,
-    Any,
-}
+#[derive(GodotConvert, Var, Export)] #[godot(via = i8)] pub enum Sex {Male, Female, Any,}

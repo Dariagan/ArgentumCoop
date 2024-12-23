@@ -5,24 +5,13 @@ var mid: StringName
 
 @export var mname: String
 
-@export var mavailable_followers: Dictionary[BeingGenTemplate, float] = {}#use a null as key to specify weight of getting no follower
+@export var mselectable_followers: Array[BeingGenTemplate]
+@export var mmax_followers: int = 1
+@export var mmax_bk_points: int = -1 
 
 @export var mcombat_multipliers: CombatMultipliers = CombatMultipliers.new()
 
 @export var mavailable_spells: Array[StringName] = []
-
-func validate() -> bool: 
-	var sum_of_weights: float = 0
-	for follower: BeingGenTemplate in mavailable_followers.keys():
-		var weight: float = mavailable_followers[follower]
-		sum_of_weights += weight
-		if weight < 0: return false
-		if not follower.mrace is UncontrollableRace: return false
-	
-	if not mavailable_followers.keys().is_empty() and sum_of_weights <= 0:
-		push_error("sum of weights for available followers in klass %s is zero"%[mid])
-		return false
-	return true
 
 
 # class shouldn't change how much you are capable of carrying

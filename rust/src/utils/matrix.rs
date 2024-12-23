@@ -1,7 +1,5 @@
 use std::ops::{Index, IndexMut};
-
 pub use crate::utils::uns_vec::UnsVec;
-
 pub struct Matrix<T: Default + Clone> {
   flattened_matrix: Vec<T>,
   size: UnsVec,
@@ -9,7 +7,6 @@ pub struct Matrix<T: Default + Clone> {
 #[allow(dead_code)]
 impl<T: Default + Clone> Matrix<T> {
   pub fn size(&self) -> UnsVec {self.size}
-
   pub fn new(size: UnsVec) -> Self {
     let area: usize = size.area();
     let flattened_matrix = create_reserved_vec::<T>(area);
@@ -19,10 +16,7 @@ impl<T: Default + Clone> Matrix<T> {
   }
   pub fn new_with_element_value(size: UnsVec, element_value: T) -> Self {
     let area: usize = size.area();
-    Self {
-      flattened_matrix: vec![element_value; area],
-      size,
-    }
+    Self {flattened_matrix: vec![element_value; area], size,}
   }
   pub fn get(&self, coords: UnsVec) -> Option<&T> {
     self.flattened_matrix.get(coords.flat_index(&self.size))
@@ -43,9 +37,7 @@ impl<T: Default + Clone> IndexMut<UnsVec> for Matrix<T> {
   }
 }
 pub struct DownScalingMatrix<T: Default> {
-  downscale_factor: u8,
-  flattened_matrix: Vec<T>,
-  downscaled_size: UnsVec,
+  downscale_factor: u8, flattened_matrix: Vec<T>, downscaled_size: UnsVec,
 }
 #[allow(dead_code)]
 impl<T: Default> DownScalingMatrix<T> {
@@ -87,19 +79,13 @@ impl<T: Default> DownScalingMatrix<T> {
 }
 impl<T: Default> Index<UnsVec> for DownScalingMatrix<T> {
   type Output = T;
-  fn index(&self, coords: UnsVec) -> &T {
-    self.get_unchecked(coords)
-  }
+  fn index(&self, coords: UnsVec) -> &T {self.get_unchecked(coords)}
 }
 impl<T: Default> IndexMut<UnsVec> for DownScalingMatrix<T> {
-  fn index_mut(&mut self, coords: UnsVec) -> &mut T {
-    self.get_unchecked_mut(coords)
-  }
+  fn index_mut(&mut self, coords: UnsVec) -> &mut T {self.get_unchecked_mut(coords)}
 }
 
 fn create_reserved_vec<T: Default>(area: usize) -> Vec<T> {
-  let mut flattened_matrix: Vec<T> = Vec::new();
-  flattened_matrix.reserve_exact(area);
-  flattened_matrix.resize_with(area, T::default);
-  flattened_matrix
+  let mut flattened_matrix: Vec<T> = Vec::new(); flattened_matrix.reserve_exact(area);
+  flattened_matrix.resize_with(area, T::default); flattened_matrix
 }

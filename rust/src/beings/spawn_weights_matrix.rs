@@ -14,9 +14,8 @@ impl Add for SpawnWeight {
   }
 }
 
-pub struct SpawnWeightsMatrix{
-  ds_matrix: DownScalingMatrix<HashMap<BeingKindStrId, SpawnWeight>>
-}
+pub struct SpawnWeightsMatrix{ds_matrix: DownScalingMatrix<HashMap<BeingKindStrId, SpawnWeight>>}
+
 #[allow(dead_code)]
 impl SpawnWeightsMatrix{
   

@@ -12,9 +12,9 @@ class_name BeingGenTemplate
 @export var mbodies_distribution: Dictionary[SpriteData, float]
 @export var mheads_distribution: Dictionary[BodySpriteData, float]
 
-@export var mav_followers_weighted_dist: Dictionary[BeingGenTemplate, float] # leave empty if not used
+@export var mav_followers_weighted_dist: Dictionary[StringName, float] #key: follower BeingGenTemplate mid
 @export var max_followers_count: int = 1
-@export var mav_raid_points_for_followers: int = 0 # leave as 0 if not to be used
+@export var mav_raid_points_for_followers: int = -1 # put as 0 to disable any followers from spawning even if mav_followers_weighted_dist has entries. -1 to ignore this and only take into account max_followers count
 
 #if unset it uses the race's ratio
 @export var mmales_ratio: float = -1
@@ -32,11 +32,11 @@ class_name BeingGenTemplate
 
 func validate() -> bool: 
 	var sum_of_weights: float = 0
-	for follower: BeingGenTemplate in mav_followers_weighted_dist.keys():
-		var weight: float = mav_followers_weighted_dist[follower]
+	for follower_mid: StringName in mav_followers_weighted_dist.keys():
+		var weight: float = mav_followers_weighted_dist[follower_mid]
 		sum_of_weights += weight
 		if weight < 0: return false
-		if not follower.mrace is UncontrollableRace: return false
+		if not Global.being_gen_templates[follower_mid] .mrace is UncontrollableRace: return false
 	
 	if not mav_followers_weighted_dist.keys().is_empty() and (sum_of_weights <= 0):
 		push_error("sum of weights for available followers in klass %s is zero"%[mid])

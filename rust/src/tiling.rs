@@ -3,7 +3,6 @@ use godot::{register::GodotClass, prelude::*};
 use rand_distr::{Distribution, WeightedAliasIndex};
 use rand_pcg::Lcg128Xsl64; use std::fmt::{self, format};
 use std::hash::{Hash, Hasher};
-
 pub use crate::utils::uns_vec::UnsVec;
 
 #[derive(Clone, PartialEq, Copy, Debug)]
@@ -14,10 +13,8 @@ impl Hash for TileUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u1
 impl fmt::Display for TileUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Tunid{}", self.0)}}//alt+z
 
 use strum_macros::EnumIter;
-#[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter, VariantNames)]
-#[godot(via = i32)]
+#[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter, VariantNames)] #[godot(via = i32)]
 pub enum TileZLevel {Soil = 0, Water, Floor, Stain, Structure, Roof,}
-
 impl Default for TileZLevel {fn default() -> Self {Self::Soil}} impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
 
 #[derive(GodotClass, Debug)]
@@ -33,11 +30,9 @@ pub struct Tile {
   #[export] mrandom_scale_range: Vector4,// tal vez es mejor volver a los bushes y trees escenas para poder hacer esto
   #[export] mflipped_at_random: bool,
 
-  
   pub unid: Option<TileUnid>,
 }
-#[godot_api]
-impl Tile {//TODO hacer
+#[godot_api] impl Tile {//TODO hacer
   pub fn base(&self) -> &Base<Resource> { &self.base }
   pub fn id(&self) -> &StringName { &self.mid }
   pub fn z_level(&self) -> TileZLevel { self.mz_level }
@@ -48,20 +43,15 @@ impl Tile {//TODO hacer
   pub fn random_scale_range(&self) -> Vector4 { self.mrandom_scale_range }
   pub fn flipped_at_random(&self) -> bool { self.mflipped_at_random }
 
-
   #[func]
   fn validate(&self) -> bool {
     let err_msg = format!("modulo tiling area for Tile id={} must be bigger or equal than (1,1)", self.id());
     let modulo_tiling_area: UnsVec = match self.mmodulo_tiling_area.try_into() {
         Ok(area) => area,
-        Err(_) => {
-            godot_error!("{}", err_msg);
-            return false;
-        },
+        Err(_) => {godot_error!("{}", err_msg); return false;},
     };
     if modulo_tiling_area.all_bigger_than_min(1).is_err() {
-        godot_error!("{}", err_msg);
-        return false;
+        godot_error!("{}", err_msg); return false;
     }
     true
   }
@@ -75,19 +65,10 @@ impl IResource for Tile{
 }
 impl Into<TileDto> for Gd<Tile> {fn into(self) -> TileDto {let gd_tile = self.bind(); TileDto { id: gd_tile.id().clone(), z_level: gd_tile.z_level(), source_atlas: gd_tile.source_atlas(), origin_position: gd_tile.origin_position(), modulo_tiling_area: gd_tile.modulo_tiling_area().try_into().expect("error negative"), alternative_id: gd_tile.alternative_id(), random_scale_range: gd_tile.random_scale_range(), flipped_at_random: gd_tile.flipped_at_random() }}}
 pub struct TileDto{
-  pub id: StringName,
-  pub z_level: TileZLevel,
-  pub source_atlas: i32,
-  pub origin_position: Vector2i,
-  pub modulo_tiling_area: UnsVec,
-  pub alternative_id: i32,
-  pub random_scale_range: Vector4,
-  pub flipped_at_random: bool,
-
+  pub id: StringName, pub z_level: TileZLevel, pub source_atlas: i32, pub origin_position: Vector2i,
+  pub modulo_tiling_area: UnsVec, pub alternative_id: i32, pub random_scale_range: Vector4, pub flipped_at_random: bool,
 }
-
-#[derive(GodotClass)]
-#[class(init, tool, base=Resource)]
+#[derive(GodotClass)]#[class(init, tool, base=Resource)]
 pub struct TileSelection {
   base: Base<Resource>,
   #[var] mid: StringName,
@@ -96,8 +77,7 @@ pub struct TileSelection {
   #[export] mtiles: Array<Gd<Tile>>,
   #[export] mtiles_distributions: Array<Gd<TileDistribution>>,
 }
-#[godot_api]
-impl TileSelection {
+#[godot_api] impl TileSelection {
   pub fn id(&self) -> &StringName { &self.mid }
   pub fn targets(&self) -> &Array<StringName> {&self.mtargets}
   
@@ -112,18 +92,12 @@ impl TileSelection {
     self.tiles_distributions().len() == self.use_distribution().len()
   }
 }
-//TODO HACERLE UN INIT CON UNA ID MALA PLACEHOLDER ASÍ SE PUEDE VALIDAR^^^
-
 pub struct GdTileSelectionIterator{tile_selection: Gd<TileSelection>, current_index: usize}
 impl GdTileSelectionIterator{pub fn new(tile_selection: Gd<TileSelection>) -> Self {Self{tile_selection, current_index: 0}}}
-impl Iterator for GdTileSelectionIterator {
-  type Item = UnidOrDist;
-
+impl Iterator for GdTileSelectionIterator { type Item = UnidOrDist;
   fn next(&mut self) -> Option<Self::Item> {
     let tile_selection = self.tile_selection.bind();
-    if self.current_index >= tile_selection.targets().len() {
-      return None;
-    }
+    if self.current_index >= tile_selection.targets().len() {return None;}
     unsafe{
       let result = if tile_selection.muse_distribution.get(self.current_index).is_some_and(|x| x) {
         tile_selection.mtiles_distributions.get(self.current_index)
@@ -139,16 +113,14 @@ impl Iterator for GdTileSelectionIterator {
     }
   }
 }
-#[derive(GodotClass)]
-#[class(tool, init, base=Resource)]
+#[derive(GodotClass)] #[class(tool, init, base=Resource)]
 pub struct TileDistribution {
   base: Base<Resource>,
   #[var] mid: StringName,
   #[export] mtiles: Array<Gd<Tile>>,
   #[export] mweights: PackedInt32Array,
 }
-#[godot_api]
-#[allow(dead_code)]
+#[godot_api] #[allow(dead_code)]
 impl TileDistribution {
   pub fn base(&self) -> &Base<Resource> { &self.base }
   pub fn id(&self) -> &StringName { &self.mid }
@@ -159,8 +131,7 @@ impl TileDistribution {
     && self.mweights.as_slice().iter().all(|x| *x >= 0) 
   }
 }
-#[derive(Debug)]
-enum ErrTileOrDistribution{Tile(StringName),Distribution(StringName),}
+#[derive(Debug)] enum ErrTileOrDistribution{Tile(StringName),Distribution(StringName),}
 
 #[derive(Debug)]
 pub enum TileDistributionError {EmptyTilesArr{id: StringName}, NegativeWeight{id: StringName}, MissingUnid{unid_or_dist: ErrTileOrDistribution}, MissingBoth{id: StringName}, MoreWeightsThanTiles{id: StringName}}//TODO add tile or distribution id to each error-variant (to find culprit more easily)
@@ -175,10 +146,7 @@ impl std::fmt::Display for TileDistributionError {
     }
   }
 }
-
-impl TryFrom<Gd<TileDistribution>> for UnidOrDist {
-  type Error = TileDistributionError;
-  
+impl TryFrom<Gd<TileDistribution>> for UnidOrDist {type Error = TileDistributionError;
   fn try_from(mut val: Gd<TileDistribution>) -> Result<UnidOrDist, Self::Error> {
 
     let gd_tile_dist = val.bind();
@@ -227,11 +195,8 @@ impl TryFrom<Gd<TileDistribution>> for UnidOrDist {
       Ok(UnidOrDist::Dist(DiscreteDistribution::new(choices, sampler)))
     }
   }
-  
 }
-
-impl TryFrom<Gd<Tile>> for UnidOrDist {
-  type Error = TileDistributionError;
+impl TryFrom<Gd<Tile>> for UnidOrDist {type Error = TileDistributionError;
   fn try_from(value: Gd<Tile>) -> Result<UnidOrDist, TileDistributionError> {
 
     let tile = value.bind();
@@ -242,17 +207,12 @@ impl TryFrom<Gd<Tile>> for UnidOrDist {
     }
   }
 }
-pub struct DiscreteDistribution{
-  choices: Vec<(TileUnid, TileZLevel)>,
-  sampler: WeightedAliasIndex<i32>,
-}
+pub struct DiscreteDistribution{choices: Vec<(TileUnid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,}
 impl DiscreteDistribution{
   pub fn new(choices: Vec<(TileUnid, TileZLevel)>, sampler: WeightedAliasIndex<i32>,) -> Self {Self {choices, sampler}}
   pub fn sample(&self, rng: &mut Lcg128Xsl64) -> (TileUnid, TileZLevel){unsafe{self.choices.get_unchecked(self.sampler.sample(rng)).clone()}}
 }
-pub enum UnidOrDist{
-  Nid((TileUnid, TileZLevel)), Dist(DiscreteDistribution)
-}
+pub enum UnidOrDist{Nid((TileUnid, TileZLevel)), Dist(DiscreteDistribution)}
 impl UnidOrDist{
   pub fn get_unid(&self, rng: &mut Lcg128Xsl64) -> (TileUnid, TileZLevel){
     match self {

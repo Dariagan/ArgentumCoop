@@ -7,4 +7,3 @@ class_name Projectile
 @export var passes_solid: bool #tal vez hacer un array de las layers de collision por las q puede pasar
 
 #@export var sprite: AnimatedSprite2D
-

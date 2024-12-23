@@ -77,18 +77,18 @@ func _play_handled(animation_state: Enums.AnimationState, direction: Enums.Dir, 
 
 static func get_animation_name(animation_state: Enums.AnimationState, direction: Enums.Dir) -> StringName:
 	match [animation_state, direction]:
-		[Enums.AnimationState.IDLE, Enums.Dir.LEFT]:  return &"idle_left"
-		[Enums.AnimationState.IDLE, Enums.Dir.RIGHT]: return &"idle_right"
-		[Enums.AnimationState.IDLE, Enums.Dir.DOWN]:  return &"idle_down"
-		[Enums.AnimationState.IDLE, Enums.Dir.UP]:    return &"idle_up"
-		[Enums.AnimationState.WALK, Enums.Dir.LEFT]:  return &"walk_left"
-		[Enums.AnimationState.WALK, Enums.Dir.RIGHT]: return &"walk_right"
-		[Enums.AnimationState.WALK, Enums.Dir.DOWN]:  return &"walk_down"
-		[Enums.AnimationState.WALK, Enums.Dir.UP]:    return &"walk_up"
-		[Enums.AnimationState.JOG, Enums.Dir.LEFT]:   return &"jog_left"
-		[Enums.AnimationState.JOG, Enums.Dir.RIGHT]:  return &"jog_right"
-		[Enums.AnimationState.JOG, Enums.Dir.DOWN]:   return &"jog_down"
-		[Enums.AnimationState.JOG, Enums.Dir.UP]:     return &"jog_up"
+		[Enums.AnimationState.IDLE, Enums.Dir.LEFT]:  return Keys.IDLE_LEFT
+		[Enums.AnimationState.IDLE, Enums.Dir.RIGHT]: return Keys.IDLE_RIGHT
+		[Enums.AnimationState.IDLE, Enums.Dir.DOWN]:  return Keys.IDLE_DOWN
+		[Enums.AnimationState.IDLE, Enums.Dir.UP]:    return Keys.IDLE_UP
+		[Enums.AnimationState.WALK, Enums.Dir.LEFT]:  return Keys.WALK_LEFT
+		[Enums.AnimationState.WALK, Enums.Dir.RIGHT]: return Keys.WALK_RIGHT
+		[Enums.AnimationState.WALK, Enums.Dir.DOWN]:  return Keys.WALK_DOWN
+		[Enums.AnimationState.WALK, Enums.Dir.UP]:    return Keys.WALK_UP
+		[Enums.AnimationState.JOG, Enums.Dir.LEFT]:   return Keys.JOG_LEFT
+		[Enums.AnimationState.JOG, Enums.Dir.RIGHT]:  return Keys.JOG_RIGHT
+		[Enums.AnimationState.JOG, Enums.Dir.DOWN]:   return Keys.JOG_DOWN
+		[Enums.AnimationState.JOG, Enums.Dir.UP]:     return Keys.JOG_UP
 		#meter mas animationstates si hace falta, simplemente no usarlos si no se usan en el caso default
 		#ejemplo EXTRA1, EXTRA2
 	push_error("couldn't match %d %d" % [animation_state, direction])

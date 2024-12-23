@@ -20,7 +20,7 @@ signal head_selected(head: SpriteData)
 signal follower_selected(follower: BeingGenTemplate)
 signal body_scale_changed(new_scale: Vector3)
 
-# HACER QUE SE PUEDA CAMBIAR EL NAME DE TU FOLLOWER
+# HACER QUE SE PUEDA CAMBIAR EL mname DE TU FOLLOWER
 
 # MULTIPLICAR LA FONT SIZE POR (LA WIDTH ACTUAL * (LA WIDTH ORIGINAL/ LA FONT SIZE ORIGINAL) ? ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
 # NUEVA FONT SIZE = (FONT SIZE ORIGINAL * WIDTH ACTUAL/WIDTH ORIGINAL)  ASÍ SE LE CAMBIA EL TAMAÑO DINÁMICAMENTE
@@ -49,7 +49,7 @@ func _on_race_selected(id: int):
 		
 	_setup_sex_menu_popup(_current_race)
 	
-	race_menu_button.text = "Race: %s" % _current_race.name
+	race_menu_button.text = "Race: %s" % _current_race.mname
 	
 	if _current_race and _current_sex > 0:
 		_setup_head_menu_popup(_current_sex)
@@ -75,54 +75,54 @@ func _on_sex_selected(id: int):
 		_setup_head_menu_popup(_current_sex)
 	
 func _on_head_selected(i: int):
-	_current_head = _current_race.head_sprites_datas[i]
+	_current_head = _current_race.mhead_sprites_datas[i]
 	head_selected.emit(_current_head)
 	head_menu_button.text = " "
-	head_menu_button.icon = _current_head.frames.get_frame_texture("idle_down", 0)
+	head_menu_button.icon = _current_head.frames.get_frame_texture(Keys.IDLE_DOWN, 0)
 
 func _on_class_selected(id: int):
-	_current_class = _current_race.klasses[id]
+	_current_class = _current_race.mklasses[id]
 	class_selected.emit(_current_class)
 	
-	if _current_follower and not _current_follower in _current_class.available_followers:
+	if _current_follower and not _current_follower in _current_class.mselectable_followers:
 		_current_follower = null
 		follower_selected.emit(null)
 	if not _current_follower:
 		follower_menu_button.text = "Follower: Not picked"
 		follower_menu_button.disabled = false
 	
-	class_menu_button.text = "Class: %s" % _current_class.name
-	_update_popup_menu(follower_menu_button.get_popup(), _current_class.available_followers)
+	class_menu_button.text = "Class: %s" % _current_class.mname
+	_update_popup_menu(follower_menu_button.get_popup(), _current_class.mselectable_followers)
 	
 func _on_follower_selected(id: int):
-	_current_follower = _current_class.available_followers[id]
+	_current_follower = _current_class.mselectable_followers[id]
 	follower_selected.emit(_current_follower)
-	follower_menu_button.text = "Follower: %s" % _current_follower.name
+	follower_menu_button.text = "Follower: %s" % _current_follower.mname
 	
 func _update_popup_menu(popup_menu: PopupMenu, items: Array):
 	popup_menu.clear()
 	var i: int = 0
 	for item in items:
 		if "icon" in item and item.icon:
-			popup_menu.add_icon_item(item.icon, item.name, i)
-		elif item is BasicRace and item.head_sprites_datas and item.head_sprites_datas.size() >= 1 and item.head_sprites_datas[0] and item.head_sprites_datas[0].frames:
-			popup_menu.add_icon_item(item.head_sprites_datas[0].frames.get_frame_texture("idle_down", 0), item.name, i)
+			popup_menu.add_icon_item(item.icon, item.mname, i)
+		elif item is BasicRace and item.mhead_sprites_datas and item.mhead_sprites_datas.size() >= 1 and item.mhead_sprites_datas[0] and item.mhead_sprites_datas[0].frames:
+			popup_menu.add_icon_item(item.mhead_sprites_datas[0].frames.get_frame_texture(Keys.IDLE_DOWN, 0), item.mname, i)
 		elif item is BeingGenTemplate : 
-			var follower_race : UncontrollableRace = Global.uncontrollable_races[item.race_id]
-			if follower_race.body_sprites_datas and follower_race.body_sprites_datas.size() >= 1 and follower_race.body_sprites_datas[0] and follower_race.body_sprites_datas[0].frames:
-				popup_menu.add_icon_item(follower_race.body_sprites_datas[0].frames.get_frame_texture("idle_down", 0), item.name, i)
+			var follower_race : UncontrollableRace = item.mrace
+			if follower_race.mbody_sprites_datas and follower_race.mbody_sprites_datas.size() >= 1 and follower_race.mbody_sprites_datas[0] and follower_race.mbody_sprites_datas[0].frames:
+				popup_menu.add_icon_item(follower_race.mbody_sprites_datas[0].frames.get_frame_texture(Keys.IDLE_DOWN, 0), item.mname, i)
 		else:
-			popup_menu.add_item(item.name, i)
+			popup_menu.add_item(item.mname, i)
 		i += 1
 
 func _setup_sex_menu_popup(current_race: ControllableRace):
 	var popup: PopupMenu = sex_menu_button.get_popup()
 	popup.clear()
-	if current_race.males_ratio == 1:
+	if current_race.mmales_ratio == 1:
 		popup.add_item("Male", 1)
 		_current_sex = Enums.Sex.MALE
 		sex_menu_button.text = "Sex: Male"
-	elif current_race.males_ratio == 0:
+	elif current_race.mmales_ratio == 0:
 		popup.add_item("Female", 2)
 		_current_sex = Enums.Sex.FEMALE
 		sex_menu_button.text = "Sex: Female"
@@ -135,12 +135,12 @@ func _setup_head_menu_popup(sex: Enums.Sex):
 	var popup: PopupMenu = head_menu_button.get_popup()
 	popup.clear()
 	var i: int = 0
-	for head_sprite in _current_race.head_sprites_datas:
+	for head_sprite in _current_race.mhead_sprites_datas:
 		if head_sprite.sex == Enums.Sex.ANY || head_sprite.sex == sex:
-			popup.add_icon_item(head_sprite.frames.get_frame_texture("idle_down", 0), "", i)
+			popup.add_icon_item(head_sprite.frames.get_frame_texture(Keys.IDLE_DOWN, 0), "", i)
 		i += 1
 	
-	if _current_head and not _current_head in _current_race.head_sprites_datas:
+	if _current_head and not _current_head in _current_race.mhead_sprites_datas:
 		_current_head = null
 	if not _current_head:
 		head_menu_button.text = "Head: Not picked"
