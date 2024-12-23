@@ -2,3 +2,4 @@
 
 [resource]
 msource_atlas = 0
+mmodulo_tiling_area = Vector2i(32, 32)

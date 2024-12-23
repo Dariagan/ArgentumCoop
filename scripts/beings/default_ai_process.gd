@@ -10,8 +10,8 @@ func _init(_being: Being = null):
 
 #overridear esto
 func behave(delta: float):
-	if mmyself.istate.mmaster:
-		goto_being(delta, mmyself.istate.mmaster, mmyself.distance_to(mmyself.istate.mmaster), 150, 10, 1, wander)
+	if mmyself.mistate.mmaster:
+		goto_being(delta, mmyself.mistate.mmaster, mmyself.distance_to(mmyself.mistate.mmaster), 150, 10, 1, wander)
 		pass
 	pass
 
@@ -43,10 +43,10 @@ func goto_being(delta:float, target:Being, curr_dist:float, maxdist:float=0, mch
 		
 		recalc_path_remai_time -= delta * final_factor
 		if recalc_path_remai_time < 0:
-			mmyself.nav.target_position = target.global_position
+			mmyself.mnav.target_position = target.global_position
 			recalc_path_remai_time = 0.5 #dejar hardcodeado
 		
-		var next_pos: Vector2 = mmyself.nav.get_next_path_position()
+		var next_pos: Vector2 = mmyself.mnav.get_next_path_position()
 		
 		mmyself._direction_axis = mmyself.global_position.direction_to(next_pos)
 	else: #within range

@@ -77,4 +77,5 @@
     "C_Cpp.default.compilerPath": "/usr/bin/gcc-13",
     "cmake.configureOnOpen": false,
     "C_Cpp.errorSquiggles": "enabled",
+    "godotTools.editorPath.godot4": "c:\\Users\\Stefano\\Desktop\\Godot_v4.4-dev7_win64.exe",
 }

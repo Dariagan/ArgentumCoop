@@ -107,18 +107,9 @@ func construct(being_birth_dict: Dictionary) -> void:
 	else:
 		assert(false, "invalid type for \"sex\" entry in birth dict")
 		
-	
-
 	assert(sex && race && faction)
 	mistate = BeingInternalState.new()
 	mistate.construct_for_posterior_serialization(sex, race, faction, null, klass, being_gen_template)
-
-# TODO
-func construct_from_serialized(serialized_being_spawn_data: Dictionary) -> void:
-	pass
-	
-func serialize_being_internal_state() -> Dictionary:
-	return mistate.serialize()
 
 func serialize() -> Dictionary:
 	var dict: Dictionary = {

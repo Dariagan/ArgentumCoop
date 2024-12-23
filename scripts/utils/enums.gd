@@ -8,7 +8,7 @@ enum Handling {ANY, ONE_HANDED, TWO_HANDED}
 
 enum ClothingLayer {BOTTOM, MIDDLE, TOP}
 
-enum Dir {LEFT, RIGHT, UP, DOWN}
+enum Dir {UP, RIGHT, DOWN, LEFT}
 
 #chequear que esté igual que como está puesto en rust
 enum TileZLevel {Soil = 0, Water, Floor, Stain, Structure, Roof}

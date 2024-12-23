@@ -71,8 +71,8 @@ func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, player:bool=
 func set_master_follower(master_name: NodePath, follower_name: NodePath):
 	var master: Being = get_node(master_name)
 	var follower: Being = get_node(follower_name)
-	master.istate.mfollowers.append(follower)
-	follower.istate.mmaster = master
+	master.mistate.mfollowers.append(follower)
+	follower.mistate.mmaster = master
 
 func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, faction: StringName, map_coords: Vector2i,mp_auth:int=1) -> Being:
 	return birth_being_gen_template_at(being_gen_template_id, faction, tilemap_to_local(map_coords), mp_auth)
