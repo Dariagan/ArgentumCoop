@@ -66,7 +66,7 @@ impl BasicRace {
   pub fn id(&self) -> &StringName {&self.mid}
 
   #[func]
-  pub fn validate(&self) -> bool {return self.mmales_ratio >= 0.0 && self.mmales_ratio <= 1.0;}
+  pub fn validate(&self) -> bool {return self.mmales_ratio >= 0.0 && self.mmales_ratio <= 1.0 && self.mhunger_rate >= 0.0 && self.mhunger_size > 0.0;}
 }
 
 impl Hash for BasicRace {

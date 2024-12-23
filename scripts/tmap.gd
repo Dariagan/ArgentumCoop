@@ -56,9 +56,9 @@ func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, player:bool=
 	
 	being.setsync_pos_reliable.rpc(loc_pos)
 	
-	if preinit.followers.size() > 0:
-		for follower_template in preinit.followers:
-			var spawned_follower: Being = birth_being_at(follower_template.instantiate(preinit.istate.mfaction.minstance_id),loc_pos,player)
+	if preinit.mfollowers.size() > 0:
+		for follower_template in preinit.mfollowers:
+			var spawned_follower: Being = birth_being_at(follower_template.instantiate(preinit.mistate.mfaction.minstance_id),loc_pos,player)
 			set_master_follower.rpc(being.get_path(), spawned_follower.get_path())
 			
 	if player or zlevel_layers[0].get_cell_tile_data(local_to_tilemap(loc_pos)): #TODO

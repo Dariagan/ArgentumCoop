@@ -19,18 +19,18 @@ const CHUNK_SIZE: Vector2 = Vector2i(192, 120)
 
 #constructs for multiplayer too
 func construct(preiniter: BeingStatePreIniter, uid_: int) -> void:
-	if preiniter.sprite_body:
-		body.construct(preiniter.sprite_body, preiniter.body_scale)
-		if preiniter.sprite_head:
-			head.construct(preiniter.sprite_head, preiniter.head_scale, preiniter.sprite_body.head_v_offset, preiniter.body_scale.z)
+	if preiniter.msprite_body:
+		body.construct(preiniter.msprite_body, preiniter.mbody_scale)
+		if preiniter.msprite_head:
+			head.construct(preiniter.msprite_head, preiniter.mhead_scale, preiniter.msprite_body.head_v_offset, preiniter.mbody_scale.z)
 			
-	istate.construct_from_seri.rpc(preiniter.istate.serialize())
+	istate.construct_from_seri.rpc(preiniter.mistate.serialize())
 	
 	set_ai_process.rpc()
 	
 	var show_label: bool = istate.mfaction is PlayerFaction or (istate.mbeing_gen_template and istate.being_gen_template.display_being_name)
 	
-	set_name_label_text_and_color.rpc(preiniter.name, istate.mfaction.mcolor, show_label)
+	set_name_label_text_and_color.rpc(preiniter.mname, istate.mfaction.mcolor, show_label)
 	
 	self.setsync_node_name_and_uid.rpc(uid_)
 	#TODO key press para ocultar las namelabels de todos (usar el grupo)
