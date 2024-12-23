@@ -14,7 +14,7 @@ impl fmt::Display for TileUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt
 
 use strum_macros::EnumIter;
 #[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter, VariantNames)] #[godot(via = i32)]
-pub enum TileZLevel {Soil = 0, Water, Floor, Stain, Structure, Roof,}
+pub enum TileZLevel {Soil = 0, Water=1, Floor=2, Stain=3, Structure=4, Roof=5,}
 impl Default for TileZLevel {fn default() -> Self {Self::Soil}} impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
 
 #[derive(GodotClass, Debug)]

@@ -14,3 +14,6 @@ class_name UncontrollableRace
 
 #hacer tupla triple de id-item, probabilidad, cantidad. 
 @export var mfallback_possible_loot: Dictionary
+
+func validate() -> bool:
+	return self.mmales_ratio >= 0.0 && self.mmales_ratio <= 1.0 && self.mhunger_rate >= 0.0 && self.mhunger_size > 0.0

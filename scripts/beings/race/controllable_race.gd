@@ -25,4 +25,4 @@ func validate() -> bool:
 	if mklasses.is_empty(): return false
 	for klass: Klass in mklasses:
 		if klass == null: return false
-	return true
+	return self.mmales_ratio >= 0.0 && self.mmales_ratio <= 1.0 && self.mhunger_rate >= 0.0 && self.mhunger_size > 0.0

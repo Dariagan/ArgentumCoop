@@ -65,6 +65,7 @@ impl INode2D for RustTileMap {
   }
 
   fn ready(&mut self) {
+    self.base_mut().set_y_sort_enabled(true);
 
     let layer_names: Array<StringName> = TileZLevel::VARIANTS
       .iter().map(|&name| StringName::from(name)).collect();
@@ -83,8 +84,8 @@ impl INode2D for RustTileMap {
       self.zlevel_layers.push(&new_child);
 
       if layer_name.to_string() == "Structure" {
+          self.beings_z_index = i; // Define beings_z_index as part of your struct if needed
           new_child.set_y_sort_enabled(true);
-          self.beings_z_index = i - 1; // Define beings_z_index as part of your struct if needed
       }
     }
 

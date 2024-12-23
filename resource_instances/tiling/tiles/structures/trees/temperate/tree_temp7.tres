@@ -1,6 +1,6 @@
 [gd_resource type="Tile" format=3 uid="uid://w0617v6wvib6"]
 
 [resource]
-mz_level = 3
+mz_level = 4
 msource_atlas = 4
 morigin_position = Vector2i(56, 0)

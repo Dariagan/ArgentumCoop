@@ -89,7 +89,6 @@ func _input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	var my_peer:int = multiplayer.get_unique_id()
-	if my_peer!=1 and mistate.mrace is UncontrollableRace: print(is_multiplayer_authority())
 	match [is_multiplayer_authority(), mcontrolling_peer]:
 		[_, my_peer]: player_control(delta)
 		[true, _]: ai_control(delta); 
