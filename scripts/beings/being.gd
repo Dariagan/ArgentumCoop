@@ -5,17 +5,17 @@ class_name Being
 
 var uid: int
 
-var acceleration = 2500
+var maccel = 2500
 var ai_process: AiProcess = AiProcess.new(self)
 
 var friction = 1600 #hacer q provenga de la tile en custom data
 @onready var camera_2d: Camera2D = $Camera2D; @onready var body_holder: Node2D = $BodyHolder
 @onready var istate: BeingInternalState = $InternalState
 @onready var body: AnimatedBodyPortion = $BodyHolder/Body; @onready var head: AnimatedBodyPortion = $BodyHolder/Head
-@onready var name_label = $NameLabel; @onready var nav = $NavigationAgent2D
+@onready var name_label = $NameLabel; @onready var nav: NavigationAgent2D = $NavigationAgent2D
 @onready var tile_map: GdTileMap = get_parent()
 const CHUNK_SIZE: Vector2 = Vector2i(192, 120)
-
+var mcontroller_speed_multiplier: float = 1
 
 #constructs for multiplayer too
 func construct(preiniter: BeingStatePreIniter, uid_: int) -> void:
@@ -121,21 +121,16 @@ func _adjust_speed_scale(factor: float):
 		if body_part is AnimatedBodyPortion:
 			body_part.speed_scale = distance_moved/factor
 		
-func ai_control(delta: float): 
-	ai_process.behave(delta)
-	_update_velocity(delta)
+func ai_control(delta: float): ai_process.behave(delta); _update_velocity(delta)
 	
 var _direction_axis: Vector2 = Vector2.ZERO
 
 var distance_moved_since_load: float = 501
 func _update_direction_axis_by_input(delta: float) -> void:
-	
 	_direction_axis = Input.get_vector(&"ui_left", &"ui_right", &"ui_up", &"ui_down")
-	
+	mcontroller_speed_multiplier = 1.0
 	_update_velocity(delta)
-	
 	distance_moved_since_load += distance_moved
-	
 	if distance_moved_since_load > 500:
 		tile_map.load_tiles_around(tile_map.local_to_tilemap(position), CHUNK_SIZE, uid)#195, 120
 		distance_moved_since_load = 0
@@ -147,9 +142,8 @@ func _update_velocity(delta: float):
 	apply_friction(friction, delta)
 	if _direction_axis != Vector2.ZERO:
 		_direction_axis = _direction_axis.normalized()
-		velocity += _direction_axis * acceleration * delta
-		
-		velocity = velocity.limit_length(istate.get_max_speed())
+		velocity += _direction_axis*maccel*delta
+		velocity = velocity.limit_length(istate.get_max_speed()*mcontroller_speed_multiplier)
 		_update_faced_dir(_direction_axis)
 		if controlling_peer==0 or not (Config.noclip and controlling_peer > 0):
 			move_and_slide()
@@ -185,4 +179,3 @@ func serialize() -> Dictionary:#guardar como packedscene en vez de esto
 @rpc("call_local")func setsync_node_name_and_uid(_uid:int):self.name="%d%s%s"%[_uid,istate.mrace.mname,name_label.text];self.uid=_uid;
 
 func distance_to(thing: Node2D) -> float: return self.global_position.distance_to(thing.global_position)
-	

@@ -32,8 +32,7 @@ pub fn retrieve_being_gen_template_from_id(being_gen_template_id: StringName) ->
 }
 
 use godot::{classes::{IResource, Resource}, obj::Base,register::godot_api, register::GodotClass,};
-#[derive(GodotClass)]
-#[class(base=Resource)] // SAQUÉ TOOL
+#[derive(GodotClass)] #[class(base=Resource)]
 pub struct RustBeingGenTemplate {
   base: Base<Resource>,
   #[var] mid: StringName,
@@ -64,3 +63,5 @@ use crate::formation_generation::{Tile, TileDto};
 impl Hash for RustBeingGenTemplate {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u32(self.mid.hash());}}
 
 #[derive(GodotConvert, Var, Export)] #[godot(via = i8)] pub enum Sex {Male, Female, Any,}
+
+//TODO hacer que se puedan instanciar factions NPC nuevas desde el rust-side

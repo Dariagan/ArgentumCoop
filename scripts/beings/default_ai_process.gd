@@ -1,51 +1,77 @@
 extends RefCounted
 class_name AiProcess #extender el script
 
-var mybeing: Being
+var mmyself: Being
 
 func _init(_being: Being = null):
 	assert(_being != null)
-	mybeing = _being
+	mmyself = _being
 
 
 #overridear esto
 func behave(delta: float):
-	if mybeing.istate.mmaster:
-		goto_being(delta, mybeing.istate.mmaster, mybeing.distance_to(mybeing.istate.mmaster), 150, 2)
+	if mmyself.istate.mmaster:
+		goto_being(delta, mmyself.istate.mmaster, mmyself.distance_to(mmyself.istate.mmaster), 150, 10, 1, wander)
 		pass
 	pass
 
 # posible optimizacion: solo calcular hasta la primera mitad de los puntos del camino (no pathear a un punto arbitrario intermedio, puede ser inválido)
 
 var i: int = 0
-var recalc_path_remai_time: float # llamar con super.gotobeing() en subscripts
-func goto_being(delta: float, target_being: Being, distance: float, min_distance: float = 0, path_update_time_mult: float = 1, on_min_distance_reached: Callable = Callable()):
-	i+=1
-	if distance > min_distance:
-		var own_velocity_factor: float = max(mybeing.velocity.length()*0.0035, 0.3)
-		var target_velocity_factor: float = max(target_being.velocity.length()*0.0035, 0.3)
+var mcheck_within_range_remai_time: float = -1000
+var recalc_path_remai_time: float; var chase: bool = false; 
+# llamar con super.gotobeing() en subscripts (heredan de este)
+func goto_being(delta:float, target:Being, curr_dist:float, maxdist:float=0, mcheck_within_range_tperiod:float=20, 
+	path_update_time_mult:float=1, on_min_distance_reached: Callable=Callable()):
+	if mcheck_within_range_remai_time == -1000: mcheck_within_range_remai_time = mcheck_within_range_tperiod
+	if (mcheck_within_range_remai_time < 0 and curr_dist > maxdist):
+		chase = true; mmyself.mcontroller_speed_multiplier = randf_range(0.05, 0.2)
+	if target.velocity.length() > 150: 
+		chase = true; mmyself.mcontroller_speed_multiplier = 1.0
+	if chase:
+		if curr_dist <= maxdist: 
+			mcheck_within_range_remai_time = mcheck_within_range_tperiod;
+			chase = false; mmyself.mcontroller_speed_multiplier = 0.1
+			mpicked_dir=Utils.random_vector2_with_length(1)
+			return;
+		
+		var own_velocity_factor: float = max(mmyself.velocity.length()*0.0035, 0.3)
+		var target_velocity_factor: float = max(target.velocity.length()*0.0035, 0.3)
 		var relative_velocity_factor: float = target_velocity_factor*own_velocity_factor
-		var target_distance_factor: float = distance/400
+		var target_distance_factor: float = curr_dist/400
 		var final_factor: float = relative_velocity_factor/(target_distance_factor*path_update_time_mult)
 		
-		if i%40==0:
-			pass#print(mybeing.velocity.length()*0.003)
 		recalc_path_remai_time -= delta * final_factor
 		if recalc_path_remai_time < 0:
-			mybeing.nav.target_position = target_being.global_position
+			mmyself.nav.target_position = target.global_position
 			recalc_path_remai_time = 0.5 #dejar hardcodeado
 		
-		var next_pos: Vector2 = mybeing.nav.get_next_path_position()
-		mybeing._direction_axis = mybeing.global_position.direction_to(next_pos)
-	else:
-		mybeing._direction_axis = Vector2.ZERO
+		var next_pos: Vector2 = mmyself.nav.get_next_path_position()
+		
+		mmyself._direction_axis = mmyself.global_position.direction_to(next_pos)
+	else: #within range
+		mcheck_within_range_remai_time -= delta
 		if on_min_distance_reached.is_valid():
-			on_min_distance_reached.call(delta )
+			on_min_distance_reached.call(delta)
+	i+=1
+	
 
-var _nodir_rem_time: float = 1.0; var _maintaindir_rem_time: float
+var mrem_time: float = -1.0; var mstay: bool = true
+var mpicked_dir: Vector2
 func wander(delta: float):
-	_nodir_rem_time -= delta
-	#_maintaindir_rem_time
+	mrem_time -= delta
+	
+	if mrem_time < 0: 
+		mstay = not mstay
+		mrem_time = randf_range(2.0, 10.0)
+		if not mstay:
+			mpicked_dir=Utils.random_vector2_with_length(1)
+			mmyself.mcontroller_speed_multiplier = randf_range(0.05, 0.3)
+		
+	if not mstay:
+		mmyself._direction_axis = mpicked_dir
+	else: 
+		mmyself._direction_axis = Vector2.ZERO
 	
 	
 	

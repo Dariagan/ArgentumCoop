@@ -4,12 +4,9 @@ var mbeings: Dictionary # key(str): individual unique id. value: Being Scene. el
 var mtiles_states: Dictionary[Vector3, Dictionary] # key: posx_posy_zi (vec3, no un string). value: state object
 const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
 
-
 #IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
-
 var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
-
 
 @rpc("call_local")
 func generate_world():
