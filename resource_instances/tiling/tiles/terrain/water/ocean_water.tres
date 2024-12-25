@@ -3,3 +3,4 @@
 [resource]
 mz_level = 1
 msource_atlas = 2
+mmodulo_tiling_area = Vector2i(2, 2)

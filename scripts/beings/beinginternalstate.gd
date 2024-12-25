@@ -7,7 +7,7 @@ class_name BeingInternalState
 var mcarried_weight: int = 0
 var mfaction: Faction
 
-var msex: Enums.Sex
+var msex: Enu.Sex
 var mrace: BasicRace #mover estos dos a una clase Characterization guardada en otro lado?
 var mklass: Klass = null #mover estos dos a una clase Characterization guardada en otro lado?
 
@@ -20,7 +20,7 @@ var mbeing_gen_template: BeingGenTemplate = null
 var mfollowers: Array[Being] = []
 var mmaster: Being = null
 #necesario para que funciona  serialize()
-func construct_for_posterior_serialization(psex: Enums.Sex, prace: BasicRace, pfaction: Faction, pbody: HarmableBody, pklass: Klass, pbeing_gen_template: BeingGenTemplate):
+func construct_for_posterior_serialization(psex: Enu.Sex, prace: BasicRace, pfaction: Faction, pbody: HarmableBody, pklass: Klass, pbeing_gen_template: BeingGenTemplate):
 	self.msex = psex; self.mrace = prace; self.mfaction = pfaction; self.mbody = pbody; self.mklass= pklass; self.mbeing_gen_template = pbeing_gen_template
 
 @rpc("call_local")

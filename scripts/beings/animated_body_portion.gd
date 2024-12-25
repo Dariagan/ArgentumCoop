@@ -58,37 +58,37 @@ func change_sprite_data(sprite_data: SpriteData) -> void:
 	var net_scale: Vector3 = _starting_sprite_width_frontally_sideways_height * _character_width_frontally_sideways_height * sprite_data.width_frontally_sideways_height
 	_scale = net_scale
 
-func _play_handled(animation_state: Enums.AnimationState, direction: Enums.Dir, custom_speed: float = 1.0, from_end: bool = false) -> void:
+func _play_handled(animation_state: Enu.AnimationState, direction: Enu.Dir, custom_speed: float = 1.0, from_end: bool = false) -> void:
 	if _width_asimetrically_altered:
 		match direction:
-			Enums.Dir.UP, Enums.Dir.DOWN:
+			Enu.Dir.UP, Enu.Dir.DOWN:
 				scale.x = _scale[0]
-			Enums.Dir.LEFT, Enums.Dir.RIGHT:
+			Enu.Dir.LEFT, Enu.Dir.RIGHT:
 				scale.x = _scale[1]
 	
 	if _avai_animation_states.find(animation_state) != -1:
 		super.play(get_animation_name(animation_state, direction), custom_speed, from_end)
-	elif animation_state == Enums.AnimationState.WALK and _avai_animation_states.find(Enums.AnimationState.JOG) != -1:
-		super.play(get_animation_name(Enums.AnimationState.JOG, direction), custom_speed, from_end)
-	elif animation_state == Enums.AnimationState.JOG and _avai_animation_states.find(Enums.AnimationState.WALK) != -1:		
-		super.play(get_animation_name(Enums.AnimationState.WALK, direction), custom_speed, from_end)
+	elif animation_state == Enu.AnimationState.WALK and _avai_animation_states.find(Enu.AnimationState.JOG) != -1:
+		super.play(get_animation_name(Enu.AnimationState.JOG, direction), custom_speed, from_end)
+	elif animation_state == Enu.AnimationState.JOG and _avai_animation_states.find(Enu.AnimationState.WALK) != -1:		
+		super.play(get_animation_name(Enu.AnimationState.WALK, direction), custom_speed, from_end)
 	else:
-		super.play(get_animation_name(Enums.AnimationState.IDLE, direction), custom_speed, from_end)
+		super.play(get_animation_name(Enu.AnimationState.IDLE, direction), custom_speed, from_end)
 
-static func get_animation_name(animation_state: Enums.AnimationState, direction: Enums.Dir) -> StringName:
+static func get_animation_name(animation_state: Enu.AnimationState, direction: Enu.Dir) -> StringName:
 	match [animation_state, direction]:
-		[Enums.AnimationState.IDLE, Enums.Dir.LEFT]:  return Keys.IDLE_LEFT
-		[Enums.AnimationState.IDLE, Enums.Dir.RIGHT]: return Keys.IDLE_RIGHT
-		[Enums.AnimationState.IDLE, Enums.Dir.DOWN]:  return Keys.IDLE_DOWN
-		[Enums.AnimationState.IDLE, Enums.Dir.UP]:    return Keys.IDLE_UP
-		[Enums.AnimationState.WALK, Enums.Dir.LEFT]:  return Keys.WALK_LEFT
-		[Enums.AnimationState.WALK, Enums.Dir.RIGHT]: return Keys.WALK_RIGHT
-		[Enums.AnimationState.WALK, Enums.Dir.DOWN]:  return Keys.WALK_DOWN
-		[Enums.AnimationState.WALK, Enums.Dir.UP]:    return Keys.WALK_UP
-		[Enums.AnimationState.JOG, Enums.Dir.LEFT]:   return Keys.JOG_LEFT
-		[Enums.AnimationState.JOG, Enums.Dir.RIGHT]:  return Keys.JOG_RIGHT
-		[Enums.AnimationState.JOG, Enums.Dir.DOWN]:   return Keys.JOG_DOWN
-		[Enums.AnimationState.JOG, Enums.Dir.UP]:     return Keys.JOG_UP
+		[Enu.AnimationState.IDLE, Enu.Dir.LEFT]:  return Keys.IDLE_LEFT
+		[Enu.AnimationState.IDLE, Enu.Dir.RIGHT]: return Keys.IDLE_RIGHT
+		[Enu.AnimationState.IDLE, Enu.Dir.DOWN]:  return Keys.IDLE_DOWN
+		[Enu.AnimationState.IDLE, Enu.Dir.UP]:    return Keys.IDLE_UP
+		[Enu.AnimationState.WALK, Enu.Dir.LEFT]:  return Keys.WALK_LEFT
+		[Enu.AnimationState.WALK, Enu.Dir.RIGHT]: return Keys.WALK_RIGHT
+		[Enu.AnimationState.WALK, Enu.Dir.DOWN]:  return Keys.WALK_DOWN
+		[Enu.AnimationState.WALK, Enu.Dir.UP]:    return Keys.WALK_UP
+		[Enu.AnimationState.JOG, Enu.Dir.LEFT]:   return Keys.JOG_LEFT
+		[Enu.AnimationState.JOG, Enu.Dir.RIGHT]:  return Keys.JOG_RIGHT
+		[Enu.AnimationState.JOG, Enu.Dir.DOWN]:   return Keys.JOG_DOWN
+		[Enu.AnimationState.JOG, Enu.Dir.UP]:     return Keys.JOG_UP
 		#meter mas animationstates si hace falta, simplemente no usarlos si no se usan en el caso default
 		#ejemplo EXTRA1, EXTRA2
 	push_error("couldn't match %d %d" % [animation_state, direction])

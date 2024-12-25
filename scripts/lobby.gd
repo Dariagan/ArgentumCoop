@@ -138,7 +138,7 @@ func _on_name_selected(new_name: String):
 func _on_race_selected(race: ControllableRace):
 	if race: _allfn_update_characterization.rpc(Keys.RACE, race.mid)
 	else: _allfn_update_characterization.rpc(Keys.RACE)
-func _on_sex_selected(sex: Enums.Sex):
+func _on_sex_selected(sex: Enu.Sex):
 	if sex > 0: _allfn_update_characterization.rpc(Keys.SEX, sex)
 	else: _allfn_update_characterization.rpc(Keys.SEX)
 func _on_head_selected(head : SpriteData):

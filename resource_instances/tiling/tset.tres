@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://dfw0k5nv07jm" path="res://assets/textures/world/terrain/temperate_grass/grass.png" id="1_ggyrk"]
 [ext_resource type="Texture2D" uid="uid://c70rprfwrpnkq" path="res://assets/textures/world/terrain/sand.png" id="2_o0c2o"]
 [ext_resource type="Texture2D" uid="uid://ci07cxx3h6wii" path="res://assets/textures/world/terrain/waters.png" id="3_vu6vq"]
-[ext_resource type="Texture2D" uid="uid://ds2l0tf2mleu4" path="res://assets/textures/world/dungeons/dungeons.png" id="4_ew1hr"]
+[ext_resource type="Texture2D" uid="uid://ds2l0tf2mleu4" path="res://assets/textures/world/portals/dungeons.png" id="4_ew1hr"]
 [ext_resource type="Texture2D" uid="uid://bds1exypub58" path="res://assets/textures/world/trees/trees.png" id="5_8dwrb"]
 [ext_resource type="Texture2D" uid="uid://cttj5nc38hmyn" path="res://assets/textures/world/bushes/bush.png" id="6_xpbd5"]
 [ext_resource type="Texture2D" uid="uid://dqpf2urp4led4" path="res://assets/textures/world/terrain/water.png" id="7_0x8oh"]

@@ -20,7 +20,7 @@ var mcheck_within_range_remai_time: float = -1000
 var recalc_path_remai_time: float; var chase: bool = false; 
 # llamar con super.gotobeing() en subscripts (heredan de este)
 func goto_being(delta:float, target:Being, curr_dist:float, maxdist:float=0, mcheck_within_range_tperiod:float=25, 
-	path_update_time_mult:float=1, on_min_distance_reached: Callable=Callable()):
+	path_update_time_mult:float=1, on_min_distance_reached: Callable=Callable()) -> void:
 	if mcheck_within_range_remai_time == -1000: mcheck_within_range_remai_time = mcheck_within_range_tperiod
 	if (mcheck_within_range_remai_time < 0 and curr_dist > maxdist):
 		chase = true; mmyself.mcontroller_speed_multiplier = randf_range(0.05, 0.2)

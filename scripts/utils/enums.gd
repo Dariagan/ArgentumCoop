@@ -1,4 +1,4 @@
-class_name Enums
+class_name Enu
 
 enum Sex { ANY = 0, MALE = 1, FEMALE = 2}
 
@@ -18,3 +18,5 @@ const TileZLevelKey:Array[StringName] = [&"Soil", &"Floor", &"Stain", &"Structur
 enum AnimationState { IDLE, WALK, JOG, EXTRA0, EXTRA1, EXTRA2, EXTRA3 }
 
 enum AiState { WANDER, CHASE, ATTACK_RANGED, FLEE,}
+
+enum PierceType { SHARP, BLUNT, FIRE, MAGIC, FROST }

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ds2l0tf2mleu4"
-path="res://.godot/imported/dungeons.png-fc920a3ce00cadc410f9ed189f054851.ctex"
+uid="uid://gngqqj5fp4pd"
+path="res://.godot/imported/newbie.png-744c97c894ce9c91b4d8308e7d79e630.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/world/dungeons/dungeons.png"
-dest_files=["res://.godot/imported/dungeons.png-fc920a3ce00cadc410f9ed189f054851.ctex"]
+source_file="res://assets/textures/world/portals/newbie.png"
+dest_files=["res://.godot/imported/newbie.png-744c97c894ce9c91b4d8308e7d79e630.ctex"]
 
 [params]
 

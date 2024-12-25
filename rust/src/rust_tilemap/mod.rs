@@ -1,10 +1,8 @@
 pub(crate) mod world_matrix;
 
 use godot::classes::TileSet;
-use godot::obj::NewGd;
 use spawn_weights_matrix::SpawnWeightsMatrix;
 use strum::EnumCount;
-use strum::IntoEnumIterator;
 use strum::VariantNames;
 use world_matrix::*;
 use crate::beings::*;
@@ -18,12 +16,9 @@ use godot::classes::{INode2D, Node2D, TileMapLayer};
 use godot::prelude::*;
 use std::borrow::{Borrow, BorrowMut};
 use std::collections::{HashMap, HashSet};
-use std::fmt;
-use std::hash::{Hash, Hasher};
-#[derive(GodotClass)]
-#[class(base=Node2D)]
+#[derive(GodotClass)]#[class(base=Node2D)]
 struct RustTileMap {
-
+  base: Base<Node2D>,
   #[var] layer_count: u16,
   #[var] seed: i64,
   #[var(get = get_tile_set_path)] tile_set_path: GString,
@@ -32,7 +27,6 @@ struct RustTileMap {
   tile_unid_mapping: Vec<TileDto>,
   tile_set: Gd<TileSet>,
   world_matrix: Option<WorldMatrix>,
-  base: Base<Node2D>,
   world_size: UnsVec,
   being_loaded_tiles_map: HashMap<BeingUnid, HashSet<UnsVec>> /*don't remove an entry directly*/,
   tile_shared_loads_count: HashMap<UnsVec, i64>  /*don't reduce this directly*/,
@@ -42,9 +36,7 @@ struct RustTileMap {
 
 }
 
-
-#[godot_api]
-impl INode2D for RustTileMap {
+#[godot_api] impl INode2D for RustTileMap {
   fn init(base: Base<Node2D>) -> Self {
     Self {
       base,
@@ -63,7 +55,6 @@ impl INode2D for RustTileMap {
       beings_in_chunk_count: None
     }
   }
-
   fn ready(&mut self) {
     self.base_mut().set_y_sort_enabled(true);
 
@@ -73,27 +64,20 @@ impl INode2D for RustTileMap {
     for (i, layer_name) in layer_names.iter_shared().enumerate(){
       let mut new_child: Gd<TileMapLayer> = TileMapLayer::new_alloc(); let i: i32 = i as i32;
       new_child.set_name(&layer_name.to_string());
-
       self.base_mut().add_child(&new_child);
       self.base_mut().move_child(&new_child, i);
-      new_child.set_z_index(i);
-
-      new_child.set_rendering_quadrant_size(20);
+      new_child.set_z_index(i); new_child.set_rendering_quadrant_size(20); 
       new_child.set_tile_set(&self.tile_set);
 
       self.zlevel_layers.push(&new_child);
 
       if layer_name.to_string() == "Structure" {
-          self.beings_z_index = i; // Define beings_z_index as part of your struct if needed
-          new_child.set_y_sort_enabled(true);
+          self.beings_z_index = i; new_child.set_y_sort_enabled(true);
       }
     }
-
-    
   }
 }
-#[godot_api]
-impl RustTileMap {
+#[godot_api] impl RustTileMap {
   #[constant] const MACROSCOPIC_SPAWNING_CHUNK_SIZE: u8 = 15;
   #[constant] const BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK: u16 = 200;  
   const TILE_SET_PATH: &'static str = "res://resource_instances/tiling/tset.tres";
@@ -131,7 +115,6 @@ impl RustTileMap {
     godot_print!("time taken to generate: {:.2?}", now.elapsed());
     true
   }
-
   #[func]
   fn load_tiles_around(&mut self, _being_coords: Vector2i, chunk_size: Vector2i, being_unid: i64) {
 
@@ -139,7 +122,6 @@ impl RustTileMap {
     let being_unid: BeingUnid = BeingUnid(being_unid);
     
     let being_coords: SafeVec = _being_coords.into();
-
     let world_size: UnsVec = self.world_size;
 
     for chunk_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))

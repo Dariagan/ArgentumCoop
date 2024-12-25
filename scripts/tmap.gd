@@ -60,7 +60,7 @@ func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, isplayerfac:
 	if isplayerfac or zlevel_layers[0].get_cell_tile_data(local_to_tilemap(loc_pos)): #TODO
 		being.set_multiplayer_authority(mp_auth)
 		return being
-	else:
+	else:#TODO almacenar la authority?
 		mbeings[being.uid] = being.serialize() # no sé si hacer esto o guardar packedscene del being
 		being.queue_free()
 		#freeze_and_store_being(local_to_tilemap(loc_pos), being.uid)

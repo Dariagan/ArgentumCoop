@@ -8,14 +8,14 @@ extends VBoxContainer
 
 var _found_races: Array
 var _current_race: ControllableRace
-var _current_sex: Enums.Sex
+var _current_sex: Enu.Sex
 var _current_head: SpriteData
 var _current_class: Klass
 var _current_follower: BeingGenTemplate
 
 signal race_selected(race: ControllableRace)
 signal class_selected(klass: Klass)
-signal sex_selected(sex: Enums.Sex)
+signal sex_selected(sex: Enu.Sex)
 signal head_selected(head: SpriteData)
 signal follower_selected(follower: BeingGenTemplate)
 signal body_scale_changed(new_scale: Vector3)
@@ -58,12 +58,12 @@ func _on_race_selected(id: int):
 	#selected_race.emit(_current_race)
 
 func _on_sex_selected(id: int):
-	_current_sex = id as Enums.Sex
-	sex_menu_button.text = "Sex: %s" % str(Enums.Sex.keys()[id])
+	_current_sex = id as Enu.Sex
+	sex_menu_button.text = "Sex: %s" % str(Enu.Sex.keys()[id])
 	
 	sex_selected.emit(_current_sex)
 	
-	if _current_head and (_current_head.sex != Enums.Sex.ANY || _current_head.sex != _current_sex):
+	if _current_head and (_current_head.sex != Enu.Sex.ANY || _current_head.sex != _current_sex):
 		_current_head = null
 		head_menu_button.icon = null
 		head_selected.emit(null)
@@ -120,23 +120,23 @@ func _setup_sex_menu_popup(current_race: ControllableRace):
 	popup.clear()
 	if current_race.mmales_ratio == 1:
 		popup.add_item("Male", 1)
-		_current_sex = Enums.Sex.MALE
+		_current_sex = Enu.Sex.MALE
 		sex_menu_button.text = "Sex: Male"
 	elif current_race.mmales_ratio == 0:
 		popup.add_item("Female", 2)
-		_current_sex = Enums.Sex.FEMALE
+		_current_sex = Enu.Sex.FEMALE
 		sex_menu_button.text = "Sex: Female"
 	else:
 		popup.add_item("Male", 1)
 		popup.add_item("Female", 2)
 
-func _setup_head_menu_popup(sex: Enums.Sex):
+func _setup_head_menu_popup(sex: Enu.Sex):
 	
 	var popup: PopupMenu = head_menu_button.get_popup()
 	popup.clear()
 	var i: int = 0
 	for head_sprite in _current_race.mhead_sprites_datas:
-		if head_sprite.sex == Enums.Sex.ANY || head_sprite.sex == sex:
+		if head_sprite.sex == Enu.Sex.ANY || head_sprite.sex == sex:
 			popup.add_icon_item(head_sprite.frames.get_frame_texture(Keys.IDLE_DOWN, 0), "", i)
 		i += 1
 	

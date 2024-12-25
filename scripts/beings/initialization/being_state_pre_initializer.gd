@@ -19,7 +19,7 @@ func construct(being_birth_dict: Dictionary) -> void:
 	assert(being_birth_dict != null && being_birth_dict != {})
 	
 	#region are constructed inside mistate
-	var sex: Enums.Sex
+	var sex: Enu.Sex
 	var race: BasicRace
 	var klass: Klass
 	var faction: Faction
@@ -97,12 +97,12 @@ func construct(being_birth_dict: Dictionary) -> void:
 	var sex_value = being_birth_dict[Keys.SEX]
 	
 	if sex_value is float and sex_value >= 0.0 and sex_value <= 1.0:
-		var sex_probs: Dictionary = {Enums.Sex.MALE: sex_value, Enums.Sex.FEMALE: 1 - sex_value}
+		var sex_probs: Dictionary = {Enu.Sex.MALE: sex_value, Enu.Sex.FEMALE: 1 - sex_value}
 		sex = WeightedChoice.pick(sex_probs)
-	elif sex_value is StringName or sex_value == Enums.Sex.ANY or (sex_value is float and (sex_value<0.0 or sex_value>1.0)):
-		var sex_probs: Dictionary = {Enums.Sex.MALE: race.mmales_ratio, Enums.Sex.FEMALE: 1 - race.mmales_ratio}
+	elif sex_value is StringName or sex_value == Enu.Sex.ANY or (sex_value is float and (sex_value<0.0 or sex_value>1.0)):
+		var sex_probs: Dictionary = {Enu.Sex.MALE: race.mmales_ratio, Enu.Sex.FEMALE: 1 - race.mmales_ratio}
 		sex = WeightedChoice.pick(sex_probs)
-	elif sex_value is Enums.Sex:
+	elif sex_value is Enu.Sex:
 		sex = sex_value
 	else:
 		assert(false, "invalid type for \"sex\" entry in birth dict")

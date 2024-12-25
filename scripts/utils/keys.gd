@@ -32,3 +32,5 @@ const JOG_DOWN: StringName =  &"jog_down"
 const JOG_UP: StringName =    &"jog_up"
 const JOG_LEFT: StringName =  &"jog_left"
 const JOG_RIGHT: StringName = &"jog_right"
+
+const G_PORTALS_POI: StringName = &"portals_poi"

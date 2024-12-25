@@ -102,14 +102,14 @@ func _update_distance_moved() -> void:
 	mprevious_pos = position
 	
 func _update_body_state() -> void: 	
-	if mdistance_moved > 1: _adjust_speed_scale(1); _change_body_state(Enums.AnimationState.JOG)
-	elif mdistance_moved > 0.01: _adjust_speed_scale(0.8); _change_body_state(Enums.AnimationState.WALK)
-	else: _change_body_state(Enums.AnimationState.IDLE)
+	if mdistance_moved > 1: _adjust_speed_scale(1); _change_body_state(Enu.AnimationState.JOG)
+	elif mdistance_moved > 0.01: _adjust_speed_scale(0.8); _change_body_state(Enu.AnimationState.WALK)
+	else: _change_body_state(Enu.AnimationState.IDLE)
 
-var mbody_state: Enums.AnimationState = Enums.AnimationState.IDLE
-var mfaced_dir: Enums.Dir = Enums.Dir.DOWN
+var mbody_state: Enu.AnimationState = Enu.AnimationState.IDLE
+var mfaced_dir: Enu.Dir = Enu.Dir.DOWN
 
-func _change_body_state(new_body_state: Enums.AnimationState):
+func _change_body_state(new_body_state: Enu.AnimationState):
 	mbody_state = new_body_state
 func _adjust_speed_scale(factor: float):
 	for body_part in mbodyholder.get_children():
@@ -147,12 +147,12 @@ func _update_velocity_and_move(delta: float):
 			position += mdirection_axis * Config.noclip_speed
 		
 func _update_faced_dir(direction: Vector2) -> void:
-	var new_dir: Enums.Dir
-	if abs(direction.x) > abs(direction.y): new_dir = Enums.Dir.LEFT if direction.x < 0 else Enums.Dir.RIGHT
-	else: new_dir = Enums.Dir.UP if direction.y < 0 else Enums.Dir.DOWN
+	var new_dir: Enu.Dir
+	if abs(direction.x) > abs(direction.y): new_dir = Enu.Dir.LEFT if direction.x < 0 else Enu.Dir.RIGHT
+	else: new_dir = Enu.Dir.UP if direction.y < 0 else Enu.Dir.DOWN
 	if new_dir != mfaced_dir: _setsync_faced_dir.rpc(new_dir)
 
-@rpc("call_local") func _setsync_faced_dir(new_dir: Enums.Dir): mfaced_dir = new_dir
+@rpc("call_local") func _setsync_faced_dir(new_dir: Enu.Dir): mfaced_dir = new_dir
 		
 func _play_animation() -> void:	
 	for body_part in mbodyholder.get_children():
@@ -166,3 +166,6 @@ func serialize() -> Dictionary:#guardar como packedscene en vez de esto
 @rpc("call_local")func setsync_node_name_and_uid(_uid:int):self.name="%d%s%s"%[_uid,mistate.mrace.mname,name_label.text];self.uid=_uid;
 
 func distance_to(thing: Node2D) -> float: return self.global_position.distance_to(thing.global_position)
+
+@rpc("call_local")
+func setsync_zindex(pz_index: int): self.z_index = pz_index
