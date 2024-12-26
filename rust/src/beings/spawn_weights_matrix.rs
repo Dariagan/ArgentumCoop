@@ -20,12 +20,12 @@ impl SpawnWeightsMatrix{
   pub fn new(size_to_downscale_from: UnsVec, downscale_factor: u32) -> Self {
     Self { ds_matrix: DownScalingMatrix::new(size_to_downscale_from, downscale_factor) }
   }
-  pub fn overwrite_at(&mut self, coords: UnsVec, being_kind_id: BeingGenTemplIdAndFac, new_weight: SpawnWeight) {
-    self.ds_matrix.get_unchecked_mut(coords).insert(being_kind_id, new_weight);
+  pub fn overwrite_at(&mut self, coords: UnsVec, being_gen_templ_fac: BeingGenTemplIdAndFac, new_weight: SpawnWeight) {
+    self.ds_matrix.get_unchecked_mut(coords).insert(being_gen_templ_fac, new_weight);
   }
-  pub fn increase_at(&mut self, coords: UnsVec, being_kind_id: BeingGenTemplIdAndFac, added_weight: SpawnWeight) {
+  pub fn increase_at(&mut self, coords: UnsVec, bein_gen_templ_fac: BeingGenTemplIdAndFac, added_weight: SpawnWeight) {
     let hash_map = self.ds_matrix.get_unchecked_mut(coords);
-    hash_map.entry(being_kind_id)
+    hash_map.entry(bein_gen_templ_fac)
       .and_modify(|existing_weight| *existing_weight = *existing_weight + added_weight)
       .or_insert(added_weight);
   }

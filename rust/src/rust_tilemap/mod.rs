@@ -19,7 +19,7 @@ use godot::prelude::*;
 use std::borrow::{Borrow, BorrowMut};
 use std::collections::{HashMap, HashSet};
 #[derive(GodotClass)]#[class(base=Node2D)]
-struct RustTileMap {
+pub struct RustTileMap {
   base: Base<Node2D>,
   #[var] layer_count: u16,
   #[var] seed: i64,
@@ -28,7 +28,7 @@ struct RustTileMap {
   #[var] zlevel_layers: Array<Gd<TileMapLayer>>,
   tile_unid_mapping: Vec<TileDto>,
   tile_set: Gd<TileSet>,
-  world_matrix: Option<WorldMatrix>,
+  pub world_matrix: Option<WorldMatrix>,
   world_size: UnsVec,
   being_loaded_tiles_map: HashMap<BeingUnid, HashSet<UnsVec>> /*don't remove an entry directly*/,
   tile_shared_loads_count: HashMap<UnsVec, i64>  /*don't reduce this directly*/,
@@ -78,9 +78,12 @@ struct RustTileMap {
   #[constant] const SWMAT_DOWNSCALE_FACTOR: u32 = 3;  
 
   const TILE_SET_PATH: &'static str = "res://resource_instances/tiling/tset.tres";
+
   
-  #[func]fn get_tile_set_path(&self) -> GString {return self.tile_set_path.clone();}
-  
+  #[func]fn get_tile_set_path(&self) -> GString {self.tile_set_path.clone()}
+  pub fn spawn_weight_matrix(&self) -> Option<&SpawnWeightsMatrix> {self.spawn_weights_matrix.as_ref()}
+  pub fn world_size(&self) -> UnsVec {self.world_size}
+
   #[func]
   fn generate_world_matrix(&mut self, size: Vector2i, tiles: Array<Gd<Tile>>) {
     
@@ -107,8 +110,10 @@ struct RustTileMap {
   #[func]
   fn generate_formation(&mut self, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
     
+
     let now = std::time::Instant::now();
-    generate(self.world_matrix.as_mut().expect("world matrix needs to be generated before formation (call generate_world_matrix first)"), formation, origin, size, tile_selection, seed, data);
+
+    generate(self, formation, origin, size, tile_selection, seed, data);
     godot_print!("time taken to generate: {:.2?}", now.elapsed());
     true
   }

@@ -8,16 +8,14 @@ const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
 
 var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
 
-func _ready() -> void:
-	self.birth_from_being_gen_templ.connect(birth_being_gen_template_at_snapped)
-
 @rpc("call_local")
 func generate_world():
 	@warning_ignore("assert_always_true")
 	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y > 500)
 	
-	var tiles: Array[Tile] = []
-	tiles.append_array(Global.tilesdict.values())
+	self.birth_from_being_gen_templ.connect(birth_being_gen_template_at_snapped) #DON'T DO THIS IN _ready func, having _ready func overrides the RustTileMap's ready function
+	
+	var tiles: Array[Tile] = []; tiles.append_array(Global.tilesdict.values())
 		
 	generate_world_matrix(WORLD_SIZE, tiles)
 	

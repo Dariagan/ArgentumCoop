@@ -28,7 +28,7 @@ signal clicked_leave
 signal character_create(value: bool)
 
 func _ready() -> void:
-	get_children()[1].hide()
+	$CharacterCreation.hide()
 	Chat.input_enabled = true
 	Chat.chat_label = $ChatLobbyContainer/VBoxContainer/HBoxContainer2/ScrollContainer/ChatLabel
 	Chat.chat_text_edit = $ChatLobbyContainer/VBoxContainer/HBoxContainer3/WriteMsgBox

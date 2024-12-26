@@ -1,4 +1,6 @@
 use std::borrow::BorrowMut;
+use rust_tilemap::RustTileMap;
+
 use super::*;
 use std::collections::{HashMap, HashSet};
 
@@ -15,21 +17,22 @@ const SMALL_LAKER_CUTOFF: f32 = 1.15;
 const BEACHER_CUTOFF: f32 = 1.; 
 const FORESTER_CUTOFF: f32 = 5.4; 
 
-//TODO LO Q SE TOQUE EN EL GAMEPLAY DEBE SER GUARDADO EN UN DICT(INCLUSO LO DESTRUIDO)
+//TODO LO Q SE TOQUE EN EL GAMEPLAY DEBE SER GUARDADO EN UN DICT(INCLUYENDO LOS ÁRBOLES DESTRUIDOS)
 impl IFormationGenerator for FracturedContinentGenerator {
-fn generate(world: &mut WorldMatrix, origin: UnsVec, size: UnsVec,
+fn generate(tilemap: &mut RustTileMap, origin: UnsVec, size: UnsVec,
 tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary,
 ) {unsafe{
-//NOTA: SI ES MUY ALTO SE QUEDA INFINITAMENTE EN EL WHILE DE ABAJO
-CONTINENTER_CUTOFF = 1.77;
-
+  
+  //NOTA: SI ES MUY ALTO SE QUEDA INFINITAMENTE EN EL WHILE DE ABAJO
+  CONTINENTER_CUTOFF = 1.77;
+  
+let world: &mut WorldMatrix = &mut tilemap.world_matrix.as_mut().expect("world matrix needs to be generated before formation (call generate_world_matrix first)");
 let world_ptr: SendMutPtr<WorldMatrix> = make_mut_ptr!(world.borrow_mut());
 
 let mut unidordist_mapped2targets: [UnidOrDist; Target::COUNT] = Default::default();
 crate::tiling::fill_targets(&mut unidordist_mapped2targets, Target::VARIANTS, tile_selection);
 
 let unidordist_mped2targets: SendPtr<[UnidOrDist; Target::COUNT]> = make_ptr!(&unidordist_mapped2targets);
-//TODO hacer esto un struct ^
 
 //https://github.com/Auburn/FastNoiseLite/tree/master/Rust
 //https://github.com/Razaekel/noise-rs/tree/4fea5f6156bd0b142495a99fe1995502bfe473d6
@@ -119,7 +122,7 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
     let (beachness, beach) = val_surpasses_cutoff(calc_beachness(rel_coords, big_beacher, small_beacher, continentness), BEACHER_CUTOFF);
     if beach {
       tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::beach as usize).get_unid(rng))
-    }//else rocky
+    }//else rocky (si es tile costera, en vez de pasto)
     else {
       
       let lake: bool =  calc_lakeness(rel_coords, big_laker, small_laker, beachness, continentness);

@@ -4,6 +4,7 @@ pub use godot::builtin::Dictionary;
 pub use rust_tilemap::world_matrix::*;
 
 use crate::rust_tilemap;
+use crate::rust_tilemap::RustTileMap;
 use crate::utils::raw_pointers::*;
 use crate::utils::uns_vec::UnsVec;
 use fastnoise_lite::*;
@@ -28,40 +29,35 @@ pub enum FormGenEnum {
   FracturedContinentGenerator = 0,
 }
 
-pub fn generate(world_matrix: &mut WorldMatrix, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) {
+pub fn generate(tilemap: &mut RustTileMap, formation: FormGenEnum, origin: Vector2i, form_size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) {
 
   let asd = crate::beings::retrieve_being_gen_template_from_id("basic_warrior".into());
-  
 
   let (origin, size) = 
       (UnsVec::try_from(origin).expect("({} at {}, {}): passed arg origin: Vector2i is negative"), 
-      UnsVec::try_from(size).expect("({} at {}, {}): passed arg size: Vector2i is negative")); 
+      UnsVec::try_from(form_size).expect("({} at {}, {}): passed arg size: Vector2i is negative")); 
 
   const MIN_SIZE: u32 = 100;
   if size.all_bigger_than_min(MIN_SIZE).is_err(){
     panic!("({formation} origin:{origin} size:{size}): formation size is too small, must be at least {MIN_SIZE}X{MIN_SIZE}");
   }
-  if origin.lef + size.lef > world_matrix.size().lef{
+  if origin.lef + size.lef > tilemap.world_size().lef{
     panic!("({formation} origin:{origin} size:{size}): formation would go out of world bounds eastward");
   }
-  if origin.right + size.right > world_matrix.size().right{
+  if origin.right + size.right > tilemap.world_size().right{
     panic!("({formation} origin:{origin} size:{size}): formation would go out of world bounds southward");
   }
   match formation {
     FormGenEnum::FracturedContinentGenerator => {
-      FracturedContinentGenerator::generate(world_matrix, origin, size, tile_selection, seed, data)
+      FracturedContinentGenerator::generate(tilemap, origin, size, tile_selection, seed, data)
     }
   }
 }
 
 pub trait IFormationGenerator {
   fn generate(
-    world_matrix: &mut WorldMatrix,
-    origin: UnsVec,
-    size: UnsVec,
-    tile_selection: Gd<TileSelection>,
-    seed: i32,
-    data: Dictionary,
+    tilemap: &mut RustTileMap, origin: UnsVec, size: UnsVec, 
+    tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary,
   );
 }
 pub fn overwrite_all_tiles_at_coord(mut world: SendMutPtr<WorldMatrix>, (origin, relative): (UnsVec, UnsVec), unids: &TileUnidArray, instantiation_data: Option<Dictionary>){
