@@ -8,6 +8,9 @@ const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
 
 var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
 
+func _ready() -> void:
+	self.birth_from_being_gen_templ.connect(birth_being_gen_template_at_snapped)
+
 @rpc("call_local")
 func generate_world():
 	@warning_ignore("assert_always_true")
@@ -26,7 +29,7 @@ func generate_world():
 	#water_sprite.show()
 	if multiplayer.get_unique_id() == 1:
 		await get_tree().create_timer(2).timeout
-		birth_being_gen_template_at_snapped(&"basic_warrior", Keys.WILD_FACTION_INSTANCE, WORLD_SIZE/2 + Vector2i.ONE*2)
+		birth_being_gen_template_at_snapped(&"basic_warrior",  WORLD_SIZE/2 + Vector2i.ONE*2, Keys.WILD_FACTION_INSTANCE,)
 	
 #region SPAWNING 
 var mplayers_start_position: Vector2i
@@ -41,8 +44,8 @@ var mbirthed_beings_i: int = 0
 #ALERT, NO APARECE EL BEING SI LA TILE NO ESTÁ CARGADA EN EL MOMENTO Q SPAWNEA
 func birth_being_snapped_at(preinit: BeingStatePreIniter, tilemap_coords: Vector2i, isplayerfac:bool=false,mp_auth:int=1) -> Being:
 	return birth_being_at(preinit, tilemap_to_local(tilemap_coords), isplayerfac, mp_auth)
-func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, isplayerfac:bool=false, mp_auth:int=1, master:Being=null) -> Being:
-	var being: Being = preload("res://scenes/being.tscn").instantiate()
+func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, isplayerfac:bool=false, mp_auth:int=1, master:Being=null, scene:String="res://scenes/being.tscn") -> Being:
+	var being: Being = load(scene).instantiate()
 	#nota: el being.name hay q ponerlo antes del add_child
 	being.name = str(mbirthed_beings_i)
 	add_child(being); being.z_index = beings_z_index
@@ -73,7 +76,7 @@ func set_master_follower(master_name: NodePath, follower_name: NodePath):
 	master.mistate.mfollowers.append(follower)
 	follower.mistate.mmaster = master
 
-func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, faction: StringName, map_coords: Vector2i,mp_auth:int=1) -> Being:
+func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, map_coords: Vector2i, faction: StringName, mp_auth:int=1) -> Being:
 	return birth_being_gen_template_at(being_gen_template_id, faction, tilemap_to_local(map_coords), mp_auth)
 func birth_being_gen_template_at(being_gen_template_id: StringName, faction: StringName, loc_pos: Vector2,mp_auth:int=1) -> Being:
 	assert(Global.being_gen_templates.has(being_gen_template_id))

@@ -1,6 +1,7 @@
 pub(crate) mod world_matrix;
 
 use godot::classes::TileSet;
+use rand_distr::WeightedAliasIndex;
 use spawn_weights_matrix::SpawnWeightsMatrix;
 use strum::EnumCount;
 use strum::VariantNames;
@@ -11,6 +12,7 @@ use crate::tiling::TileDto;
 use crate::utils::matrix::DownScalingMatrix;
 use crate::utils::safe_vec::SafeVec;
 use crate::utils::uns_vec::UnsVec;
+use crate::utils::weighted_sample_hashmap;
 use godot::builtin::Dictionary;
 use godot::classes::{INode2D, Node2D, TileMapLayer};
 use godot::prelude::*;
@@ -31,11 +33,11 @@ struct RustTileMap {
   being_loaded_tiles_map: HashMap<BeingUnid, HashSet<UnsVec>> /*don't remove an entry directly*/,
   tile_shared_loads_count: HashMap<UnsVec, i64>  /*don't reduce this directly*/,
 //-- beings section --
+  
   beings_in_chunk_count: Option<DownScalingMatrix<u16>>,
   spawn_weights_matrix: Option<SpawnWeightsMatrix>,
 
 }
-
 #[godot_api] impl INode2D for RustTileMap {
   fn init(base: Base<Node2D>) -> Self {
     Self {
@@ -51,35 +53,30 @@ struct RustTileMap {
       beings_z_index: -1,
       being_loaded_tiles_map: Default::default(),
       tile_shared_loads_count: Default::default(),
+
+      beings_in_chunk_count: None,
       spawn_weights_matrix: None,
-      beings_in_chunk_count: None
     }
   }
   fn ready(&mut self) {
     self.base_mut().set_y_sort_enabled(true);
-
-    let layer_names: Array<StringName> = TileZLevel::VARIANTS
-      .iter().map(|&name| StringName::from(name)).collect();
-
-    for (i, layer_name) in layer_names.iter_shared().enumerate(){
+    for (i, layer_name) in TileZLevel::VARIANTS.iter().enumerate(){
       let mut new_child: Gd<TileMapLayer> = TileMapLayer::new_alloc(); let i: i32 = i as i32;
-      new_child.set_name(&layer_name.to_string());
-      self.base_mut().add_child(&new_child);
-      self.base_mut().move_child(&new_child, i);
-      new_child.set_z_index(i); new_child.set_rendering_quadrant_size(20); 
-      new_child.set_tile_set(&self.tile_set);
-
+      new_child.set_name(*layer_name);
+      self.base_mut().add_child(&new_child); self.base_mut().move_child(&new_child, i);
+      new_child.set_z_index(i); new_child.set_rendering_quadrant_size(20); new_child.set_tile_set(&self.tile_set);
       self.zlevel_layers.push(&new_child);
-
-      if layer_name.to_string() == "Structure" {
-          self.beings_z_index = i; new_child.set_y_sort_enabled(true);
+      if *layer_name == "Structure" {
+        self.beings_z_index = i; new_child.set_y_sort_enabled(true);
       }
     }
   }
 }
 #[godot_api] impl RustTileMap {
-  #[constant] const MACROSCOPIC_SPAWNING_CHUNK_SIZE: u8 = 15;
-  #[constant] const BEING_LIMIT_PER_MACROSCOPIC_SPAWNING_CHUNK: u16 = 200;  
+  #[constant] const SPAWNWEIGHTS_SQUARE_SIZE: u32 = 15; //ex 15 -> 15x15 spawn weights. 
+  #[constant] const BEING_LIMIT_PER_SWCHUNK: u16 = 200;  
+  #[constant] const SWMAT_DOWNSCALE_FACTOR: u32 = 3;  
+
   const TILE_SET_PATH: &'static str = "res://resource_instances/tiling/tset.tres";
   
   #[func]fn get_tile_set_path(&self) -> GString {return self.tile_set_path.clone();}
@@ -92,8 +89,7 @@ struct RustTileMap {
     self.tile_unid_mapping.extend(tiles.iter_shared()
       .enumerate() 
       .map(|(i, mut tile)| {
-        tile.bind_mut().unid = Some(TileUnid{0: i as u16}); 
-        tile.into()
+        tile.bind_mut().unid = Some(TileUnid{0: i as u16}); tile.into()
       })
     );
     let size: UnsVec = size.try_into().expect("passed arg size: Vector2i is negative");
@@ -105,7 +101,8 @@ struct RustTileMap {
 
     self.world_matrix = Some(WorldMatrix::new(size));     
     self.world_size = size;
-    self.spawn_weights_matrix = Some(SpawnWeightsMatrix::new(size, 3));
+    self.spawn_weights_matrix = Some(SpawnWeightsMatrix::new(size, Self::SWMAT_DOWNSCALE_FACTOR));
+    self.beings_in_chunk_count = Some(DownScalingMatrix::new(size, Self::SPAWNWEIGHTS_SQUARE_SIZE*Self::SWMAT_DOWNSCALE_FACTOR));
   }
   #[func]
   fn generate_formation(&mut self, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
@@ -133,8 +130,8 @@ struct RustTileMap {
           
           self.tile_shared_loads_count.insert(chunk_coord, 1);
 
-          let tiles = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];
-          tiles.iter().filter(|&&unid| unid != TileUnid::NULL).for_each(|&unid| self.set_cell(unid, chunk_coord));
+          let tiles: TileUnidArray = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];
+          tiles.iter().filter(|&&t_unid| t_unid != TileUnid::NULL).for_each(|&t_unid| self.set_cell(t_unid, chunk_coord));
         } 
         else if !self.being_loaded_tiles_map.get(&being_unid).map_or(false, |set| set.contains(&chunk_coord)) {
           *self.tile_shared_loads_count.get_mut(&chunk_coord).unwrap_unchecked() += 1;
@@ -203,16 +200,39 @@ struct RustTileMap {
 
 // hacerlo async (no bloqueante)
 //solo debería ejecutar esto el host y desp retransmitir los spawneos específicos
-  #[func] fn do_natural_spawning(&mut self) {
-          
-  }
+  #[func] fn do_natural_spawning(&mut self) {unsafe{
+    let self_ptr: *mut Self = self as *mut _;
+    if let Some(beings_in_chunk_count) = self.beings_in_chunk_count.as_mut() {
+      if let Some(spawn_weights_matrix) = self.spawn_weights_matrix.as_ref() {
+        for chunk_i in 0..beings_in_chunk_count.size().lef {
+        for chunk_j in 0..beings_in_chunk_count.size().right {
+          let chunk_coords = UnsVec::new(chunk_i, chunk_j );
 
-  #[signal] pub fn birth_being_kind(coords: Vector2i, id: StringName);
-  #[signal] pub fn birth_being_w_init_data(coords: Vector2i, init_data: Dictionary);
+          for sw_i in 0..Self::SPAWNWEIGHTS_SQUARE_SIZE {
+          for sw_j in 0..Self::SPAWNWEIGHTS_SQUARE_SIZE {
+            if beings_in_chunk_count[chunk_coords] < Self::BEING_LIMIT_PER_SWCHUNK {
+              let spawnweight_coords: UnsVec = chunk_coords * Self::SPAWNWEIGHTS_SQUARE_SIZE + UnsVec::new(sw_i, sw_j);
+              let sw_mapping: &HashMap<BeingGenTemplIdAndFac, spawn_weights_matrix::SpawnWeight> = spawn_weights_matrix.get_unchk_no_downscale(spawnweight_coords);
+              
+              if let Some(BeingGenTemplIdAndFac { being_gen_templ_id, fac_id }) = weighted_sample_hashmap::sample_from_weighted_map(sw_mapping) {
+                let varargs: &[Variant; 3] = &[Into::<Vector2i>::into(spawnweight_coords).to_variant(), being_gen_templ_id.to_variant(), fac_id.to_variant()];
+                (*self_ptr).base_mut().emit_signal("birth_from_being_gen_templ", varargs);
+                beings_in_chunk_count[chunk_coords] += 1;
+              } 
+              else {godot_error!("Error: Invalid weight configuration in swmapping");}
+            } 
+            else {break;}
+          }}
+        }}
+      } else {godot_error!("Error: spawn_weights_matrix is None");}
+    } else {godot_error!("Error: beings_in_chunk_count is None");}
+  }}
+
+  #[signal] pub fn birth_from_being_gen_templ(coords: Vector2i, being_gen_templ_id: StringName, faction_id: StringName);
+  #[signal] pub fn birth_from_init_data(coords: Vector2i, init_data: Dictionary);
   #[signal] pub fn being_unfrozen(coords: Vector2i, being_unid: i64);
+  #[signal] pub fn instantiate_faction(faction_defining_data: Dictionary);
+
 }
 
-fn exceeds_tile_limit(arr: &VariantArray) -> Result<(),()> {
-  if arr.len() >= TileUnid::NULL.0 as usize {Ok(())} 
-  else {Err(())}
-}
+fn exceeds_tile_limit(arr:&VariantArray)->Result<(),()>{if arr.len()>=TileUnid::NULL.0 as usize {Ok(())}else{Err(())}}

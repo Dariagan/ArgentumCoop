@@ -11,9 +11,9 @@ use std::{fmt, hash::*};
 
 pub mod being_builder; pub mod diet; pub mod spawn_weights_matrix; pub mod basic_race; pub mod sprite_data;
 
-#[derive(PartialEq, Eq, Clone)]
-pub struct BeingKindStrId(pub StringName); impl Hash for BeingKindStrId {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u32(self.0.hash())}}
-impl fmt::Display for BeingKindStrId {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bstrid{}", self.0)}}
+#[derive(PartialEq, Eq, Clone, Hash)]
+pub struct BeingGenTemplIdAndFac{pub being_gen_templ_id: StringName, pub fac_id: StringName} 
+impl fmt::Display for BeingGenTemplIdAndFac {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bstrid{} Facstrid{}", self.being_gen_templ_id, self.fac_id)}}
 #[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct BeingUnid(pub i64); impl Hash for BeingUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i64(self.0);}}
 impl fmt::Display for BeingUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bunid{}", self.0)}}

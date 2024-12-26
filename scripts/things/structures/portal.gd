@@ -1,6 +1,7 @@
 extends StaticBody2D
-class_name Portal
+#subject to changes
 
+#assigned by user, not random
 var mid: StringName
 var mpos_for_arrivals: Vector2
 @onready var mtrigger_area: Area2D = $Area2D

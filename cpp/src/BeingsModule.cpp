@@ -106,7 +106,7 @@ void BeingsModule::doNaturalSpawning()
 
                 letref beingkindUids = spawnWeightsMapping.first;
                 let randomBeingkindUid = beingkindUids[distribution(mEngine)];
-
+                
                 birthBeingOfKind(swCoords*SpawnWeightsMatrix::DOWNSCALING_FACTOR, randomBeingkindUid);
                 (*mBeingsInChunkCount)[chunkCoords]++;
             }

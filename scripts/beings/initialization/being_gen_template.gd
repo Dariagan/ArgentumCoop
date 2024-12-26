@@ -5,6 +5,7 @@ class_name BeingGenTemplate
 @export var mrace: BasicRace
 @export var mklass_id: StringName = &"random"
 @export var mname: String = "BeingGenTemplate_missingname"
+@export var fallback_faction: StringName 
 
 @export var mai_process: GDScript
 @export var mdisplay_being_name: bool = false

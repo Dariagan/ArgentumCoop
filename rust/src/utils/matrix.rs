@@ -37,12 +37,13 @@ impl<T: Default + Clone> IndexMut<UnsVec> for Matrix<T> {
   }
 }
 pub struct DownScalingMatrix<T: Default> {
-  downscale_factor: u8, flattened_matrix: Vec<T>, downscaled_size: UnsVec,
+  downscale_factor: u32, flattened_matrix: Vec<T>, downscaled_size: UnsVec,
 }
 #[allow(dead_code)]
 impl<T: Default> DownScalingMatrix<T> {
-  pub fn size(&self) -> UnsVec {self.downscaled_size}
-  pub fn new(size_to_downscale_from: UnsVec, downscale_factor: u8) -> Self {
+pub fn size(&self) -> UnsVec {self.downscaled_size}
+  
+  pub fn new(size_to_downscale_from: UnsVec, downscale_factor: u32) -> Self {
     let downscale_factor = downscale_factor.max(1);
 
     let downscaled_size = size_to_downscale_from / downscale_factor;
