@@ -15,12 +15,12 @@ const CHUNK_SIZE: Vector2 = Vector2i(192, 120)
 var mcontroller_speed_multiplier: float = 1
 
 #constructs for multiplayer too
-func construct(preiniter: BeingStatePreIniter, uid_: int) -> void:
+func construct(preiniter: BeingPreInit, uid_: int) -> void:
 	if preiniter.msprite_body:
 		mbody.construct(preiniter.msprite_body, preiniter.mbody_scale)
 		if preiniter.msprite_head:
 			mhead.construct(preiniter.msprite_head, preiniter.mhead_scale, preiniter.msprite_body.head_v_offset, preiniter.mbody_scale.z)
-	mistate.construct_from_seri.rpc(preiniter.mistate.serialize())
+	mistate.construct_from_seri.rpc(preiniter.serialize())
 	if mistate.mrace is UncontrollableRace or not mistate.mfaction is PlayerFaction:
 		_set_controlling_peer.rpc(0)
 	

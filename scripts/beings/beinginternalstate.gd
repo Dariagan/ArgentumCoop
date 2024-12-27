@@ -20,8 +20,8 @@ var mbeing_gen_template: BeingGenTemplate = null
 var mfollowers: Array[Being] = []
 var mmaster: Being = null
 #necesario para que funciona  serialize()
-func construct_for_posterior_serialization(psex: Enu.Sex, prace: BasicRace, pfaction: Faction, pbody: HarmableBody, pklass: Klass, pbeing_gen_template: BeingGenTemplate):
-	self.msex = psex; self.mrace = prace; self.mfaction = pfaction; self.mbody = pbody; self.mklass= pklass; self.mbeing_gen_template = pbeing_gen_template
+
+
 
 @rpc("call_local")
 func construct_from_seri(pserialized_self: Dictionary) -> void:

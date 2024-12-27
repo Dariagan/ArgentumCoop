@@ -38,15 +38,15 @@ var mplayers_start_position: Vector2i
 
 var mplayer_i: int = -1
 #TODO buscar suitable tiles
-func spawn_starting_player(preinit: BeingStatePreIniter, peer_id: int) -> Being:
+func spawn_starting_player(preinit: BeingPreInit, peer_id: int) -> Being:
 	mplayer_i += 1
 	return birth_being_snapped_at(preinit, mplayers_start_position + Vector2i(mplayer_i*2, 0), true, peer_id)
 
 var mbirthed_beings_i: int = 0
 #ALERT, NO APARECE EL BEING SI LA TILE NO ESTÁ CARGADA EN EL MOMENTO Q SPAWNEA
-func birth_being_snapped_at(preinit: BeingStatePreIniter, tilemap_coords: Vector2i, isplayerfac:bool=false,mp_auth:int=1) -> Being:
+func birth_being_snapped_at(preinit: BeingPreInit, tilemap_coords: Vector2i, isplayerfac:bool=false,mp_auth:int=1) -> Being:
 	return birth_being_at(preinit, tilemap_to_local(tilemap_coords), isplayerfac, mp_auth)
-func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, isplayerfac:bool=false, mp_auth:int=1, master:Being=null, scene:String="res://scenes/being.tscn") -> Being:
+func birth_being_at(preinit: BeingPreInit, loc_pos: Vector2, isplayerfac:bool=false, mp_auth:int=1, master:Being=null, scene:String="res://scenes/being.tscn") -> Being:
 	var being: Being = load(scene).instantiate()
 	#nota: el being.name hay q ponerlo antes del add_child
 	being.name = str(mbirthed_beings_i)
@@ -60,7 +60,7 @@ func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, isplayerfac:
 	if preinit.mfollowers.size() > 0:
 		for follower_template in preinit.mfollowers:
 			var spawned_follower: Being = birth_being_at(follower_template.instantiate(\
-				preinit.mistate.mfaction.minstance_id),loc_pos, isplayerfac, mp_auth, being)
+				preinit.mfaction.minstance_id),loc_pos, isplayerfac, mp_auth, being)
 			
 	if isplayerfac or zlevel_layers[0].get_cell_tile_data(local_to_tilemap(loc_pos)): #TODO
 		being.set_multiplayer_authority(mp_auth)

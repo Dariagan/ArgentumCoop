@@ -7,10 +7,6 @@ class_name BeingGenTemplate
 @export var mname: String = "BGT_missingname"
 @export var fallback_faction: StringName 
 
-@export var spawn_in_pack_size_min: int = 1
-#to be used in do_natural spawning to spawn multiple at the same time, close to each other (like in rimworld)
-@export var spawn_in_pack_size_max: int = 1
-
 @export var mai_process: GDScript
 @export var mdisplay_being_name: bool = false
 
@@ -36,25 +32,23 @@ class_name BeingGenTemplate
 @export var mcombat_multipliers: CombatMultipliers = CombatMultipliers.new()
 
 func validate() -> bool: 
-	var sum_of_weights: float = 0
-	for follower_mid: StringName in mav_followers_weighted_dist.keys():
-		var weight: float = mav_followers_weighted_dist[follower_mid]
-		sum_of_weights += weight
-		if weight < 0: return false
-		if not Global.being_gen_templates[follower_mid] .mrace is UncontrollableRace: return false
 	
-	if not mav_followers_weighted_dist.keys().is_empty() and (sum_of_weights <= 0):
-		push_error("sum of weights for available followers in klass %s is zero"%[mid])
-		return false
-	
-	return mrace and Global.races.values().has(mrace)
-
-func _instantiate_being_birth_dict() -> Dictionary:
-	assert(self.mid and mrace)
+	if mav_followers_weighted_dist and not mav_followers_weighted_dist.keys().is_empty():
+		var sum_of_weights: float = 0
+		for follower_mid: StringName in mav_followers_weighted_dist.keys():
+			var weight: float = mav_followers_weighted_dist[follower_mid]
+			sum_of_weights += weight
+			if weight < 0: return false
+			assert(Global.being_gen_templates[follower_mid].mrace is UncontrollableRace)
+		assert(sum_of_weights > 0)
+		
+	assert(self.mid and mrace and Global.races.values().has(mrace))
 
 	if mklass_id != &"random":
 		assert(Global.klasses.has(mklass_id))
-
+	
+	if mmales_ratio != -1:
+		assert(mmales_ratio >= 0.0 and mmales_ratio <= 1.0)
 	assert(mextra_health_multiplier_range.x <= mextra_health_multiplier_range.y)
 	assert(mhead_scale_range.x <= mhead_scale_range.y)
 	assert(mbody_scale_range.x <= mbody_scale_range.y)
@@ -63,6 +57,10 @@ func _instantiate_being_birth_dict() -> Dictionary:
 		assert(mrace.head_sprites_datas.has(head))
 	for body: BodySpriteData in mbodies_distribution:
 		assert(mrace.head_sprites_datas.has(body))
+	
+	return true 
+
+func _instantiate_being_birth_dict() -> Dictionary:
 	
 	var h_scale: float = randf_range(mhead_scale_range.x, mhead_scale_range.y)
 	var b_scale: float = randf_range(mbody_scale_range.x, mbody_scale_range.y)
@@ -82,9 +80,6 @@ func _instantiate_being_birth_dict() -> Dictionary:
 	}
 	return being_birth_dict
 
-func instantiate(faction: StringName) -> BeingStatePreIniter:
-	var being_pre_init = BeingStatePreIniter.new()
-	var birth_dict: Dictionary = _instantiate_being_birth_dict();
-	birth_dict[Keys.FACTION] = faction
-	being_pre_init.construct(birth_dict)
+func instantiate(faction: StringName) -> BeingPreInit:
+	var being_pre_init = BeingPreInit.new_from_being_gen_templ(self, faction)
 	return being_pre_init;

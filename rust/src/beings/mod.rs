@@ -56,6 +56,9 @@ pub struct RustBeingGenTemplate {
   #[export] mwhitelisted_tiles_for_spawning: Array<StringName>,
   //TODO SETTER QUE ACTUALIZE whitelisted_tiles_for_spawning TMB
 
+  //to be used in do_natural spawning to spawn multiple at the same time, close to each other (like in rimworld)
+  #[export] m_pack_min_size: i32, #[export] m_pack_max_size: i32,
+
   allowed_soil_tiles_unids: Option<Vec<TileUnid>>,
 
 }
@@ -63,9 +66,10 @@ pub struct RustBeingGenTemplate {
 impl IResource for RustBeingGenTemplate {
   fn init(base: Base<Resource>) -> Self {
     Self {
-      base: base, mid: StringName::from(""),
-      mwhitelisted_tiles_for_spawning: Array::new(),
-      allowed_soil_tiles_unids: None
+      base, mid: StringName::from(""),
+      mwhitelisted_tiles_for_spawning: godot::prelude::array!["grass", "sand"],
+      allowed_soil_tiles_unids: None,
+      m_pack_min_size: 1, m_pack_max_size: 1,
     }
   }
 }
