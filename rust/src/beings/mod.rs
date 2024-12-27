@@ -14,9 +14,11 @@ pub mod being_builder; pub mod diet; pub mod spawn_weights_matrix; pub mod basic
 #[derive(PartialEq, Eq, Clone, Hash)]
 pub struct BeingGenTemplIdAndFac{pub being_gen_templ_id: StringName, pub fac_id: StringName} 
 impl fmt::Display for BeingGenTemplIdAndFac {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bstrid{} Facstrid{}", self.being_gen_templ_id, self.fac_id)}}
+
 #[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct BeingUnid(pub i64); impl Hash for BeingUnid {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i64(self.0);}}
 impl fmt::Display for BeingUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bunid{}", self.0)}}
+
 #[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct BeingGenTemplateUnid(pub u16);impl Hash for BeingGenTemplateUnid {fn hash<H: Hasher>(&self, state: &mut H){state.write_u16(self.0);}}
 impl fmt::Display for BeingGenTemplateUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bkindunid{}", self.0)}}

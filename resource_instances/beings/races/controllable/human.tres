@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://firm1xvtgire" path="res://scripts/damage_health_system/combat_multipliers.gd" id="3_8payl"]
 [ext_resource type="Script" uid="uid://du8btl3uhqeam" path="res://scripts/beings/race/controllable_race.gd" id="4_46qb0"]
 [ext_resource type="Resource" uid="uid://bsfv14kk64tct" path="res://resource_instances/beings/sprites/spritesdatas/head/human_male_head.tres" id="5_07lp5"]
-[ext_resource type="Resource" uid="uid://cvkw8mcnvjt8e" path="res://resource_instances/beings/klasses/melee/warrior.tres" id="8_gtky7"]
+[ext_resource type="Resource" uid="uid://crunidnoqow0l" path="res://resource_instances/beings/klasses/melee/warrior.tres" id="8_gtky7"]
 
 [sub_resource type="Resource" id="Resource_mg2aq"]
 script = ExtResource("3_8payl")

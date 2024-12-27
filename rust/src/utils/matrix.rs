@@ -1,8 +1,7 @@
 use std::ops::{Index, IndexMut};
 pub use crate::utils::uns_vec::UnsVec;
 pub struct Matrix<T: Default + Clone> {
-  flattened_matrix: Vec<T>,
-  size: UnsVec,
+  flattened_matrix: Vec<T>, size: UnsVec,
 }
 #[allow(dead_code)]
 impl<T: Default + Clone> Matrix<T> {
@@ -39,15 +38,14 @@ pub struct DownScalingMatrix<T: Default> {
 }
 #[allow(dead_code)]
 impl<T: Default> DownScalingMatrix<T> {
-pub fn size(&self) -> UnsVec {self.downscaled_size}
+  pub fn size(&self) -> UnsVec {self.downscaled_size}
   
   pub fn new(size_to_downscale_from: UnsVec, downscale_factor: u32) -> Self {
     let downscale_factor = downscale_factor.max(1);
-
     let downscaled_size = size_to_downscale_from / downscale_factor;
     let area: usize = downscaled_size.area();
     let flattened_matrix = create_reserved_vec::<T>(area);
-    Self {downscale_factor, flattened_matrix, downscaled_size,}
+    Self {downscale_factor, flattened_matrix, downscaled_size}
   }
   pub fn get_unchecked(&self, coords: UnsVec) -> &T {
     unsafe{
@@ -74,10 +72,11 @@ pub fn size(&self) -> UnsVec {self.downscaled_size}
 }
 impl<T: Default> Index<UnsVec> for DownScalingMatrix<T> {
   type Output = T;
-  fn index(&self, coords: UnsVec) -> &T {self.get_unchecked(coords)}
+  fn index(&self, coords: UnsVec) -> &T {
+    unsafe{self.flattened_matrix.get_unchecked(coords.flat_index(&self.downscaled_size))/*.expect(format!("crash c{} s{}",coords, &self.downscaled_size).as_str())*/}}
 }
 impl<T: Default> IndexMut<UnsVec> for DownScalingMatrix<T> {
-  fn index_mut(&mut self, coords: UnsVec) -> &mut T {self.get_unchecked_mut(coords)}
+  fn index_mut(&mut self, coords: UnsVec) -> &mut T {unsafe{self.flattened_matrix.get_unchecked_mut(coords.flat_index(&self.downscaled_size))}}
 }
 
 fn create_reserved_vec<T: Default>(area: usize) -> Vec<T> {

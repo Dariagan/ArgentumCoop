@@ -4,6 +4,7 @@ use std::hash::{Hash, Hasher};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 use godot::builtin::{Vector2, Vector2i};
+use rand::Rng;
 
 use crate::utils::safe_vec::SafeVec;
 
@@ -14,6 +15,11 @@ pub struct UnsVec {pub lef: u32, pub right: u32}
 impl UnsVec {
   pub const ZERO: UnsVec = UnsVec{lef:0,right:0}; pub const ONE: UnsVec = UnsVec{lef:1,right:1}; 
   pub fn new(lef: u32, right: u32) -> Self {UnsVec { lef, right }}
+
+  pub fn new_from_thread_rng(min: u32, max_exc: u32) -> Self{
+    let mut rng = rand::thread_rng();
+    UnsVec {lef: rng.gen_range(min..max_exc) , right: rng.gen_range(min..max_exc)}
+  }
 
   pub fn add_assign_lef(&mut self, other: &Self) {self.lef += other.lef;}
   pub fn add_assign_right(&mut self, other: &Self) {self.right += other.right;}

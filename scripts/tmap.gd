@@ -2,18 +2,19 @@ extends RustTileMap
 class_name GdTileMap
 var mbeings: Dictionary # key(str): individual unique id. value: Being Scene. el multiplayerspawner se encarga del sync
 var mtiles_states: Dictionary[Vector3, Dictionary] # key: posx_posy_zi (vec3, no un string). value: state object
-const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
+const WORLD_SIZE: Vector2i = Vector2i(500, 500)
 
 #IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
 var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
 
+#don't define ready func
+
 @rpc("call_local")
 func generate_world():
 	@warning_ignore("assert_always_true")
-	assert(WORLD_SIZE.x > 500 && WORLD_SIZE.y > 500)
+	assert(WORLD_SIZE.x >= 500 && WORLD_SIZE.y >= 500)
 	
-	self.birth_from_being_gen_templ.connect(birth_being_gen_template_at_snapped) #DON'T DO THIS IN _ready func, having _ready func overrides the RustTileMap's ready function
 	
 	var tiles: Array[Tile] = []; tiles.append_array(Global.tilesdict.values())
 		
@@ -26,8 +27,9 @@ func generate_world():
 	# ALERT SI APARECE TODO VACÍO PUEDE SER PORQUE EL SPAWN POINT ESTÁ PUESTO EN UN LUGAR VACÍO
 	#water_sprite.show()
 	if multiplayer.get_unique_id() == 1:
-		await get_tree().create_timer(2).timeout
-		birth_being_gen_template_at_snapped(&"basic_warrior",  WORLD_SIZE/2 + Vector2i.ONE*2, Keys.WILD_FACTION_INSTANCE,)
+		await get_tree().create_timer(1).timeout
+		do_natural_spawning()
+		#birth_being_gen_template_at_snapped(&"basic_warrior",  WORLD_SIZE/2 + Vector2i.ONE*2, Keys.WILD_FACTION_INSTANCE,)
 	
 #region SPAWNING 
 var mplayers_start_position: Vector2i
@@ -62,6 +64,7 @@ func birth_being_at(preinit: BeingStatePreIniter, loc_pos: Vector2, isplayerfac:
 		being.set_multiplayer_authority(mp_auth)
 		return being
 	else:#TODO almacenar la authority?
+		return null
 		mbeings[being.uid] = being.serialize() # no sé si hacer esto o guardar packedscene del being
 		being.queue_free()
 		#freeze_and_store_being(local_to_tilemap(loc_pos), being.uid)
@@ -73,6 +76,10 @@ func set_master_follower(master_name: NodePath, follower_name: NodePath):
 	var follower: Being = get_node(follower_name)
 	master.mistate.mfollowers.append(follower)
 	follower.mistate.mmaster = master
+
+func mass_birth_being_gen_template_at_snapped(being_gen_template_ids: Array[StringName], spawns_coords: Array[Vector2i], faction_ids: Array[StringName], mp_auth:int=1):
+	for i in being_gen_template_ids.size():
+		birth_being_gen_template_at_snapped(being_gen_template_ids[i], spawns_coords[i], faction_ids[i], mp_auth)
 
 func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, map_coords: Vector2i, faction: StringName, mp_auth:int=1) -> Being:
 	return birth_being_gen_template_at(being_gen_template_id, faction, tilemap_to_local(map_coords), mp_auth)

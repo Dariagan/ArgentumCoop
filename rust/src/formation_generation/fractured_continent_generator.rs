@@ -1,6 +1,8 @@
 use std::borrow::BorrowMut;
 use rust_tilemap::RustTileMap;
 
+use crate::beings::{spawn_weights_matrix::{self, SpawnWeight, SpawnWeightsMatrix}, BeingGenTemplIdAndFac};
+
 use super::*;
 use std::collections::{HashMap, HashSet};
 
@@ -28,6 +30,8 @@ tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary,
   
 let world: &mut WorldMatrix = &mut tilemap.world_matrix.as_mut().expect("world matrix needs to be generated before formation (call generate_world_matrix first)");
 let world_ptr: SendMutPtr<WorldMatrix> = make_mut_ptr!(world.borrow_mut());
+let sw_mat: &mut SpawnWeightsMatrix = &mut tilemap.spawn_weights_matrix.as_mut().expect("spawn weights matrix needs to be generated before formation (call generate_world_matrix first)");
+let mut sw_mat_ptr: SendMutPtr<SpawnWeightsMatrix> = make_mut_ptr!(sw_mat.borrow_mut());
 
 let mut unidordist_mapped2targets: [UnidOrDist; Target::COUNT] = Default::default();
 crate::tiling::fill_targets(&mut unidordist_mapped2targets, Target::VARIANTS, tile_selection);
@@ -108,7 +112,7 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
     
   let mut tiles_2b_placed: TileUnidArray = Default::default();
   let continenter=continenter;let peninsuler=peninsuler;let big_laker=big_laker;let small_laker=small_laker;let big_beacher=big_beacher;let small_beacher=small_beacher;let forester=forester;
-  let trees = trees.drf().get_unchecked_mut(thread_i); let bushes = bushes.drf().get_unchecked_mut(thread_i);
+  let trees: &mut HashSet<UnsVec> = trees.drf().get_unchecked_mut(thread_i); let bushes = bushes.drf().get_unchecked_mut(thread_i);
   
   
   let (continentness, continental): (f32, bool) = 
@@ -118,7 +122,9 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
   let rng: &mut Lcg128Xsl64 = rngs.drf().get_unchecked_mut(thread_i);
   if continental{
     tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::cont as usize).get_unid(rng));
-  
+    let being_gen_templ_fac: BeingGenTemplIdAndFac = BeingGenTemplIdAndFac { being_gen_templ_id: "basic_warrior".into(), fac_id: "wild".into() };
+    sw_mat_ptr.drf().overwrite_at(origin+rel_coords, being_gen_templ_fac,SpawnWeight(1));
+
     let (beachness, beach) = val_surpasses_cutoff(calc_beachness(rel_coords, big_beacher, small_beacher, continentness), BEACHER_CUTOFF);
     if beach {
       tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::beach as usize).get_unid(rng))
@@ -166,7 +172,7 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
 
   let mut min_distance_multiplier: f64 = 1.0;
   let mut tries_count: u64 = 1;
-  let rng = rngs.drf().get_unchecked_mut(0);
+  let rng: &mut Lcg128Xsl64 = rngs.drf().get_unchecked_mut(0);
 
   let mut placed_count: usize = 0;
   while placed_count < placed_dungeons_coords.len() {

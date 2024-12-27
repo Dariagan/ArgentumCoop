@@ -22,6 +22,8 @@ impl SpawnWeightsMatrix{
   }
   pub fn overwrite_at(&mut self, coords: UnsVec, being_gen_templ_fac: BeingGenTemplIdAndFac, new_weight: SpawnWeight) {
     self.ds_matrix.get_unchecked_mut(coords).insert(being_gen_templ_fac, new_weight);
+    //    self.ds_matrix.get_mut(coords).expect("erorkof ds").insert(being_gen_templ_fac, new_weight);
+
   }
   pub fn increase_at(&mut self, coords: UnsVec, bein_gen_templ_fac: BeingGenTemplIdAndFac, added_weight: SpawnWeight) {
     let hash_map = self.ds_matrix.get_unchecked_mut(coords);
