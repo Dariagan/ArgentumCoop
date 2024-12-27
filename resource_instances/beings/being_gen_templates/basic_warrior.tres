@@ -6,11 +6,14 @@
 [ext_resource type="Script" uid="uid://cxobg6ntpa8p7" path="res://scripts/beings/initialization/being_gen_template.gd" id="4_4npau"]
 
 [resource]
+mwhitelisted_tiles_for_spawning = Array[StringName]([&"grass"])
 script = ExtResource("4_4npau")
 mrace = ExtResource("3_6de8d")
 mklass_id = &"random"
 mname = "BGT_missingname"
 fallback_faction = &""
+spawn_in_pack_size_min = 1
+spawn_in_pack_size_max = 1
 mdisplay_being_name = false
 mbodies_distribution = Dictionary[ExtResource("1_7s88w"), float]({})
 mheads_distribution = Dictionary[ExtResource("2_urqma"), float]({})

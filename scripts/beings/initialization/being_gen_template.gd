@@ -7,6 +7,10 @@ class_name BeingGenTemplate
 @export var mname: String = "BGT_missingname"
 @export var fallback_faction: StringName 
 
+@export var spawn_in_pack_size_min: int = 1
+#to be used in do_natural spawning to spawn multiple at the same time, close to each other (like in rimworld)
+@export var spawn_in_pack_size_max: int = 1
+
 @export var mai_process: GDScript
 @export var mdisplay_being_name: bool = false
 

@@ -20,12 +20,8 @@ impl WorldMatrix {
   } 
   pub unsafe fn is_empty_at_unchk(&self, coords: UnsVec) -> bool {self.count_at(coords) == 0}
   pub unsafe fn has_tiles_at_unchk(&self, coords: UnsVec) -> bool {self.count_at(coords) > 0}
-  pub fn is_empty_at() -> Result<bool, ()> {
-    todo!()
-  }
-  pub fn has_tiles_at() -> Result<bool, ()> {
-    todo!()
-  }
+  pub fn is_empty_at() -> Result<bool, ()> {todo!()}
+  pub fn has_tiles_at() -> Result<bool, ()> {todo!()}
 
   pub unsafe fn overwrite_tile(&mut self, tile: TileUnid, coords: UnsVec, z_level: TileZLevel){
     let prev_tile = self[coords].arr.get_unchecked_mut(z_level as usize);
@@ -57,4 +53,14 @@ impl TileUnidArray {
   pub fn assign_unid(&mut self, (unid, z_level): (TileUnid, TileZLevel)){
     unsafe{*self.arr.get_unchecked_mut(z_level as usize) = unid;}
   }
+}
+
+impl Index<TileZLevel> for TileUnidArray {
+  type Output = TileUnid;
+  fn index(&self, z_level: TileZLevel) -> &TileUnid {
+    unsafe{self.arr.get_unchecked(z_level as usize)}}
+}
+impl IndexMut<TileZLevel> for TileUnidArray {
+  fn index_mut(&mut self, z_level: TileZLevel) -> &mut TileUnid {
+    unsafe{self.arr.get_unchecked_mut(z_level as usize)}}
 }

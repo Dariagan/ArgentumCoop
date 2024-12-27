@@ -23,8 +23,21 @@ impl fmt::Display for BeingUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fm
 pub struct BeingGenTemplateUnid(pub u16);impl Hash for BeingGenTemplateUnid {fn hash<H: Hasher>(&self, state: &mut H){state.write_u16(self.0);}}
 impl fmt::Display for BeingGenTemplateUnid {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {write!(f, "Bkindunid{}", self.0)}}
 
+
+pub fn cache_being_gen_templates_soil_tiles_unids(tilemap: &RustTileMap) {
+  let obj = godot::classes::Engine::singleton().get_singleton("Global").expect("couldn't retrieve /Global singleton");
+
+  let being_gen_templates: Dictionary = obj.get("being_gen_templates").try_to().expect("couldn't get dict being_gen_templates from Global");
+
+  for being_gen_templ in being_gen_templates.values_array().iter_shared(){
+    let mut being_gen_templ: Gd<RustBeingGenTemplate> = being_gen_templ.try_to().expect("couldn't do Gd<RustBeingGenTemplate> = being_gen_templ.try_to()");
+    being_gen_templ.bind_mut().cache_allowed_soil_tiles_unids(tilemap);
+  }
+}
+
+
 #[allow(dead_code)]
-pub fn retrieve_being_gen_template_from_id(being_gen_template_id: StringName) -> Gd<RustBeingGenTemplate> {
+pub fn retrieve_being_gen_template_from_id(being_gen_template_id: &StringName) -> Gd<RustBeingGenTemplate> {
   let obj = godot::classes::Engine::singleton().get_singleton("Global").expect("couldn't retrieve /Global singleton");
 
   let being_gen_templates: Dictionary = obj.get("being_gen_templates").try_to().expect("couldn't get dict being_gen_templates from Global");
@@ -40,18 +53,19 @@ pub struct RustBeingGenTemplate {
   #[var] mid: StringName,
   //if none specified (array is empty), race defaults are used
   //TODO hacer sets de tiles whitelisted comúnes para reutilizar (hacerlo un array const definido en godot usando preload?)
-  #[export] mwhitelisted_tiles_for_spawning: Array<Gd<Tile>>, #[export] mblacklisted_tiles_for_spawning: Array<Gd<Tile>>,
+  #[export] mwhitelisted_tiles_for_spawning: Array<StringName>,
   //TODO SETTER QUE ACTUALIZE whitelisted_tiles_for_spawning TMB
 
-  rust_whitelisted_tiles_for_spawning: HashSet<TileDto>, rust_blacklisted_tiles_for_spawning: HashSet<TileDto>,
+  allowed_soil_tiles_unids: Option<Vec<TileUnid>>,
+
 }
 #[godot_api]
 impl IResource for RustBeingGenTemplate {
   fn init(base: Base<Resource>) -> Self {
     Self {
       base: base, mid: StringName::from(""),
-      mwhitelisted_tiles_for_spawning: Array::new(), mblacklisted_tiles_for_spawning: Array::new(),
-      rust_whitelisted_tiles_for_spawning: HashSet::new(), rust_blacklisted_tiles_for_spawning: HashSet::new(),
+      mwhitelisted_tiles_for_spawning: Array::new(),
+      allowed_soil_tiles_unids: None
     }
   }
 }
@@ -59,9 +73,27 @@ impl IResource for RustBeingGenTemplate {
 impl RustBeingGenTemplate {
   pub fn base(&self) -> &Base<Resource> {&self.base}
   pub fn id(&self) -> &StringName {&self.mid}
+
+  pub fn cache_allowed_soil_tiles_unids(&mut self, tilemap: &RustTileMap){
+    self.allowed_soil_tiles_unids = Some(Vec::new());
+    for soil_tile_id in self.mwhitelisted_tiles_for_spawning.iter_shared() {
+      for (i, tile_dto) in tilemap.tile_nid_mapping().iter().enumerate(){
+        if tile_dto.id == soil_tile_id{
+          unsafe{
+            self.allowed_soil_tiles_unids.as_mut().unwrap_unchecked().push(TileUnid(i as u16));
+          }
+        }
+      }
+    }
+  }
+  pub fn allowed_soil_tiles_unids(&self) -> Option<&Vec<TileUnid>>{
+    self.allowed_soil_tiles_unids.as_ref()
+  }
 }
 
 use crate::formation_generation::{Tile, TileDto};
+use crate::rust_tilemap::RustTileMap;
+use crate::tiling::TileUnid;
 impl Hash for RustBeingGenTemplate {fn hash<H: Hasher>(&self, state: &mut H) {state.write_u32(self.mid.hash());}}
 
 #[derive(GodotConvert, Var, Export)] #[godot(via = i8)] pub enum Sex {Male, Female, Any,}

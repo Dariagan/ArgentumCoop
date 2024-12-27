@@ -151,13 +151,16 @@ pub struct RustTileMap {
       let tile_z_level: i32 = tile.z_level as i32;
       let atlas_origin_position: Vector2i = (*tile).origin_position;
       let atlas_origin_position_offset: Vector2i = matrix_coord.mod_unsv((*tile).modulo_tiling_area).into(); 
-
+      let matrix_coord: Vector2i = matrix_coord.into();
       let args: [Variant; 4] = 
-        [Into::<Vector2i>::into(matrix_coord).to_variant(), ((*tile).source_atlas).to_variant(),
+        [matrix_coord.to_variant(), ((*tile).source_atlas).to_variant(),
         (atlas_origin_position+atlas_origin_position_offset).to_variant(), (*tile).alternative_id.to_variant()];
 
       // TODO: METER  NUEVA TILEMAPLAYER SI NO TA. GUARDAR SU REF EN UN DICT CON KEY=TILEID
       self.base_mut().get_child(tile_z_level).unwrap_unchecked().call("set_cell", &args);
+
+      let args: [Variant; 1] = [matrix_coord.to_variant()];
+      self.base_mut().call("tile_loaded", &args);
     }
   }
   fn unload_excess_tiles(&mut self, being_coords: SafeVec, chunk_size: UnsVec, being_unid: BeingUnid) {unsafe {
@@ -213,6 +216,7 @@ pub struct RustTileMap {
 
 //CREO Q SERIA MUCHO MAS RAPIDO SI EL ARRAY ESTA EN GDSCRIPT Y SE HACE TODO ESTO EN GDDSCRIPT
   #[func] fn do_natural_spawning(&mut self) {unsafe{
+    cache_being_gen_templates_soil_tiles_unids(&self);
     let self_ptr: *mut Self = self as *mut _;
     if let Some(beings_in_chunk_count) = self.beings_in_chunk_count.as_mut() {
       if let Some(spawn_weights_matrix) = self.spawn_weights_matrix.as_ref() {
@@ -242,18 +246,23 @@ pub struct RustTileMap {
               let sw_mapping: &HashMap<BeingGenTemplIdAndFac, spawn_weights_matrix::SpawnWeight> = spawn_weights_matrix.get_unchk_no_downscale(spawnweight_coords);
               
               if let Some(BeingGenTemplIdAndFac { being_gen_templ_id, fac_id }) = weighted_sample_hashmap::sample_from_weighted_map(sw_mapping) {
-                let being_gen_templ: Gd<RustBeingGenTemplate> = retrieve_being_gen_template_from_id(being_gen_templ_id.clone());
+                let being_gen_templ: Gd<RustBeingGenTemplate> = retrieve_being_gen_template_from_id(&being_gen_templ_id);
 
                 for _ in 0..Self::SWMAT_DOWNSCALE_FACTOR*Self::SWMAT_DOWNSCALE_FACTOR {
                   let rand_offset: UnsVec = UnsVec::new_from_thread_rng(0, Self::SWMAT_DOWNSCALE_FACTOR);
-                  let spawn_coords: Vector2i = (chunk_coords*Self::MACCHUNKMAT_DS_FACTOR + sw_unsvec*Self::SWMAT_DOWNSCALE_FACTOR + rand_offset).into();
-                  if true {//TODO checkear si tile suitada en spawn_coords es válida para el being_gen_templ
-                    godot_print!("{}", spawn_coords);
-                    
-                    being_gen_templ_ids.push(&being_gen_templ_id.clone()); spawns_coords.push(spawn_coords); facs_ids.push(&fac_id.clone());
-                    beings_in_chunk_count[chunk_coords] += 1;
-                    break;
-                  }//it is fine if nothing gets spawned, adds more variability between population densities in different places
+                  let spawn_coords: UnsVec = (chunk_coords*Self::MACCHUNKMAT_DS_FACTOR + sw_unsvec*Self::SWMAT_DOWNSCALE_FACTOR + rand_offset);
+                  let tile_unid_arr: TileUnidArray = self.world_matrix.as_ref().unwrap_unchecked()[spawn_coords];
+                  let soil_tile_unid: TileUnid = tile_unid_arr[TileZLevel::Soil]; let structure_tile_unid: TileUnid = tile_unid_arr[TileZLevel::Structure];
+
+                  if structure_tile_unid != TileUnid::NULL {continue;}
+                  if let Some(allowed_soil_tiles_unids) = being_gen_templ.bind().allowed_soil_tiles_unids(){
+                    if allowed_soil_tiles_unids.contains(&soil_tile_unid) {
+                      let spawn_coords: Vector2i = spawn_coords.into();
+                      being_gen_templ_ids.push(&being_gen_templ_id); spawns_coords.push(spawn_coords); facs_ids.push(&fac_id);
+                      beings_in_chunk_count[chunk_coords] += 1;
+                      break;
+                    }
+                  }
                 }
               } 
             } 

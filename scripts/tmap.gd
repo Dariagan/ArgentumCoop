@@ -8,6 +8,8 @@ const WORLD_SIZE: Vector2i = Vector2i(500, 500)
 
 var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
 
+var beinggentempls_coords_facids_tobspawned_when_reached: Array
+
 #don't define ready func
 
 @rpc("call_local")
@@ -78,13 +80,17 @@ func set_master_follower(master_name: NodePath, follower_name: NodePath):
 	follower.mistate.mmaster = master
 
 func mass_birth_being_gen_template_at_snapped(being_gen_template_ids: Array[StringName], spawns_coords: Array[Vector2i], faction_ids: Array[StringName], mp_auth:int=1):
+	#la instanciación de beings es demasiado slow, hay q volverla más rápida
+	for i in being_gen_template_ids.size():
+		birth_being_gen_template_at_snapped(being_gen_template_ids[i], spawns_coords[i], faction_ids[i], mp_auth)
+		
+func task_mass_birth_being_gen_template_at_snapped(being_gen_template_ids: Array[StringName], spawns_coords: Array[Vector2i], faction_ids: Array[StringName], mp_auth:int=1):
 	for i in being_gen_template_ids.size():
 		birth_being_gen_template_at_snapped(being_gen_template_ids[i], spawns_coords[i], faction_ids[i], mp_auth)
 
 func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, map_coords: Vector2i, faction: StringName, mp_auth:int=1) -> Being:
 	return birth_being_gen_template_at(being_gen_template_id, faction, tilemap_to_local(map_coords), mp_auth)
 func birth_being_gen_template_at(being_gen_template_id: StringName, faction: StringName, loc_pos: Vector2,mp_auth:int=1) -> Being:
-	assert(Global.being_gen_templates.has(being_gen_template_id))
 	var being_gen_template: BeingGenTemplate = Global.being_gen_templates[being_gen_template_id]
 	
 	return birth_being_at(being_gen_template.instantiate(faction), loc_pos, false, mp_auth)
@@ -94,6 +100,7 @@ func tilemap_to_local(tilemap_pos: Vector2i) -> Vector2: return zlevel_layers[0]
 
 func local_to_tilemap(local_pos: Vector2) -> Vector2i: return zlevel_layers[0].local_to_map(local_pos)
 
+func tile_loaded(coords: Vector2i): pass
 
 func _on_tile_unloaded(coords):
 	pass
