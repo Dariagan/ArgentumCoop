@@ -15,7 +15,7 @@ pub struct SafeVec {
 #[allow(dead_code)]
 impl SafeVec {
 
-  pub const ZERO: SafeVec = SafeVec{lef: 0, right: 0};
+  pub const ZERO: SafeVec = SafeVec{lef: 0, right: 0}; pub const ONE: SafeVec = SafeVec{lef: 1, right: 1};
 
   pub fn new(lef: i32, right: i32) -> Self {SafeVec { lef, right }}
 

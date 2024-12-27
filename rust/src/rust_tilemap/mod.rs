@@ -1,6 +1,8 @@
 pub(crate) mod world_matrix;
 
 use godot::classes::TileSet;
+use rand::thread_rng;
+use rand::Rng;
 use rand_distr::WeightedAliasIndex;
 use spawn_weights_matrix::SpawnWeightsMatrix;
 use strum::EnumCount;
@@ -73,9 +75,10 @@ pub struct RustTileMap {
   }
 }
 #[godot_api] impl RustTileMap {
-  #[constant] const SPAWNWEIGHTS_SQUARE_SIZE: u32 = 15; //ex 15 -> 15x15 spawn weights. 
-  #[constant] const BEING_LIMIT_PER_SWCHUNK: u16 = 200;  
-  #[constant] const SWMAT_DOWNSCALE_FACTOR: u32 = 3;  
+#[constant]const BEING_LIMIT_PER_SWCHUNK: u16 = 200;  
+#[constant]const SWMAT_DOWNSCALE_FACTOR: u32 = 10;  
+#[constant]const SPAWNWEIGHTS_PER_MACROCHUNK_SIDE: u32 = 10;
+#[constant]const MACCHUNKMAT_DS_FACTOR: u32 = Self::SWMAT_DOWNSCALE_FACTOR * Self::SPAWNWEIGHTS_PER_MACROCHUNK_SIDE;  
 
   const TILE_SET_PATH: &'static str = "res://resource_instances/tiling/tset.tres";
 
@@ -105,12 +108,11 @@ pub struct RustTileMap {
     self.world_matrix = Some(WorldMatrix::new(size));     
     self.world_size = size;
     self.spawn_weights_matrix = Some(SpawnWeightsMatrix::new(size, Self::SWMAT_DOWNSCALE_FACTOR));
-    self.beings_in_chunk_count = Some(DownScalingMatrix::new(size, Self::SPAWNWEIGHTS_SQUARE_SIZE*Self::SWMAT_DOWNSCALE_FACTOR));
+    self.beings_in_chunk_count = Some(DownScalingMatrix::new(size, Self::MACCHUNKMAT_DS_FACTOR));
   }
   #[func]
   fn generate_formation(&mut self, formation: FormGenEnum, origin: Vector2i, size: Vector2i, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary) -> bool{
     
-
     let now = std::time::Instant::now();
 
     generate(self, formation, origin, size, tile_selection, seed, data);
@@ -213,16 +215,26 @@ pub struct RustTileMap {
         for chunk_j in 0..beings_in_chunk_count.size().right {
           let chunk_coords = UnsVec::new(chunk_i, chunk_j );
 
-          for sw_i in 0..Self::SPAWNWEIGHTS_SQUARE_SIZE {
-          for sw_j in 0..Self::SPAWNWEIGHTS_SQUARE_SIZE {
+          for sw_i in 0..Self::SPAWNWEIGHTS_PER_MACROCHUNK_SIDE {
+          for sw_j in 0..Self::SPAWNWEIGHTS_PER_MACROCHUNK_SIDE {
             if beings_in_chunk_count[chunk_coords] < Self::BEING_LIMIT_PER_SWCHUNK {
-              let spawnweight_coords: UnsVec = chunk_coords * Self::SPAWNWEIGHTS_SQUARE_SIZE + UnsVec::new(sw_i, sw_j);
+              let spawnweight_coords: UnsVec = chunk_coords*Self::MACCHUNKMAT_DS_FACTOR + UnsVec::new(sw_i, sw_j)*Self::SWMAT_DOWNSCALE_FACTOR;
               let sw_mapping: &HashMap<BeingGenTemplIdAndFac, spawn_weights_matrix::SpawnWeight> = spawn_weights_matrix.get_unchk_no_downscale(spawnweight_coords);
               
               if let Some(BeingGenTemplIdAndFac { being_gen_templ_id, fac_id }) = weighted_sample_hashmap::sample_from_weighted_map(sw_mapping) {
-                let varargs: &[Variant; 3] = &[Into::<Vector2i>::into(spawnweight_coords).to_variant(), being_gen_templ_id.to_variant(), fac_id.to_variant()];
-                (*self_ptr).base_mut().emit_signal("birth_from_being_gen_templ", varargs);
-                beings_in_chunk_count[chunk_coords] += 1;
+                let being_gen_templ: Gd<RustBeingGenTemplate> = retrieve_being_gen_template_from_id(being_gen_templ_id.clone());
+                for tries in 0..Self::SPAWNWEIGHTS_PER_MACROCHUNK_SIDE*Self::SPAWNWEIGHTS_PER_MACROCHUNK_SIDE {
+                  let belowright_spawnweight_coords: UnsVec = chunk_coords*Self::MACCHUNKMAT_DS_FACTOR + UnsVec::new(sw_i+1, sw_j+1)*Self::SWMAT_DOWNSCALE_FACTOR;
+                  let lef: u32 = thread_rng().gen_range(spawnweight_coords.lef..belowright_spawnweight_coords.lef);//hay algo mal con las coords
+                  let right: u32 = thread_rng().gen_range(spawnweight_coords.right..belowright_spawnweight_coords.right);//hay algo mal con las coords
+                  let birth_coords: UnsVec = UnsVec::new(lef, right);
+                  if true {//TODO checkear si tile suitada en birth_coords es válida
+                    let varargs: &[Variant; 3] = &[Into::<Vector2i>::into(spawnweight_coords).to_variant(), being_gen_templ_id.to_variant(), fac_id.to_variant()];
+                    (*self_ptr).base_mut().emit_signal("birth_from_being_gen_templ", varargs);
+                    beings_in_chunk_count[chunk_coords] += 1;
+                    break;
+                  }
+                }
               } 
               else {godot_error!("Error: Invalid weight configuration in swmapping");}
             } 

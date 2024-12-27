@@ -10,9 +10,7 @@ impl<T: Default + Clone> Matrix<T> {
   pub fn new(size: UnsVec) -> Self {
     let area: usize = size.area();
     let flattened_matrix = create_reserved_vec::<T>(area);
-    Self {
-      flattened_matrix, size,
-    }
+    Self {flattened_matrix, size,}
   }
   pub fn new_with_element_value(size: UnsVec, element_value: T) -> Self {
     let area: usize = size.area();
@@ -49,11 +47,7 @@ pub fn size(&self) -> UnsVec {self.downscaled_size}
     let downscaled_size = size_to_downscale_from / downscale_factor;
     let area: usize = downscaled_size.area();
     let flattened_matrix = create_reserved_vec::<T>(area);
-    Self {
-      downscale_factor,
-      flattened_matrix,
-      downscaled_size,
-    }
+    Self {downscale_factor, flattened_matrix, downscaled_size,}
   }
   pub fn get_unchecked(&self, coords: UnsVec) -> &T {
     unsafe{

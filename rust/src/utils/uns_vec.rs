@@ -12,7 +12,7 @@ pub struct UnsVec {pub lef: u32, pub right: u32}
 
 #[allow(dead_code)]
 impl UnsVec {
-  pub const ZERO: UnsVec = UnsVec{lef:0,right:0};
+  pub const ZERO: UnsVec = UnsVec{lef:0,right:0}; pub const ONE: UnsVec = UnsVec{lef:1,right:1}; 
   pub fn new(lef: u32, right: u32) -> Self {UnsVec { lef, right }}
 
   pub fn add_assign_lef(&mut self, other: &Self) {self.lef += other.lef;}
