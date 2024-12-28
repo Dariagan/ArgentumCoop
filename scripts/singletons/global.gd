@@ -26,6 +26,9 @@ static var music_peace_order: Dictionary
 static var taunt_sounds: Dictionary
 static var shaders: Dictionary
 
+#preload into here, then reference the packedscene from here
+static var packed_scenes: Dictionary[StringName, PackedScene] = {}
+
 #causa error al descomentar (ya está cargado)
 #var tile_set: TileSet = preload("res://resource_instances/tiling/tiles/tile_set.tres")
 

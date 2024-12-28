@@ -20,7 +20,7 @@ class_name BeingGenTemplate
 #if unset it uses the race's ratio
 @export var mmales_ratio: float = -1
 
-@export var mextra_health_multiplier_range: Vector2 = Vector2.ONE
+@export var mhealth_multiplier_range: Vector2 = Vector2.ONE
 @export var mhead_scale_range: Vector2 = Vector2.ONE
 @export var mbody_scale_range: Vector2 = Vector2.ONE
 
@@ -49,7 +49,7 @@ func validate() -> bool:
 	
 	if mmales_ratio != -1:
 		assert(mmales_ratio >= 0.0 and mmales_ratio <= 1.0)
-	assert(mextra_health_multiplier_range.x <= mextra_health_multiplier_range.y)
+	assert(mhealth_multiplier_range.x <= mhealth_multiplier_range.y)
 	assert(mhead_scale_range.x <= mhead_scale_range.y)
 	assert(mbody_scale_range.x <= mbody_scale_range.y)
 	assert(mdropped_xp_range.x <= mdropped_xp_range.y)
@@ -67,7 +67,7 @@ func _instantiate_being_birth_dict() -> Dictionary:
 	
 	var being_birth_dict: Dictionary = {
 		Keys.NAME: &"random",
-		Keys.HEALTH_MULTIP: randf_range(mextra_health_multiplier_range.x, mextra_health_multiplier_range.y),
+		Keys.HEALTH_MULTIP: randf_range(mhealth_multiplier_range.x, mhealth_multiplier_range.y),
 		Keys.RACE: mrace.mid,
 		Keys.SEX: mmales_ratio,
 		Keys.KLASS: mklass_id,
@@ -81,5 +81,5 @@ func _instantiate_being_birth_dict() -> Dictionary:
 	return being_birth_dict
 
 func instantiate(faction: StringName) -> BeingPreInit:
-	var being_pre_init = BeingPreInit.new_from_being_gen_templ(self, faction)
+	var being_pre_init: BeingPreInit = BeingPreInit.new_from_being_gen_templ(self, faction)
 	return being_pre_init;

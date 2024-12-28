@@ -12,22 +12,23 @@ var mname: String
 var mhead_scale: Vector3 = Vector3.ONE; var mbody_scale: Vector3 = Vector3.ONE
 var msprite_head: SpriteData; var msprite_body: BodySpriteData
 var mchosen_extra_sprites: Array[int] = []
-var mextra_health_multiplier: float = 1
+var mhealth_multiplier: float = 1
 var msex: Enu.Sex
 var mrace: BasicRace
 var mklass: Klass
 var mfaction: Faction
 var mbeing_gen_templ: BeingGenTemplate
 var mlevel: int
+var mfollowers: Array[BeingGenTemplate] = []
 
-var mistate: BeingInternalState; var mfollowers: Array[BeingGenTemplate] = []
-
+#probar pasarlo a rust
 static func new_from_being_gen_templ(being_gen_template: BeingGenTemplate, faction: StringName) -> BeingPreInit:
-	var preiniter = BeingPreInit.new()
+	
+	var preiniter: BeingPreInit = BeingPreInit.new()
 	preiniter.mbeing_gen_templ = being_gen_template
 	if being_gen_template.mav_followers_weighted_dist != null and not being_gen_template.mav_followers_weighted_dist.is_empty():
 		if being_gen_template.mav_raid_points_for_followers == -1: # ignore raid point costs
-			for follower_i in being_gen_template.max_followers_count:
+			for follower_i: int in being_gen_template.max_followers_count:
 				preiniter.mfollowers.append(Global.being_gen_templates[WeightedChoice.pick(being_gen_template.mav_followers_weighted_dist)])
 		elif being_gen_template.mav_raid_points_for_followers > 0:
 			var remaining_points: int = being_gen_template.mav_raid_points_for_followers
@@ -65,6 +66,7 @@ static func new_from_being_gen_templ(being_gen_template: BeingGenTemplate, facti
 			preiniter.mklass =  Global.klasses[being_gen_template.mklass_id]
 	
 	preiniter.mfaction = GameData.factions[faction]
+
 	
 	return preiniter
 
@@ -72,11 +74,10 @@ static func new_from_being_gen_templ(being_gen_template: BeingGenTemplate, facti
 static func construct(being_birth_dict: Dictionary) -> BeingPreInit:
 	assert(being_birth_dict != null && being_birth_dict != {})
 	var preiniter = BeingPreInit.new()
-	
 	var result
 	
 	result = handle_key(Keys.HEALTH_MULTIP, being_birth_dict)
-	if result: preiniter.mextra_health_multiplier = result; result = null
+	if result: preiniter.mhealth_multiplier = result; result = null
 		
 	#result = handle_key("level", being_birth_dict)
 	#if result: level = result; result = null
@@ -146,8 +147,6 @@ static func construct(being_birth_dict: Dictionary) -> BeingPreInit:
 	return preiniter
 
 func serialize() -> Dictionary:
-	
-	
 	var dict: Dictionary = {
 		Keys.NAME: mname,
 		Keys.HEAD_SCALE: mhead_scale, Keys.BODY_SCALE: mbody_scale,
@@ -157,7 +156,7 @@ func serialize() -> Dictionary:
 		Keys.HARMABLE_BODY: null,
 		Keys.FACTION: mfaction.minstance_id,
 		Keys.CHOSEN_EXTRA_HEAD_SPRITES: get_array_of_ids(mchosen_extra_sprites),
-		Keys.HEALTH_MULTIP: mextra_health_multiplier,
+		Keys.HEALTH_MULTIP: mhealth_multiplier,
 		Keys.BEING_LEVEL: mlevel,
 		#extra_stats_multiplier,
 	}
@@ -171,7 +170,7 @@ func serialize() -> Dictionary:
 #func _construct_from_saved_starter_character(starter_character: Resource) -> void: pass
 
 # LEAVE WITHOUT TYPING FOR Array, OTHERWISE IT ISN'T SENDABLE THROUGH RPC
-func get_array_of_ids(array_of_objects: Array) ->  Array:
+static func get_array_of_ids(array_of_objects: Array) ->  Array:
 	var array_ids: Array = []
 	for o in array_of_objects:
 		array_ids.push_back(o.mid)

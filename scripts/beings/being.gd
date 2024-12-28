@@ -16,6 +16,8 @@ var mcontroller_speed_multiplier: float = 1
 
 #constructs for multiplayer too
 func construct(preiniter: BeingPreInit, uid_: int) -> void:
+	var time_start = Time.get_unix_time_from_system()
+	
 	if preiniter.msprite_body:
 		mbody.construct(preiniter.msprite_body, preiniter.mbody_scale)
 		if preiniter.msprite_head:
@@ -29,6 +31,8 @@ func construct(preiniter: BeingPreInit, uid_: int) -> void:
 	set_name_label_text_and_color.rpc(preiniter.mname, mistate.mfaction.mcolor, show_label)
 	self.setsync_node_name_and_uid.rpc(uid_)
 	#TODO key press para ocultar las namelabels de todos (usar el grupo)
+	print("construct %f"%(Time.get_unix_time_from_system() - time_start))
+	
 
 @rpc("call_local")
 func set_ai_process():

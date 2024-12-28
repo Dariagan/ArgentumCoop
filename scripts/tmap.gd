@@ -2,13 +2,14 @@ extends RustTileMap
 class_name GdTileMap
 var mbeings: Dictionary # key(str): individual unique id. value: Being Scene. el multiplayerspawner se encarga del sync
 var mtiles_states: Dictionary[Vector3, Dictionary] # key: posx_posy_zi (vec3, no un string). value: state object
-const WORLD_SIZE: Vector2i = Vector2i(500, 500)
+const WORLD_SIZE: Vector2i = Vector2i(2500, 2500)
 
 #IMPORTANTE: USAR CUSTOM DATA DE TILE EN TILESET PA PONER DATOS DE LA TILE, ASÍ ES FÁCILMENTE ACCESIBLE DESDE EL GDSIDE
 
 var tile_id_binded_layers: Dictionary = {} #key: tile_id . val: TileMapLayer
 
-var beinggentempls_coords_facids_tobspawned_when_reached: Array
+var mbeinggentempls_to_b_spawned: Dictionary[Vector2i, StringName] = {}
+var mbgtfac_ids: Dictionary[Vector2i, StringName] = {}
 
 #don't define ready func
 
@@ -46,8 +47,11 @@ var mbirthed_beings_i: int = 0
 #ALERT, NO APARECE EL BEING SI LA TILE NO ESTÁ CARGADA EN EL MOMENTO Q SPAWNEA
 func birth_being_snapped_at(preinit: BeingPreInit, tilemap_coords: Vector2i, isplayerfac:bool=false,mp_auth:int=1) -> Being:
 	return birth_being_at(preinit, tilemap_to_local(tilemap_coords), isplayerfac, mp_auth)
-func birth_being_at(preinit: BeingPreInit, loc_pos: Vector2, isplayerfac:bool=false, mp_auth:int=1, master:Being=null, scene:String="res://scenes/being.tscn") -> Being:
-	var being: Being = load(scene).instantiate()
+func birth_being_at(preinit: BeingPreInit, loc_pos: Vector2, isplayerfac:bool=false, mp_auth:int=1, master:Being=null) -> Being:#, scene:String="res://scenes/being.tscn" requires load() instead of preload which is much slower. should be preloaded before
+	
+	var time_start = Time.get_unix_time_from_system()
+	var being: Being = preload("res://scenes/being.tscn").instantiate()
+	print("birth %f"%((Time.get_unix_time_from_system()-time_start)))
 	#nota: el being.name hay q ponerlo antes del add_child
 	being.name = str(mbirthed_beings_i)
 	add_child(being); being.z_index = beings_z_index
@@ -71,6 +75,7 @@ func birth_being_at(preinit: BeingPreInit, loc_pos: Vector2, isplayerfac:bool=fa
 		being.queue_free()
 		#freeze_and_store_being(local_to_tilemap(loc_pos), being.uid)
 		return null
+	
 		
 @rpc("call_local")
 func set_master_follower(master_name: NodePath, follower_name: NodePath):
@@ -79,14 +84,11 @@ func set_master_follower(master_name: NodePath, follower_name: NodePath):
 	master.mistate.mfollowers.append(follower)
 	follower.mistate.mmaster = master
 
-func mass_birth_being_gen_template_at_snapped(being_gen_template_ids: Array[StringName], spawns_coords: Array[Vector2i], faction_ids: Array[StringName], mp_auth:int=1):
+func mass_birth_being_gen_template_at_snapped(being_gen_template_ids: Array[StringName], spawns_coords: Array[Vector2i], faction_ids: Array[StringName]):
 	#la instanciación de beings es demasiado slow, hay q volverla más rápida
 	for i in being_gen_template_ids.size():
-		birth_being_gen_template_at_snapped(being_gen_template_ids[i], spawns_coords[i], faction_ids[i], mp_auth)
-		
-func task_mass_birth_being_gen_template_at_snapped(being_gen_template_ids: Array[StringName], spawns_coords: Array[Vector2i], faction_ids: Array[StringName], mp_auth:int=1):
-	for i in being_gen_template_ids.size():
-		birth_being_gen_template_at_snapped(being_gen_template_ids[i], spawns_coords[i], faction_ids[i], mp_auth)
+		mbeinggentempls_to_b_spawned[spawns_coords[i]] = being_gen_template_ids[i]
+		mbgtfac_ids[spawns_coords[i]] = faction_ids[i]
 
 func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, map_coords: Vector2i, faction: StringName, mp_auth:int=1) -> Being:
 	return birth_being_gen_template_at(being_gen_template_id, faction, tilemap_to_local(map_coords), mp_auth)
@@ -100,7 +102,11 @@ func tilemap_to_local(tilemap_pos: Vector2i) -> Vector2: return zlevel_layers[0]
 
 func local_to_tilemap(local_pos: Vector2) -> Vector2i: return zlevel_layers[0].local_to_map(local_pos)
 
-func tile_loaded(coords: Vector2i): pass
+#TODO LIDIAR CON PROBLEMAS DE MULTIPLAYER
+func tile_loaded(coords: Vector2i): 
+	#PROBLEMA, SI UN CLIENTE HACE ESTO NO LE LLEGA AL SERVER
+	if mbeinggentempls_to_b_spawned.has(coords):
+		birth_being_gen_template_at_snapped(mbeinggentempls_to_b_spawned[coords], coords, mbgtfac_ids[coords])
 
 func _on_tile_unloaded(coords):
 	pass

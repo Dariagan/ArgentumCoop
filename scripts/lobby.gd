@@ -188,7 +188,7 @@ func start_new_game() -> void:
 		#extra health para los protagonists
 		player_start_data[Keys.HEALTH_MULTIP] = 2	
 		
-		var player_being_preinit_data = BeingPreInit.construct(player_start_data)
+		var player_being_preinit_data: BeingPreInit = BeingPreInit.construct(player_start_data)
 		
 		var being: Being = tile_map.spawn_starting_player(player_being_preinit_data, mpeers[i])
 		spawned_beings.push_back(being)
