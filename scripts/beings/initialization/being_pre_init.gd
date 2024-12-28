@@ -138,7 +138,7 @@ static func construct(being_birth_dict: Dictionary) -> BeingPreInit:
 		if randf() < preiniter.mrace.mmales_ratio: preiniter.msex = Enu.Sex.MALE
 		else: preiniter.msex = Enu.Sex.FEMALE
 	elif sex_value is Enu.Sex:
-		preiniter.sex = sex_value
+		preiniter.msex = sex_value
 	else:
 		assert(false, "invalid type for \"sex\" entry in birth dict")
 		

@@ -100,6 +100,7 @@ func _update_lobby_title_client_side(new_text: String) -> void:
 
 func _on_leave_button_pressed() -> void:
 	clicked_leave.emit()
+	Chat.clear()
 
 func _on_create_character_button_pressed() -> void:
 	get_children()[0].hide()

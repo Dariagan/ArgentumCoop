@@ -18,7 +18,6 @@ func generate_world():
 	@warning_ignore("assert_always_true")
 	assert(WORLD_SIZE.x >= 500 && WORLD_SIZE.y >= 500)
 	
-	
 	var tiles: Array[Tile] = []; tiles.append_array(Global.tilesdict.values())
 		
 	generate_world_matrix(WORLD_SIZE, tiles)
@@ -48,13 +47,10 @@ var mbirthed_beings_i: int = 0
 func birth_being_snapped_at(preinit: BeingPreInit, tilemap_coords: Vector2i, isplayerfac:bool=false,mp_auth:int=1) -> Being:
 	return birth_being_at(preinit, tilemap_to_local(tilemap_coords), isplayerfac, mp_auth)
 func birth_being_at(preinit: BeingPreInit, loc_pos: Vector2, isplayerfac:bool=false, mp_auth:int=1, master:Being=null) -> Being:#, scene:String="res://scenes/being.tscn" requires load() instead of preload which is much slower. should be preloaded before
-	
-	var time_start = Time.get_unix_time_from_system()
 	var being: Being = preload("res://scenes/being.tscn").instantiate()
-	print("birth %f"%((Time.get_unix_time_from_system()-time_start)))
 	#nota: el being.name hay q ponerlo antes del add_child
 	being.name = str(mbirthed_beings_i)
-	add_child(being); being.z_index = beings_z_index
+	add_child(being); being.setsync_zindex.rpc(beings_z_index)
 	being.construct(preinit, mbirthed_beings_i); mbirthed_beings_i += 1
 	being.setsync_pos_reliable.rpc(loc_pos)
 	if master != null:
@@ -85,10 +81,11 @@ func set_master_follower(master_name: NodePath, follower_name: NodePath):
 	follower.mistate.mmaster = master
 
 func mass_birth_being_gen_template_at_snapped(being_gen_template_ids: Array[StringName], spawns_coords: Array[Vector2i], faction_ids: Array[StringName]):
-	#la instanciación de beings es demasiado slow, hay q volverla más rápida
 	for i in being_gen_template_ids.size():
 		mbeinggentempls_to_b_spawned[spawns_coords[i]] = being_gen_template_ids[i]
 		mbgtfac_ids[spawns_coords[i]] = faction_ids[i]
+	#for i in being_gen_template_ids.size():
+		#birth_being_gen_template_at_snapped(being_gen_template_ids[i], spawns_coords[i], faction_ids[i])
 
 func birth_being_gen_template_at_snapped(being_gen_template_id: StringName, map_coords: Vector2i, faction: StringName, mp_auth:int=1) -> Being:
 	return birth_being_gen_template_at(being_gen_template_id, faction, tilemap_to_local(map_coords), mp_auth)
@@ -103,10 +100,17 @@ func tilemap_to_local(tilemap_pos: Vector2i) -> Vector2: return zlevel_layers[0]
 func local_to_tilemap(local_pos: Vector2) -> Vector2i: return zlevel_layers[0].local_to_map(local_pos)
 
 #TODO LIDIAR CON PROBLEMAS DE MULTIPLAYER
-func tile_loaded(coords: Vector2i): 
+
+@rpc("any_peer")#EN VEZ DE ESTO, HACER tiles_loaded y que entre un Array directamente con todas las coords q se cargaron, sino son como 1000 llamadas
+func tiles_loaded(positions: Array[Vector2i]): 
+	#return
 	#PROBLEMA, SI UN CLIENTE HACE ESTO NO LE LLEGA AL SERVER
-	if mbeinggentempls_to_b_spawned.has(coords):
-		birth_being_gen_template_at_snapped(mbeinggentempls_to_b_spawned[coords], coords, mbgtfac_ids[coords])
+	if multiplayer.multiplayer_peer.get_unique_id() == 1:
+		for coord: Vector2i in positions:
+			if mbeinggentempls_to_b_spawned.has(coord):
+				birth_being_gen_template_at_snapped(mbeinggentempls_to_b_spawned[coord], coord, mbgtfac_ids[coord])
+	else:
+		tiles_loaded.rpc_id(1, positions)
 
 func _on_tile_unloaded(coords):
 	pass

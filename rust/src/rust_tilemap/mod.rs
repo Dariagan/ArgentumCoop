@@ -124,6 +124,7 @@ pub struct RustTileMap {
     
     let being_coords: SafeVec = _being_coords.into();
     let world_size: UnsVec = self.world_size;
+    let mut now_loaded_tiles: Array<Vector2i> = Array::new();
 
     for chunk_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))
       .map(|vec| SafeVec::from(vec) + being_coords)
@@ -131,11 +132,11 @@ pub struct RustTileMap {
       .map(|vec|unsafe{UnsVec::try_from(vec).unwrap_unchecked()})
       .filter(|vec| vec.is_strictly_smaller_than(world_size)){unsafe{
         if ! self.tile_shared_loads_count.contains_key(&chunk_coord) {
-          
           self.tile_shared_loads_count.insert(chunk_coord, 1);
-
+          
           let tiles: TileUnidArray = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];
           tiles.iter().filter(|&&t_unid| t_unid != TileUnid::NULL).for_each(|&t_unid| self.set_cell(t_unid, chunk_coord));
+          now_loaded_tiles.push(Into::<Vector2i>::into(chunk_coord));
         } 
         else if !self.being_loaded_tiles_map.get(&being_unid).map_or(false, |set| set.contains(&chunk_coord)) {
           *self.tile_shared_loads_count.get_mut(&chunk_coord).unwrap_unchecked() += 1;
@@ -143,6 +144,8 @@ pub struct RustTileMap {
         self.being_loaded_tiles_map.entry(being_unid).or_insert_with(|| HashSet::with_capacity(chunk_size.area()*3/2)).insert(chunk_coord);
           
       }}
+    let args: [Variant; 1] = [now_loaded_tiles.to_variant()];
+    self.base_mut().call("tiles_loaded", &args);
     self.unload_excess_tiles(being_coords, chunk_size.into(), being_unid);
   }
   fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) {
@@ -158,24 +161,23 @@ pub struct RustTileMap {
 
       // TODO: METER  NUEVA TILEMAPLAYER SI NO TA. GUARDAR SU REF EN UN DICT CON KEY=TILEID
       self.base_mut().get_child(tile_z_level).unwrap_unchecked().call("set_cell", &args);
-
-      let args: [Variant; 1] = [matrix_coord.to_variant()];
-      self.base_mut().call("tile_loaded", &args);
     }
   }
   fn unload_excess_tiles(&mut self, being_coords: SafeVec, chunk_size: UnsVec, being_unid: BeingUnid) {unsafe {
     let self_ptr: *mut Self = self as *mut _;
 
     let loaded_tiles: &mut HashSet<UnsVec> = self.being_loaded_tiles_map.get_mut(&being_unid).unwrap_unchecked();
+    let mut now_unloaded_tiles: Array<Vector2i> = Array::new();
 
     loaded_tiles.retain(|&tile_coord| {
       let keep: bool = chunk_size.within_bounds_centered(SafeVec::from(tile_coord) - being_coords);
       
-      if keep == false {(*self_ptr).decrement_shared_loads_count(tile_coord);}
+      if keep == false {(*self_ptr).decrement_shared_loads_count(tile_coord); now_unloaded_tiles.push(Into::<Vector2i>::into(tile_coord));}
       keep
     });
+    //let args: [Variant; 1] = [now_unloaded_tiles.to_variant()];
+    //self.base_mut().call("tiles_unloaded", &args);
   }}
-  #[signal] pub fn tile_unloaded(coords: Vector2i);
   fn decrement_shared_loads_count(&mut self, tile_coord: UnsVec) {
     if let Some(&mut mut count) = self.tile_shared_loads_count.get_mut(tile_coord.borrow()) {
       if count > 0 {count -= 1;}
@@ -186,7 +188,8 @@ pub struct RustTileMap {
         for layer_i in 0..self.layer_count {
           unsafe{self.base_mut().get_child(layer_i as i32).unwrap_unchecked().call("erase_cell", tile_coord);}
         }
-        self.base_mut().emit_signal("tile_unloaded", tile_coord);
+
+        
       }
     }
   }

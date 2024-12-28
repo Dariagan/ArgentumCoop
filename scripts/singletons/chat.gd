@@ -8,6 +8,8 @@ func set_chat_label(label: Label):
 	chat_label.text = chat_log
 	_scroll_container = label.get_parent()
 	
+func clear(): chat_label.text = ""; chat_log = ""
+	
 func set_text_edit(text_edit: TextEdit):
 	chat_text_edit = text_edit
 	chat_text_edit.gui_input.connect(_on_input_event)
