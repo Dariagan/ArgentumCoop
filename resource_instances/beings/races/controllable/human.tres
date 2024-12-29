@@ -1,34 +1,18 @@
-[gd_resource type="BasicRace" script_class="ControllableRace" load_steps=10 format=3 uid="uid://dx7s13s3m2koy"]
+[gd_resource type="BasicRace" script_class="ControllableRace" load_steps=9 format=3 uid="uid://dx7s13s3m2koy"]
 
 [ext_resource type="Script" uid="uid://nkdjmrfrcmic" path="res://scripts/beings/sprites/bodyspritedata.gd" id="1_ikied"]
 [ext_resource type="Resource" uid="uid://br6gqx36f275l" path="res://resource_instances/beings/sprites/spritesdatas/body/human_male_body_1.tres" id="2_53po6"]
 [ext_resource type="Script" uid="uid://cxgjpxndfrg4y" path="res://scripts/beings/sprites/spritedata.gd" id="2_sruu1"]
 [ext_resource type="Script" uid="uid://cwjwcbyo0kbwl" path="res://scripts/beings/klass.gd" id="3_0lt3k"]
-[ext_resource type="Script" uid="uid://firm1xvtgire" path="res://scripts/damage_health_system/combat_multipliers.gd" id="3_8payl"]
+[ext_resource type="Resource" uid="uid://bnfqpjfvyyurv" path="res://resource_instances/beings/races/combat_multipliers/basic.tres" id="3_gtky7"]
 [ext_resource type="Script" uid="uid://du8btl3uhqeam" path="res://scripts/beings/race/controllable_race.gd" id="4_46qb0"]
 [ext_resource type="Resource" uid="uid://bsfv14kk64tct" path="res://resource_instances/beings/sprites/spritesdatas/head/human_male_head.tres" id="5_07lp5"]
 [ext_resource type="Resource" uid="uid://crunidnoqow0l" path="res://resource_instances/beings/klasses/melee/warrior.tres" id="8_gtky7"]
 
-[sub_resource type="Resource" id="Resource_mg2aq"]
-script = ExtResource("3_8payl")
-health = 1.0
-speed = 1.0
-strength = 1.0
-stamina = 1.0
-sneaking_proficiency = 1.0
-incoming_damage_types = {
-"blunt": 1,
-"fire": 1,
-"magic": 1,
-"sharp": 1
-}
-war_cry_strength = 1.0
-metadata/_custom_type_script = ExtResource("3_8payl")
-
 [resource]
 mname = "Human"
 script = ExtResource("4_46qb0")
-mcombat_multipliers = SubResource("Resource_mg2aq")
+mcombat_multipliers = ExtResource("3_gtky7")
 mhead_sprites_datas = Array[ExtResource("2_sruu1")]([ExtResource("5_07lp5")])
 mbody_sprites_datas = Array[ExtResource("1_ikied")]([ExtResource("2_53po6")])
 mother_sprites_datas = Array[ExtResource("2_sruu1")]([])

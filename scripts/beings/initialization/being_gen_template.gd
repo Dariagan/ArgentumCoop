@@ -39,16 +39,17 @@ func validate() -> bool:
 			var weight: float = mav_followers_weighted_dist[follower_mid]
 			sum_of_weights += weight
 			if weight < 0: return false
-			assert(Global.being_gen_templates[follower_mid].mrace is UncontrollableRace)
 		assert(sum_of_weights > 0)
 		
-	assert(self.mid and mrace and Global.races.values().has(mrace))
+	assert(self.mid, "no id")
+	assert(self.mrace, "no race")
+	assert(Global.races.values().has(mrace), "race %s not found in Global.races"%self.mrace.mid)
 
 	if mklass_id != &"random":
-		assert(Global.klasses.has(mklass_id))
+		assert(Global.klasses.has(mklass_id),  "klass %s not found in Global.klasses"%mklass_id)
 	
 	if mmales_ratio != -1:
-		assert(mmales_ratio >= 0.0 and mmales_ratio <= 1.0)
+		assert(mmales_ratio >= 0.0 and mmales_ratio <= 1.0, "males_ratio not in interval [0, 1]")
 	assert(mhealth_multiplier_range.x <= mhealth_multiplier_range.y)
 	assert(mhead_scale_range.x <= mhead_scale_range.y)
 	assert(mbody_scale_range.x <= mbody_scale_range.y)

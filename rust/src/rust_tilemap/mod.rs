@@ -37,15 +37,14 @@ pub struct RustTileMap {
   tile_shared_loads_count: HashMap<UnsVec, i64>  /*don't reduce this directly*/,
 //-- beings section --
 
-  tile_z_levels: Array<i32>,
-  source_atlases: Array<i32>,
-  atlas_origin_positions: Array<Vector2i>,
-  grid_positions: Array<Vector2i>,
-
   now_loaded_gridpos: Array<Vector2i>,
+  now_unloaded_gridpos: Array<Vector2i>,
+
   
   beings_in_chunk_count: Option<DownScalingMatrix<u16>>,
   pub spawn_weights_matrix: Option<SpawnWeightsMatrix>,
+  rust_zlevel_layers: Vec<Gd<TileMapLayer>>,
+
 
 }
 #[godot_api] impl INode2D for RustTileMap {
@@ -63,15 +62,12 @@ pub struct RustTileMap {
       being_loaded_tiles_map: Default::default(),
       tile_shared_loads_count: Default::default(),
 
-      tile_z_levels: Array::new(),
-      source_atlases: Array::new(),
-      atlas_origin_positions: Array::new(),
-      grid_positions: Array::new(),
-
       now_loaded_gridpos: Array::new(),
+      now_unloaded_gridpos: Array::new(),
 
       beings_in_chunk_count: None,
       spawn_weights_matrix: None,
+      rust_zlevel_layers: Vec::with_capacity(TileZLevel::COUNT + 5),
     }
   }
   fn ready(&mut self) {
@@ -85,6 +81,7 @@ pub struct RustTileMap {
       if *layer_name == "Structure" {
         self.beings_z_index = i; new_child.set_y_sort_enabled(true);
       }
+      self.rust_zlevel_layers.push(new_child);
     }
   }
 }
@@ -136,16 +133,18 @@ pub struct RustTileMap {
     godot_print!("time taken to generate: {:.2?}", now.elapsed());
     true
   }
+
   #[func]
-  fn load_tiles_around(&mut self, _being_coords: Vector2i, chunk_size: Vector2i, being_unid: i64) {
+  fn load_tiles_around(&mut self, being_coords: Vector2i, chunk_size: Vector2i, being_unid: i64) {
+    let now = std::time::Instant::now();
 
     let chunk_size: SafeVec = SafeVec::from(chunk_size).all_bigger_than_min(10).expect("chunk size is smaller than minimum 10");
     let being_unid: BeingUnid = BeingUnid(being_unid);
     
-    let being_coords: SafeVec = _being_coords.into();
+    let being_coords: SafeVec = being_coords.into();
     let world_size: UnsVec = self.world_size;
 
-    self.tile_z_levels.clear(); self.source_atlases.clear(); self.atlas_origin_positions.clear(); self.grid_positions.clear(); self.now_loaded_gridpos.clear();
+    self.now_loaded_gridpos.clear();
 
     for matrix_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))
       .map(|vec| SafeVec::from(vec) + being_coords)
@@ -158,12 +157,13 @@ pub struct RustTileMap {
           
 
           tiles.iter().filter(|&&t_unid| t_unid != TileUnid::NULL).for_each(|&t_unid| {
-            let (z_level, atlas, atlas_pos) = self.set_cell(t_unid, matrix_coord);
-            self.grid_positions.push(Into::<Vector2i>::into(matrix_coord));
-            self.tile_z_levels.push(z_level); self.source_atlases.push(atlas); self.atlas_origin_positions.push(atlas_pos); 
+            let (z_level, atlas, atlas_pos, alt_id) = self.get_cell_data(t_unid, matrix_coord);
+
+            self.rust_zlevel_layers.get_unchecked_mut(z_level as usize).set_cell_ex(Into::<Vector2i>::into(matrix_coord))
+              .source_id(atlas).atlas_coords(atlas_pos).alternative_tile(alt_id).done();
+
             }
           );
-          //TODO AGRUPAR TODAS LAS LLAMADAS DE SET_CELL Y QUE SE PASE UN ARRAY DE VECTOR2I, UN ARRAY DE ? ASÍ SE HACE UNA SOLA CALL
 
           self.now_loaded_gridpos.push(Into::<Vector2i>::into(matrix_coord));
         } 
@@ -174,37 +174,30 @@ pub struct RustTileMap {
           
       }}
 
-    let args: [Variant; 5] = [self.grid_positions.to_variant(), self.tile_z_levels.to_variant(), self.source_atlases.to_variant(), self.atlas_origin_positions.to_variant(), self.now_loaded_gridpos.to_variant()];
-    self.base_mut().call("set_cells", &args);
+    godot_print!("load: {:.2?}", now.elapsed());
+    let now = std::time::Instant::now();
+    self.now_unloaded_gridpos.clear();
     self.unload_excess_tiles(being_coords, chunk_size.into(), being_unid);
+    godot_print!("unload: {:.2?}", now.elapsed());
   }
-  fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) -> (i32, i32, Vector2i) {
-    let tile: &TileDto = self.tile_nid_mapping().get(unid.0 as usize).expect(format!("tile mapped to {unid} not found").as_str());
+  fn get_cell_data(&mut self, unid: TileUnid, matrix_coord: UnsVec) -> (i32, i32, Vector2i, i32) {
     unsafe{
+      let tile: &TileDto = self.tile_nid_mapping().get(unid.0 as usize).expect(format!("tile mapped to {unid} not found").as_str());
       let tile_z_level: i32 = tile.z_level as i32;
       let atlas_origin_position: Vector2i = (*tile).origin_position;
       let atlas_origin_position_offset: Vector2i = matrix_coord.mod_unsv((*tile).modulo_tiling_area).into(); 
-      
-      (tile_z_level, (*tile).source_atlas, atlas_origin_position+atlas_origin_position_offset)
-
-      // let args: [Variant; 4] = 
-      //   [matrix_coord.to_variant(), ((*tile).source_atlas).to_variant(),
-      //   (atlas_origin_position+atlas_origin_position_offset).to_variant(), (*tile).alternative_id.to_variant()];
-
-      // // TODO: METER  NUEVA TILEMAPLAYER SI NO TA. GUARDAR SU REF EN UN DICT CON KEY=TILEID
-      // self.base_mut().get_child(tile_z_level).unwrap_unchecked().call("set_cell", &args);
+      (tile_z_level, (*tile).source_atlas, atlas_origin_position+atlas_origin_position_offset, (*tile).alternative_id)
     }
   }
   fn unload_excess_tiles(&mut self, being_coords: SafeVec, chunk_size: UnsVec, being_unid: BeingUnid) {unsafe {
     let self_ptr: *mut Self = self as *mut _;
 
     let loaded_tiles: &mut HashSet<UnsVec> = self.being_loaded_tiles_map.get_mut(&being_unid).unwrap_unchecked();
-    let mut now_unloaded_tiles: Array<Vector2i> = Array::new();
 
     loaded_tiles.retain(|&tile_coord| {
       let keep: bool = chunk_size.within_bounds_centered(SafeVec::from(tile_coord) - being_coords);
       
-      if ! keep {(*self_ptr).decrement_shared_loads_count(tile_coord); now_unloaded_tiles.push(Into::<Vector2i>::into(tile_coord));}
+      if ! keep {(*self_ptr).decrement_shared_loads_count(tile_coord);}
       keep
     });
 
@@ -215,10 +208,13 @@ pub struct RustTileMap {
       
       if count == 0 {
         self.tile_shared_loads_count.remove(tile_coord.borrow());
-        let tile_coord: &[Variant; 1] = &[Into::<Vector2i>::into(tile_coord).to_variant()];
-        self.base_mut().call("tile_unloaded", tile_coord);
-
-        
+        // let tile_coord: &[Variant; 1] = &[Into::<Vector2i>::into(tile_coord).to_variant()];
+        // self.base_mut().call("tile_unloaded", tile_coord);
+        for i in 0..TileZLevel::COUNT{
+          self.rust_zlevel_layers[i].erase_cell(tile_coord.into());
+          if i == TileZLevel::Structure as usize {continue;}
+          //CAUSA PROBLEMAS CON CÓMO SE VEN LOS ÁRBOLES EL SET_CELL POSTERIOR
+        }
       }
     }
   }
@@ -241,6 +237,7 @@ pub struct RustTileMap {
 #[constant]const SWMAT_DOWNSCALE_FACTOR: u32 = 20;  
 #[constant]const SPAWNWEIGHTS_PER_MACROCHUNK_SIDE: u32 = 5;
 #[constant]const MACCHUNKMAT_DS_FACTOR: u32 = Self::SWMAT_DOWNSCALE_FACTOR * Self::SPAWNWEIGHTS_PER_MACROCHUNK_SIDE;  
+
 // hacerlo async (no bloqueante)
 //solo debería ejecutar esto el host y desp retransmitir los spawneos específicos
 

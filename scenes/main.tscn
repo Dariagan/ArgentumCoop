@@ -30,6 +30,7 @@ script = ExtResource("7_itdl2")
 
 [node name="OmniLight" type="DirectionalLight2D" parent="Lobby/GdTileMap"]
 unique_name_in_owner = true
+enabled = false
 blend_mode = 2
 script = ExtResource("4_choun")
 gradient_texture = ExtResource("5_ya4ey")

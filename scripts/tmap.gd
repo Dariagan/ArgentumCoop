@@ -21,7 +21,7 @@ func generate_world(world_config: Dictionary = {}):#
 		
 	generate_world_matrix(WORLD_SIZE, tiles)
 	
-	generate_formation(0, Vector2i.ZERO, WORLD_SIZE, Global.tile_selections[&"selectiontemperate"], 0, {})
+	generate_formation(0, Vector2i.ZERO, WORLD_SIZE, Global.tile_selections[&"selectiontemp"], 0, {})
 	
 	mplayers_start_position = WORLD_SIZE/2
 	# FIXME HACER CHECK DE SI EL SPAWN ESTÁ FUERA DEL WORLD CON set: DE GDSCRIPT
@@ -118,14 +118,7 @@ func set_tile_state(gridposs: Vector2i, tile_z_level: Enum.TileZLevel, state: Di
 		Enum.TileZLevel.Roof: mrooftiles_states[gridposs] = state
 		
 #TODO: arreglar set_cell de escenas si lo hace otro jugador antes, si es una escena que no lo haga si ya está cargada
-		
-func set_cells(grid_positions: Array[Vector2i], z_levels: Array[int], source_atlases: Array[int], atlas_position: Array[Vector2i], _now_loaded_grid_positions: Array):
-	var start: float = Time.get_unix_time_from_system()
-	for i in grid_positions.size():
-		zlevel_layers[z_levels[i]].set_cell(grid_positions[i], source_atlases[i], atlas_position[i])
-	tiles_loaded(_now_loaded_grid_positions)
-	var end: float = Time.get_unix_time_from_system()
-	print(end-start)
+	
 	
 #LAS ESCENAS-TILE QUE SE CARGUEN TIENEN QUE SER CARGADAS POR TODOS SIMULTÁNEAMENTE??
 		
@@ -162,12 +155,10 @@ func get_node_at_gridpos(tmap_layer: TileMapLayer, gridpos: Vector2i) -> Node2D:
 	return null
 
 func tile_unloaded(gridpos: Vector2i):
-	for i in LAYER_COUNT:
-		var node: Node2D = get_node_at_gridpos(zlevel_layers[i], gridpos)
-		if node: #and node.hide_on_unload:
-			node.hide()
-			continue
-		zlevel_layers[i].erase_cell(gridpos)
+	pass
+	#var node: Node2D = get_node_at_gridpos(zlevel_layers[Enum.TileZLevel.Structure], gridpos)
+	#if node: #and node.hide_on_unload:
+
 				#node.load_state.rpc(tiles_states[gridpos], gridpos)
 
 @rpc("call_local", "any_peer") func hide_node(nodepath: NodePath) -> void: get_node(nodepath).hide() 

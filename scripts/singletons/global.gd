@@ -59,6 +59,7 @@ func _init() -> void:
 	races.merge(uncontrollable_races, true); races.merge(controllable_races, true); races.make_read_only()
 	
 	tile_selections.merge(_index_all_found_resource_instances(tile_selections_dirs, false)); tile_selections.make_read_only()
+	
 	klasses.merge(_index_all_found_resource_instances(klasses_dirs, true)); klasses.make_read_only()
 	tilesdict.merge(_index_all_found_resource_instances(tiles_dirs, true)); tilesdict.make_read_only()
 	
@@ -101,6 +102,7 @@ static func _index_all_found_resource_instances(dirs: Array[String], check_subfo
 			while file_name != "":
 				if !dir_access.current_is_dir():
 					if allowed_file_extension(file_name):
+						file_name = file_name.trim_suffix(".remap")
 						var resource
 						if not use_safe_loader:
 							resource = ResourceLoader.load(directory + file_name)

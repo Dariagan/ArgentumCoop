@@ -17,7 +17,7 @@ var friction = 1600 #hacer q provenga de la tile en custom data
 
 var mmelee_timeout: float
 
-const CHUNK_SIZE: Vector2 = Vector2i(192, 120)
+const CHUNK_SIZE: Vector2i = Vector2i(192, 120)
 var mcontroller_speed_multiplier: float = 1
 
 func _ready() -> void:
@@ -136,14 +136,14 @@ func ai_control(delta: float): mai_process.behave(delta); _update_velocity_and_m
 	
 var mdirection_axis: Vector2 = Vector2.ZERO
 
-var mdistance_moved_since_load: float = 501
+var mdistance_moved_since_load: float = INF
 func player_control(delta: float) -> void:
 	
 	mdirection_axis = Input.get_vector(&"ui_left", &"ui_right", &"ui_up", &"ui_down")
 	mcontroller_speed_multiplier = 1.0
 	_update_velocity_and_move(delta)
 	mdistance_moved_since_load += mdistance_moved
-	if mdistance_moved_since_load > 500:
+	if mdistance_moved_since_load > 200:
 		mtilemap.load_tiles_around(mtilemap.local_to_tilemap(position), CHUNK_SIZE, uid)#195, 120
 		mdistance_moved_since_load = 0
 		
