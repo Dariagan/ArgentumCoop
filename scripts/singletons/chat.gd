@@ -36,25 +36,34 @@ func _on_input_event(event: InputEvent):
 	if input_enabled and event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_ENTER:
 			get_viewport().set_input_as_handled()
-			add_chat_message.rpc(chat_text_edit.text.strip_edges(), Global.username)
+			match chat_text_edit.text:
+				"/help":
+					pass
+				"/taunts":
+					chat_label.text += "Taunts: " 
+					for keyword: String in Global.taunt_sounds.keys():
+						chat_label.text += (keyword + " ")
+					chat_label.text += "\n"
+				"/mutetaunts":
+					taunts_enabled = not taunts_enabled
+				_:
+					add_chat_message.rpc(chat_text_edit.text.strip_edges(), Global.username)
 			chat_text_edit.text = ""
 			chat_text_edit.set_caret_line(0)
 			chat_text_edit.set_caret_column(0)
 
-var audio_timeout: float
-func _process(delta):
-	audio_timeout -= delta
-	audio_timeout = max(audio_timeout, -0.1) 
+var audio_spam_timeout: float
+func _process(delta: float):
+	audio_spam_timeout -= delta
+	audio_spam_timeout = maxf(audio_spam_timeout, -0.1) 
 			
 @rpc("any_peer", "call_local")
 func add_chat_message(new_text : String, sender: String) -> void:
-
 	if new_text.length() > 0:
-		if taunts_enabled and audio_timeout < 0 and new_text.is_valid_int() and new_text.length() <= 3:
-			var taunt_number : int = new_text.to_int()
-			if taunt_number >= 0 and taunt_number < Global.taunt_sounds.values().size():
-				audio_stream_poly_playback.play_stream(Global.taunt_sounds.values()[taunt_number])
-				audio_timeout = 0.5
+		if taunts_enabled and audio_spam_timeout < 0 and new_text.length() <= 13:
+			if Global.taunt_sounds.has(new_text):
+				audio_stream_poly_playback.play_stream(Global.taunt_sounds[new_text])
+				audio_spam_timeout = 0.5
 		chat_label.text += "%s: %s\n" % [sender, new_text]
 		chat_log = chat_label.text
 		await get_tree().create_timer(0.001).timeout

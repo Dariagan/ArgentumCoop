@@ -117,7 +117,7 @@ func _on_lobby_button_pressed() -> void:
 
 signal name_changed(new_name: StringName)
 signal race_selected(race: ControllableRace)
-signal sex_selected(sex: Enu.Sex)
+signal sex_selected(sex: Enum.Sex)
 signal class_selected(klass: Klass)
 signal head_selected(head: SpriteData)
 signal follower_selected(follower: BeingGenTemplate)
@@ -130,7 +130,7 @@ func _on_character_characterization_race_selected(race: ControllableRace) -> voi
 	race_selected.emit(race)
 	# mostrar stats en cuadradito
 	
-func _on_character_characterization_sex_selected(sex: Enu.Sex) -> void:
+func _on_character_characterization_sex_selected(sex: Enum.Sex) -> void:
 	sex_selected.emit(sex)
 func _on_character_characterization_class_selected(klass: Klass) -> void:
 	class_selected.emit(klass)

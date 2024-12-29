@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cendl1xpkbuwt"
-path="res://.godot/imported/whatwaswthat.wav-50666118664bafdb8e11d291db59b06d.sample"
+path="res://.godot/imported/whatthat.wav-c501142cc422a1ef5eab1bf7bb03d77c.sample"
 
 [deps]
 
-source_file="res://assets/sound/taunts/whatwaswthat.wav"
-dest_files=["res://.godot/imported/whatwaswthat.wav-50666118664bafdb8e11d291db59b06d.sample"]
+source_file="res://assets/sound/taunts/whatthat.wav"
+dest_files=["res://.godot/imported/whatthat.wav-c501142cc422a1ef5eab1bf7bb03d77c.sample"]
 
 [params]
 

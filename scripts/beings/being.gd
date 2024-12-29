@@ -11,8 +11,21 @@ var friction = 1600 #hacer q provenga de la tile en custom data
 @onready var mbody: AnimatedBodyPortion = $BodyHolder/Body; @onready var mhead: AnimatedBodyPortion = $BodyHolder/Head
 @onready var mnav: NavigationAgent2D = $NavigationAgent2D; @onready var name_label = $NameLabel; 
 @onready var mtilemap: GdTileMap = get_parent()
+@onready var action_area: Area2D = $ActionArea; @onready var maction_collision: CollisionShape2D = $ActionArea/ActionCollision
+
+@onready var maudio_stream_player: AudioStreamPlayer2D = $AudioStreamPlayer2D; var maudio_stream_poly_playback: AudioStreamPlaybackPolyphonic
+
+var mmelee_timeout: float
+
 const CHUNK_SIZE: Vector2 = Vector2i(192, 120)
 var mcontroller_speed_multiplier: float = 1
+
+func _ready() -> void:
+	var audio_stream_poly: AudioStreamPolyphonic = AudioStreamPolyphonic.new()
+	audio_stream_poly.polyphony = 10
+	maudio_stream_player.stream = audio_stream_poly
+	maudio_stream_player.play()
+	maudio_stream_poly_playback = maudio_stream_player.get_stream_playback()
 
 #constructs for multiplayer too
 func construct(preiniter: BeingPreInit, uid_: int) -> void:
@@ -21,9 +34,7 @@ func construct(preiniter: BeingPreInit, uid_: int) -> void:
 		if preiniter.msprite_head:
 			mhead.construct(preiniter.msprite_head, preiniter.mhead_scale, preiniter.msprite_body.head_v_offset, preiniter.mbody_scale.z)
 	mistate.construct_from_seri.rpc(preiniter.serialize())
-	if mistate.mrace is UncontrollableRace or not mistate.mfaction is PlayerFaction:
-		_set_controlling_peer.rpc(0)
-	
+	if mistate.mrace is UncontrollableRace or not mistate.mfaction is PlayerFaction: _set_controlling_peer.rpc(0)
 	set_ai_process.rpc()
 	var show_label: bool = mistate.mfaction is PlayerFaction or (mistate.mbeing_gen_template and mistate.being_gen_template.display_being_name)
 	set_name_label_text_and_color.rpc(preiniter.mname, mistate.mfaction.mcolor, show_label)
@@ -47,7 +58,7 @@ func set_ai_process():
 var mcontrolling_peer: int = 0 : set = _set_controlling_peer
 @rpc("call_local") 
 func _set_controlling_peer(peer: int):  
-	mcontrolling_peer = max(0, peer)
+	mcontrolling_peer = maxi(0, peer)
 	if mcontrolling_peer == 0: wall_min_slide_angle = 0
 	else: wall_min_slide_angle = 0.261799
 
@@ -82,7 +93,9 @@ func _input(event: InputEvent) -> void:
 					mcamera.zoom *= 1.1
 				if Config.enable_zoom_limit and not Config.debug:
 					mcamera.zoom = mcamera.zoom.clamp(Config.zoom_out_max, Config.zoom_in_max)
-			
+		if event.is_action_pressed(&"melee") && mmelee_timeout < 0:
+			mmelee_timeout = 10# cambiar por lo del arma actualmente equipada
+		
 		if Config.debug and event.is_action(&"f1"):
 			print(mtilemap.local_to_tilemap(position))
 
@@ -90,6 +103,8 @@ func _input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	var my_peer:int = multiplayer.get_unique_id()
+	mmelee_timeout -= delta
+	mmelee_timeout = maxf(-1.0, mmelee_timeout)
 	match [is_multiplayer_authority(), mcontrolling_peer]:
 		[_, my_peer]: player_control(delta)
 		[true, _]: ai_control(delta); 
@@ -103,14 +118,14 @@ func _update_distance_moved() -> void:
 	mprevious_pos = position
 	
 func _update_body_state() -> void: 	
-	if mdistance_moved > 1: _adjust_speed_scale(1); _change_body_state(Enu.AnimationState.JOG)
-	elif mdistance_moved > 0.01: _adjust_speed_scale(0.8); _change_body_state(Enu.AnimationState.WALK)
-	else: _change_body_state(Enu.AnimationState.IDLE)
+	if mdistance_moved > 1: _adjust_speed_scale(1); _change_body_state(Enum.AnimationState.JOG)
+	elif mdistance_moved > 0.01: _adjust_speed_scale(0.8); _change_body_state(Enum.AnimationState.WALK)
+	else: _change_body_state(Enum.AnimationState.IDLE)
 
-var mbody_state: Enu.AnimationState = Enu.AnimationState.IDLE
-var mfaced_dir: Enu.Dir = Enu.Dir.DOWN
+var mbody_state: Enum.AnimationState = Enum.AnimationState.IDLE
+var mfaced_dir: Enum.Dir = Enum.Dir.DOWN
 
-func _change_body_state(new_body_state: Enu.AnimationState):
+func _change_body_state(new_body_state: Enum.AnimationState):
 	mbody_state = new_body_state
 func _adjust_speed_scale(factor: float):
 	for body_part in mbodyholder.get_children():
@@ -123,6 +138,7 @@ var mdirection_axis: Vector2 = Vector2.ZERO
 
 var mdistance_moved_since_load: float = 501
 func player_control(delta: float) -> void:
+	
 	mdirection_axis = Input.get_vector(&"ui_left", &"ui_right", &"ui_up", &"ui_down")
 	mcontroller_speed_multiplier = 1.0
 	_update_velocity_and_move(delta)
@@ -148,12 +164,18 @@ func _update_velocity_and_move(delta: float):
 			position += mdirection_axis * Config.noclip_speed
 		
 func _update_faced_dir(direction: Vector2) -> void:
-	var new_dir: Enu.Dir
-	if abs(direction.x) > abs(direction.y): new_dir = Enu.Dir.LEFT if direction.x < 0 else Enu.Dir.RIGHT
-	else: new_dir = Enu.Dir.UP if direction.y < 0 else Enu.Dir.DOWN
+	var new_dir: Enum.Dir
+	if absf(direction.x) > absf(direction.y): new_dir = Enum.Dir.LEFT if direction.x < 0 else Enum.Dir.RIGHT
+	else: new_dir = Enum.Dir.UP if direction.y < 0 else Enum.Dir.DOWN
 	if new_dir != mfaced_dir: _setsync_faced_dir.rpc(new_dir)
 
-@rpc("call_local") func _setsync_faced_dir(new_dir: Enu.Dir): mfaced_dir = new_dir
+@rpc("call_local") func _setsync_faced_dir(new_dir: Enum.Dir): 
+	mfaced_dir = new_dir; 
+	match new_dir:
+		Enum.Dir.LEFT: maction_collision.position = Vector2(-20, 15)
+		Enum.Dir.RIGHT: maction_collision.position = Vector2(20, 15)
+		Enum.Dir.UP: maction_collision.position = Vector2(0, -5)
+		Enum.Dir.DOWN: maction_collision.position = Vector2(0, 35)
 		
 func _play_animation() -> void:	
 	for body_part in mbodyholder.get_children():

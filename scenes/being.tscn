@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=4 uid="uid://bxcw3yocig3he"]
+[gd_scene load_steps=14 format=4 uid="uid://bxcw3yocig3he"]
 
 [ext_resource type="Script" uid="uid://deqr1axymk8jv" path="res://scripts/beings/being.gd" id="1_qp2au"]
 [ext_resource type="FontFile" uid="uid://dkqe4sqj38qdi" path="res://assets/fonts/name_label/PixAntiqua.ttf" id="2_0u0dk"]
@@ -257,6 +257,8 @@ outline_color = Color(0, 0, 0, 1)
 shadow_size = 32
 shadow_color = Color(0, 0, 0, 0.756863)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xlynb"]
+
 [node name="Being" type="CharacterBody2D"]
 z_index = 10
 collision_layer = 2
@@ -303,7 +305,15 @@ horizontal_alignment = 1
 [node name="RightHand" type="Node" parent="BodyHolder"]
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-debug_enabled = true
 
 [node name="InternalState" type="Node" parent="."]
 script = ExtResource("3_ptxgd")
+
+[node name="ActionArea" type="Area2D" parent="."]
+
+[node name="ActionCollision" type="CollisionShape2D" parent="ActionArea"]
+position = Vector2(0, 35)
+shape = SubResource("RectangleShape2D_xlynb")
+debug_color = Color(0.831373, 0, 0, 0.419608)
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]

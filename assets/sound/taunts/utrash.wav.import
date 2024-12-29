@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://chubgrgldyejn"
-path="res://.godot/imported/youretrash.wav-a7a9e1d5e79e3412ef16a708251b0233.sample"
+path="res://.godot/imported/utrash.wav-55a6a890cb885256b9f8404590a08821.sample"
 
 [deps]
 
-source_file="res://assets/sound/taunts/youretrash.wav"
-dest_files=["res://.godot/imported/youretrash.wav-a7a9e1d5e79e3412ef16a708251b0233.sample"]
+source_file="res://assets/sound/taunts/utrash.wav"
+dest_files=["res://.godot/imported/utrash.wav-55a6a890cb885256b9f8404590a08821.sample"]
 
 [params]
 

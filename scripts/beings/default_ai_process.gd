@@ -33,8 +33,8 @@ func goto_being(delta:float, target:Being, curr_dist:float, maxdist:float=0, mch
 			mpicked_dir = Utils.random_vector2_with_length(1)
 			return;
 		
-		var own_velocity_factor: float = max(mmyself.velocity.length()*0.0035, 0.3)
-		var target_velocity_factor: float = max(target.velocity.length()*0.0035, 0.3)
+		var own_velocity_factor: float = maxf(mmyself.velocity.length()*0.0035, 0.3)
+		var target_velocity_factor: float = maxf(target.velocity.length()*0.0035, 0.3)
 		var relative_velocity_factor: float = target_velocity_factor*own_velocity_factor
 		var target_distance_factor: float = curr_dist/400
 		var final_factor: float = relative_velocity_factor/(target_distance_factor*path_update_time_mult)

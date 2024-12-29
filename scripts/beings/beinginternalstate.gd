@@ -7,7 +7,7 @@ class_name BeingInternalState
 var mcarried_weight: int = 0
 var mfaction: Faction
 
-var msex: Enu.Sex
+var msex: Enum.Sex
 var mrace: BasicRace #mover estos dos a una clase Characterization guardada en otro lado?
 var mklass: Klass = null #mover estos dos a una clase Characterization guardada en otro lado?
 

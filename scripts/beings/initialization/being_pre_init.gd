@@ -13,7 +13,7 @@ var mhead_scale: Vector3 = Vector3.ONE; var mbody_scale: Vector3 = Vector3.ONE
 var msprite_head: SpriteData; var msprite_body: BodySpriteData
 var mchosen_extra_sprites: Array[int] = []
 var mhealth_multiplier: float = 1
-var msex: Enu.Sex
+var msex: Enum.Sex
 var mrace: BasicRace
 var mklass: Klass
 var mfaction: Faction
@@ -40,11 +40,11 @@ static func new_from_being_gen_templ(being_gen_template: BeingGenTemplate, facti
 					preiniter.mfollowers.append(pick)
 	
 	if being_gen_template.mmales_ratio != -1:
-		if randf() < being_gen_template.mmales_ratio: preiniter.msex = Enu.Sex.MALE
-		else: preiniter.msex = Enu.Sex.FEMALE
+		if randf() < being_gen_template.mmales_ratio: preiniter.msex = Enum.Sex.MALE
+		else: preiniter.msex = Enum.Sex.FEMALE
 	else:
-		if randf() < being_gen_template.mrace.mmales_ratio: preiniter.msex = Enu.Sex.MALE
-		else: preiniter.msex = Enu.Sex.FEMALE
+		if randf() < being_gen_template.mrace.mmales_ratio: preiniter.msex = Enum.Sex.MALE
+		else: preiniter.msex = Enum.Sex.FEMALE
 		
 	if not being_gen_template.mheads_distribution:
 		if being_gen_template.mrace.mhead_sprites_datas and not being_gen_template.mrace.mhead_sprites_datas.is_empty():
@@ -132,12 +132,12 @@ static func construct(being_birth_dict: Dictionary) -> BeingPreInit:
 	var sex_value = being_birth_dict[Keys.SEX]
 	
 	if sex_value is float and sex_value >= 0.0 and sex_value <= 1.0:
-		if randf() < sex_value: preiniter.msex = Enu.Sex.MALE
-		else: preiniter.msex = Enu.Sex.FEMALE
-	elif sex_value is StringName or sex_value == Enu.Sex.ANY or (sex_value is float and (sex_value<0.0 or sex_value>1.0)):
-		if randf() < preiniter.mrace.mmales_ratio: preiniter.msex = Enu.Sex.MALE
-		else: preiniter.msex = Enu.Sex.FEMALE
-	elif sex_value is Enu.Sex:
+		if randf() < sex_value: preiniter.msex = Enum.Sex.MALE
+		else: preiniter.msex = Enum.Sex.FEMALE
+	elif sex_value is StringName or sex_value == Enum.Sex.ANY or (sex_value is float and (sex_value<0.0 or sex_value>1.0)):
+		if randf() < preiniter.mrace.mmales_ratio: preiniter.msex = Enum.Sex.MALE
+		else: preiniter.msex = Enum.Sex.FEMALE
+	elif sex_value is Enum.Sex:
 		preiniter.msex = sex_value
 	else:
 		assert(false, "invalid type for \"sex\" entry in birth dict")

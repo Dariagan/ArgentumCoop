@@ -1,14 +1,21 @@
-[gd_scene load_steps=10 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=13 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" uid="uid://xety1nexsqo3" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" uid="uid://c2n7c5oi1frwx" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
+[ext_resource type="Script" uid="uid://c448yap2hlvh5" path="res://scripts/omni_light.gd" id="4_choun"]
 [ext_resource type="Script" uid="uid://djk6d78fdcv85" path="res://scripts/lobby.gd" id="4_vtap0"]
 [ext_resource type="PackedScene" uid="uid://dtg1qitjwcjk2" path="res://scenes/inventory/inventory.tscn" id="5_7q6ev"]
+[ext_resource type="Texture2D" uid="uid://bl4pbcsywbg6y" path="res://assets/daynightcycle-gradient-texture.tres" id="5_ya4ey"]
 [ext_resource type="Script" uid="uid://xa1qswwnhun1" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" uid="uid://c4qtbvror1smx" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
 [ext_resource type="Script" uid="uid://b2e7g5ye5jpxt" path="res://scripts/tmap.gd" id="7_itdl2"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="10_ysw5o"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ya4ey"]
+properties/0/path = NodePath(".:color")
+properties/0/spawn = true
+properties/0/replication_mode = 1
 
 [node name="Main" type="Node"]
 script = ExtResource("1_iuim6")
@@ -20,6 +27,15 @@ script = ExtResource("4_vtap0")
 [node name="GdTileMap" type="RustTileMap" parent="Lobby"]
 unique_name_in_owner = true
 script = ExtResource("7_itdl2")
+
+[node name="OmniLight" type="DirectionalLight2D" parent="Lobby/GdTileMap"]
+unique_name_in_owner = true
+blend_mode = 2
+script = ExtResource("4_choun")
+gradient_texture = ExtResource("5_ya4ey")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Lobby/GdTileMap/OmniLight"]
+replication_config = SubResource("SceneReplicationConfig_ya4ey")
 
 [node name="chequear AutoSpawnList" type="MultiplayerSpawner" parent="Lobby"]
 _spawnable_scenes = PackedStringArray("uid://bxcw3yocig3he")

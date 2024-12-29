@@ -8,6 +8,9 @@ const PLAYER_FACTION_INSTANCE: StringName = &"player"
 const WILD_FACTION_INSTANCE: StringName = &"wild"
 const BEING_LEVEL: StringName = &"mlevel"
 
+const ID: StringName = &"mid"
+
+
 const KLASS: StringName = &"mklass"
 const FOLLOWERS: StringName = &"mfollowers"
 const HEAD_SCALE: StringName = &"mhead_scale"

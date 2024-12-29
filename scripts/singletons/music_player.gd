@@ -23,11 +23,11 @@ func stop_prev_thread():
 		
 
 func play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
-	if not Global.music.has(playlist_key):
+	if not Global.playlists.has(playlist_key):
 		push_error("playlist %s not found" % playlist_key)
 		return
 	
-	if not Global.music[playlist_key].is_empty():
+	if not Global.playlists[playlist_key].is_empty():
 		if sync_mp: stop_prev_thread.rpc()
 		else: stop_prev_thread()
 		
@@ -39,7 +39,7 @@ func play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
 		push_error("playlist %s is empty" % playlist_key)
 
 func _thread_play_playlist_shuffled(playlist_key: StringName, sync_mp: bool):
-	var playlist = Global.music[playlist_key]
+	var playlist = Global.playlists[playlist_key]
 	var remaining: Array[StringName] = []
 	remaining.append_array(playlist.keys().duplicate())
 	
@@ -62,5 +62,5 @@ func play_stream_deferred_rpc(playlist_key: StringName, soundtrack_id: StringNam
 @rpc("call_local")
 func _play_stream(playlist_key: StringName, soundtrack_id: StringName):
 	self.stop()
-	self.stream = Global.music[playlist_key][soundtrack_id]
+	self.stream = Global.playlists[playlist_key][soundtrack_id]
 	self.play()

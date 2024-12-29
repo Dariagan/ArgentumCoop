@@ -1,4 +1,4 @@
-class_name Enu
+class_name Enum
 
 enum Sex { ANY = 0, MALE = 1, FEMALE = 2}
 

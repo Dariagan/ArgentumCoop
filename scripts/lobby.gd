@@ -138,7 +138,7 @@ func _on_name_selected(new_name: String):
 func _on_race_selected(race: ControllableRace):
 	if race: _allfn_update_characterization.rpc(Keys.RACE, race.mid)
 	else: _allfn_update_characterization.rpc(Keys.RACE)
-func _on_sex_selected(sex: Enu.Sex):
+func _on_sex_selected(sex: Enum.Sex):
 	if sex > 0: _allfn_update_characterization.rpc(Keys.SEX, sex)
 	else: _allfn_update_characterization.rpc(Keys.SEX)
 func _on_head_selected(head : SpriteData):
@@ -171,7 +171,8 @@ func start_new_game() -> void:
 	var i: int = 0
 	for player_start_data: Dictionary in mcharacters_spawn_data:
 		if not player_start_data.has(Keys.NAME):
-			player_start_data[Keys.NAME] = &"random"
+			if Config.debug and i == 0: player_start_data[Keys.NAME] = &"host"
+			else: player_start_data[Keys.NAME] = &"random"
 		if not player_start_data.has(Keys.RACE):
 			player_start_data[Keys.RACE] = &"controllable_random"
 		if not player_start_data.has(Keys.KLASS):
@@ -194,6 +195,9 @@ func start_new_game() -> void:
 		spawned_beings.push_back(being)
 		being.give_control.rpc(mpeers[i])
 		i+=1
+	
+	#%OmniLight.set_process(true)
+	%OmniLight.enable_process()
 	
 	MusicPlayer.play_playlist_shuffled(Keys.PEACE_ORDER, true)
 	

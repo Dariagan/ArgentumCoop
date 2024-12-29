@@ -25,7 +25,6 @@ use std::collections::{HashMap, HashSet};
 #[derive(GodotClass)]#[class(base=Node2D)]
 pub struct RustTileMap {
   base: Base<Node2D>,
-  #[var] layer_count: u16,
   #[var] seed: i64,
   #[var(get = get_tile_set_path)] tile_set_path: GString,
   #[var] beings_z_index: i32 /*z to assign on spawned beings*/,
@@ -37,6 +36,13 @@ pub struct RustTileMap {
   being_loaded_tiles_map: HashMap<BeingUnid, HashSet<UnsVec>> /*don't remove an entry directly*/,
   tile_shared_loads_count: HashMap<UnsVec, i64>  /*don't reduce this directly*/,
 //-- beings section --
+
+  tile_z_levels: Array<i32>,
+  source_atlases: Array<i32>,
+  atlas_origin_positions: Array<Vector2i>,
+  grid_positions: Array<Vector2i>,
+
+  now_loaded_gridpos: Array<Vector2i>,
   
   beings_in_chunk_count: Option<DownScalingMatrix<u16>>,
   pub spawn_weights_matrix: Option<SpawnWeightsMatrix>,
@@ -46,7 +52,6 @@ pub struct RustTileMap {
   fn init(base: Base<Node2D>) -> Self {
     Self {
       base,
-      layer_count: TileZLevel::COUNT as u16,
       seed: 0,
       tile_set_path: RustTileMap::TILE_SET_PATH.into(),
       tile_set: try_load(RustTileMap::TILE_SET_PATH).expect(format!("couldn't find tile set in {}", RustTileMap::TILE_SET_PATH).as_str()),
@@ -57,6 +62,13 @@ pub struct RustTileMap {
       beings_z_index: -1,
       being_loaded_tiles_map: Default::default(),
       tile_shared_loads_count: Default::default(),
+
+      tile_z_levels: Array::new(),
+      source_atlases: Array::new(),
+      atlas_origin_positions: Array::new(),
+      grid_positions: Array::new(),
+
+      now_loaded_gridpos: Array::new(),
 
       beings_in_chunk_count: None,
       spawn_weights_matrix: None,
@@ -78,10 +90,18 @@ pub struct RustTileMap {
 }
 #[godot_api] impl RustTileMap {
 
+  #[constant] const LAYER_COUNT: u16 = TileZLevel::COUNT as u16;    
+
   const TILE_SET_PATH: &'static str = "res://resource_instances/tiling/tset.tres";
+
+  pub fn set_tile_state(&mut self, coords: UnsVec, tile_z_level: TileZLevel, state: Dictionary){
+    let args: &[Variant; 3] = &[Into::<Vector2i>::into(coords).to_variant(), tile_z_level.to_variant(),state.to_variant()];
+    self.base_mut().call("set_tile_state", args);
+  }
 
   
   #[func]fn get_tile_set_path(&self) -> GString {self.tile_set_path.clone()}
+
   pub fn world_size(&self) -> UnsVec {self.world_size}
 
   #[func]
@@ -124,43 +144,55 @@ pub struct RustTileMap {
     
     let being_coords: SafeVec = _being_coords.into();
     let world_size: UnsVec = self.world_size;
-    let mut now_loaded_tiles: Array<Vector2i> = Array::new();
 
-    for chunk_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))
+    self.tile_z_levels.clear(); self.source_atlases.clear(); self.atlas_origin_positions.clear(); self.grid_positions.clear(); self.now_loaded_gridpos.clear();
+
+    for matrix_coord in (-chunk_size.lef as i32/2..chunk_size.lef as i32/2).flat_map(|i| (-chunk_size.right as i32/2..chunk_size.right as i32/2).map(move |j| (i,j)))
       .map(|vec| SafeVec::from(vec) + being_coords)
       .filter(|vec| vec.is_non_negative())
       .map(|vec|unsafe{UnsVec::try_from(vec).unwrap_unchecked()})
       .filter(|vec| vec.is_strictly_smaller_than(world_size)){unsafe{
-        if ! self.tile_shared_loads_count.contains_key(&chunk_coord) {
-          self.tile_shared_loads_count.insert(chunk_coord, 1);
+        if ! self.tile_shared_loads_count.contains_key(&matrix_coord) {
+          self.tile_shared_loads_count.insert(matrix_coord, 1);
+          let tiles: TileUnidArray = self.world_matrix.as_ref().unwrap_unchecked()[matrix_coord];
           
-          let tiles: TileUnidArray = self.world_matrix.as_ref().unwrap_unchecked()[chunk_coord];
-          tiles.iter().filter(|&&t_unid| t_unid != TileUnid::NULL).for_each(|&t_unid| self.set_cell(t_unid, chunk_coord));
-          now_loaded_tiles.push(Into::<Vector2i>::into(chunk_coord));
+
+          tiles.iter().filter(|&&t_unid| t_unid != TileUnid::NULL).for_each(|&t_unid| {
+            let (z_level, atlas, atlas_pos) = self.set_cell(t_unid, matrix_coord);
+            self.grid_positions.push(Into::<Vector2i>::into(matrix_coord));
+            self.tile_z_levels.push(z_level); self.source_atlases.push(atlas); self.atlas_origin_positions.push(atlas_pos); 
+            }
+          );
+          //TODO AGRUPAR TODAS LAS LLAMADAS DE SET_CELL Y QUE SE PASE UN ARRAY DE VECTOR2I, UN ARRAY DE ? ASÍ SE HACE UNA SOLA CALL
+
+          self.now_loaded_gridpos.push(Into::<Vector2i>::into(matrix_coord));
         } 
-        else if !self.being_loaded_tiles_map.get(&being_unid).map_or(false, |set| set.contains(&chunk_coord)) {
-          *self.tile_shared_loads_count.get_mut(&chunk_coord).unwrap_unchecked() += 1;
+        else if !self.being_loaded_tiles_map.get(&being_unid).map_or(false, |set| set.contains(&matrix_coord)) {
+          *self.tile_shared_loads_count.get_mut(&matrix_coord).unwrap_unchecked() += 1;
         }
-        self.being_loaded_tiles_map.entry(being_unid).or_insert_with(|| HashSet::with_capacity(chunk_size.area()*3/2)).insert(chunk_coord);
+        self.being_loaded_tiles_map.entry(being_unid).or_insert_with(|| HashSet::with_capacity(chunk_size.area()*3/2)).insert(matrix_coord);
           
       }}
-    let args: [Variant; 1] = [now_loaded_tiles.to_variant()];
-    self.base_mut().call("tiles_loaded", &args);
+
+    let args: [Variant; 5] = [self.grid_positions.to_variant(), self.tile_z_levels.to_variant(), self.source_atlases.to_variant(), self.atlas_origin_positions.to_variant(), self.now_loaded_gridpos.to_variant()];
+    self.base_mut().call("set_cells", &args);
     self.unload_excess_tiles(being_coords, chunk_size.into(), being_unid);
   }
-  fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) {
+  fn set_cell(&mut self, unid: TileUnid, matrix_coord: UnsVec) -> (i32, i32, Vector2i) {
     let tile: &TileDto = self.tile_nid_mapping().get(unid.0 as usize).expect(format!("tile mapped to {unid} not found").as_str());
     unsafe{
       let tile_z_level: i32 = tile.z_level as i32;
       let atlas_origin_position: Vector2i = (*tile).origin_position;
       let atlas_origin_position_offset: Vector2i = matrix_coord.mod_unsv((*tile).modulo_tiling_area).into(); 
-      let matrix_coord: Vector2i = matrix_coord.into();
-      let args: [Variant; 4] = 
-        [matrix_coord.to_variant(), ((*tile).source_atlas).to_variant(),
-        (atlas_origin_position+atlas_origin_position_offset).to_variant(), (*tile).alternative_id.to_variant()];
+      
+      (tile_z_level, (*tile).source_atlas, atlas_origin_position+atlas_origin_position_offset)
 
-      // TODO: METER  NUEVA TILEMAPLAYER SI NO TA. GUARDAR SU REF EN UN DICT CON KEY=TILEID
-      self.base_mut().get_child(tile_z_level).unwrap_unchecked().call("set_cell", &args);
+      // let args: [Variant; 4] = 
+      //   [matrix_coord.to_variant(), ((*tile).source_atlas).to_variant(),
+      //   (atlas_origin_position+atlas_origin_position_offset).to_variant(), (*tile).alternative_id.to_variant()];
+
+      // // TODO: METER  NUEVA TILEMAPLAYER SI NO TA. GUARDAR SU REF EN UN DICT CON KEY=TILEID
+      // self.base_mut().get_child(tile_z_level).unwrap_unchecked().call("set_cell", &args);
     }
   }
   fn unload_excess_tiles(&mut self, being_coords: SafeVec, chunk_size: UnsVec, being_unid: BeingUnid) {unsafe {
@@ -172,11 +204,10 @@ pub struct RustTileMap {
     loaded_tiles.retain(|&tile_coord| {
       let keep: bool = chunk_size.within_bounds_centered(SafeVec::from(tile_coord) - being_coords);
       
-      if keep == false {(*self_ptr).decrement_shared_loads_count(tile_coord); now_unloaded_tiles.push(Into::<Vector2i>::into(tile_coord));}
+      if ! keep {(*self_ptr).decrement_shared_loads_count(tile_coord); now_unloaded_tiles.push(Into::<Vector2i>::into(tile_coord));}
       keep
     });
-    //let args: [Variant; 1] = [now_unloaded_tiles.to_variant()];
-    //self.base_mut().call("tiles_unloaded", &args);
+
   }}
   fn decrement_shared_loads_count(&mut self, tile_coord: UnsVec) {
     if let Some(&mut mut count) = self.tile_shared_loads_count.get_mut(tile_coord.borrow()) {
@@ -185,9 +216,7 @@ pub struct RustTileMap {
       if count == 0 {
         self.tile_shared_loads_count.remove(tile_coord.borrow());
         let tile_coord: &[Variant; 1] = &[Into::<Vector2i>::into(tile_coord).to_variant()];
-        for layer_i in 0..self.layer_count {
-          unsafe{self.base_mut().get_child(layer_i as i32).unwrap_unchecked().call("erase_cell", tile_coord);}
-        }
+        self.base_mut().call("tile_unloaded", tile_coord);
 
         
       }

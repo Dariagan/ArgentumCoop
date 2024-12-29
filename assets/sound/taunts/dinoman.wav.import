@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bc47onmmt0hvp"
-path="res://.godot/imported/dinosaurman.wav-d0cd271b37010e07c43ba9c7fb985c80.sample"
+path="res://.godot/imported/dinoman.wav-7c376a87ebebd5c66edb18f3735aeda2.sample"
 
 [deps]
 
-source_file="res://assets/sound/taunts/dinosaurman.wav"
-dest_files=["res://.godot/imported/dinosaurman.wav-d0cd271b37010e07c43ba9c7fb985c80.sample"]
+source_file="res://assets/sound/taunts/dinoman.wav"
+dest_files=["res://.godot/imported/dinoman.wav-7c376a87ebebd5c66edb18f3735aeda2.sample"]
 
 [params]
 

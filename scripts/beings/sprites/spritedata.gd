@@ -9,8 +9,8 @@ var mid: StringName
 
 @export var frames: SpriteFrames
 
-@export var sex: Enu.Sex = Enu.Sex.ANY
-@export var animation_states: Array[Enu.AnimationState] = [Enu.AnimationState.IDLE]
+@export var sex: Enum.Sex = Enum.Sex.ANY
+@export var animation_states: Array[Enum.AnimationState] = [Enum.AnimationState.IDLE]
 
 @export var offset_global: Vector2 = Vector2.ZERO
 @export var offset_looking_down: Vector2 = Vector2.ZERO

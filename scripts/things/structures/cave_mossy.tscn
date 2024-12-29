@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dg6nouibqkng2"]
 
-[ext_resource type="Script" uid="uid://83qpj2lnm4nu" path="res://scripts/things/structures/portal.gd" id="1_wjt5v"]
-[ext_resource type="Texture2D" uid="uid://dtm8bl8if116t" path="res://assets/textures/world/portals/basic.png" id="2_osk8n"]
+[ext_resource type="Script" uid="uid://83qpj2lnm4nu" path="res://scripts/things/structures/portal.gd" id="1_yeqd3"]
+[ext_resource type="Texture2D" uid="uid://dtm8bl8if116t" path="res://assets/textures/world/portals/basic.png" id="2_acxe8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ju1ud"]
 size = Vector2(215.5, 89)
@@ -10,10 +10,10 @@ size = Vector2(215.5, 89)
 size = Vector2(96, 64)
 
 [node name="Portal" type="StaticBody2D"]
-script = ExtResource("1_wjt5v")
+script = ExtResource("1_yeqd3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_osk8n")
+texture = ExtResource("2_acxe8")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 14.5)

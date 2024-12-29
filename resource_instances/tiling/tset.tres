@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=53 format=3 uid="uid://dt7wa4b136j67"]
+[gd_resource type="TileSet" load_steps=55 format=3 uid="uid://dt7wa4b136j67"]
 
 [ext_resource type="Texture2D" uid="uid://dfw0k5nv07jm" path="res://assets/textures/world/terrain/temperate_grass/grass.png" id="1_ggyrk"]
 [ext_resource type="Texture2D" uid="uid://c70rprfwrpnkq" path="res://assets/textures/world/terrain/sand.png" id="2_o0c2o"]
@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://ddbmpvegrg8ph" path="res://assets/textures/world/terrain/ocean_water/PineTools.com_files/water1.png" id="25_hgjfn"]
 [ext_resource type="Texture2D" uid="uid://ixq1nwvkkwml" path="res://assets/textures/world/bushes/bush2.png" id="25_rhy6d"]
 [ext_resource type="Texture2D" uid="uid://dk1ng3eaqtodb" path="res://assets/textures/world/terrain/ocean_water/PineTools.com_files/water2.png" id="26_mgegi"]
+[ext_resource type="PackedScene" uid="uid://dg6nouibqkng2" path="res://scripts/things/structures/cave_mossy.tscn" id="27_d33v4"]
 [ext_resource type="Texture2D" uid="uid://cwdqvvle4scon" path="res://assets/textures/world/terrain/ocean_water/PineTools.com_files/water3.png" id="27_drvrv"]
 [ext_resource type="Texture2D" uid="uid://iwshkd2aenku" path="res://assets/textures/world/terrain/ocean_water/PineTools.com_files/water4.png" id="28_7wc05"]
 [ext_resource type="Texture2D" uid="uid://dn8ivn665top" path="res://assets/textures/world/terrain/ocean_water/PineTools.com_files/water5.png" id="29_5lah5"]
@@ -2372,6 +2373,9 @@ texture_region_size = Vector2i(32, 32)
 0:0/1 = 1
 0:0/1/flip_h = true
 
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_vp3en"]
+scenes/0/scene = ExtResource("27_d33v4")
+
 [resource]
 tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
@@ -2400,6 +2404,7 @@ sources/5013 = SubResource("TileSetAtlasSource_lmik2")
 sources/5014 = SubResource("TileSetAtlasSource_404h0")
 sources/5015 = SubResource("TileSetAtlasSource_me0rv")
 sources/50 = SubResource("TileSetAtlasSource_t70nj")
+sources/7 = SubResource("TileSetScenesCollectionSource_vp3en")
 metadata/_better_terrain = {
 "decoration": ["Decoration", Color(0.411765, 0.411765, 0.411765, 1), 3, [], {
 "path": "res://addons/better-terrain/icons/Decoration.svg"
