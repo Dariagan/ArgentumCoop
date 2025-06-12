@@ -1,7 +1,7 @@
-use godot::classes::{ISprite2D, Material, Shader, ShaderMaterial, Sprite2D};
 use godot::{register::GodotClass, prelude::*};
-use rand_distr::{Distribution, WeightedAliasIndex};
-use rand_pcg::Lcg128Xsl64; use std::fmt::{self, format};
+use rand_distr::{Distribution};
+use rand_distr::weighted::WeightedAliasIndex;
+use rand_pcg::Lcg128Xsl64; use std::fmt::{self};
 use std::hash::{Hash, Hasher};
 pub use crate::utils::uns_vec::UnsVec;
 
@@ -16,6 +16,21 @@ use strum_macros::EnumIter;
 #[derive(GodotConvert, Var, Export, Clone, Copy, EnumCount, Debug, Display, EnumIter, VariantNames)] #[godot(via = i32)]
 pub enum TileZLevel {Soil = 0, Water=1, Floor=2, Stain=3, Structure=4, Roof=5,}
 impl Default for TileZLevel {fn default() -> Self {Self::Soil}} impl Hash for TileZLevel {fn hash<H: Hasher>(&self, state: &mut H) {state.write_i8(*self as i8)}}
+
+impl TileZLevel{
+  pub fn new(i: i32) -> Self {
+    match i {
+      0 => Self::Soil,
+      1 => Self::Water,
+      2 => Self::Floor,
+      3 => Self::Stain,
+      4 => Self::Structure,
+      5 => Self::Roof,
+      _ => panic!("TileZLevel::new: invalid i={}", i),
+    }
+  }
+}
+
 
 #[derive(GodotClass, Debug)]
 #[class(tool, base=Resource)]

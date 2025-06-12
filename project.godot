@@ -22,7 +22,7 @@ resources_spreadsheet_view/context_menu_on_leftclick=false
 
 config/name="ArgentumCoop"
 run/main_scene="res://scenes/main.tscn"
-config/features=PackedStringArray("4.4")
+config/features=PackedStringArray("4.5")
 
 [autoload]
 
@@ -149,3 +149,4 @@ melee={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"

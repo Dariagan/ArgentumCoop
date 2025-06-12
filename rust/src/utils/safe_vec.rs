@@ -4,6 +4,8 @@ use std::hash::{Hash, Hasher};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 use godot::builtin::{Vector2, Vector2i};
+use rand::Rng;
+use rand_pcg::Lcg128Xsl64;
 
 use crate::utils::uns_vec::UnsVec;
 
@@ -18,6 +20,17 @@ impl SafeVec {
   pub const ZERO: SafeVec = SafeVec{lef: 0, right: 0}; pub const ONE: SafeVec = SafeVec{lef: 1, right: 1};
 
   pub fn new(lef: i32, right: i32) -> Self {SafeVec { lef, right }}
+
+  pub fn random_dir(rng: &mut Lcg128Xsl64) -> SafeVec {
+    let mut dir = SafeVec::ZERO;
+      dir = match rng.random_range(0..4) {
+        0 => SafeVec { lef: 1, right: 0 },
+        1 => SafeVec { lef: 0, right: 1 },
+        2 => SafeVec { lef: -1, right: 0 },
+        _ => SafeVec { lef: 0, right: -1 },
+      };
+    dir
+  }
 
   pub fn add_assign_lef(&mut self, other: &Self) {self.lef += other.lef;}
   pub fn add_assign_right(&mut self, other: &Self) {self.right += other.right;}

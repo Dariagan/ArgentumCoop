@@ -1,7 +1,7 @@
 use std::borrow::BorrowMut;
 use rust_tilemap::RustTileMap;
 
-use crate::beings::{spawn_weights_matrix::{self, SpawnWeight, SpawnWeightsMatrix}, BeingGenTemplIdAndFac};
+use crate::beings::{spawn_weights_matrix::{SpawnWeight, SpawnWeightsMatrix}, BeingGenTemplIdAndFac};
 
 use super::*;
 use std::collections::{HashMap, HashSet};
@@ -10,8 +10,8 @@ use std::collections::{HashMap, HashSet};
 //RECOMMENDED SIZE = 2500X2500
 pub struct FracturedContinentGenerator{}
 
-#[derive(strum_macros::VariantNames, EnumCount)] #[allow(non_camel_case_types)]
-enum Target{ beach = 0, oceanfloor, lake, cont, tree, bush, ocean, cave0, cave1, cave2}//no poner targets nuevos al final (ahí van las caves)
+#[derive(VariantNames, EnumCount)] #[allow(non_camel_case_types, dead_code)]
+enum Target{beach = 0, oceanfloor, lake, cont, tree, bush, ocean, cave0, cave1, cave2}//no poner targets nuevos al final (ahí van las caves)
 
 
 const BIG_LAKER_CUTOFF: f32 = 1.23;
@@ -21,8 +21,7 @@ const FORESTER_CUTOFF: f32 = 5.4;
 
 //TODO LO Q SE TOQUE EN EL GAMEPLAY DEBE SER GUARDADO EN UN DICT(INCLUYENDO LOS ÁRBOLES DESTRUIDOS)
 impl IFormationGenerator for FracturedContinentGenerator {
-fn generate(tilemap: &mut RustTileMap, origin: UnsVec, size: UnsVec,
-tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary,
+fn generate(tilemap: &mut RustTileMap, origin: UnsVec, size: UnsVec, tile_selection: Gd<TileSelection>, seed: i32, data: Dictionary,
 ) {unsafe{
   
   //NOTA: SI ES MUY ALTO SE QUEDA INFINITAMENTE EN EL WHILE DE ABAJO
@@ -94,7 +93,7 @@ let mut continenter_offset: UnsVec = UnsVec { lef: 0, right: 0 };
 
 const N_THREADS: usize = 16;
 let mut threads: [Option<JoinHandle<()>>; N_THREADS] = Default::default();
-let mut rngs: [Pcg64; N_THREADS] = core::array::from_fn(|i| Seeder::from(seed+i as i32).make_rng());
+let mut rngs: [Pcg64; N_THREADS] = core::array::from_fn(|i| Seeder::from(seed+i as i32).into_rng());
 let mut rngs: SendMutPtr<[Pcg64; N_THREADS]> = make_mut_ptr!(&mut rngs);
 
 let mut bushes: [HashSet<UnsVec>; N_THREADS] = Default::default();
@@ -137,8 +136,8 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
         tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::lake as usize).get_unid(rng))
       }
       else if beachness < BEACHER_CUTOFF - 0.05{
-        let good_roll: bool = rng.gen_range(0.0..=4.0) + forester.get_noise_2d(rel_coords)*1.4 > FORESTER_CUTOFF;
-        let rogue_tree: bool = rng.gen_bool(1.0/1000.0);
+        let good_roll: bool = rng.random_range(0.0..=4.0) + forester.get_noise_2d(rel_coords)*1.4 > FORESTER_CUTOFF;
+        let rogue_tree: bool = rng.random_bool(1.0/1000.0);
         
         let tree: bool = (good_roll || rogue_tree) && clear_of(trees, rel_coords, 3, false);
         
@@ -146,7 +145,7 @@ for thread_i in 0..N_THREADS {threads[thread_i] = Some(thread::spawn(move || {
           trees.insert(rel_coords);
           tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::tree as usize).get_unid(rng));
         }
-        else if rng.gen_bool(1.0/400.0) && clear_of(&bushes, rel_coords, 1, false){
+        else if rng.random_bool(1.0/400.0) && clear_of(&bushes, rel_coords, 1, false){
           bushes.insert(rel_coords);
           tiles_2b_placed.assign_unid(unidordist_mped2targets.drf().get_unchecked(Target::bush as usize).get_unid(rng));
         }
@@ -177,8 +176,8 @@ for (thread_i, thread) in threads.into_iter().enumerate() {
   let mut placed_count: usize = 0;
   while placed_count < placed_dungeons_coords.len() {
     let r_coords = UnsVec {
-        lef: rng.gen_range(size.lef/10..size.lef*9/10),
-        right: rng.gen_range(size.right/10..size.right*9/10),
+        lef: rng.random_range(size.lef/10..size.lef*9/10),
+        right: rng.random_range(size.right/10..size.right*9/10),
       };
   
     let continentness = calc_continentness(continenter, r_coords, size, Some(peninsuler), Some(continenter_offset), None);

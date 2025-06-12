@@ -5,6 +5,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 
 use godot::builtin::{Vector2, Vector2i};
 use rand::Rng;
+use rand_pcg::Lcg128Xsl64;
 
 use crate::utils::safe_vec::SafeVec;
 
@@ -17,9 +18,11 @@ impl UnsVec {
   pub fn new(lef: u32, right: u32) -> Self {UnsVec { lef, right }}
 
   pub fn new_from_thread_rng(min: u32, max_exc: u32) -> Self{
-    let mut rng = rand::thread_rng();
-    UnsVec {lef: rng.gen_range(min..max_exc) , right: rng.gen_range(min..max_exc)}
+    let mut rng = rand::rng();
+    UnsVec {lef: rng.random_range(min..max_exc) , right: rng.random_range(min..max_exc)}
   }
+  //, rng: &mut Lcg128Xsl64
+
 
   pub fn add_assign_lef(&mut self, other: &Self) {self.lef += other.lef;}
   pub fn add_assign_right(&mut self, other: &Self) {self.right += other.right;}

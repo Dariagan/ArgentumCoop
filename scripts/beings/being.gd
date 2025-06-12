@@ -192,3 +192,4 @@ func distance_to(thing: Node2D) -> float: return self.global_position.distance_t
 
 @rpc("call_local")
 func setsync_zindex(pz_index: int): self.z_index = pz_index
+@rpc("call_local") func setsync_uid(puid: int): self.uid = puid

@@ -12,8 +12,8 @@ pub fn sample_from_weighted_map(
     
     if total_weight == 0 {return None; }
     
-    let mut rng = rand::thread_rng();
-    let random_value: u16 = rng.gen_range(0..total_weight);
+    let mut rng = rand::rng();
+    let random_value: u16 = rng.random_range(0..total_weight);
     
     let mut accumulated_weight = 0;
     

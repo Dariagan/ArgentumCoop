@@ -1,4 +1,5 @@
 mod fractured_continent_generator;
+mod dungeon_generator;
 
 pub use godot::builtin::Dictionary;
 pub use rust_tilemap::world_matrix::*;

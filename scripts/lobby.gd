@@ -194,8 +194,11 @@ func start_new_game() -> void:
 		var being: Being = tile_map.spawn_starting_player(player_being_preinit_data, mpeers[i])
 		spawned_beings.push_back(being)
 		being.give_control.rpc(mpeers[i])
+
+		
+		
+		
 		i+=1
-	
 	#%OmniLight.set_process(true)
 	%OmniLight.enable_process()
 	

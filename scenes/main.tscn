@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://3oyxjehm0b8"]
+[gd_scene load_steps=14 format=3 uid="uid://3oyxjehm0b8"]
 
 [ext_resource type="Script" uid="uid://xety1nexsqo3" path="res://main.gd" id="1_iuim6"]
 [ext_resource type="Script" uid="uid://c2n7c5oi1frwx" path="res://scripts/inventory/inventory_interface.gd" id="4_10wcn"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://bl4pbcsywbg6y" path="res://assets/daynightcycle-gradient-texture.tres" id="5_ya4ey"]
 [ext_resource type="Script" uid="uid://xa1qswwnhun1" path="res://scripts/multiplayer_spawner.gd" id="6_r3dut"]
 [ext_resource type="Script" uid="uid://c4qtbvror1smx" path="res://scripts/ui/uim_menu_control.gd" id="7_6o24h"]
+[ext_resource type="Script" uid="uid://ctm4oxguypaoc" path="res://scenes/label.gd" id="7_eb6dy"]
 [ext_resource type="Script" uid="uid://b2e7g5ye5jpxt" path="res://scripts/tmap.gd" id="7_itdl2"]
 [ext_resource type="PackedScene" uid="uid://c1rsrsvwmbh6l" path="res://scenes/ui/main_menu.tscn" id="7_wv7ku"]
 [ext_resource type="PackedScene" uid="uid://dvqq1banvf1yw" path="res://scenes/ui/lobby/lobby_interface.tscn" id="10_ysw5o"]
@@ -44,6 +45,11 @@ spawn_path = NodePath("../GdTileMap")
 script = ExtResource("6_r3dut")
 
 [node name="Canvas" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="Canvas"]
+offset_right = 40.0
+offset_bottom = 23.0
+script = ExtResource("7_eb6dy")
 
 [node name="HUD" type="Control" parent="Canvas"]
 visible = false

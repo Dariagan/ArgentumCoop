@@ -5,6 +5,7 @@ use std::ops::{Index, IndexMut};
 pub use crate::tiling::*;
 
 pub struct WorldMatrix {matrix: Matrix<TileUnidArray>,}
+#[allow(dead_code)]
 impl WorldMatrix {
 
   pub fn size(&self) -> UnsVec{self.matrix.size()}

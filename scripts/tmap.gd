@@ -49,9 +49,9 @@ func birth_being_at(preinit: BeingPreInit, loc_pos: Vector2, isplayerfac:bool=fa
 	var being: Being = preload("res://scenes/being.tscn").instantiate()
 	#nota: el being.name hay q ponerlo antes del add_child
 	being.name = str(mbirthed_beings_i)
-	add_child(being); being.setsync_zindex.rpc(beings_z_index)
+	add_child(being); being.setsync_zindex.rpc(beings_z_index); 
 	being.construct(preinit, mbirthed_beings_i); mbirthed_beings_i += 1
-	being.setsync_pos_reliable.rpc(loc_pos)
+	being.setsync_pos_reliable.rpc(loc_pos); being.setsync_uid.rpc(mbirthed_beings_i)
 	if master != null:
 		set_master_follower.rpc(master.get_path(), being.get_path())
 		if mp_auth != 1: being.setsync_mp_authority.rpc(mp_auth)
