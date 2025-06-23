@@ -1,7 +1,7 @@
 #include "register_types.h"
-#include "FormationGenerator.hpp"
-#include "FracturedContinentGenerator.hpp"
-#include "ArgentumTileMap.hpp"
+#include "CppFormationGenerator.hpp"
+#include "CppFracturedContinentGenerator.hpp"
+#include "CppArgentumTileMap.hpp"
 #include "BeingBuilder.hpp"
 
 #include <godot_cpp/core/defs.hpp>
@@ -20,10 +20,10 @@ void initialize_argentum_cpp(ModuleInitializationLevel p_level)
 {
     if(p_level != MODULE_INITIALIZATION_LEVEL_SCENE){return;}
 
-    ClassDB::register_class<ArgentumTileMap>();
+    ClassDB::register_class<CppArgentumTileMap>();
     ClassDB::register_class<BeingBuilder>();
-    ClassDB::register_abstract_class<FormationGenerator>();
-    ClassDB::register_class<FracturedContinentGenerator>();
+    ClassDB::register_abstract_class<CppFormationGenerator>();
+    ClassDB::register_class<CppFracturedContinentGenerator>();
     
     // register custom classes here in order for them to show up in Godot!
 }

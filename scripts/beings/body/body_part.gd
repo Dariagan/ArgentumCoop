@@ -23,5 +23,3 @@ var health = max_hit_points
 var is_destroyed: bool = false
 
 signal destroyed
-
-

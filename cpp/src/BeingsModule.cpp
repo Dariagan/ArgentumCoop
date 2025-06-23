@@ -106,7 +106,7 @@ void BeingsModule::doNaturalSpawning()
 
                 letref beingkindUids = spawnWeightsMapping.first;
                 let randomBeingkindUid = beingkindUids[distribution(mEngine)];
-
+                
                 birthBeingOfKind(swCoords*SpawnWeightsMatrix::DOWNSCALING_FACTOR, randomBeingkindUid);
                 (*mBeingsInChunkCount)[chunkCoords]++;
             }
@@ -117,7 +117,7 @@ void BeingsModule::doNaturalSpawning()
     
 }
 
-BeingsModule::BeingsModule(godot::ArgentumTileMap* argentumTileMap, const SafeVec& size)
+BeingsModule::BeingsModule(godot::CppArgentumTileMap* argentumTileMap, const SafeVec& size)
 {
     this->mArgentumTileMap = argentumTileMap;
     this->mBeingsInChunkCount = std::make_unique<matrix<std::uint_fast16_t>>(size, MACROSCOPIC_SPAWNING_CHUNK_SIZE*mSpawnWeightsMatrix->DOWNSCALING_FACTOR);

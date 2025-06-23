@@ -1,8 +1,7 @@
-[gd_scene load_steps=18 format=3 uid="uid://dvqq1banvf1yw"]
+[gd_scene load_steps=17 format=3 uid="uid://dvqq1banvf1yw"]
 
-[ext_resource type="Script" path="res://scripts/ui/uim_lobby_interface.gd" id="1_gewq0"]
-[ext_resource type="PackedScene" uid="uid://cpat3jp6fu4q2" path="res://scenes/ui/lobby/chat_component.tscn" id="2_5fe4g"]
-[ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse-7021371.jpg" id="3_rncrb"]
+[ext_resource type="Script" uid="uid://bwk5fc6be47xd" path="res://scripts/ui/uim_lobby_interface.gd" id="1_gewq0"]
+[ext_resource type="Texture2D" uid="uid://c02fglij4xt7o" path="res://assets/apocalypse.jpg" id="3_rncrb"]
 [ext_resource type="FontFile" uid="uid://ctrsrtkxeu85y" path="res://assets/fonts/Exocet2.ttf" id="4_n6a85"]
 [ext_resource type="StyleBox" uid="uid://c1i3svkycn37m" path="res://resource_instances/ui/buttonhover.tres" id="5_43a4n"]
 [ext_resource type="PackedScene" uid="uid://vxv66o5h4qwi" path="res://scenes/ui/coolborder.tscn" id="5_msqxt"]
@@ -67,11 +66,6 @@ size_flags_vertical = 3
 [node name="VBoxContainer" type="VBoxContainer" parent="ChatLobbyContainer"]
 layout_mode = 2
 
-[node name="ChatComponent" parent="ChatLobbyContainer/VBoxContainer" node_paths=PackedStringArray("chat_text_edit", "chat_label", "scroll_container") instance=ExtResource("2_5fe4g")]
-chat_text_edit = NodePath("../HBoxContainer3/WriteMsgBox")
-chat_label = NodePath("../HBoxContainer2/ScrollContainer/ChatLabel")
-scroll_container = NodePath("../HBoxContainer2/ScrollContainer")
-
 [node name="HBoxContainer1" type="HBoxContainer" parent="ChatLobbyContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
@@ -107,7 +101,6 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 
 [node name="WriteMsgBox" type="TextEdit" parent="ChatLobbyContainer/VBoxContainer/HBoxContainer3"]
-clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 caret_blink = true
@@ -119,23 +112,25 @@ layout_mode = 2
 text = "Create Character"
 
 [node name="CharacterCreation" type="TextureRect" parent="."]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("3_rncrb")
-expand_mode = 5
+expand_mode = 3
 
 [node name="HasTheme" type="Control" parent="CharacterCreation"]
-custom_minimum_size = Vector2(1024, 600)
+clip_contents = true
+custom_minimum_size = Vector2(1024, 768)
 layout_mode = 1
 anchor_left = 0.13
 anchor_top = 0.1
 anchor_right = 0.87
 anchor_bottom = 0.9
 offset_left = -0.464005
-offset_top = -0.320004
+offset_top = -0.320007
 offset_right = -0.368042
 offset_bottom = 0.295959
 grow_horizontal = 2
@@ -193,14 +188,14 @@ anchor_right = 0.7
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.721569, 0.713726, 0.435294, 1)
-theme_override_colors/font_placeholder_color = Color(0.721569, 0.713726, 0.435294, 1)
 theme_override_colors/caret_color = Color(0.733333, 0.501961, 0.298039, 1)
+theme_override_colors/font_placeholder_color = Color(0.721569, 0.713726, 0.435294, 1)
+theme_override_colors/font_color = Color(0.721569, 0.713726, 0.435294, 1)
 theme_override_fonts/font = ExtResource("4_n6a85")
 theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = ExtResource("6_nuk4o")
 theme_override_styles/focus = ExtResource("6_nuk4o")
 theme_override_styles/read_only = ExtResource("6_nuk4o")
+theme_override_styles/normal = ExtResource("6_nuk4o")
 placeholder_text = "Name"
 alignment = 1
 max_length = 28
@@ -262,17 +257,17 @@ theme_override_constants/margin_bottom = 10
 [node name="VBoxContainer" type="VBoxContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="NetStatsLabel" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 27
 text = "Net stats"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
+[node name="NetStatsScrollContainer" type="ScrollContainer" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer/ScrollContainer"]
+[node name="NetStatsContentLabel" type="Label" parent="CharacterCreation/HasTheme/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/WhiteBorderTopLeft2/MarginContainer/VBoxContainer/NetStatsScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

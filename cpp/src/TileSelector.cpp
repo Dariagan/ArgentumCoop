@@ -1,7 +1,7 @@
 #include "TileSelector.hpp"
 using namespace godot;
 
-TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const ArgentumTileMap& argentumTileMap, const std::uint_fast32_t seed, const std::uint_fast8_t input_n_threads) try : 
+TileSelector::TileSelector(const Ref<Resource>& gdTileSelection, const CppArgentumTileMap& argentumTileMap, const std::uint_fast32_t seed, const std::uint_fast8_t input_n_threads) try : 
     TARGETS_COUNT(((Array)gdTileSelection->get("targets")).size()), N_THREADS(input_n_threads)
 {
     if (input_n_threads < 1){UtilityFunctions::printerr("TileSelector.cpp: passed input_n_threads is less than 1");return;}

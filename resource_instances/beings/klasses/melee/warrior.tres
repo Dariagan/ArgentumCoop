@@ -1,11 +1,16 @@
-[gd_resource type="Resource" script_class="Klass" load_steps=3 format=3 uid="uid://b8lgllcsn3y18"]
+[gd_resource type="Resource" script_class="Klass" load_steps=5 format=3 uid="uid://crunidnoqow0l"]
 
-[ext_resource type="Resource" uid="uid://bm5mlop6d50eo" path="res://resource_instances/beings/races/uncontrollable/pig.tres" id="1_jrhdh"]
-[ext_resource type="Script" path="res://scripts/beings/being_klass.gd" id="2_5fesx"]
+[ext_resource type="Script" uid="uid://cxobg6ntpa8p7" path="res://scripts/beings/initialization/being_gen_template.gd" id="1_gujke"]
+[ext_resource type="Resource" uid="uid://bnfqpjfvyyurv" path="res://resource_instances/beings/races/combat_multipliers/basic.tres" id="1_shbgc"]
+[ext_resource type="Script" uid="uid://cwjwcbyo0kbwl" path="res://scripts/beings/klass.gd" id="2_5fesx"]
+[ext_resource type="RustBeingGenTemplate" uid="uid://dxcvvfdoulgn6" path="res://resource_instances/beings/being_gen_templates/common_chancho.tres" id="2_5nu35"]
 
 [resource]
 script = ExtResource("2_5fesx")
-id = "class_warrior"
-name = "Warrior"
-available_followers = Array[Resource("res://scripts/beings/race/uncontrollable_race.gd")]([ExtResource("1_jrhdh")])
-available_spells = Array[String]([])
+mname = "Warrior"
+mselectable_followers = Array[ExtResource("1_gujke")]([ExtResource("2_5nu35")])
+mmax_followers = 1
+mmax_bk_points = -1
+mcombat_multipliers = ExtResource("1_shbgc")
+mavailable_spells = Array[StringName]([])
+metadata/_custom_type_script = ExtResource("2_5fesx")

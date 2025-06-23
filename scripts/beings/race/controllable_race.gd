@@ -1,16 +1,28 @@
 extends BasicRace
 class_name ControllableRace
 
-@export var id: String = "controllable_"
+@export var mcombat_multipliers: CombatMultipliers = CombatMultipliers.new()
+@export var mhead_sprites_datas: Array[SpriteData]
 
-@export var klasses: Array[Klass]
+@export var mbody_sprites_datas: Array[BodySpriteData]
+@export var mother_sprites_datas: Array[SpriteData]
 
-@export var max_width_frontally_sideways_height: Vector3 = Vector3(1, 1, 1.3)
+@export var mklasses: Array[Klass]
+
+@export var mmax_width_frontally_sideways_height: Vector3 = Vector3(1, 1, 1.3)
+@export var mfallback_possible_loot: Dictionary
+
 
 @export_category("Work Multipliers")
 
-@export_range(0, 3) var global_learning_multiplier: float = 1
-@export_range(0, 3) var smithing_learning_multiplier: float = 1
-@export_range(0, 3) var manual_labor_multiplier: float = 1
-@export_range(0, 3) var research_multiplier: float = 1
-@export_range(0, 3) var trade_proficiency: float = 1
+@export_range(0, 3) var mglobal_learning_multiplier: float = 1
+@export_range(0, 3) var msmithing_learning_multiplier: float = 1
+@export_range(0, 3) var mmanual_labor_multiplier: float = 1
+@export_range(0, 3) var mresearch_multiplier: float = 1
+@export_range(0, 3) var mtrade_proficiency: float = 1
+
+func validate() -> bool:
+	if mklasses.is_empty(): return false
+	for klass: Klass in mklasses:
+		if klass == null: return false
+	return self.mmales_ratio >= 0.0 && self.mmales_ratio <= 1.0 && self.mhunger_rate >= 0.0 && self.mhunger_size > 0.0

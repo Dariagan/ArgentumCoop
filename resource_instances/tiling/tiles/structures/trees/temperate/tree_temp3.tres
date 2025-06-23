@@ -1,0 +1,6 @@
+[gd_resource type="Tile" format=3 uid="uid://cdanqso8go1bl"]
+
+[resource]
+mz_level = 4
+msource_atlas = 4
+morigin_position = Vector2i(25, 1)

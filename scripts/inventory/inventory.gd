@@ -17,4 +17,3 @@ func populate_item_grid(slot_datas: Array[SlotData]) -> void:
 		
 		if slot_data:
 			slot.set_slot_data(slot_data)
-

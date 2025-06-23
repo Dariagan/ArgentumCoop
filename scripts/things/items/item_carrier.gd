@@ -6,7 +6,7 @@ class_name ItemCarrier
 @export var max_contained_real_weight: float = 0
 @export var weight_multiplier: float = 0
 @export var encumberance_multiplier: float = 0
-@export var encumberance_reducion_on_worn_only: bool = true
+@export var encumberance_reduction_on_worn_only: bool = true
 
 var held_items: Array
 

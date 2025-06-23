@@ -1,9 +1,17 @@
 # singleton
-extends Node
+extends Object
+class_name GameData
+
+func _init() -> void:
+	Engine.register_singleton(&"GameData", self)
 
 
 #clearear al salir de la partida
-var factions: Dictionary = {
-	&"player": PlayerFaction.new(),# en el caso de cargar una savefile, va a haber q agregarlo diferentemente
-	&"wild": WildFaction.new(),
+static var factions: Dictionary[StringName, Faction] = {
+	Keys.PLAYER_FACTION_INSTANCE: PlayerFaction.new(),# en el caso de cargar una savefile, va a haber q agregarlo diferentemente
+	Keys.WILD_FACTION_INSTANCE: WildFaction.new(),
 }
+
+#value: portal location
+static var portals_gridpos: Dictionary[StringName, Vector2i] = {}
+static var portals: Dictionary[StringName, Portal] = {}

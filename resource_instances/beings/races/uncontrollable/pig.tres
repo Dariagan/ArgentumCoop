@@ -1,30 +1,32 @@
-[gd_resource type="Resource" script_class="UncontrollableRace" load_steps=3 format=3 uid="uid://bm5mlop6d50eo"]
+[gd_resource type="BasicRace" script_class="UncontrollableRace" load_steps=7 format=3 uid="uid://dr4fk4i73qhkk"]
 
-[ext_resource type="Resource" uid="uid://cms52k2dbl8ho" path="res://resource_instances/beings/sprites/spritesdatas/body/pig_body_data.tres" id="1_7fyc7"]
-[ext_resource type="Script" path="res://scripts/beings/race/uncontrollable_race.gd" id="1_b1aba"]
+[ext_resource type="Script" uid="uid://nkdjmrfrcmic" path="res://scripts/beings/sprites/bodyspritedata.gd" id="1_feonu"]
+[ext_resource type="Resource" uid="uid://cms52k2dbl8ho" path="res://resource_instances/beings/sprites/spritesdatas/body/pig_body_data.tres" id="2_fydbc"]
+[ext_resource type="Script" uid="uid://cxgjpxndfrg4y" path="res://scripts/beings/sprites/spritedata.gd" id="2_kwkpa"]
+[ext_resource type="Script" uid="uid://firm1xvtgire" path="res://scripts/damage_health_system/combat_multipliers.gd" id="3_87tya"]
+[ext_resource type="Script" uid="uid://gl17abvp1ckc" path="res://scripts/beings/race/uncontrollable_race.gd" id="3_elw0e"]
+
+[sub_resource type="Resource" id="Resource_w5fxt"]
+script = ExtResource("3_87tya")
+health = 1.0
+speed = 1.0
+strength = 1.0
+stamina = 1.0
+sneaking_proficiency = 1.0
+incoming_damage_types = {
+"blunt": 1,
+"fire": 1,
+"magic": 1,
+"sharp": 1
+}
+war_cry_strength = 1.0
+metadata/_custom_type_script = ExtResource("3_87tya")
 
 [resource]
-script = ExtResource("1_b1aba")
-id = "uncontrollable_pig"
-taming_difficulty = 0.5
-possible_loot = {}
-name = &" Pig"
-default_being_names = Array[StringName]([])
-default_blacklisted_tiles_for_spawning = Array[String]([])
-head_sprites_datas = Array[Resource("res://scripts/beings/sprites/sprite_data.gd")]([])
-body_sprites_datas = Array[Resource("res://scripts/beings/sprites/body_sprite_data.gd")]([ExtResource("1_7fyc7")])
-other_sprites_datas = Array[Resource("res://scripts/beings/sprites/sprite_data.gd")]([])
-demonym = ""
-singular_denomination = ""
-plural_denomination = ""
-description = ""
-can_equip_tools = false
-filth_generation = 0.0
-max_encumberance_multiplier = 1.0
-comfortable_temp_range = Vector2i(16, 23)
-hunger_rate = 1.0
-diets = Array[Resource("res://scripts/beings/race/diet.gd")]([])
-can_walk_on = Array[int]([0])
-can_vent = false
-can_climb = false
-males_ratio = 0.5
+script = ExtResource("3_elw0e")
+mtaming_difficulty = 0.5
+mcombat_multipliers = SubResource("Resource_w5fxt")
+mhead_sprites_datas = Array[ExtResource("2_kwkpa")]([])
+mbody_sprites_datas = Array[ExtResource("1_feonu")]([ExtResource("2_fydbc")])
+mfallback_possible_loot = {}
+metadata/_custom_type_script = ExtResource("3_elw0e")

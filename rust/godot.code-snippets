@@ -253,7 +253,7 @@
         "#[class(tool, init, base=Resource)]",
         "pub struct ${1:MyResource} {",
         "\tbase: Base<Resource>,",
-        "\t#[export] id: StringName,",
+        "\t#[var] id: StringName,",
         "\t#[export] ${2:attribute}: i64,",
         "}",
         "impl $1 {",

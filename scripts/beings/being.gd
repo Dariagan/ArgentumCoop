@@ -1,184 +1,195 @@
 extends CharacterBody2D
-
-#todo separar funciones en componentes hijos?
 class_name Being
 #para persistirlo habrá que usar packedscene para guardar las cosas custom children q puede ser q tenga, sino habrá q iterar por cada child
+var uid: int
+var maccel = 2500
+var mai_process: AiProcess = AiProcess.new(self)
 
-var uid: int = randi_range(-9223372036854775808, 9223372036854775807)
+var friction = 1600 #hacer q provenga de la tile en custom data
+@onready var mcamera: Camera2D = $Camera2D; @onready var mbodyholder: Node2D = $BodyHolder
+@onready var mistate: BeingInternalState = $InternalState
+@onready var mbody: AnimatedBodyPortion = $BodyHolder/Body; @onready var mhead: AnimatedBodyPortion = $BodyHolder/Head
+@onready var mnav: NavigationAgent2D = $NavigationAgent2D; @onready var name_label = $NameLabel; 
+@onready var mtilemap: GdTileMap = get_parent()
+@onready var action_area: Area2D = $ActionArea; @onready var maction_collision: CollisionShape2D = $ActionArea/ActionCollision
 
-@export var acceleration = 30
+@onready var maudio_stream_player: AudioStreamPlayer2D = $AudioStreamPlayer2D; var maudio_stream_poly_playback: AudioStreamPlaybackPolyphonic
 
-@export var friction = 16 #hacer q provenga de la tile en custom data
+var mmelee_timeout: float
 
-@onready var body_holder: Node2D = $BodyHolder
-@onready var camera_2d: Camera2D = $Camera2D
+const CHUNK_SIZE: Vector2i = Vector2i(192, 120)
+var mcontroller_speed_multiplier: float = 1
 
-@onready var internal_state: BeingInternalState = $InternalState
-
-signal load_tiles_around_me(cords: Vector2, chunk_size: Vector2i, uid: int)
-
-@onready var body: AnimatedBodyPortion = $BodyHolder/Body
-@onready var head: AnimatedBodyPortion = $BodyHolder/Head
-
-func _ready():
-	_connect_tile_map.rpc()
-
-@rpc("call_local")
-func _connect_tile_map():
-	var tile_map: ArgentumTileMap = get_parent()
-	load_tiles_around_me.connect(tile_map.load_tiles_around)
+func _ready() -> void:
+	var audio_stream_poly: AudioStreamPolyphonic = AudioStreamPolyphonic.new()
+	audio_stream_poly.polyphony = 10
+	maudio_stream_player.stream = audio_stream_poly
+	maudio_stream_player.play()
+	maudio_stream_poly_playback = maudio_stream_player.get_stream_playback()
 
 #constructs for multiplayer too
-func construct(data: BeingStatePreIniter) -> void:
-	if data.sprite_body:
-		body.construct(data.sprite_body, data.body_scale)
-		if data.sprite_head:
-			head.construct(data.sprite_head, data.head_scale, data.sprite_body.head_v_offset, data.body_scale.z)
-	construct_internal_state.rpc(data.serialize())
+func construct(preiniter: BeingPreInit, uid_: int) -> void:
+	if preiniter.msprite_body:
+		mbody.construct(preiniter.msprite_body, preiniter.mbody_scale)
+		if preiniter.msprite_head:
+			mhead.construct(preiniter.msprite_head, preiniter.mhead_scale, preiniter.msprite_body.head_v_offset, preiniter.mbody_scale.z)
+	mistate.construct_from_seri.rpc(preiniter.serialize())
+	if mistate.mrace is UncontrollableRace or not mistate.mfaction is PlayerFaction: _set_controlling_peer.rpc(0)
+	set_ai_process.rpc()
+	var show_label: bool = mistate.mfaction is PlayerFaction or (mistate.mbeing_gen_template and mistate.being_gen_template.display_being_name)
+	set_name_label_text_and_color.rpc(preiniter.mname, mistate.mfaction.mcolor, show_label)
+	self.setsync_node_name_and_uid.rpc(uid_)
+	#TODO key press para ocultar las namelabels de todos (usar el grupo)
 	
-@rpc("call_local")#dejar esto
-func construct_internal_state(data: Dictionary):
-	internal_state.construct(data[BeingStatePreIniter.K.INTERNAL_STATE])
-
-var uncontrolled: bool = true
 
 @rpc("call_local")
-func give_control(peer_id: int) -> void:
-	if internal_state.faction is PlayerFaction and internal_state.race is ControllableRace:
-		uncontrolled = false
-		set_multiplayer_authority(peer_id)
-		if peer_id == multiplayer.get_unique_id() and internal_state.faction is PlayerFaction:
-			camera_2d.make_current()
+func set_ai_process():
+	if mistate.mbeing_gen_template and mistate.mbeing_gen_template.mai_process:
+		mai_process = mistate.mbeing_gen_template.mai_process.new(self)
+	elif mistate.mrace.mai_process:
+		mai_process = mistate.mrace.mai_process.new(self)
+
+@rpc("call_local") func set_name_label_text_and_color(text: String, color: Color, show_label: bool): 
+	var ui_show_labels: bool = true
+	
+	name_label.text = text; name_label.visible = show_label and ui_show_labels
+	name_label.label_settings = name_label.label_settings.duplicate(); name_label.label_settings.font_color = color; 
+
+var mcontrolling_peer: int = 0 : set = _set_controlling_peer
+@rpc("call_local") 
+func _set_controlling_peer(peer: int):  
+	mcontrolling_peer = maxi(0, peer)
+	if mcontrolling_peer == 0: wall_min_slide_angle = 0
+	else: wall_min_slide_angle = 0.261799
+
+@rpc("call_local", "any_peer")
+func give_control(peer_takingover: int) -> void:
+	if (mcontrolling_peer==0 or multiplayer.get_remote_sender_id() == mcontrolling_peer)\
+	   and mistate.mfaction is PlayerFaction and mistate.mrace is ControllableRace:
+		set_multiplayer_authority(peer_takingover)
+		mcontrolling_peer = peer_takingover
+		if peer_takingover == multiplayer.get_unique_id():
+			mcamera.make_current()
 
 @rpc("call_local", "any_peer")
 func take_control() -> void:
-	if internal_state.faction is PlayerFaction and uncontrolled and internal_state.race is ControllableRace:
-		uncontrolled = false
+	if mcontrolling_peer==0 and mistate.mfaction is PlayerFaction and mistate.mrace is ControllableRace:
+		mcontrolling_peer = multiplayer.get_remote_sender_id()
 		set_multiplayer_authority(multiplayer.get_remote_sender_id())
 		if multiplayer.get_unique_id() == multiplayer.get_remote_sender_id():
-			camera_2d.make_current()
+			mcamera.make_current()
 
-@rpc("call_local") 
-func free_control() -> void: uncontrolled = true
-		
-var zoom_min = Vector2(0.05, 0.05); var zoom_max = Vector2(9999999, 9999999)		
+@rpc("call_local", "any_peer") 
+func free_control() -> void: 
+	if mcontrolling_peer == multiplayer.get_remote_sender_id(): mcontrolling_peer = 0
 		
 func _input(event: InputEvent) -> void:
-	if is_multiplayer_authority() and event.is_pressed():
-		
+	if mcontrolling_peer==multiplayer.get_unique_id() and event.is_pressed():
 		if event is InputEventMouseButton:
-			if event.is_action("wheel_down"):
-				camera_2d.zoom *= 0.9
-			elif event.is_action("wheel_up"):
-				camera_2d.zoom *= 1.1
-			camera_2d.zoom = camera_2d.zoom.clamp(zoom_min, zoom_max)
-			
-		if GlobalData.debug and event.is_action("f1"):
-			print((get_parent() as TileMap).local_to_map(position))
-	
+			if Config.enable_change_zoom:
+				if event.is_action(&"wheel_down"):
+					mcamera.zoom *= 0.9
+				elif event.is_action(&"wheel_up"):
+					mcamera.zoom *= 1.1
+				if Config.enable_zoom_limit and not Config.debug:
+					mcamera.zoom = mcamera.zoom.clamp(Config.zoom_out_max, Config.zoom_in_max)
+		if event.is_action_pressed(&"melee") && mmelee_timeout < 0:
+			mmelee_timeout = 10# cambiar por lo del arma actualmente equipada
 		
+		if Config.debug and event.is_action(&"f1"):
+			print(mtilemap.local_to_tilemap(position))
 
-func _physics_process(delta: float) -> void:
-	
-	match [is_multiplayer_authority(), internal_state.faction is PlayerFaction, uncontrolled]:
-		[false, ..]:
-			return
-		[_, false, _]:
-			ai_control()
-		[_, true, false]:
-			_update_direction_axis_by_input(delta)
-		[_, true, true]:
-			owned_ai_control()
-			
+@rpc("call_local") func setsync_mp_authority(peer: int): set_multiplayer_authority(peer)
+
+func _process(delta: float) -> void:
+	var my_peer:int = multiplayer.get_unique_id()
+	mmelee_timeout -= delta
+	mmelee_timeout = maxf(-1.0, mmelee_timeout)
+	match [is_multiplayer_authority(), mcontrolling_peer]:
+		[_, my_peer]: player_control(delta)
+		[true, _]: ai_control(delta); 
 	_update_distance_moved()
 	_update_body_state()
-	
-	_process_animation()
+	_play_animation()
 
-var distance_moved: float; var _previous_position: Vector2 = position
+var mdistance_moved: float; var mprevious_pos: Vector2 = position
 func _update_distance_moved() -> void:
-	distance_moved = position.distance_to(_previous_position)
-	_previous_position = position
+	mdistance_moved = position.distance_to(mprevious_pos)
+	mprevious_pos = position
 	
-func _update_body_state() -> void:
-	if distance_moved > 1:
-		_adjust_speed_scale.rpc(distance_moved, 1)
-		_change_body_state.rpc(BodyState.JOG)
-	elif distance_moved > 0.01:
-		_adjust_speed_scale.rpc(distance_moved, 0.8)
-		_change_body_state.rpc(BodyState.WALK)
-	else:
-		_change_body_state.rpc(BodyState.IDLE)
-	
+func _update_body_state() -> void: 	
+	if mdistance_moved > 1: _adjust_speed_scale(1); _change_body_state(Enum.AnimationState.JOG)
+	elif mdistance_moved > 0.01: _adjust_speed_scale(0.8); _change_body_state(Enum.AnimationState.WALK)
+	else: _change_body_state(Enum.AnimationState.IDLE)
 
-enum BodyState { IDLE, WALK, JOG }
+var mbody_state: Enum.AnimationState = Enum.AnimationState.IDLE
+var mfaced_dir: Enum.Dir = Enum.Dir.DOWN
 
-var _body_state: BodyState = BodyState.IDLE
-		
-var _facing_direction: String = "down"
-
-@rpc("call_local", "unreliable")
-func _change_body_state(new_body_state: BodyState):
-	_body_state = new_body_state
-@rpc ("call_local", "unreliable")
-func _adjust_speed_scale(distance_moved: float, factor: float):
-	for body_part in body_holder.get_children():
+func _change_body_state(new_body_state: Enum.AnimationState):
+	mbody_state = new_body_state
+func _adjust_speed_scale(factor: float):
+	for body_part in mbodyholder.get_children():
 		if body_part is AnimatedBodyPortion:
-			body_part.speed_scale = distance_moved/factor
+			body_part.speed_scale = mdistance_moved/factor
 		
-func owned_ai_control(): pass		
-func ai_control(): pass
+func ai_control(delta: float): mai_process.behave(delta); _update_velocity_and_move(delta)
 	
-var _direction_axis: Vector2 = Vector2.ZERO
-var _velocity: Vector2 = Vector2.ZERO
+var mdirection_axis: Vector2 = Vector2.ZERO
 
-var distance_moved_since_load: float = 501
-func _update_direction_axis_by_input(delta: float) -> void:
+var mdistance_moved_since_load: float = INF
+func player_control(delta: float) -> void:
 	
-	_direction_axis = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	
+	mdirection_axis = Input.get_vector(&"ui_left", &"ui_right", &"ui_up", &"ui_down")
+	mcontroller_speed_multiplier = 1.0
+	_update_velocity_and_move(delta)
+	mdistance_moved_since_load += mdistance_moved
+	if mdistance_moved_since_load > 200:
+		mtilemap.load_tiles_around(mtilemap.local_to_tilemap(position), CHUNK_SIZE, uid)#195, 120
+		mdistance_moved_since_load = 0
+		
+func apply_friction(amount:float, delta:float):velocity=velocity.move_toward(Vector2.ZERO,amount*delta)
+
+@rpc("call_local", "unreliable") func _setsync_velocity(new: Vector2): velocity = new
+
+func _update_velocity_and_move(delta: float):
 	apply_friction(friction, delta)
-	
-	if _direction_axis != Vector2.ZERO:
-		_direction_axis = _direction_axis.normalized()
-		_velocity += _direction_axis * acceleration * delta
-		_velocity = _velocity.limit_length(internal_state.get_max_speed())
-		_update_facing_direction()
-	
-	if not GlobalData.noclip:
-		move_and_collide(_velocity*GlobalData.debug_walk_mult)
-	else:
-		position += _direction_axis * GlobalData.noclip_speed_mult
-	
-	distance_moved_since_load += distance_moved
-	
-	if distance_moved_since_load > 500:
-		load_tiles_around_me.emit(position, Vector2i(195, 120), uid)
-		distance_moved_since_load = 0
+	if mdirection_axis != Vector2.ZERO:
+		mdirection_axis = mdirection_axis.normalized()
+		velocity += mdirection_axis*maccel*delta
+		_setsync_velocity.rpc(velocity.limit_length(mistate.get_max_speed()*mcontroller_speed_multiplier))
+		_update_faced_dir(mdirection_axis)
+		if mcontrolling_peer==0 or not (Config.noclip and mcontrolling_peer > 0):
+			move_and_slide()
+		else:
+			position += mdirection_axis * Config.noclip_speed
 		
-func apply_friction(amount: float, delta: float):
-	_velocity = _velocity.move_toward(Vector2.ZERO, amount * delta)
-	
+func _update_faced_dir(direction: Vector2) -> void:
+	var new_dir: Enum.Dir
+	if absf(direction.x) > absf(direction.y): new_dir = Enum.Dir.LEFT if direction.x < 0 else Enum.Dir.RIGHT
+	else: new_dir = Enum.Dir.UP if direction.y < 0 else Enum.Dir.DOWN
+	if new_dir != mfaced_dir: _setsync_faced_dir.rpc(new_dir)
+
+@rpc("call_local") func _setsync_faced_dir(new_dir: Enum.Dir): 
+	mfaced_dir = new_dir; 
+	match new_dir:
+		Enum.Dir.LEFT: maction_collision.position = Vector2(-20, 15)
+		Enum.Dir.RIGHT: maction_collision.position = Vector2(20, 15)
+		Enum.Dir.UP: maction_collision.position = Vector2(0, -5)
+		Enum.Dir.DOWN: maction_collision.position = Vector2(0, 35)
 		
-func _update_facing_direction() -> void:
-	if abs(_direction_axis.x) > abs(_direction_axis.y): 
-		_facing_direction = "left" if _direction_axis.x < 0 else "right"
-	else: 
-		_facing_direction = "up" if _direction_axis.y < 0 else "down"
-
-# esto debería ser un componente?
-func _process_animation() -> void:	
-	_play_animation(str(BodyState.keys()[_body_state]).to_lower()
-	 + "_" + _facing_direction)
-
-func _play_animation(animation_name: String) -> void:	
-	for body_part in body_holder.get_children():
+func _play_animation() -> void:	
+	for body_part in mbodyholder.get_children():
 		if body_part is AnimatedBodyPortion and body_part.sprite_frames:
-			body_part._play_handled(animation_name)
+			body_part._play_handled(mbody_state, mfaced_dir)
 			
-func serialize() -> Dictionary:
-	return {
-		"direction": _facing_direction,
-		"position": position,
-		"state": internal_state.serialize()
-	}
+func serialize() -> Dictionary:#guardar como packedscene en vez de esto
+	return {&"direction": mfaced_dir, &"position": position, &"state": mistate.serialize(), &"mauth": get_multiplayer_authority()}
+
+@rpc("call_local")func setsync_pos_reliable(loc_pos: Vector2): position=loc_pos; mprevious_pos=loc_pos
+@rpc("call_local")func setsync_node_name_and_uid(_uid:int):self.name="%d%s%s"%[_uid,mistate.mrace.mname,name_label.text];self.uid=_uid;
+
+func distance_to(thing: Node2D) -> float: return self.global_position.distance_to(thing.global_position)
+
+@rpc("call_local")
+func setsync_zindex(pz_index: int): self.z_index = pz_index
+@rpc("call_local") func setsync_uid(puid: int): self.uid = puid

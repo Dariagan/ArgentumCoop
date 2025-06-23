@@ -11,7 +11,7 @@ func _init(data: Dictionary = {}):
 	# TODO
 	pass
 
-#HACER QUE CADA BODY PART SEA UN NODE?
+#HACER QUE CADA BODY PART SEA UN NODE? NO. DESYNCS
 
 func rec(body_tree: BodyTree):
 	

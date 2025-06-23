@@ -1,0 +1,28 @@
+[gd_resource type="RustBeingGenTemplate" script_class="BeingGenTemplate" load_steps=5 format=3 uid="uid://bcstlr7qtpu3t"]
+
+[ext_resource type="Script" uid="uid://cxgjpxndfrg4y" path="res://scripts/beings/sprites/spritedata.gd" id="1_7s88w"]
+[ext_resource type="Script" uid="uid://nkdjmrfrcmic" path="res://scripts/beings/sprites/bodyspritedata.gd" id="2_urqma"]
+[ext_resource type="BasicRace" uid="uid://dx7s13s3m2koy" path="res://resource_instances/beings/races/controllable/human.tres" id="3_6de8d"]
+[ext_resource type="Script" uid="uid://cxobg6ntpa8p7" path="res://scripts/beings/initialization/being_gen_template.gd" id="4_4npau"]
+
+[resource]
+mwhitelisted_tiles_for_spawning = Array[StringName]([&"grass"])
+script = ExtResource("4_4npau")
+mrace = ExtResource("3_6de8d")
+mklass_id = &"random"
+mname = "BGT_missingname"
+fallback_faction = &""
+mdisplay_being_name = false
+mbodies_distribution = Dictionary[ExtResource("1_7s88w"), float]({})
+mheads_distribution = Dictionary[ExtResource("2_urqma"), float]({})
+mav_followers_weighted_dist = Dictionary[StringName, float]({})
+max_followers_count = 1
+mav_raid_points_for_followers = -1
+mmales_ratio = -1.0
+mhealth_multiplier_range = Vector2(1, 1)
+mhead_scale_range = Vector2(1, 1)
+mbody_scale_range = Vector2(1, 1)
+mequipment_distribution = Dictionary[StringName, float]({})
+mloot_distribution = Dictionary[StringName, float]({})
+munit_raid_points = 100
+mdropped_xp_range = Vector2(10, 10)

@@ -1,31 +1,26 @@
-use godot::prelude::*;
+mod tiling;
+use godot::{prelude::*};
 
+mod utils;
 mod rust_tilemap;
-mod formation_generator;
-mod matrix;
-pub mod safevec;
-pub mod world_matrix;
-pub mod tile;
-
+mod formation_generation;
+mod beings;
 struct ArgentumExtension;
-
 #[gdextension]
-unsafe impl ExtensionLibrary for ArgentumExtension{}
-
-use godot::engine::Node2D;
-
-#[derive(GodotClass)]
-#[class(base=Node2D)]
-struct Test {
-    node2d: Base<Node2D>,
-}
-
-#[godot_api]
-impl INode2D for Test{
-
-    fn init(node2d: Base<Node2D>) -> Self {
-        godot_print!("hello");
-        Self { node2d }
+unsafe impl ExtensionLibrary for ArgentumExtension{
+   
+  fn on_level_init(_level: InitLevel) {
+    if _level == InitLevel::Scene{
+      let formatted_time = chrono::Local::now().format("%H:%M:%S").to_string();
+      godot_print!("{}: Rust module loaded", formatted_time);
     }
-    fn ready(&mut self) {}
+  }
+  fn on_level_deinit(level: InitLevel) {
+    if level == InitLevel::Scene {
+    }
 }
+}
+
+extern crate strum; // 0.10.0
+#[macro_use]
+extern crate strum_macros; // 0.10.0

@@ -1,11 +1,5 @@
-[gd_resource type="Tile" format=3 uid="uid://bbx8v2uao8fod"]
+[gd_resource type="Tile" format=3 uid="uid://dsj3n5ytfej0r"]
 
 [resource]
-id = &"grass"
-layer = 0
-source_atlas = 5
-origin_position = Vector2i(0, 0)
-flipped_at_random = false
-random_scale_range = Vector4(0, 0, 0, 0)
-modulo_tiling_area = Vector2i(16, 16)
-alt_id = 0
+msource_atlas = 0
+mmodulo_tiling_area = Vector2i(32, 32)

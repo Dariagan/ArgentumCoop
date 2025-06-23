@@ -1,0 +1,41 @@
+class_name Keys
+
+const NAME: StringName = &"mname"
+const SEX: StringName = &"msex"
+const RACE: StringName = &"mrace"
+const FACTION: StringName = &"mfaction"
+const PLAYER_FACTION_INSTANCE: StringName = &"player"
+const WILD_FACTION_INSTANCE: StringName = &"wild"
+const BEING_LEVEL: StringName = &"mlevel"
+
+const ID: StringName = &"mid"
+
+
+const KLASS: StringName = &"mklass"
+const FOLLOWERS: StringName = &"mfollowers"
+const HEAD_SCALE: StringName = &"mhead_scale"
+const BODY_SCALE: StringName = &"mbody_scale"
+const HEAD: StringName = &"mhead"
+const BODY: StringName = &"mbody"
+const HEALTH_MULTIP: StringName = &"mhealth_multiplier"
+const BEING_GEN_TEMPLATE: StringName = &"mbeing_gen_template"
+const CHOSEN_EXTRA_HEAD_SPRITES: StringName = &"mchosen_extra_head_sprites"
+const HARMABLE_BODY: StringName = &"mharmable_body"
+
+const PEACE_ORDER: StringName = &"mpeace_order"
+const COMBAT_ORDER: StringName = &"mcombat_order"
+
+const IDLE_DOWN: StringName = &"idle_down"
+const IDLE_UP: StringName =   &"idle_up"
+const IDLE_LEFT: StringName = &"idle_left"
+const IDLE_RIGHT: StringName =&"idle_right"
+const WALK_DOWN: StringName = &"walk_down"
+const WALK_UP: StringName =   &"walk_up"
+const WALK_LEFT: StringName = &"walk_left"
+const WALK_RIGHT: StringName =&"walk_right"
+const JOG_DOWN: StringName =  &"jog_down"
+const JOG_UP: StringName =    &"jog_up"
+const JOG_LEFT: StringName =  &"jog_left"
+const JOG_RIGHT: StringName = &"jog_right"
+
+const G_PORTALS_POI: StringName = &"portals_poi"

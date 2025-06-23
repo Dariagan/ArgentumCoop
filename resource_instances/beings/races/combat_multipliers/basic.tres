@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CombatMultipliers" load_steps=2 format=3 uid="uid://bnfqpjfvyyurv"]
+
+[ext_resource type="Script" uid="uid://firm1xvtgire" path="res://scripts/damage_health_system/combat_multipliers.gd" id="1_hhsrx"]
+
+[resource]
+script = ExtResource("1_hhsrx")
+health = 1.0
+speed = 1.0
+strength = 1.0
+stamina = 1.0
+sneaking_proficiency = 1.0
+incoming_damage_types = {
+"blunt": 1,
+"fire": 1,
+"magic": 1,
+"sharp": 1
+}
+war_cry_strength = 1.0
+metadata/_custom_type_script = ExtResource("1_hhsrx")

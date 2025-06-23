@@ -6,13 +6,11 @@ enum Invisibility { NONE, REMOVES, GIVES }
 
 # se aplica después de que se hayan aplicado armor reductions. la armor actual del atacado resta damage. 
 # la damage que quede tras la resta se aplica sobre el body del character
-@export var damages: Dictionary = {"sharp": 0, "blunt": 0, "fire": 0, "magic": 0}
-
+@export var damages: Dictionary[Enum.PierceType, float] = {Enum.PierceType.SHARP: 0, Enum.PierceType.BLUNT: 0, Enum.PierceType.FIRE: 0, Enum.PierceType.MAGIC: 0, Enum.PierceType.FROST: 0}
 
 # reducción de armor (no produce daño)
 @export_category("Armor Reduction")
-
-@export var armor_reductions: Dictionary = {"sharp": 0, "blunt": 0, "fire": 0, "magic": 0}
+@export var armor_reductions: Dictionary[Enum.PierceType, float] = {Enum.PierceType.SHARP: 0, Enum.PierceType.BLUNT: 0, Enum.PierceType.FIRE: 0, Enum.PierceType.MAGIC: 0, Enum.PierceType.FROST: 0}
 
 @export_category("Effects")
 
@@ -28,7 +26,7 @@ enum Invisibility { NONE, REMOVES, GIVES }
 @export_range(-15, 15) var speed: float
 
 #por ejemplo, dragones
-@export var damage_multipliers_vs_races: Dictionary
+@export var damage_multipliers_vs_races: Dictionary[StringName, float]
 
 @export_category("Lasting damage")
 
@@ -41,6 +39,3 @@ enum Invisibility { NONE, REMOVES, GIVES }
 @export var poison_duration: float
 
 @export_range(0, 1) var wound_infection_chance_increase: float
-
-
-
